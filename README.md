@@ -19,3 +19,5 @@
 + 可以自定义是否显示提取到的原文。
 <br/>
 ### 界面截图
+<br/>
+!(https://raw.githubusercontent.com/PantsuDango/Dango-Translator/master/git_image/1.png)
