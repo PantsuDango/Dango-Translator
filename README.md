@@ -23,7 +23,8 @@
 
 <h3>效果截图</h3>
 
-![翻译界面](https://raw.githubusercontent.com/PantsuDango/Dango-Translator/master/git_image/1.png)
-![设置界面](https://raw.githubusercontent.com/PantsuDango/Dango-Translator/master/git_image/2.png)
-![范围界面](https://raw.githubusercontent.com/PantsuDango/Dango-Translator/master/git_image/3.png)
+![](https://raw.githubusercontent.com/PantsuDango/Dango-Translator/master/git_image/1.png)
+![](https://raw.githubusercontent.com/PantsuDango/Dango-Translator/master/git_image/2.png)
+![](https://raw.githubusercontent.com/PantsuDango/Dango-Translator/master/git_image/3.png)
+![](https://raw.githubusercontent.com/PantsuDango/Dango-Translator/master/git_image/4.png)
 
