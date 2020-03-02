@@ -18,6 +18,4 @@
 + 能自定义自动翻译时的刷新频率（3-10秒）；
 + 可以自定义是否显示提取到的原文。
 <br/>
-### 界面截图
-<br/>
 ![image.png](https://upload-images.jianshu.io/upload_images/4273402-2c98304ba824df87.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
