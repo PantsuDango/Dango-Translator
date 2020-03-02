@@ -23,5 +23,4 @@
 
 <h3>效果截图</h3>
 
-
 ![image.png](https://raw.githubusercontent.com/PantsuDango/Dango-Translator/master/git_image/1.png)
