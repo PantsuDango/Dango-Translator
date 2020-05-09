@@ -1,169 +1,160 @@
-import tkinter
-from PIL import Image, ImageTk
-import os
-import UI
+import interface
 
-from PIL import ImageGrab
 import tkinter
 import tkinter.messagebox
+
+from os import startfile
+
+from PIL import Image, ImageTk, ImageGrab
 
 
 def get_Coordinates():
 
-    path = os.getcwd() + '\\config\\'
-    os.startfile(path+'获取屏幕坐标.exe')
+    startfile('.\\config\\获取屏幕坐标.exe')
 
 
-def get_image(X1,Y1,X2,Y2,path):
+def get_image(X1,Y1,X2,Y2):
     
-    x1 = int(X1.get(1.0,'end').replace('\n','').replace(' ',''))
-    y1 = int(Y1.get(1.0,'end').replace('\n','').replace(' ',''))
-    x2 = int(X2.get(1.0,'end').replace('\n','').replace(' ',''))
-    y2 = int(Y2.get(1.0,'end').replace('\n','').replace(' ',''))
+    x1 = X1.get(1.0,'end').replace('\n','').replace(' ','')
+    y1 = Y1.get(1.0,'end').replace('\n','').replace(' ','')
+    x2 = X2.get(1.0,'end').replace('\n','').replace(' ','')
+    y2 = Y2.get(1.0,'end').replace('\n','').replace(' ','')
 
     try:
-        bbox = (x1,y1,x2,y2)
+        bbox = (int(x1), int(y1), int(x2), int(y2))
         image = ImageGrab.grab(bbox)
-        image.save(path+'image.png')
-        os.startfile(path+'image.png')
+        image.save('.\\config\\image.png')
+        startfile('.\\config\\image.png')
     except Exception:
         tkinter.messagebox.showerror(title='error', message='坐标错误！')
 
 
-def Range_save(X1,Y1,X2,Y2,game_name,sign,path,Coordinates_window):
+def Range_save(X1,Y1,X2,Y2,game_name,sign,coordinates_window):
 
-    with open(path+'屏幕坐标.txt') as file:
-        string = file.read().split('\n')
+    x1 = X1.get(1.0,'end').replace(' ','').replace('\n','')
+    y1 = Y1.get(1.0,'end').replace(' ','').replace('\n','')
+    x2 = X2.get(1.0,'end').replace(' ','').replace('\n','')
+    y2 = Y2.get(1.0,'end').replace(' ','').replace('\n','')
+    game_name = game_name.get(1.0,'end').replace('\n','')
 
-    x1 = X1.get(1.0,'end').replace('\n','').replace(' ','').replace(',','')
-    y1 = Y1.get(1.0,'end').replace('\n','').replace(' ','').replace(',','')
-    x2 = X2.get(1.0,'end').replace('\n','').replace(' ','').replace(',','')
-    y2 = Y2.get(1.0,'end').replace('\n','').replace(' ','').replace(',','')
-    game_name = game_name.get(1.0,'end').replace('\n','').replace(',','，')
+    data = interface.get_config()
+    data['coordinate'][sign]['X1'] = x1
+    data['coordinate'][sign]['Y1'] = y1
+    data['coordinate'][sign]['X2'] = x2
+    data['coordinate'][sign]['Y2'] = y2
+    data['coordinate'][sign]['name'] = game_name
+    interface.save_config(data)
 
-    string[sign] = '%s,%s,%s,%s,%s'%(x1,y1,x2,y2,game_name)
-    string = '\n'.join(string)
-
-    with open(path+'屏幕坐标.txt', 'w') as file:
-        file.write(string)
-
-    Coordinates_window.destroy()
+    coordinates_window.destroy()
 
 
-def sure(path,var,Range_window):
+def sure(var,Range_window):
 
-    with open(path+'屏幕坐标.txt') as file:
-        string = file.read().split('\n')
-
-    string[0] = str(var.get())
-    string = '\n'.join(string)
-    with open(path+'屏幕坐标.txt', 'w') as file:
-        file.write(string)
+    data = interface.get_config()
+    data['coordinate']['Type'] = str(var.get())
+    interface.save_config(data)
 
     Range_window.destroy()
 
 
-def Coordinates_UI(path,sign):
+def coordinates_UI(sign,Range_window):
 
-    with open(path+'屏幕坐标.txt') as file:
-        string = file.read().split('\n')
-
-    if sign == 1:
+    Range_window.destroy()
+    
+    if sign == 'One':
         title = '坐标一设定'
-    elif sign == 2:
+    elif sign == 'Two':
         title = '坐标二设定'
-    elif sign == 3:
+    elif sign == 'Three':
         title = '坐标三设定'
-    elif sign == 4:
+    elif sign == 'Four':
         title = '坐标四设定'
 
-    Coordinates_window = tkinter.Tk()
-    Coordinates_window.wm_attributes('-topmost',1)
-    Coordinates_window.geometry('260x260')
-    Coordinates_window.iconbitmap(path+'图标.ico')
-    Coordinates_window.title(title)
-    Coordinates_window.resizable(0,0)
+    coordinates_window = tkinter.Tk()
+    coordinates_window.wm_attributes('-topmost',1)
+    interface.window_center(coordinates_window,260,260)
+    coordinates_window.iconbitmap('.\\config\\图标.ico')
+    coordinates_window.title(title)
+    #coordinates_window.resizable(0,0)
 
-    tkinter.Label(Coordinates_window , text='游戏名：').place(x=20, y=10, anchor='nw')
-    game_name = tkinter.Text(Coordinates_window, width=22, height=1)
+    tkinter.Label(coordinates_window , text='游戏名：').place(x=20, y=10, anchor='nw')
+    game_name = tkinter.Text(coordinates_window, width=22, height=1)
     game_name.place(x=75, y=14) 
 
 
-    tkinter.Label(Coordinates_window , text='文本框左上角坐标：').place(x=20, y=40, anchor='nw')
+    tkinter.Label(coordinates_window , text='文本框左上角坐标：').place(x=20, y=40, anchor='nw')
    
-    tkinter.Label(Coordinates_window , text='X1：').place(x=20, y=60, anchor='nw')
-    X1 = tkinter.Text(Coordinates_window, width=10, height=1)
+    tkinter.Label(coordinates_window , text='X1：').place(x=20, y=60, anchor='nw')
+    X1 = tkinter.Text(coordinates_window, width=10, height=1)
     X1.place(x=40, y=64)  
     
-    tkinter.Label(Coordinates_window , text='Y1：').place(x=130, y=60, anchor='nw')
-    Y1 = tkinter.Text(Coordinates_window, width=10, height=1)
+    tkinter.Label(coordinates_window , text='Y1：').place(x=130, y=60, anchor='nw')
+    Y1 = tkinter.Text(coordinates_window, width=10, height=1)
     Y1.place(x=160, y=64)
 
-    tkinter.Label(Coordinates_window , text='文本框右下角坐标：').place(x=20, y=90, anchor='nw')
+    tkinter.Label(coordinates_window , text='文本框右下角坐标：').place(x=20, y=90, anchor='nw')
     
-    tkinter.Label(Coordinates_window , text='X2：').place(x=20, y=110, anchor='nw')
-    X2 = tkinter.Text(Coordinates_window, width=10, height=1)
+    tkinter.Label(coordinates_window , text='X2：').place(x=20, y=110, anchor='nw')
+    X2 = tkinter.Text(coordinates_window, width=10, height=1)
     X2.place(x=40, y=114)
     
-    tkinter.Label(Coordinates_window , text='Y2：').place(x=130, y=110, anchor='nw')
-    Y2 = tkinter.Text(Coordinates_window, width=10, height=1)
+    tkinter.Label(coordinates_window , text='Y2：').place(x=130, y=110, anchor='nw')
+    Y2 = tkinter.Text(coordinates_window, width=10, height=1)
     Y2.place(x=160, y=114)
 
-    coordinates = string[sign].split(',')
-    X1.insert(0.0,coordinates[0])
-    Y1.insert(0.0,coordinates[1])
-    X2.insert(0.0,coordinates[2])
-    Y2.insert(0.0,coordinates[3])
-    game_name.insert(0.0,coordinates[4])
+    data = interface.get_config()['coordinate'][sign]
+    X1.insert(0.0,data['X1'])
+    Y1.insert(0.0,data['Y1'])
+    X2.insert(0.0,data['X2'])
+    Y2.insert(0.0,data['Y2'])
+    game_name.insert(0.0,data['name'])
 
-    tkinter.Label(Coordinates_window , text='*填入获取到的坐标值，保存后生效').place(x=20, y=140, anchor='nw')
+    tkinter.Label(coordinates_window , text='*填入获取到的坐标值，保存后生效').place(x=20, y=140, anchor='nw')
 
-    tkinter.Button(Coordinates_window, text="获取坐标", width=7, height=1, command=get_Coordinates).place(x=45, y=170, anchor='nw')
-    tkinter.Button(Coordinates_window, text="查看效果", width=7, height=1, command=lambda:get_image(X1,Y1,X2,Y2,path)).place(x=150, y=170, anchor='nw')
-    tkinter.Button(Coordinates_window, text="保存", width=7, height=1, command=lambda:Range_save(X1,Y1,X2,Y2,game_name,sign,path,Coordinates_window)).place(x=45, y=210, anchor='nw')
-    tkinter.Button(Coordinates_window, text="取消", width=7, height=1, command=Coordinates_window.destroy).place(x=150, y=210, anchor='nw')
+    tkinter.Button(coordinates_window, text="获取坐标", width=7, height=1, command=get_Coordinates).place(x=45, y=170, anchor='nw')
+    tkinter.Button(coordinates_window, text="查看效果", width=7, height=1, command=lambda:get_image(X1,Y1,X2,Y2)).place(x=150, y=170, anchor='nw')
+    tkinter.Button(coordinates_window, text="保存", width=7, height=1, command=lambda:Range_save(X1,Y1,X2,Y2,game_name,sign,coordinates_window)).place(x=45, y=210, anchor='nw')
+    tkinter.Button(coordinates_window, text="取消", width=7, height=1, command=coordinates_window.destroy).place(x=150, y=210, anchor='nw')
     
-    Coordinates_window.mainloop()
+    coordinates_window.mainloop()
+    range_UI()
 
 
-def Range_UI():
-
-    path = os.getcwd() + '\\config\\'
-    with open(path+'屏幕坐标.txt') as file:
-        string = file.read().split('\n')
+def range_UI():
 
     Range_window = tkinter.Tk()
     Range_window.wm_attributes('-topmost',1)
-    Range_window.geometry('260x270')
-    Range_window.iconbitmap(path+'图标.ico')
+    interface.window_center(Range_window,260,270)
+    Range_window.iconbitmap('.\\config\\图标.ico')
     Range_window.title('翻译范围设置')
-    Range_window.resizable(0,0)
+    #Range_window.resizable(0,0)
 
     frame = tkinter.Frame(Range_window).pack()
-    var = tkinter.IntVar()
-    var.set(int(string[0]))
+    var = tkinter.StringVar()
+    data = interface.get_config()
+    var.set(data['coordinate']['Type'])
     
     tkinter.Label(Range_window , text='选择要使用的坐标：').place(x=20, y=10, anchor='nw')
-    tkinter.Radiobutton(frame, text='使用坐标一', variable=var, value=1).place(x=20, y=40, anchor='nw')
-    tkinter.Button(Range_window, text="坐标一设定", width=10, height=1, command=lambda:Coordinates_UI(path,1)).place(x=150, y=40, anchor='nw')
+    tkinter.Radiobutton(frame, text='使用坐标一', variable=var, value='One').place(x=20, y=40, anchor='nw')
+    tkinter.Button(Range_window, text="坐标一设定", width=10, height=1, command=lambda:coordinates_UI('One',Range_window)).place(x=150, y=40, anchor='nw')
 
-    tkinter.Radiobutton(frame, text='使用坐标二', variable=var, value=2).place(x=20, y=80, anchor='nw')
-    tkinter.Button(Range_window, text="坐标二设定", width=10, height=1, command=lambda:Coordinates_UI(path,2)).place(x=150, y=80, anchor='nw')
+    tkinter.Radiobutton(frame, text='使用坐标二', variable=var, value='Two').place(x=20, y=80, anchor='nw')
+    tkinter.Button(Range_window, text="坐标二设定", width=10, height=1, command=lambda:coordinates_UI('Two',Range_window)).place(x=150, y=80, anchor='nw')
 
-    tkinter.Radiobutton(frame, text='使用坐标三', variable=var, value=3).place(x=20, y=120, anchor='nw')
-    tkinter.Button(Range_window, text="坐标三设定", width=10, height=1, command=lambda:Coordinates_UI(path,3)).place(x=150, y=120, anchor='nw')
+    tkinter.Radiobutton(frame, text='使用坐标三', variable=var, value='Three').place(x=20, y=120, anchor='nw')
+    tkinter.Button(Range_window, text="坐标三设定", width=10, height=1, command=lambda:coordinates_UI('Three',Range_window)).place(x=150, y=120, anchor='nw')
 
-    tkinter.Radiobutton(frame, text='使用坐标四', variable=var, value=4).place(x=20, y=160, anchor='nw')
-    tkinter.Button(Range_window, text="坐标四设定", width=10, height=1, command=lambda:Coordinates_UI(path,4)).place(x=150, y=160, anchor='nw')
+    tkinter.Radiobutton(frame, text='使用坐标四', variable=var, value='Four').place(x=20, y=160, anchor='nw')
+    tkinter.Button(Range_window, text="坐标四设定", width=10, height=1, command=lambda:coordinates_UI('Four',Range_window)).place(x=150, y=160, anchor='nw')
 
-    tkinter.Button(Range_window, text="确定", width=7, height=1, command=lambda:sure(path,var,Range_window)).place(x=45, y=210, anchor='nw')
+    tkinter.Button(Range_window, text="确定", width=7, height=1, command=lambda:sure(var,Range_window)).place(x=45, y=210, anchor='nw')
     tkinter.Button(Range_window, text="取消", width=7, height=1, command=Range_window.destroy).place(x=150, y=210, anchor='nw')
     
     Range_window.mainloop()
 
 
-def Range_main(window):
+def range_main(window):
     
     window.destroy()
-    Range_UI()
-    UI.UI_main()
+    range_UI()
+    interface.interface_main()
