@@ -66,6 +66,12 @@ def get_Access_Token():
     host = 'https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=%s&client_secret=%s'%(client_id, client_secret)
     try:
         response = requests.get(host)
+    
+    except TypeError:
+        print_exc()
+        MessageBox('文件路径错误', '请将翻译器目录的路径设置为纯英文\n否则无法在非简中区的电脑系统下运行使用')
+        return 0  # 返回失败标志
+    
     except Exception:
         print_exc()
         MessageBox('OCR错误', '啊咧... Σ(っ°Д°;)っ OCR连接失败惹 (つД`)\n请打开“网络和Internet设置”的代理页面\n将其中的全部代理设置开关都关掉呢 (˘•ω•˘)')
@@ -109,7 +115,7 @@ def baidu_orc(data):
     if not access_token:
         sentence = 'OCR连接失败：还未注册OCR API，不可使用'
         error_stop()
-        return None
+        return None, sentence
     else:
         if showTranslateRow == 'True' or highPrecision == 'True':
             request_url = "https://aip.baidubce.com/rest/2.0/ocr/v1/accurate_basic" # 高精度
@@ -124,29 +130,36 @@ def baidu_orc(data):
     
         try:
             response = requests.post(request_url, data=params, headers=headers)
+        
+        except TypeError:
+            print_exc()
+            sentence = '路径错误：请将翻译器目录的路径设置为纯英文，否则无法在非简中区的电脑系统下运行使用'
+            error_stop()
+            return None, sentence
+        
         except Exception:
             print_exc()
             sentence = 'OCR连接失败：请打开【网络和Internet设置】的【代理】页面，将其中的全部代理设置开关都关掉'
             error_stop()
-            return None
+            return None, sentence
         else:
             if response:
                 try:
                     words = response.json()['words_result']
                 except Exception:
-                    print_exc()
+                    print()
                     error_code = response.json()["error_code"]
                     error_msg = response.json()["error_msg"]
                 
                     if error_code == 6:
                         sentence = 'OCR错误：检查一下你的OCR注册网页，注册的类型是不是文字识别，你可能注册到语音技术还是其它什么奇怪的东西了'
                         error_stop()
-                        return None
+                        return None, sentence
 
                     elif error_code == 17:
                         sentence = 'OCR错误：OCR额度用光了，每天五万次的额度你是怎么用光的，是不是开着自动模式挂机呢？只有等明天再玩了'
                         error_stop()
-                        return None
+                        return None, sentence
 
                     elif error_code == 18:
                         baidu_orc(data)
@@ -154,32 +167,37 @@ def baidu_orc(data):
                     elif error_code == 111:
                         sentence = 'OCR错误：密钥过期了，请进入设置页面后按一次保存设置，以重新生成密钥'
                         error_stop()
+                        return None, sentence
                     
                     elif error_code == 216202:
                         sentence = 'OCR错误：范围截取过小无法识别，请重新框选一下你要翻译的区域'
                         error_stop()
-                        return None
+                        return None, sentence
                     
                     else:
                         sentence = 'OCR错误：%s，%s'%(error_code, error_msg)
                         error_stop()
-                        return None
+                        return None, sentence
                 
                 else:
                     sentence = ''
+                    
                     # 竖排翻译模式
                     if showTranslateRow == 'True':
-                        for word in words[::-1]:
-                            sentence += word['words'] + '，'
-                        sentence = sentence.replace(',','')
+                        if words:
+                            for word in words[::-1]:
+                                sentence += word['words'] + '，'
+                            sentence = sentence.replace(',','')
+                    
                     # 普通翻译模式
                     else:
                         for word in words:
                             sentence += word['words']
                     
-                    return sentence
+                    return True, sentence
             else:
-                return None
+                sentence = 'OCR错误：response无响应'
+                return None, sentence
 
 
 # 有道翻译
