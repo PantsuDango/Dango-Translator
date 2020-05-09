@@ -4,13 +4,14 @@ import requests
 import js2py
 import json
 import re
-
 from traceback import print_exc
 
 
-class WebFanyi():
+class BaiduWeb():
+    
     """百度翻译网页版爬虫"""
-    def __init__(self, query_str, data):
+    
+    def __init__(self, query_str):
         self.session = requests.session()
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36",
@@ -22,18 +23,25 @@ class WebFanyi():
         self.trans_url = "https://fanyi.baidu.com/v2transapi"
         self.query_str = query_str
 
+
     def get_token_gtk(self):
+        
         '''获取token和gtk(用于合成Sign)'''
+        
         self.session.get(self.root_url)
         resp = self.session.get(self.root_url)
         html_str = resp.content.decode()
         token = re.findall(r"token: '(.*?)'", html_str)[0]
         gtk = re.findall(r"window.gtk = '(.*?)'", html_str)[0]
+        
         return token,gtk
 
+
     def generate_sign(self,gtk):
+        
         """生成sign"""
         # 1. 准备js编译环境
+        
         context = js2py.EvalJs()
         with open('.\\config\\webtrans.js', encoding='utf8') as f:
             js_data = f.read()
@@ -42,25 +50,32 @@ class WebFanyi():
             # print(js_data)
             context.execute(js_data)
         sign = context.e(self.query_str)
+       
         return sign
 
+
     def lang_detect(self):
+        
         '''获取语言转换类型.eg: zh-->en'''
+        
         lang_resp = self.session.post(self.lang_url,data={"query":self.query_str})
         lang_json_str = lang_resp.content.decode()  # {"error":0,"msg":"success","lan":"zh"}
         lan = json.loads(lang_json_str)['lan']
         to = "en" if lan == "zh" else "zh"
+        
         return lan,to
 
 
     def parse_url(self,post_data):
+        
         trans_resp = self.session.post(self.trans_url,data=post_data)
         trans_json_str = trans_resp.content.decode()
         trans_json = json.loads(trans_json_str)
         self.result = trans_json["trans_result"]["data"][0]["dst"]
 
+
     def run(self):
-        
+
         try:
             """实现逻辑"""
             # 1.获取百度的cookie,(缺乏百度首页的cookie会始终报错998)
@@ -73,6 +88,7 @@ class WebFanyi():
             lan, to = self.lang_detect()
             # 5. 发送请求,获取响应,输出结果
             post_data = {
+                #"from": lan,
                 "from": lan,
                 "to": to,
                 "query": self.query_str,
@@ -82,13 +98,16 @@ class WebFanyi():
                 "token": token
             }
             self.parse_url(post_data)
+        
         except Exception:
             print_exc()
-            self.result = '百度翻译网页版：我抽风啦'
+            self.result = '网页百度：我抽风啦！'
+        
         return self.result
+
 
 if __name__ == '__main__':
     
-    webfanyi = WebFanyi('一歩ひくと见えてくる 何かの中にどっぷり浸かっていると何がなんだか分からなくなってしまうことがある。')
+    webfanyi = BaiduWeb('一歩ひくと见えてくる 何かの中にどっぷり浸かっていると何がなんだか分からなくなってしまうことがある。')
     a = webfanyi.run()
     print(a)
