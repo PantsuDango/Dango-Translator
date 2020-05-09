@@ -734,7 +734,7 @@ class SettinInterface(QWidget):
         self.Mysay_label = QtWidgets.QLabel(self.tab_5)
         self.Mysay_label.setGeometry(QtCore.QRect(40*self.rate, 10*self.rate, 281*self.rate, 141*self.rate))
         self.Mysay_label.setText("<html><head/><body><p>大家好，我是胖次团子 ❤\
-                                  </p><p>谢谢大家使用团子翻译器Ver3.2 ~\
+                                  </p><p>谢谢大家使用团子翻译器Ver3.3 ~\
                                   </p><p>软件是免费的，但是若能收到你的充电支持 ~\
                                   </p><p>我会非常开心的，这会是我后续更新的动力 ~\
                                   </p><p>联系方式 ———— QQ 394883561</p></body></html>")
@@ -772,14 +772,13 @@ class SettinInterface(QWidget):
         self.SaveButton = QtWidgets.QPushButton(self)
         self.SaveButton.setGeometry(QtCore.QRect(85*self.rate, 515*self.rate, 90*self.rate, 30*self.rate))
         self.SaveButton.setStyleSheet("background: rgba(255, 255, 255, 0.4);font: 12pt;")
-        self.SaveButton.clicked.connect(self.save_settin)
         self.SaveButton.setText("保存设置")
 
         # 设置返回按钮
         self.CancelButton = QtWidgets.QPushButton(self)
         self.CancelButton.setGeometry(QtCore.QRect(232*self.rate, 515*self.rate, 90*self.rate, 30*self.rate))
         self.CancelButton.setStyleSheet("background: rgba(255, 255, 255, 0.4);font: 12pt")
-        self.CancelButton.setText("返 回")
+        self.CancelButton.setText("退 出")
 
 
     def get_settin(self):  # 获取所有预设值

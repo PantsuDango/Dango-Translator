@@ -4,7 +4,6 @@ import execjs
 from playsound import playsound
 from traceback import print_exc
 import json
-
 from js2py import EvalJs
 
 
@@ -38,6 +37,9 @@ class Voice():
 
     def play_voice(self):
   
+        
+
+
         with open('.\\config\\settin.json') as file:
             data = json.load(file)
 
