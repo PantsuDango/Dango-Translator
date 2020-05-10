@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from API import baidu_orc, youdao, caiyun, jinshan, baidu, tencent
+from API import baidu_orc, youdao, caiyun, jinshan, yeekit, ALAPI, baidu, tencent
+from baidufanyi import WebFanyi
 
 from PIL import ImageGrab
 from skimage.measure import compare_ssim
@@ -23,8 +24,12 @@ def image_cut(data):
     y2 = data["range"]['Y2']
 
     screenSize = data["screenSize"]
-    if screenSize >= 1.5:
+    if  1.5 <= screenSize < 2.5:
     	bbox = (x1*2, y1*2, x2*2, y2*2)
+    elif 2.5 <= screenSize < 3.5:
+        bbox = (x1*3, y1*3, x2*3, y2*3)
+    elif 3.5 <= screenSize < 4.5:
+        bbox = (x1*4, y1*4, x2*4, y2*4)
     else:
     	bbox = (x1, y1, x2, y2)
     image = ImageGrab.grab(bbox)
@@ -59,8 +64,7 @@ def translate(window, data):
     
     if score < 0.99:
 
-        original = baidu_orc(window, data)
-        original = original.replace('\n','')
+        original = baidu_orc(data)
 
         if data["showClipboard"] == 'True':
             copy(original)
@@ -68,78 +72,61 @@ def translate(window, data):
         youdaoUse = data["youdaoUse"]
         caiyunUse = data["caiyunUse"]
         jinshanUse = data["jinshanUse"]
+        yeekitUse = data["yeekitUse"]
+        alapiUse = data["alapiUse"]
+        baiduwebUse = data["baiduwebUse"]
         baiduUse = data["baiduUse"]
         tencentUse = data["tencentUse"]
-        showOriginal = data["showOriginal"]
 
         if original:
             if youdaoUse == "True":
-                try:
-                    result_youdao = youdao(window, original)
-                except Exception:
-                    print_exc()
-                    result_youdao = ''
-                else:
-                    if result_youdao:
-                        result_youdao += "<br>"
+                result_youdao = youdao(original)
             else:
                 result_youdao = ''
 
             if caiyunUse == "True":
-                try:
-                    result_caiyun = caiyun(window, original)
-                except Exception:
-                    print_exc()
-                    result_caiyun = ''
-                else:
-                    if result_caiyun:
-                        result_caiyun += "<br>"
+                result_caiyun = caiyun(original)
             else:
                 result_caiyun = ''
         
             if jinshanUse == "True":
-                try:
-                    result_jinshan = jinshan(window, original)
-                except Exception:
-                    print_exc()
-                    result_jinshan = ''
-                else:
-                    if result_jinshan:
-                        result_jinshan += "<br>"
+                result_jinshan = jinshan(original)
             else:
                 result_jinshan = ''
 
+            if yeekitUse == "True":
+                result_yeekit = yeekit(original)
+            else:
+                result_yeekit = ''
+
+            if alapiUse == "True":
+                result_alapi = ALAPI(original)
+            else:
+                result_alapi = ''
+
+            if baiduwebUse == "True":
+                webfanyi = WebFanyi(original, data)
+                result_baiduweb = webfanyi.run()
+            else:
+                result_baiduweb = ''
+
             if baiduUse == "True":
-                try:
-                    result_baidu = baidu(window, original, data)
-                except Exception:
-                    print_exc()
-                    result_baidu = ''
-                else:
-                    if result_baidu:
-                        result_baidu += "<br>"
+                result_baidu = baidu(original, data)
             else:
                 result_baidu = ''
 
             if tencentUse == "True":
-                try:
-                    result_tencent = tencent(window, original, data)
-                except Exception:
-                    print_exc()
-                    result_tencent = ''
-                else:
-                    if result_tencent:
-                        result_tencent += "<br>"
+                result_tencent = tencent(original, data)
             else:
                 result_tencent = ''
-
-            if showOriginal != "True":
-                original = ''
 
         else:
             result_youdao = ''
             result_caiyun = ''
             result_jinshan = ''
+            result_yeekit = ''
+            result_alapi = ''
+            result_baiduweb = ''
             result_baidu = ''
             result_tencent = ''
             original = ''
@@ -147,10 +134,13 @@ def translate(window, data):
         result_youdao = ''
         result_caiyun = ''
         result_jinshan = ''
+        result_yeekit = ''
+        result_alapi = ''
+        result_baiduweb = ''
         result_baidu = ''
         result_tencent = ''
         original = ''
 
-    result = (result_youdao, result_caiyun, result_jinshan, result_baidu, result_tencent, original)
+    result = (result_youdao, result_caiyun, result_jinshan, result_yeekit, result_alapi, result_baiduweb, result_baidu, result_tencent, original)
     
     return result
