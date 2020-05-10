@@ -9,9 +9,14 @@ from PyQt5.QtWebEngineWidgets import *
 from Init import MainInterface
 from Settin import SettinInterface
 from Range import WScreenShot
-from API import message_thread, message
+from API import message_thread
+from ScreenRate import get_screen_rate
+
 import json
 from system_hotkey import SystemHotkey
+
+import qtawesome
+from traceback import print_exc
 
 
 def change_horizontal(Init):
@@ -20,55 +25,80 @@ def change_horizontal(Init):
         data = json.load(file)
 
     horizontal = (data["horizontal"]) / 100
-    Init.translateText.setStyleSheet("border-width:0;border-style:outset;border-top:0px solid #e8f3f9;background-color:rgba(62, 62, 62, {}); color:#FF69B4".format(horizontal))
-    
-    translateMode = data["translateMode"]
-    if translateMode == "auto":
-        if data["sign"] % 2 == 0:
-            Init.StartButton.setText("停止")
-        else:
-            Init.StartButton.setText("开始")
-    else:
-        Init.StartButton.setText("翻译")
+    if horizontal == 0:
+        horizontal = 0.01
+    Init.translateText.setStyleSheet("border-width:0;\
+                                          border-style:outset;\
+                                          border-top:0px solid #e8f3f9;\
+                                          color:white;\
+                                          font-weight: bold;\
+                                          background-color:rgba(62, 62, 62, %s)"
+                                          %(horizontal))
 
     showHotKey = data["showHotKey"]
-    showHotKeyValue = data["showHotKeyValue"]
+    showHotKeyValue1 = data["showHotKeyValue1"]
+    showHotKeyValue2 = data["showHotKeyValue2"]
     if showHotKey == "True":
+        try:
             Init.hk_start = SystemHotkey()
-            Init.hk_start.register(('alt', showHotKeyValue), callback=lambda x:Init.send_key_event("start"))
+            Init.hk_start.register((showHotKeyValue1, showHotKeyValue2), callback=lambda x:Init.send_key_event("start"))
+        except Exception:
+                print_exc()
 
     Init.show()
 
 
 def stopWarning_settin(Init, Settin):
 
-    with open('.\\config\\settin.json') as file:
-        data = json.load(file)
+    if Init.mode == True:
+        with open('.\\config\\settin.json') as file:
+            data = json.load(file)
+            data["sign"] = 1
+        with open('.\\config\\settin.json','w') as file:
+            json.dump(data, file)
+        Init.StartButton.setIcon(qtawesome.icon('fa.play', color='white'))
 
-    if data["sign"] % 2 == 0:
-        message_thread(message, "这是来自团子的警告", "不先停止自动模式，不许你点设置 (╬◣д◢)")
-    else:
-        Init.close()
-        Settin.show()
+    Init.close()
+    Settin.tabWidget.setCurrentIndex(0)
+    Settin.show()
 
 
 def stopWarning_range(Init, Range):
 
-    with open('.\\config\\settin.json') as file:
-        data = json.load(file)
+    if Init.mode == True:
+        with open('.\\config\\settin.json') as file:
+            data = json.load(file)
+            data["sign"] = 1
+        with open('.\\config\\settin.json','w') as file:
+            json.dump(data, file)
+        Init.StartButton.setIcon(qtawesome.icon('fa.play', color='white'))
+    
+    Range.show()
+    Init.show()
 
-    if data["sign"] % 2 == 0:
-        message_thread(message, "这是来自团子的警告", "不先停止自动模式，不许你点范围 (╬◣д◢)")
-    else:
-        Range.show()
-        Init.show()
+
+def stopWarning_Battery(Init, Settin):
+
+    if Init.mode == True:
+        with open('.\\config\\settin.json') as file:
+            data = json.load(file)
+            data["sign"] = 1
+        with open('.\\config\\settin.json','w') as file:
+            json.dump(data, file)
+        Init.StartButton.setIcon(qtawesome.icon('fa.play', color='white'))
+    
+    Init.close()
+    Settin.tabWidget.setCurrentIndex(4)
+    Settin.show()
 
 
 def main():
   
+    message_thread(get_screen_rate)
+    
     with open('.\\config\\settin.json') as file:
         data = json.load(file)
-    data["sign"] = 1
+        data["sign"] = 1
     with open('.\\config\\settin.json','w') as file:
         json.dump(data, file)
 
@@ -85,6 +115,9 @@ def main():
     
     Settin.CancelButton.clicked.connect(Settin.close)
     Settin.CancelButton.clicked.connect(lambda:change_horizontal(Init))
+
+    Init.BatteryButton.clicked.connect(lambda:stopWarning_Battery(Init, Settin))
+
 
     App.exit(App.exec_())
 
