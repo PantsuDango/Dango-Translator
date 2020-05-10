@@ -749,12 +749,10 @@ class SettinInterface(QWidget):
         # 放置微信收款图片
         self.WechatImage_label = QtWidgets.QLabel(self.tab_5)
         self.WechatImage_label.setGeometry(QtCore.QRect(20*self.rate, 240*self.rate, 170*self.rate, 170*self.rate))
-        self.WechatImage_label.setStyleSheet("border-image: url(:/image/weixin.jpg);")
 
         # 放置支付宝收款图片
         self.AlipayImage_label = QtWidgets.QLabel(self.tab_5)
         self.AlipayImage_label.setGeometry(QtCore.QRect(215*self.rate, 240*self.rate, 170*self.rate, 170*self.rate))
-        self.AlipayImage_label.setStyleSheet("border-image: url(:/image/zhifubao.jpg);")
 
         # 微信充电标签
         self.Wechat_label = QtWidgets.QLabel(self.tab_5)
