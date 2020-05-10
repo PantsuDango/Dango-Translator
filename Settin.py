@@ -11,10 +11,8 @@ import json
 import webbrowser
 from os import startfile
 
-from API import get_Access_Token, MessageBox
-from ScreenRate import get_screen_rate
-
-from traceback import print_exc
+from API import get_Access_Token
+from API import message_thread, message
 
 
 def register_OCR():
@@ -49,734 +47,922 @@ def register_tencent():
     except Exception:
         pass
 
-
-def register_caiyun():
-
-    try:
-        startfile('.\\各种API注册教程\\彩云翻译API注册方法.docx')
-    except Exception:
-        pass
-
-
 def select_tencent():
     
     url = 'https://console.cloud.tencent.com/tmt'
     try:
         webbrowser.open(url, new=0, autoraise=True)
     except Exception:
-        pass
-
-
-def select_caiyun():
-    
-    url = 'https://dashboard.caiyunapp.com/v1/token/5e818320d4b84b00d29a9316/stats/?type=2'
-    try:
-        webbrowser.open(url, new=0, autoraise=True)
-    except Exception:
-        pass
+        pass   
 
 
 class SettinInterface(QWidget):
 
-    def __init__(self, screen_scale_rate):
+    def __init__(self):
         
         super(SettinInterface, self).__init__()
-        
-        if 1.01 <= screen_scale_rate <= 1.49:
-            self.rate = 1.25
-            self.px = 80
-            self.image_sign = 2
-        else:
-            self.rate = 1
-            self.px = 75
-            self.image_sign = 1
-        
         self.get_settin()
         self.setupUi()
     
 
     def setupUi(self):
 
-        # 窗口尺寸及不可拉伸
-        self.resize(404*self.rate, 576*self.rate)
-        self.setMinimumSize(QtCore.QSize(404*self.rate, 576*self.rate))
-        self.setMaximumSize(QtCore.QSize(404*self.rate, 576*self.rate))
-        self.setWindowFlags(QtCore.Qt.WindowMinimizeButtonHint)
-
-        # 窗口标题
-        self.setWindowTitle("团子翻译器 Ver3.2 - 设置")
-
-        # 窗口样式
-        self.setStyleSheet("QWidget {""font: 10pt \"华康方圆体W7\";"
-                                      "background-image: url(./config/Background%d.jpg);"
-                                      "background-repeat: no-repeat;"
-                                      "background-size:cover;""}"%self.image_sign)
-        
-        # 窗口图标
-        self.icon = QtGui.QIcon()
-        self.icon.addPixmap(QtGui.QPixmap("./config/图标.ico"), QtGui.QIcon.Normal, QtGui.QIcon.On)
-        self.setWindowIcon(self.icon)
-
-        # 鼠标样式
-        self.pixmap = QPixmap('.\\config\\光标.png')
-        self.cursor = QCursor(self.pixmap, 0, 0)
-        self.setCursor(self.cursor)
-        
-        # 顶部工具栏
+        self.setObjectName("SettinInterface")
+        self.resize(406, 476)
+        self.setMinimumSize(QtCore.QSize(406, 476))
+        self.setMaximumSize(QtCore.QSize(406, 476))
+        font = QtGui.QFont()
+        font.setFamily("华康方圆体W7")
+        font.setPointSize(12)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.setFont(font)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(":/image/图标.ico"), QtGui.QIcon.Normal, QtGui.QIcon.On)
+        self.setWindowIcon(icon)
+        self.setWindowOpacity(1.0)
         self.tabWidget = QtWidgets.QTabWidget(self)
-        self.tabWidget.setGeometry(QtCore.QRect(-2, 0, 410*self.rate, 580*self.rate))
-        self.tabWidget.setCurrentIndex(0)
-
-        # 工具栏样式
-        self.tabWidget.setStyleSheet("QTabBar::tab {""min-width:%dpx;"
-                                                     "background: rgba(255, 255, 255, 1);"
-                                                     "}"
-                                     "QTabBar::tab:selected {""border-bottom: 2px solid #4796f0;""}"
-                                     "QLabel{""background: transparent;""}"
-                                     "QCheckBox{""background: transparent;""}"%(self.px)
-                                     )
-
+        self.tabWidget.setGeometry(QtCore.QRect(0, 0, 408, 478))
+        font = QtGui.QFont()
+        font.setFamily("华康方圆体W7")
+        font.setPointSize(10)
         
-        # 工具栏1
+        self.tabWidget.setFont(font)
+        self.tabWidget.setStyleSheet("background-image: url(Background.jpg); background-repeat: no-repeat;font: 10pt \"华康方圆体W7\"; border-width:0;")
+        self.tabWidget.setObjectName("tabWidget")
+        
         self.tab_1 = QtWidgets.QWidget()
-        self.tabWidget.addTab(self.tab_1, "")
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_1), "API设定")
-
-        # 此Label用于雾化工具栏1的背景图
-        self.bgImage1 = QLabel(self.tab_1)
-        self.bgImage1.setGeometry(QRect(0, 0, 408*self.rate, 578*self.rate))
-        self.bgImage1.setStyleSheet("background: rgba(255, 255, 255, 0.3);")
+        self.tab_1.setObjectName("tab_1")
         
-        # OCR API标签
-        self.OCR_label_1 = QtWidgets.QLabel(self.tab_1)
-        self.OCR_label_1.setGeometry(QtCore.QRect(20*self.rate, 20*self.rate, 340*self.rate, 16*self.rate))
-        self.OCR_label_1.setText("<font color=red>（必填）</font><font >OCR API：用于识别要翻译的文字</font>")
-
-        # OCR API Key输入框
         self.OCR_Key_Text = QtWidgets.QTextEdit(self.tab_1)
-        self.OCR_Key_Text.setGeometry(QtCore.QRect(30*self.rate, 45*self.rate, 330*self.rate, 22*self.rate))
-        self.OCR_Key_Text.setStyleSheet("QTextEdit {""background: transparent;"
-                                                     "border-width:0; border-style:outset;"
-                                                     "border-bottom: 2px solid #92a8d1;""}"
-                                        "QTextEdit:focus {""border-bottom: 2px dashed #9265d1;""}")
-        self.OCR_Key_Text.setPlaceholderText("OCR API Key")
+        self.OCR_Key_Text.setGeometry(QtCore.QRect(110, 45, 250, 20))
+        font = QtGui.QFont()
+        font.setFamily("华康方圆体W7")
+        font.setPointSize(10)
+        self.OCR_Key_Text.setFont(font)
+        self.OCR_Key_Text.setEnabled(True)
+        self.OCR_Key_Text.setStyleSheet("background: transparent;")
         self.OCR_Key_Text.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.OCR_Key_Text.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.OCR_Key_Text.setPlainText(self.OCR_Key)
-
-        # OCR API Key输入框右侧红点标签
-        self.OCR_label_4 = QtWidgets.QLabel(self.tab_1)
-        self.OCR_label_4.setGeometry(QtCore.QRect(370*self.rate, 50*self.rate, 16*self.rate, 16*self.rate))
-        self.OCR_label_4.setStyleSheet("color: #f00000")
-        self.OCR_label_4.setText("*")
-
-        # OCR API Secret输入框
+        self.OCR_Key_Text.setObjectName("OCR_Key_Text")
+        
+        self.OCR_label_1 = QtWidgets.QLabel(self.tab_1)
+        self.OCR_label_1.setGeometry(QtCore.QRect(20, 20, 261, 16))
+        font = QtGui.QFont()
+        font.setFamily("华康方圆体W7")
+        font.setPointSize(10)
+        font.setBold(False)
+        font.setWeight(50)
+        self.OCR_label_1.setFont(font)
+        self.OCR_label_1.setStyleSheet("background: transparent;")
+        self.OCR_label_1.setObjectName("OCR_label_1")
         self.OCR_Secret_Text = QtWidgets.QTextEdit(self.tab_1)
-        self.OCR_Secret_Text.setGeometry(QtCore.QRect(30*self.rate, 70*self.rate, 330*self.rate, 22*self.rate))
-        self.OCR_Secret_Text.setStyleSheet("QTextEdit {""background: transparent;"
-                                                     "border-width:0; border-style:outset;"
-                                                     "border-bottom: 2px solid #92a8d1;""}"
-                                           "QTextEdit:focus {""border-bottom: 2px dashed #9265d1;""}")
-        self.OCR_Secret_Text.setPlaceholderText("OCR API Secret")
+        self.OCR_Secret_Text.setGeometry(QtCore.QRect(110, 70, 250, 20))
+        font = QtGui.QFont()
+        font.setFamily("华康方圆体W7")
+        font.setPointSize(10)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.OCR_Secret_Text.setFont(font)
+        self.OCR_Secret_Text.setAcceptDrops(True)
+        self.OCR_Secret_Text.setAutoFillBackground(False)
+        self.OCR_Secret_Text.setStyleSheet("background: transparent;")
         self.OCR_Secret_Text.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.OCR_Secret_Text.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.OCR_Secret_Text.setPlainText(self.OCR_Secret)
-
-        # OCR API Secret输入框右侧红点标签
+        self.OCR_Secret_Text.setObjectName("OCR_Secret_Text")
+        self.OCR_label_2 = QtWidgets.QLabel(self.tab_1)
+        self.OCR_label_2.setGeometry(QtCore.QRect(70, 45, 31, 16))
+        font = QtGui.QFont()
+        font.setFamily("华康方圆体W7")
+        font.setPointSize(10)
+        self.OCR_label_2.setFont(font)
+        self.OCR_label_2.setStyleSheet("background: transparent;")
+        self.OCR_label_2.setObjectName("OCR_label_2")
+        self.OCR_label_3 = QtWidgets.QLabel(self.tab_1)
+        self.OCR_label_3.setGeometry(QtCore.QRect(20, 70, 91, 16))
+        font = QtGui.QFont()
+        font.setFamily("华康方圆体W7")
+        font.setPointSize(10)
+        self.OCR_label_3.setFont(font)
+        self.OCR_label_3.setStyleSheet("background: transparent;")
+        self.OCR_label_3.setObjectName("OCR_label_3")
+        self.OCR_label_4 = QtWidgets.QLabel(self.tab_1)
+        self.OCR_label_4.setGeometry(QtCore.QRect(370, 50, 16, 16))
+        font = QtGui.QFont()
+        font.setFamily("华康方圆体W7")
+        font.setPointSize(10)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.OCR_label_4.setFont(font)
+        self.OCR_label_4.setStyleSheet("background: transparent;color: rgb(255, 0, 0);")
+        self.OCR_label_4.setObjectName("OCR_label_4")
         self.OCR_label_5 = QtWidgets.QLabel(self.tab_1)
-        self.OCR_label_5.setGeometry(QtCore.QRect(370*self.rate, 75*self.rate, 16*self.rate, 16*self.rate))
-        self.OCR_label_5.setStyleSheet("color: #f00000")
-        self.OCR_label_5.setText("*")
+        self.OCR_label_5.setGeometry(QtCore.QRect(370, 75, 16, 16))
+        font = QtGui.QFont()
+        font.setFamily("华康方圆体W7")
+        font.setPointSize(10)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.OCR_label_5.setFont(font)
+        self.OCR_label_5.setStyleSheet("background: transparent;color: rgb(255, 0, 0);")
+        self.OCR_label_5.setObjectName("OCR_label_5")
         
-        # 注册OCR API按钮
         self.OCRRegister_Button = QtWidgets.QPushButton(self.tab_1)
-        self.OCRRegister_Button.setGeometry(QtCore.QRect(160*self.rate, 95*self.rate, 80*self.rate, 30*self.rate))
-        self.OCRRegister_Button.setStyleSheet("background: rgba(255, 255, 255, 0.4);")
+        self.OCRRegister_Button.setGeometry(QtCore.QRect(160, 95, 80, 30))
+        font = QtGui.QFont()
+        font.setFamily("华康方圆体W7")
+        font.setPointSize(10)
+        self.OCRRegister_Button.setFont(font)
+        self.OCRRegister_Button.setStyleSheet("background-image: url(:/image/Wechat.png);")
+        self.OCRRegister_Button.setObjectName("OCRRegister_Button")
         self.OCRRegister_Button.clicked.connect(register_OCR)
-        self.OCRRegister_Button.setText("注册OCR")
         
-        # 百度翻译API标签
         self.baiduAPI_label_1 = QtWidgets.QLabel(self.tab_1)
-        self.baiduAPI_label_1.setGeometry(QtCore.QRect(20*self.rate, 140*self.rate, 281*self.rate, 16*self.rate))
-        self.baiduAPI_label_1.setText("（选填）百度翻译 API：每月额度200万字符")
-        
-        # 百度翻译API APP ID输入框
+        self.baiduAPI_label_1.setGeometry(QtCore.QRect(20, 140, 281, 16))
+        font = QtGui.QFont()
+        font.setFamily("华康方圆体W7")
+        font.setPointSize(10)
+        font.setBold(False)
+        font.setWeight(50)
+        self.baiduAPI_label_1.setFont(font)
+        self.baiduAPI_label_1.setStyleSheet("background: transparent;")
+        self.baiduAPI_label_1.setObjectName("baiduAPI_label_1")
+        self.baiduAPI_label_2 = QtWidgets.QLabel(self.tab_1)
+        self.baiduAPI_label_2.setGeometry(QtCore.QRect(50, 165, 50, 20))
+        font = QtGui.QFont()
+        font.setFamily("华康方圆体W7")
+        font.setPointSize(10)
+        self.baiduAPI_label_2.setFont(font)
+        self.baiduAPI_label_2.setStyleSheet("background: transparent;")
+        self.baiduAPI_label_2.setObjectName("baiduAPI_label_2")
+        self.baiduAPI_label_3 = QtWidgets.QLabel(self.tab_1)
+        self.baiduAPI_label_3.setGeometry(QtCore.QRect(63, 190, 41, 16))
+        font = QtGui.QFont()
+        font.setFamily("华康方圆体W7")
+        font.setPointSize(10)
+        self.baiduAPI_label_3.setFont(font)
+        self.baiduAPI_label_3.setStyleSheet("background: transparent;")
+        self.baiduAPI_label_3.setObjectName("baiduAPI_label_3")
         self.baidu_Key_Text = QtWidgets.QTextEdit(self.tab_1)
-        self.baidu_Key_Text.setGeometry(QtCore.QRect(30*self.rate, 165*self.rate, 330*self.rate, 22*self.rate))
-        self.baidu_Key_Text.setStyleSheet("QTextEdit {""background: transparent;"
-                                                     "border-width:0; border-style:outset;"
-                                                     "border-bottom: 2px solid #92a8d1;""}"
-                                          "QTextEdit:focus {""border-bottom: 2px dashed #9265d1;""}")
-        self.baidu_Key_Text.setPlaceholderText("百度翻译API APP ID")
+        self.baidu_Key_Text.setGeometry(QtCore.QRect(110, 165, 250, 20))
+        font = QtGui.QFont()
+        font.setFamily("华康方圆体W7")
+        font.setPointSize(10)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.baidu_Key_Text.setFont(font)
+        self.baidu_Key_Text.setAcceptDrops(True)
+        self.baidu_Key_Text.setAutoFillBackground(False)
+        self.baidu_Key_Text.setStyleSheet("background: transparent;")
         self.baidu_Key_Text.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.baidu_Key_Text.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.baidu_Key_Text.setPlainText(self.baidu_Key)
-
-        # 百度翻译API 密钥输入框
+        self.baidu_Key_Text.setObjectName("baidu_Key_Text")
         self.baidu_Secret_Text = QtWidgets.QTextEdit(self.tab_1)
-        self.baidu_Secret_Text.setGeometry(QtCore.QRect(30*self.rate, 190*self.rate, 330*self.rate, 22*self.rate))
-        self.baidu_Secret_Text.setStyleSheet("QTextEdit {""background: transparent;"
-                                                     "border-width:0; border-style:outset;"
-                                                     "border-bottom: 2px solid #92a8d1;""}"
-                                             "QTextEdit:focus {""border-bottom: 2px dashed #9265d1;""}")
-        self.baidu_Secret_Text.setPlaceholderText("百度翻译API 密钥")
+        self.baidu_Secret_Text.setGeometry(QtCore.QRect(110, 190, 250, 20))
+        font = QtGui.QFont()
+        font.setFamily("华康方圆体W7")
+        font.setPointSize(10)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.baidu_Secret_Text.setFont(font)
+        self.baidu_Secret_Text.setAcceptDrops(True)
+        self.baidu_Secret_Text.setAutoFillBackground(False)
+        self.baidu_Secret_Text.setStyleSheet("background: transparent;")
         self.baidu_Secret_Text.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.baidu_Secret_Text.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.baidu_Secret_Text.setPlainText(self.baidu_Secret)
-
-        # 百度翻译API注册按钮
+        self.baidu_Secret_Text.setObjectName("baidu_Secret_Text")
+        
         self.baiduRegister_Button = QtWidgets.QPushButton(self.tab_1)
-        self.baiduRegister_Button.setGeometry(QtCore.QRect(90*self.rate, 220*self.rate, 80*self.rate, 30*self.rate))
-        self.baiduRegister_Button.setStyleSheet("background: rgba(255, 255, 255, 0.4);")
+        self.baiduRegister_Button.setGeometry(QtCore.QRect(90, 220, 80, 30))
+        font = QtGui.QFont()
+        font.setFamily("华康方圆体W7")
+        font.setPointSize(10)
+        self.baiduRegister_Button.setFont(font)
+        self.baiduRegister_Button.setStyleSheet("background-image: url(:/image/Wechat.png);")
+        self.baiduRegister_Button.setObjectName("baiduRegister_Button")
         self.baiduRegister_Button.clicked.connect(register_baidu)
-        self.baiduRegister_Button.setText("注册百度")
 
-        # 百度翻译API额度查询按钮
         self.baiduSelect_Button = QtWidgets.QPushButton(self.tab_1)
-        self.baiduSelect_Button.setGeometry(QtCore.QRect(237*self.rate, 220*self.rate, 80*self.rate, 30*self.rate))
-        self.baiduSelect_Button.setStyleSheet("background: rgba(255, 255, 255, 0.4);")
+        self.baiduSelect_Button.setGeometry(QtCore.QRect(237, 220, 80, 30))
+        font = QtGui.QFont()
+        font.setFamily("华康方圆体W7")
+        font.setPointSize(10)
+        self.baiduSelect_Button.setFont(font)
+        self.baiduSelect_Button.setStyleSheet("background-image: url(:/image/Wechat.png);")
+        self.baiduSelect_Button.setObjectName("baiduSelect_Button")
         self.baiduSelect_Button.clicked.connect(select_baidu)
-        self.baiduSelect_Button.setText("额度查询")
-
-        # 腾讯翻译API标签
+        
         self.TencentAPI_laber_1 = QtWidgets.QLabel(self.tab_1)
-        self.TencentAPI_laber_1.setGeometry(QtCore.QRect(20*self.rate, 260*self.rate, 281*self.rate, 16*self.rate))
-        self.TencentAPI_laber_1.setText("（选填）腾讯翻译 API：每月额度500万字符")
-
-        # 腾讯翻译API Secretld输入框
+        self.TencentAPI_laber_1.setGeometry(QtCore.QRect(20, 260, 281, 16))
+        font = QtGui.QFont()
+        font.setFamily("华康方圆体W7")
+        font.setPointSize(10)
+        font.setBold(False)
+        font.setWeight(50)
+        self.TencentAPI_laber_1.setFont(font)
+        self.TencentAPI_laber_1.setStyleSheet("background: transparent;")
+        self.TencentAPI_laber_1.setObjectName("TencentAPI_laber_1")
+        self.TencentAPI_laber_2 = QtWidgets.QLabel(self.tab_1)
+        self.TencentAPI_laber_2.setGeometry(QtCore.QRect(35, 285, 71, 20))
+        font = QtGui.QFont()
+        font.setFamily("华康方圆体W7")
+        font.setPointSize(10)
+        self.TencentAPI_laber_2.setFont(font)
+        self.TencentAPI_laber_2.setStyleSheet("background: transparent;")
+        self.TencentAPI_laber_2.setObjectName("TencentAPI_laber_2")
+        self.TencentAPI_laber_3 = QtWidgets.QLabel(self.tab_1)
+        self.TencentAPI_laber_3.setGeometry(QtCore.QRect(28, 310, 71, 20))
+        font = QtGui.QFont()
+        font.setFamily("华康方圆体W7")
+        font.setPointSize(10)
+        self.TencentAPI_laber_3.setFont(font)
+        self.TencentAPI_laber_3.setStyleSheet("background: transparent;")
+        self.TencentAPI_laber_3.setObjectName("TencentAPI_laber_3")
         self.tencent_Key_Text = QtWidgets.QTextEdit(self.tab_1)
-        self.tencent_Key_Text.setGeometry(QtCore.QRect(30*self.rate, 285*self.rate, 330*self.rate, 22*self.rate))
-        self.tencent_Key_Text.setStyleSheet("QTextEdit {""background: transparent;"
-                                                     "border-width:0; border-style:outset;"
-                                                     "border-bottom: 2px solid #92a8d1;""}"
-                                            "QTextEdit:focus {""border-bottom: 2px dashed #9265d1;""}")
-        self.tencent_Key_Text.setPlaceholderText("腾讯翻译API Secretld")
+        self.tencent_Key_Text.setGeometry(QtCore.QRect(110, 285, 250, 20))
+        font = QtGui.QFont()
+        font.setFamily("华康方圆体W7")
+        font.setPointSize(10)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.tencent_Key_Text.setFont(font)
+        self.tencent_Key_Text.setAcceptDrops(True)
+        self.tencent_Key_Text.setAutoFillBackground(False)
+        self.tencent_Key_Text.setStyleSheet("background: transparent;")
         self.tencent_Key_Text.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.tencent_Key_Text.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.tencent_Key_Text.setPlainText(self.tencent_Key)
-        
-        # 腾讯翻译API SecretKey输入框
+        self.tencent_Key_Text.setObjectName("tencent_Key_Text")
         self.tencent_Secret_Text = QtWidgets.QTextEdit(self.tab_1)
-        self.tencent_Secret_Text.setGeometry(QtCore.QRect(30*self.rate, 310*self.rate, 330*self.rate, 22*self.rate))
-        self.tencent_Secret_Text.setStyleSheet("QTextEdit {""background: transparent;"
-                                                     "border-width:0; border-style:outset;"
-                                                     "border-bottom: 2px solid #92a8d1;""}"
-                                               "QTextEdit:focus {""border-bottom: 2px dashed #9265d1;""}")
-        self.tencent_Secret_Text.setPlaceholderText("腾讯翻译API SecretKey")
+        self.tencent_Secret_Text.setGeometry(QtCore.QRect(110, 310, 250, 20))
+        font = QtGui.QFont()
+        font.setFamily("华康方圆体W7")
+        font.setPointSize(10)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.tencent_Secret_Text.setFont(font)
+        self.tencent_Secret_Text.setAcceptDrops(True)
+        self.tencent_Secret_Text.setAutoFillBackground(False)
+        self.tencent_Secret_Text.setStyleSheet("background: transparent;")
         self.tencent_Secret_Text.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.tencent_Secret_Text.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.tencent_Secret_Text.setPlainText(self.tencent_Secret)
+        self.tencent_Secret_Text.setObjectName("tencent_Secret_Text")
+        
+        self.tencentSelect_Button_2 = QtWidgets.QPushButton(self.tab_1)
+        self.tencentSelect_Button_2.setGeometry(QtCore.QRect(90, 340, 80, 30))
+        font = QtGui.QFont()
+        font.setFamily("华康方圆体W7")
+        font.setPointSize(10)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.tencentSelect_Button_2.setFont(font)
+        self.tencentSelect_Button_2.setStyleSheet("background-image: url(:/image/Wechat.png);")
+        self.tencentSelect_Button_2.setObjectName("tencentSelect_Button_2")
+        self.tencentSelect_Button_2.clicked.connect(register_tencent)
 
-        # 腾讯翻译API注册按钮
-        self.tencentRegister_Button = QtWidgets.QPushButton(self.tab_1)
-        self.tencentRegister_Button.setGeometry(QtCore.QRect(90*self.rate, 340*self.rate, 80*self.rate, 30*self.rate))
-        self.tencentRegister_Button.setStyleSheet("background: rgba(255, 255, 255, 0.4);")
-        self.tencentRegister_Button.clicked.connect(register_tencent)
-        self.tencentRegister_Button.setText("注册腾讯")
-
-        # 腾讯翻译API额度查询按钮
         self.tencentSelect_Button = QtWidgets.QPushButton(self.tab_1)
-        self.tencentSelect_Button.setGeometry(QtCore.QRect(237*self.rate, 340*self.rate, 80*self.rate, 30*self.rate))
-        self.tencentSelect_Button.setStyleSheet("background: rgba(255, 255, 255, 0.4);")
+        self.tencentSelect_Button.setGeometry(QtCore.QRect(237, 340, 80, 30))
+        font = QtGui.QFont()
+        font.setFamily("华康方圆体W7")
+        font.setPointSize(10)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.tencentSelect_Button.setFont(font)
+        self.tencentSelect_Button.setStyleSheet("background-image: url(:/image/Wechat.png);")
+        self.tencentSelect_Button.setObjectName("tencentSelect_Button")
         self.tencentSelect_Button.clicked.connect(select_tencent)
-        self.tencentSelect_Button.setText("额度查询")
-
-        # 彩云翻译API标签
-        self.caiyunAPI_laber_1 = QtWidgets.QLabel(self.tab_1)
-        self.caiyunAPI_laber_1.setGeometry(QtCore.QRect(20*self.rate, 380*self.rate, 281*self.rate, 16*self.rate))
-        self.caiyunAPI_laber_1.setText("（选填）彩云翻译 API：每月额度100万字符")
-
-        # 彩云翻译API token输入框
-        self.caiyun_token_Text = QtWidgets.QTextEdit(self.tab_1)
-        self.caiyun_token_Text.setGeometry(QtCore.QRect(30*self.rate, 405*self.rate, 330*self.rate, 22*self.rate))
-        self.caiyun_token_Text.setStyleSheet("QTextEdit {""background: transparent;"
-                                                     "border-width:0; border-style:outset;"
-                                                     "border-bottom: 2px solid #92a8d1;""}"
-                                            "QTextEdit:focus {""border-bottom: 2px dashed #9265d1;""}")
-        self.caiyun_token_Text.setPlaceholderText("彩云小泽API token")
-        self.caiyun_token_Text.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.caiyun_token_Text.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.caiyun_token_Text.setPlainText(self.caiyun_token)
-
-        # 彩云翻译API注册按钮
-        self.caiyunRegister_Button = QtWidgets.QPushButton(self.tab_1)
-        self.caiyunRegister_Button.setGeometry(QtCore.QRect(90*self.rate, 435*self.rate, 80*self.rate, 30*self.rate))
-        self.caiyunRegister_Button.setStyleSheet("background: rgba(255, 255, 255, 0.4);")
-        self.caiyunRegister_Button.clicked.connect(register_caiyun)
-        self.caiyunRegister_Button.setText("注册彩云")
-
-        # 彩云翻译API额度查询按钮
-        self.caiyunSelect_Button = QtWidgets.QPushButton(self.tab_1)
-        self.caiyunSelect_Button.setGeometry(QtCore.QRect(237*self.rate, 435*self.rate, 80*self.rate, 30*self.rate))
-        self.caiyunSelect_Button.setStyleSheet("background: rgba(255, 255, 255, 0.4);")
-        self.caiyunSelect_Button.clicked.connect(select_caiyun)
-        self.caiyunSelect_Button.setText("额度查询")
         
-
-        # 工具栏2
+        self.OCR_Key_Text.raise_()
+        self.OCR_label_1.raise_()
+        self.OCR_Secret_Text.raise_()
+        self.OCR_label_2.raise_()
+        self.OCR_label_3.raise_()
+        self.OCR_label_4.raise_()
+        self.OCR_label_5.raise_()
+        self.baiduAPI_label_1.raise_()
+        self.baiduAPI_label_2.raise_()
+        self.baiduAPI_label_3.raise_()
+        self.baidu_Key_Text.raise_()
+        self.baidu_Secret_Text.raise_()
+        self.baiduRegister_Button.raise_()
+        self.baiduSelect_Button.raise_()
+        self.TencentAPI_laber_1.raise_()
+        self.TencentAPI_laber_2.raise_()
+        self.TencentAPI_laber_3.raise_()
+        self.tencent_Key_Text.raise_()
+        self.tencent_Secret_Text.raise_()
+        self.tencentSelect_Button_2.raise_()
+        self.tencentSelect_Button.raise_()
+        self.OCRRegister_Button.raise_()
+        self.tabWidget.addTab(self.tab_1, "")
         self.tab_2 = QtWidgets.QWidget()
-        self.tabWidget.addTab(self.tab_2, "")
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), "翻译源设定")
-
-        # 此Label用于雾化工具栏2的背景图
-        self.bgImage2 = QLabel(self.tab_2)
-        self.bgImage2.setGeometry(QRect(0, 0, 408*self.rate, 578*self.rate))
-        self.bgImage2.setStyleSheet("background: rgba(255, 255, 255, 0.3);")
-        
-        # 翻译源标签
+        self.tab_2.setObjectName("tab_2")
         self.translateSource_label_1 = QtWidgets.QLabel(self.tab_2)
-        self.translateSource_label_1.setGeometry(QtCore.QRect(30*self.rate, 20*self.rate, 340*self.rate, 40*self.rate))
-        self.translateSource_label_1.setText("<html><head/><body><p>选择你想使用的翻译源，可多选，多选会同时显示每\
-                                              </p><p>个翻译源的翻译结果，但翻译时间会变慢</p><p></p></body></html>")
+        self.translateSource_label_1.setGeometry(QtCore.QRect(20, 25, 191, 16))
+        self.translateSource_label_1.setStyleSheet("background: transparent;")
+        self.translateSource_label_1.setObjectName("translateSource_label_1")
         
-        # 公共翻译接口标签
-        self.translateSource_label_2 = QtWidgets.QLabel(self.tab_2)
-        self.translateSource_label_2.setGeometry(QtCore.QRect(30*self.rate, 85*self.rate, 340*self.rate, 16*self.rate))
-        self.translateSource_label_2.setText("公共接口：可直接使用，但可能会抽风")
-
-        # 有道翻译checkBox
         self.youdao_checkBox = QtWidgets.QCheckBox(self.tab_2)
-        self.youdao_checkBox.setGeometry(QtCore.QRect(30*self.rate, 120*self.rate, 80*self.rate, 16*self.rate))
+        self.youdao_checkBox.setGeometry(QtCore.QRect(30, 90, 80, 16))
+        self.youdao_checkBox.setStyleSheet("background: transparent;")
+        self.youdao_checkBox.setObjectName("youdao_checkBox")
         self.youdao_checkBox.setChecked(self.youdaoUse)
-        self.youdao_checkBox.setText("有道翻译")
         
-        # 彩云翻译checkBox
         self.caiyun_checkBox = QtWidgets.QCheckBox(self.tab_2)
-        self.caiyun_checkBox.setGeometry(QtCore.QRect(160*self.rate, 120*self.rate, 80*self.rate, 16*self.rate))
+        self.caiyun_checkBox.setGeometry(QtCore.QRect(160, 90, 80, 16))
+        self.caiyun_checkBox.setStyleSheet("background: transparent;")
+        self.caiyun_checkBox.setObjectName("caiyun_checkBox")
         self.caiyun_checkBox.setChecked(self.caiyunUse)
-        self.caiyun_checkBox.setText("公共彩云")
         
-        # 金山翻译checkBox
         self.jinshan_checkBox = QtWidgets.QCheckBox(self.tab_2)
-        self.jinshan_checkBox.setGeometry(QtCore.QRect(290*self.rate, 120*self.rate, 80*self.rate, 16*self.rate))
+        self.jinshan_checkBox.setGeometry(QtCore.QRect(297, 90, 80, 16))
+        self.jinshan_checkBox.setStyleSheet("background: transparent;")
+        self.jinshan_checkBox.setObjectName("jinshan_checkBox")
         self.jinshan_checkBox.setChecked(self.jinshanUse)
-        self.jinshan_checkBox.setText("金山词霸")
-
-        # yeekit翻译checkBox
-        self.yeekit_checkBox = QtWidgets.QCheckBox(self.tab_2)
-        self.yeekit_checkBox.setGeometry(QtCore.QRect(30*self.rate, 155*self.rate, 91*self.rate, 16*self.rate))
-        self.yeekit_checkBox.setChecked(self.yeekitUse)
-        self.yeekit_checkBox.setText("yeekit")
-
-        # ALAPI翻译checkBox
-        self.ALAPI_checkBox = QtWidgets.QCheckBox(self.tab_2)
-        self.ALAPI_checkBox.setGeometry(QtCore.QRect(160*self.rate, 155*self.rate, 80*self.rate, 16*self.rate))
-        self.ALAPI_checkBox.setChecked(self.alapiUse)
-        self.ALAPI_checkBox.setText("ALAPI")
-
-        # 网页翻译接口标签
-        self.translateSource_label_4 = QtWidgets.QLabel(self.tab_2)
-        self.translateSource_label_4.setGeometry(QtCore.QRect(30*self.rate, 200*self.rate, 320*self.rate, 16*self.rate))
-        self.translateSource_label_4.setText("网页版：可直接使用，但可能会抽风")
         
-        # 百度翻译网页版checkBox
-        self.baiduweb_checkBox = QtWidgets.QCheckBox(self.tab_2)
-        self.baiduweb_checkBox.setGeometry(QtCore.QRect(30*self.rate, 235*self.rate, 131*self.rate, 16*self.rate))
-        self.baiduweb_checkBox.setChecked(self.baiduwebUse)
-        self.baiduweb_checkBox.setText("百度翻译")
-
-        # 腾讯翻译网页版checkBox
-        self.tencentweb_checkBox = QtWidgets.QCheckBox(self.tab_2)
-        self.tencentweb_checkBox.setGeometry(QtCore.QRect(160*self.rate, 235*self.rate, 80*self.rate, 16*self.rate))
-        self.tencentweb_checkBox.setChecked(self.tencentwebUse)
-        self.tencentweb_checkBox.setText("腾讯翻译")
-
-        # 谷歌翻译网页版checkBox
-        self.google_checkBox = QtWidgets.QCheckBox(self.tab_2)
-        self.google_checkBox.setGeometry(QtCore.QRect(290*self.rate, 235*self.rate, 131*self.rate, 16*self.rate))
-        self.google_checkBox.setChecked(self.googleUse)
-        self.google_checkBox.setText("谷歌翻译")
-
-        # Bing翻译网页版checkBox
-        self.Bing_checkBox = QtWidgets.QCheckBox(self.tab_2)
-        self.Bing_checkBox.setGeometry(QtCore.QRect(30*self.rate, 270*self.rate, 131*self.rate, 16*self.rate))
-        self.Bing_checkBox.setChecked(self.BingUse)
-        self.Bing_checkBox.setText("Bing翻译")
-
-        # 私人翻译接口标签
+        self.translateSource_label_2 = QtWidgets.QLabel(self.tab_2)
+        self.translateSource_label_2.setGeometry(QtCore.QRect(20, 60, 220, 16))
+        self.translateSource_label_2.setStyleSheet("background: transparent;")
+        self.translateSource_label_2.setObjectName("translateSource_label_2")
         self.translateSource_label_3 = QtWidgets.QLabel(self.tab_2)
-        self.translateSource_label_3.setGeometry(QtCore.QRect(30*self.rate, 315*self.rate, 271*self.rate, 16*self.rate))
-        self.translateSource_label_3.setText("私人API：使用稳定，但需注册后才可使用")
-
-        # 百度翻译私人版checkBox
+        self.translateSource_label_3.setGeometry(QtCore.QRect(20, 125, 271, 16))
+        self.translateSource_label_3.setStyleSheet("background: transparent;")
+        self.translateSource_label_3.setObjectName("translateSource_label_3")
+        
         self.baidu_checkBox = QtWidgets.QCheckBox(self.tab_2)
-        self.baidu_checkBox.setGeometry(QtCore.QRect(30*self.rate, 350*self.rate, 80*self.rate, 16*self.rate))
+        self.baidu_checkBox.setGeometry(QtCore.QRect(30, 155, 80, 16))
+        self.baidu_checkBox.setStyleSheet("background: transparent;")
+        self.baidu_checkBox.setObjectName("baidu_checkBox")
         self.baidu_checkBox.setChecked(self.baiduUse)
-        self.baidu_checkBox.setText("私人百度")
         
-        # 腾讯翻译私人版checkBox
         self.tencent_checkBox = QtWidgets.QCheckBox(self.tab_2)
-        self.tencent_checkBox.setGeometry(QtCore.QRect(160*self.rate, 350*self.rate, 80*self.rate, 16*self.rate))
+        self.tencent_checkBox.setGeometry(QtCore.QRect(160, 155, 80, 16))
+        self.tencent_checkBox.setStyleSheet("background: transparent;")
+        self.tencent_checkBox.setObjectName("tencent_checkBox")
         self.tencent_checkBox.setChecked(self.tencentUse)
-        self.tencent_checkBox.setText("私人腾讯")
-
-        # 彩云翻译私人版checkBox
-        self.caiyunPrivate_checkBox = QtWidgets.QCheckBox(self.tab_2)
-        self.caiyunPrivate_checkBox.setGeometry(QtCore.QRect(290*self.rate, 350*self.rate, 80*self.rate, 16*self.rate))
-        self.caiyunPrivate_checkBox.setChecked(self.caiyunPrivateUse)
-        self.caiyunPrivate_checkBox.setText("私人彩云")
-
-        # 翻译语种标签
-        self.translateSource_label_6 = QtWidgets.QLabel(self.tab_2)
-        self.translateSource_label_6.setGeometry(QtCore.QRect(30*self.rate, 395*self.rate, 151*self.rate, 16*self.rate))
-        self.translateSource_label_6.setText("选择你要翻译的原语言：")
-
-        # 翻译语种comboBox
-        self.language_comboBox = QtWidgets.QComboBox(self.tab_2)
-        self.language_comboBox.setGeometry(QtCore.QRect(195*self.rate, 393*self.rate, 131*self.rate, 22*self.rate))
-        self.language_comboBox.addItem("")
-        self.language_comboBox.addItem("")
-        self.language_comboBox.addItem("")
-        self.language_comboBox.setItemText(0, "日语（Japanese）")
-        self.language_comboBox.setItemText(1, "英语（English）")
-        self.language_comboBox.setItemText(2, "韩语（Korean）")
-        self.language_comboBox.setStyleSheet("background: rgba(255, 255, 255, 0.4);")
-        self.language_comboBox.setCurrentIndex(self.language)
-
-        # 自动模式速率标签1
+        
         self.translateMode_label_1 = QtWidgets.QLabel(self.tab_2)
-        self.translateMode_label_1.setGeometry(QtCore.QRect(30*self.rate, 440*self.rate, 111*self.rate, 16*self.rate))
-        self.translateMode_label_1.setText("设定自动翻译时每")
-
-        # 自动模式速率设定
-        self.autoSpeed_spinBox = QtWidgets.QDoubleSpinBox(self.tab_2)
-        self.autoSpeed_spinBox.setGeometry(QtCore.QRect(155*self.rate, 435*self.rate, 45*self.rate, 25*self.rate))
-        self.autoSpeed_spinBox.setDecimals(1)
-        self.autoSpeed_spinBox.setMinimum(1.0)
-        self.autoSpeed_spinBox.setMaximum(15.0)
-        self.autoSpeed_spinBox.setSingleStep(0.1)
+        self.translateMode_label_1.setGeometry(QtCore.QRect(20, 210, 211, 16))
+        self.translateMode_label_1.setStyleSheet("background: transparent;")
+        self.translateMode_label_1.setObjectName("translateMode_label_1")
+        
+        self.manual_radioButton = QtWidgets.QRadioButton(self.tab_2)
+        self.manual_radioButton.setGeometry(QtCore.QRect(30, 245, 241, 16))
+        self.manual_radioButton.setStyleSheet("background: transparent;")
+        self.manual_radioButton.setObjectName("manual_radioButton")
+        self.manual_radioButton.setChecked(self.manualMode)
+        
+        self.auto_radioButton = QtWidgets.QRadioButton(self.tab_2)
+        self.auto_radioButton.setGeometry(QtCore.QRect(30, 285, 281, 16))
+        self.auto_radioButton.setStyleSheet("background: transparent;")
+        self.auto_radioButton.setObjectName("auto_radioButton")
+        self.manual_radioButton.setChecked(self.autoMode)
+        
+        self.autoSpeed_spinBox = QtWidgets.QSpinBox(self.tab_2)
+        self.autoSpeed_spinBox.setGeometry(QtCore.QRect(140, 320, 40, 25))
         self.autoSpeed_spinBox.setStyleSheet("background: transparent;")
+        self.autoSpeed_spinBox.setMinimum(2)
+        self.autoSpeed_spinBox.setMaximum(10)
+        self.autoSpeed_spinBox.setObjectName("autoSpeed_spinBox")
         self.autoSpeed_spinBox.setValue(self.translateSpeed)
-
-        # 自动模式速率标签2
+        
         self.translateMode_label_2 = QtWidgets.QLabel(self.tab_2)
-        self.translateMode_label_2.setGeometry(QtCore.QRect(215*self.rate, 440*self.rate, 101*self.rate, 16*self.rate))
-        self.translateMode_label_2.setText("秒刷新一次翻译")
-
-        # 工具栏3
+        self.translateMode_label_2.setGeometry(QtCore.QRect(48, 325, 91, 16))
+        self.translateMode_label_2.setStyleSheet("background: transparent;")
+        self.translateMode_label_2.setObjectName("translateMode_label_2")
+        self.translateMode_label_3 = QtWidgets.QLabel(self.tab_2)
+        self.translateMode_label_3.setGeometry(QtCore.QRect(190, 325, 101, 16))
+        self.translateMode_label_3.setStyleSheet("background: transparent;")
+        self.translateMode_label_3.setObjectName("translateMode_label_3")
+        self.tabWidget.addTab(self.tab_2, "")
         self.tab_3 = QtWidgets.QWidget()
-        self.tabWidget.addTab(self.tab_3, "")
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), "翻译样式")
+        self.tab_3.setObjectName("tab_3")
+        self.colour_label_1 = QtWidgets.QLabel(self.tab_3)
+        self.colour_label_1.setGeometry(QtCore.QRect(30, 25, 241, 16))
+        self.colour_label_1.setStyleSheet("background: transparent;")
+        self.colour_label_1.setObjectName("colour_label_1")
+        self.youdaoColour_label = QtWidgets.QLabel(self.tab_3)
+        self.youdaoColour_label.setGeometry(QtCore.QRect(30, 90, 71, 16))
+        self.youdaoColour_label.setStyleSheet("background: transparent;")
+        self.youdaoColour_label.setObjectName("youdaoColour_label")
+        self.caiyunColour_label = QtWidgets.QLabel(self.tab_3)
+        self.caiyunColour_label.setGeometry(QtCore.QRect(30, 130, 71, 16))
+        self.caiyunColour_label.setStyleSheet("background: transparent;")
+        self.caiyunColour_label.setObjectName("caiyunColour_label")
+        self.jinshanColour_label = QtWidgets.QLabel(self.tab_3)
+        self.jinshanColour_label.setGeometry(QtCore.QRect(30, 170, 71, 16))
+        self.jinshanColour_label.setStyleSheet("background: transparent;")
+        self.jinshanColour_label.setObjectName("jinshanColour_label")
+        self.baiduColour_label = QtWidgets.QLabel(self.tab_3)
+        self.baiduColour_label.setGeometry(QtCore.QRect(30, 210, 71, 16))
+        self.baiduColour_label.setStyleSheet("background: transparent;")
+        self.baiduColour_label.setObjectName("baiduColour_label")
+        self.tencentColour_label = QtWidgets.QLabel(self.tab_3)
+        self.tencentColour_label.setGeometry(QtCore.QRect(30, 250, 71, 16))
+        self.tencentColour_label.setStyleSheet("background: transparent;")
+        self.tencentColour_label.setObjectName("tencentColour_label")
+        self.colour_label_2 = QtWidgets.QLabel(self.tab_3)
+        self.colour_label_2.setGeometry(QtCore.QRect(130, 55, 30, 16))
+        self.colour_label_2.setStyleSheet("background: transparent;")
+        self.colour_label_2.setObjectName("colour_label_2")
+        self.colour_label_4 = QtWidgets.QLabel(self.tab_3)
+        self.colour_label_4.setGeometry(QtCore.QRect(307, 55, 30, 16))
+        self.colour_label_4.setStyleSheet("background: transparent;")
+        self.colour_label_4.setObjectName("colour_label_4")
+        self.colour_label_3 = QtWidgets.QLabel(self.tab_3)
+        self.colour_label_3.setGeometry(QtCore.QRect(200, 55, 30, 16))
+        self.colour_label_3.setStyleSheet("background: transparent;")
+        self.colour_label_3.setObjectName("colour_label_3")
+        self.originalColour_label = QtWidgets.QLabel(self.tab_3)
+        self.originalColour_label.setGeometry(QtCore.QRect(30, 290, 61, 16))
+        self.originalColour_label.setStyleSheet("background: transparent;")
+        self.originalColour_label.setObjectName("originalColour_label")
+        
+        self.fontComboBox_1 = QtWidgets.QFontComboBox(self.tab_3)
+        self.fontComboBox_1.setGeometry(QtCore.QRect(267, 85, 110, 25))
+        self.fontComboBox_1.setObjectName("fontComboBox_1")
+        ComboBoxFont_1 = QtGui.QFont(self.youdaoFont)
+        self.fontComboBox_1.setCurrentFont(ComboBoxFont_1)
+        self.fontComboBox_1.activated[str].connect(self.get_font_youdao)
 
-        # 此Label用于雾化工具栏3的背景图
-        self.bgImage3 = QLabel(self.tab_3)
-        self.bgImage3.setGeometry(QRect(0, 0, 408*self.rate, 578*self.rate))
-        self.bgImage3.setStyleSheet("background: rgba(255, 255, 255, 0.3);")
+        self.fontComboBox_2 = QtWidgets.QFontComboBox(self.tab_3)
+        self.fontComboBox_2.setGeometry(QtCore.QRect(267, 125, 110, 25))
+        self.fontComboBox_2.setObjectName("fontComboBox_2")
+        ComboBoxFont_2 = QtGui.QFont(self.caiyunFont)
+        self.fontComboBox_2.setCurrentFont(ComboBoxFont_2)
+        self.fontComboBox_2.activated[str].connect(self.get_font_caiyun)
 
-        # 翻译字体颜色设定标签
-        self.colour_label = QtWidgets.QLabel(self.tab_3)
-        self.colour_label.setGeometry(QtCore.QRect(30*self.rate, 20*self.rate, 340*self.rate, 16*self.rate))
-        self.colour_label.setText("设定不同翻译源翻译时的文字颜色：")
+        self.fontComboBox_3 = QtWidgets.QFontComboBox(self.tab_3)
+        self.fontComboBox_3.setGeometry(QtCore.QRect(267, 165, 110, 25))
+        self.fontComboBox_3.setObjectName("fontComboBox_3")
+        ComboBoxFont_3 = QtGui.QFont(self.caiyunFont)
+        self.fontComboBox_3.setCurrentFont(ComboBoxFont_3)
+        self.fontComboBox_3.activated[str].connect(self.get_font_jinshan)
 
-        # 有道翻译颜色按钮
+        self.fontComboBox_4 = QtWidgets.QFontComboBox(self.tab_3)
+        self.fontComboBox_4.setGeometry(QtCore.QRect(267, 205, 110, 25))
+        self.fontComboBox_4.setObjectName("fontComboBox_4")
+        ComboBoxFont_4 = QtGui.QFont(self.caiyunFont)
+        self.fontComboBox_4.setCurrentFont(ComboBoxFont_4)
+        self.fontComboBox_4.activated[str].connect(self.get_font_baidu)
+
+        self.fontComboBox_5 = QtWidgets.QFontComboBox(self.tab_3)
+        self.fontComboBox_5.setGeometry(QtCore.QRect(267, 245, 110, 25))
+        self.fontComboBox_5.setObjectName("fontComboBox_5")
+        ComboBoxFont_5 = QtGui.QFont(self.caiyunFont)
+        self.fontComboBox_5.setCurrentFont(ComboBoxFont_5)
+        self.fontComboBox_5.activated[str].connect(self.get_font_tencent)
+
+        self.fontComboBox_6 = QtWidgets.QFontComboBox(self.tab_3)
+        self.fontComboBox_6.setGeometry(QtCore.QRect(267, 285, 110, 25))
+        self.fontComboBox_6.setObjectName("fontComboBox_6")
+        ComboBoxFont_6 = QtGui.QFont(self.caiyunFont)
+        self.fontComboBox_6.setCurrentFont(ComboBoxFont_6)
+        self.fontComboBox_6.activated[str].connect(self.get_font_original)
+        
+        self.youdaoSize_spinBox = QtWidgets.QSpinBox(self.tab_3)
+        self.youdaoSize_spinBox.setGeometry(QtCore.QRect(195, 85, 40, 25))
+        self.youdaoSize_spinBox.setMinimum(1)
+        self.youdaoSize_spinBox.setMaximum(10)
+        self.youdaoSize_spinBox.setObjectName("youdaoSize_spinBox")
+        self.youdaoSize_spinBox.setValue(self.youdaoSize)
+
+        self.caiyunSize_spinBox = QtWidgets.QSpinBox(self.tab_3)
+        self.caiyunSize_spinBox.setGeometry(QtCore.QRect(195, 125, 40, 25))
+        self.caiyunSize_spinBox.setMinimum(1)
+        self.caiyunSize_spinBox.setMaximum(10)
+        self.caiyunSize_spinBox.setObjectName("caiyunSize_spinBox")
+        self.caiyunSize_spinBox.setValue(self.caiyunSize)
+
+        self.jinshanSize_spinBox = QtWidgets.QSpinBox(self.tab_3)
+        self.jinshanSize_spinBox.setGeometry(QtCore.QRect(195, 165, 40, 25))
+        self.jinshanSize_spinBox.setMinimum(1)
+        self.jinshanSize_spinBox.setMaximum(10)
+        self.jinshanSize_spinBox.setObjectName("jinshanSize_spinBox")
+        self.jinshanSize_spinBox.setValue(self.jinshanSize)
+
+        self.baiduSize_spinBox = QtWidgets.QSpinBox(self.tab_3)
+        self.baiduSize_spinBox.setGeometry(QtCore.QRect(195, 205, 40, 25))
+        self.baiduSize_spinBox.setMinimum(1)
+        self.baiduSize_spinBox.setMaximum(10)
+        self.baiduSize_spinBox.setObjectName("baiduSize_spinBox")
+        self.baiduSize_spinBox.setValue(self.baiduSize)
+
+        self.tencentSize_spinBox = QtWidgets.QSpinBox(self.tab_3)
+        self.tencentSize_spinBox.setGeometry(QtCore.QRect(195, 245, 40, 25))
+        self.tencentSize_spinBox.setMinimum(1)
+        self.tencentSize_spinBox.setMaximum(10)
+        self.tencentSize_spinBox.setObjectName("tencentSize_spinBox")
+        self.tencentSize_spinBox.setValue(self.tencentSize)
+
+        self.originalSize_spinBox = QtWidgets.QSpinBox(self.tab_3)
+        self.originalSize_spinBox.setGeometry(QtCore.QRect(195, 285, 40, 25))
+        self.originalSize_spinBox.setMinimum(1)
+        self.originalSize_spinBox.setMaximum(10)
+        self.originalSize_spinBox.setObjectName("originalSize_spinBox")
+        self.originalSize_spinBox.setValue(self.originalSize)
+
         self.youdaoColour_toolButton = QtWidgets.QToolButton(self.tab_3)
-        self.youdaoColour_toolButton.setGeometry(QtCore.QRect(30*self.rate, 55*self.rate, 71*self.rate, 25*self.rate))
-        self.youdaoColour_toolButton.setStyleSheet("background: rgba(255, 255, 255, 0.4); color: {};".format(self.youdaoColor))
+        self.youdaoColour_toolButton.setGeometry(QtCore.QRect(110, 85, 60, 25))
+        self.youdaoColour_toolButton.setAutoFillBackground(False)
+        self.youdaoColour_toolButton.setStyleSheet("background-image: url(:/image/Wechat.png); color: {};".format(self.youdaoColor))
+        self.youdaoColour_toolButton.setCheckable(False)
+        self.youdaoColour_toolButton.setChecked(False)
+        self.youdaoColour_toolButton.setPopupMode(QtWidgets.QToolButton.DelayedPopup)
+        self.youdaoColour_toolButton.setAutoRaise(False)
+        self.youdaoColour_toolButton.setObjectName("youdaoColour_toolButton")
         self.youdaoColour_toolButton.clicked.connect(lambda:self.get_font_color(1))
-        self.youdaoColour_toolButton.setText("有道翻译")
 
-        # 公共彩云翻译颜色按钮
         self.caiyunColour_toolButton = QtWidgets.QToolButton(self.tab_3)
-        self.caiyunColour_toolButton.setGeometry(QtCore.QRect(160*self.rate, 55*self.rate, 71*self.rate, 25*self.rate))
-        self.caiyunColour_toolButton.setStyleSheet("background: rgba(255, 255, 255, 0.4); color: {};".format(self.caiyunColor))
+        self.caiyunColour_toolButton.setGeometry(QtCore.QRect(110, 125, 60, 25))
+        self.caiyunColour_toolButton.setAutoFillBackground(False)
+        self.caiyunColour_toolButton.setStyleSheet("background-image: url(:/image/Wechat.png); color: {};".format(self.caiyunColor))
+        self.caiyunColour_toolButton.setCheckable(False)
+        self.caiyunColour_toolButton.setChecked(False)
+        self.caiyunColour_toolButton.setPopupMode(QtWidgets.QToolButton.DelayedPopup)
+        self.caiyunColour_toolButton.setAutoRaise(False)
+        self.caiyunColour_toolButton.setObjectName("caiyunColour_toolButton")
         self.caiyunColour_toolButton.clicked.connect(lambda:self.get_font_color(2))
-        self.caiyunColour_toolButton.setText("公共彩云")
 
-        # 金山翻译颜色按钮
         self.jinshanColour_toolButton = QtWidgets.QToolButton(self.tab_3)
-        self.jinshanColour_toolButton.setGeometry(QtCore.QRect(290*self.rate, 55*self.rate, 71*self.rate, 25*self.rate))
-        self.jinshanColour_toolButton.setStyleSheet("background: rgba(255, 255, 255, 0.4); color: {};".format(self.jinshanColor))
+        self.jinshanColour_toolButton.setGeometry(QtCore.QRect(110, 165, 60, 25))
+        self.jinshanColour_toolButton.setAutoFillBackground(False)
+        self.jinshanColour_toolButton.setStyleSheet("background-image: url(:/image/Wechat.png); color: {};".format(self.jinshanColor))
+        self.jinshanColour_toolButton.setCheckable(False)
+        self.jinshanColour_toolButton.setChecked(False)
+        self.jinshanColour_toolButton.setPopupMode(QtWidgets.QToolButton.DelayedPopup)
+        self.jinshanColour_toolButton.setAutoRaise(False)
+        self.jinshanColour_toolButton.setObjectName("jinshanColour_toolButton")
         self.jinshanColour_toolButton.clicked.connect(lambda:self.get_font_color(3))
-        self.jinshanColour_toolButton.setText("金山词霸")
-        
-        # yeekit翻译颜色按钮
-        self.yeekitColour_toolButton = QtWidgets.QToolButton(self.tab_3)
-        self.yeekitColour_toolButton.setGeometry(QtCore.QRect(30*self.rate, 95*self.rate, 71*self.rate, 25*self.rate))
-        self.yeekitColour_toolButton.setStyleSheet("background: rgba(255, 255, 255, 0.4); color: {};".format(self.yeekitColor))
-        self.yeekitColour_toolButton.clicked.connect(lambda:self.get_font_color(4))
-        self.yeekitColour_toolButton.setText("yeekit")
 
-        # alapi翻译颜色按钮
-        self.alapiColour_toolButton = QtWidgets.QToolButton(self.tab_3)
-        self.alapiColour_toolButton.setGeometry(QtCore.QRect(160*self.rate, 95*self.rate, 71*self.rate, 25*self.rate))
-        self.alapiColour_toolButton.setStyleSheet("background: rgba(255, 255, 255, 0.4); color: {};".format(self.ALAPIColor))
-        self.alapiColour_toolButton.clicked.connect(lambda:self.get_font_color(5))
-        self.alapiColour_toolButton.setText("ALAPI")
- 
-        # 百度翻译网页版颜色按钮
-        self.baiduwebColour_toolButton = QtWidgets.QToolButton(self.tab_3)
-        self.baiduwebColour_toolButton.setGeometry(QtCore.QRect(290*self.rate, 95*self.rate, 71*self.rate, 25*self.rate))
-        self.baiduwebColour_toolButton.setStyleSheet("background: rgba(255, 255, 255, 0.4); color: {};".format(self.baiduwebColor))
-        self.baiduwebColour_toolButton.clicked.connect(lambda:self.get_font_color(6))
-        self.baiduwebColour_toolButton.setText("网页百度")
-
-        # 腾讯翻译网页版颜色按钮
-        self.tencentwebColour_toolButton = QtWidgets.QToolButton(self.tab_3)
-        self.tencentwebColour_toolButton.setGeometry(QtCore.QRect(30*self.rate, 135*self.rate, 71*self.rate, 25*self.rate))
-        self.tencentwebColour_toolButton.setStyleSheet("background: rgba(255, 255, 255, 0.4); color: {};".format(self.tencentwebColor))
-        self.tencentwebColour_toolButton.clicked.connect(lambda:self.get_font_color(7))
-        self.tencentwebColour_toolButton.setText("网页腾讯")
-
-        # 谷歌翻译网页版颜色按钮
-        self.googleColour_toolButton = QtWidgets.QToolButton(self.tab_3)
-        self.googleColour_toolButton.setGeometry(QtCore.QRect(160*self.rate, 135*self.rate, 71*self.rate, 25*self.rate))
-        self.googleColour_toolButton.setStyleSheet("background: rgba(255, 255, 255, 0.4); color: {};".format(self.googleColor))
-        self.googleColour_toolButton.clicked.connect(lambda:self.get_font_color(8))
-        self.googleColour_toolButton.setText("谷歌翻译")
-
-        # Bing翻译网页版颜色按钮
-        self.BingColour_toolButton = QtWidgets.QToolButton(self.tab_3)
-        self.BingColour_toolButton.setGeometry(QtCore.QRect(290*self.rate, 135*self.rate, 71*self.rate, 25*self.rate))
-        self.BingColour_toolButton.setStyleSheet("background: rgba(255, 255, 255, 0.4); color: {};".format(self.BingColor))
-        self.BingColour_toolButton.clicked.connect(lambda:self.get_font_color(9))
-        self.BingColour_toolButton.setText("Bing翻译")
-
-        # 百度翻译私人版颜色按钮
         self.baiduColour_toolButton = QtWidgets.QToolButton(self.tab_3)
-        self.baiduColour_toolButton.setGeometry(QtCore.QRect(30*self.rate, 175*self.rate, 71*self.rate, 25*self.rate))
-        self.baiduColour_toolButton.setStyleSheet("background: rgba(255, 255, 255, 0.4); color: {};".format(self.baiduColor))
-        self.baiduColour_toolButton.clicked.connect(lambda:self.get_font_color(10))
-        self.baiduColour_toolButton.setText("私人百度")
+        self.baiduColour_toolButton.setGeometry(QtCore.QRect(110, 205, 60, 25))
+        self.baiduColour_toolButton.setAutoFillBackground(False)
+        self.baiduColour_toolButton.setStyleSheet("background-image: url(:/image/Wechat.png); color: {};".format(self.baiduColor))
+        self.baiduColour_toolButton.setCheckable(False)
+        self.baiduColour_toolButton.setChecked(False)
+        self.baiduColour_toolButton.setPopupMode(QtWidgets.QToolButton.DelayedPopup)
+        self.baiduColour_toolButton.setAutoRaise(False)
+        self.baiduColour_toolButton.setObjectName("baiduColour_toolButton")
+        self.baiduColour_toolButton.clicked.connect(lambda:self.get_font_color(4))
 
-        # 腾讯翻译私人版颜色按钮
         self.tencentColour_toolButton = QtWidgets.QToolButton(self.tab_3)
-        self.tencentColour_toolButton.setGeometry(QtCore.QRect(160*self.rate, 175*self.rate, 71*self.rate, 25*self.rate))
-        self.tencentColour_toolButton.setStyleSheet("background: rgba(255, 255, 255, 0.4); color: {};".format(self.tencentColor))
-        self.tencentColour_toolButton.clicked.connect(lambda:self.get_font_color(11))
-        self.tencentColour_toolButton.setText("私人腾讯")
-        
-        # 彩云翻译私人版颜色按钮
-        self.caiyunPrivateColour_toolButton = QtWidgets.QToolButton(self.tab_3)
-        self.caiyunPrivateColour_toolButton.setGeometry(QtCore.QRect(290*self.rate, 175*self.rate, 71*self.rate, 25*self.rate))
-        self.caiyunPrivateColour_toolButton.setStyleSheet("background: rgba(255, 255, 255, 0.4); color: {};".format(self.caiyunPrivateColor))
-        self.caiyunPrivateColour_toolButton.clicked.connect(lambda:self.get_font_color(12))
-        self.caiyunPrivateColour_toolButton.setText("私人彩云")
+        self.tencentColour_toolButton.setGeometry(QtCore.QRect(110, 245, 60, 25))
+        self.tencentColour_toolButton.setAutoFillBackground(False)
+        self.tencentColour_toolButton.setStyleSheet("background-image: url(:/image/Wechat.png); color: {};".format(self.tencentColor))
+        self.tencentColour_toolButton.setCheckable(False)
+        self.tencentColour_toolButton.setChecked(False)
+        self.tencentColour_toolButton.setPopupMode(QtWidgets.QToolButton.DelayedPopup)
+        self.tencentColour_toolButton.setAutoRaise(False)
+        self.tencentColour_toolButton.setObjectName("tencentColour_toolButton")
+        self.tencentColour_toolButton.clicked.connect(lambda:self.get_font_color(5))
 
-        # 原文颜色按钮
         self.originalColour_toolButton = QtWidgets.QToolButton(self.tab_3)
-        self.originalColour_toolButton.setGeometry(QtCore.QRect(30*self.rate, 215*self.rate, 71*self.rate, 25*self.rate))
-        self.originalColour_toolButton.setStyleSheet("background: rgba(255, 255, 255, 0.4); color: {};".format(self.originalColor))
-        self.originalColour_toolButton.clicked.connect(lambda:self.get_font_color(13))
-        self.originalColour_toolButton.setText("原  文")
+        self.originalColour_toolButton.setGeometry(QtCore.QRect(110, 285, 60, 25))
+        self.originalColour_toolButton.setAutoFillBackground(False)
+        self.originalColour_toolButton.setStyleSheet("background-image: url(:/image/Wechat.png); color: {};".format(self.originalColor))
+        self.originalColour_toolButton.setCheckable(False)
+        self.originalColour_toolButton.setChecked(False)
+        self.originalColour_toolButton.setPopupMode(QtWidgets.QToolButton.DelayedPopup)
+        self.originalColour_toolButton.setAutoRaise(False)
+        self.originalColour_toolButton.setObjectName("originalColour_toolButton")
+        self.originalColour_toolButton.clicked.connect(lambda:self.get_font_color(6))
 
-        # 翻译字体大小设定标签
-        self.fontSize_label = QtWidgets.QLabel(self.tab_3)
-        self.fontSize_label.setGeometry(QtCore.QRect(30*self.rate, 265*self.rate, 145*self.rate, 16*self.rate))
-        self.fontSize_label.setText("设定翻译时的文字大小：")
-
-        # 翻译字体大小设定
-        self.fontSize_spinBox = QtWidgets.QSpinBox(self.tab_3)
-        self.fontSize_spinBox.setGeometry(QtCore.QRect(190*self.rate, 260*self.rate, 50*self.rate, 25*self.rate))
-        self.fontSize_spinBox.setMinimum(10)
-        self.fontSize_spinBox.setMaximum(30)
-        self.fontSize_spinBox.setStyleSheet("background: rgba(255, 255, 255, 0)")
-        self.fontSize_spinBox.setValue(self.fontSize)
-
-        # 翻译字体样式设定标签
-        self.translate_label = QtWidgets.QLabel(self.tab_3)
-        self.translate_label.setGeometry(QtCore.QRect(30*self.rate, 305*self.rate, 145*self.rate, 20*self.rate))
-        self.translate_label.setText("设定翻译时的字体样式：")
-
-        # 翻译字体样式设定        
-        self.fontComboBox = QtWidgets.QFontComboBox(self.tab_3)
-        self.fontComboBox.setGeometry(QtCore.QRect(190*self.rate, 305*self.rate, 151*self.rate, 25*self.rate))
-        self.fontComboBox.setStyleSheet("background: rgba(255, 255, 255, 0.4)")
-        self.fontComboBox.activated[str].connect(self.get_fontType)
-        self.ComboBoxFont = QtGui.QFont(self.fontType)
-        self.fontComboBox.setCurrentFont(self.ComboBoxFont)
-
-        # 显示颜色样式checkBox
-        self.showColorType_checkBox = QtWidgets.QCheckBox(self.tab_3)
-        self.showColorType_checkBox.setGeometry(QtCore.QRect(30*self.rate, 350*self.rate, 340*self.rate, 20*self.rate))
-        self.showColorType_checkBox.setChecked(self.showColorType)
-        self.showColorType_checkBox.setText("使用实心字体样式（不勾选则显示描边字体样式）")
-
-        # 显示原文checkBox
         self.showOriginal_checkBox = QtWidgets.QCheckBox(self.tab_3)
-        self.showOriginal_checkBox.setGeometry(QtCore.QRect(30*self.rate, 390*self.rate, 340*self.rate, 20*self.rate))
+        self.showOriginal_checkBox.setGeometry(QtCore.QRect(30, 325, 101, 20))
+        self.showOriginal_checkBox.setLayoutDirection(QtCore.Qt.RightToLeft)
+        self.showOriginal_checkBox.setStyleSheet("background: transparent;")
+        self.showOriginal_checkBox.setObjectName("showOriginal_checkBox")
         self.showOriginal_checkBox.setChecked(self.showOriginal)
-        self.showOriginal_checkBox.setText("翻译时是否显示识别到的原文")
 
-        # 原文自动复制到剪贴板checkBox
-        self.Clipboard_checkBox = QtWidgets.QCheckBox(self.tab_3)
-        self.Clipboard_checkBox.setGeometry(QtCore.QRect(30*self.rate, 430*self.rate, 231*self.rate, 16*self.rate))
-        self.Clipboard_checkBox.setChecked(self.showClipboard)
-        self.Clipboard_checkBox.setText("启用将原文自动复制到剪贴板")
-
-
-        # 工具栏4
+        self.spinBox = QtWidgets.QSpinBox(self.tab_3)
+        self.spinBox.setGeometry(QtCore.QRect(200, 355, 51, 22))
+        self.spinBox.setStyleSheet("background: transparent;")
+        self.spinBox.setMinimum(100)
+        self.spinBox.setMaximum(300)
+        self.spinBox.setObjectName("spinBox")
+        self.spinBox.setValue(self.screenSize)
+        
+        self.originalColour_label_2 = QtWidgets.QLabel(self.tab_3)
+        self.originalColour_label_2.setGeometry(QtCore.QRect(30, 360, 251, 16))
+        self.originalColour_label_2.setStyleSheet("background: transparent;")
+        self.originalColour_label_2.setObjectName("originalColour_label_2")
+        
+        self.tabWidget.addTab(self.tab_3, "")
         self.tab_4 = QtWidgets.QWidget()
-        self.tabWidget.addTab(self.tab_4, "")
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_4), "其他设定")
-
-        # 此Label用于雾化工具栏4的背景图
-        self.bgImage4 = QLabel(self.tab_4)
-        self.bgImage4.setGeometry(QRect(0, 0, 408*self.rate, 578*self.rate))
-        self.bgImage4.setStyleSheet("background: rgba(255, 255, 255, 0.3);")
-        
-        # 其他设定标签
-        self.tab4_label_4 = QtWidgets.QLabel(self.tab_4)
-        self.tab4_label_4.setGeometry(QtCore.QRect(30*self.rate, 20*self.rate, 201*self.rate, 16*self.rate))
-        self.tab4_label_4.setText("一些独立的其他设定在这里调整")
-
-        # 翻译框透明度设定标签1
+        self.tab_4.setObjectName("tab_4")
         self.tab4_label_1 = QtWidgets.QLabel(self.tab_4)
-        self.tab4_label_1.setGeometry(QtCore.QRect(30*self.rate, 60*self.rate, 211*self.rate, 16*self.rate))
-        self.tab4_label_1.setText("调节翻译界面的背景透明度")
+        self.tab4_label_1.setGeometry(QtCore.QRect(30, 25, 211, 16))
+        self.tab4_label_1.setStyleSheet("background: transparent;")
+        self.tab4_label_1.setObjectName("tab4_label_1")
         
-        # 翻译框透明度设定
         self.horizontalSlider = QtWidgets.QSlider(self.tab_4)
-        self.horizontalSlider.setGeometry(QtCore.QRect(30*self.rate, 90*self.rate, 347*self.rate, 22*self.rate))
+        self.horizontalSlider.setGeometry(QtCore.QRect(30, 55, 347, 22))
         self.horizontalSlider.setStyleSheet("background: transparent;")
         self.horizontalSlider.setMaximum(100)
         self.horizontalSlider.setOrientation(QtCore.Qt.Horizontal)
+        self.horizontalSlider.setObjectName("horizontalSlider")
         self.horizontalSlider.setValue(self.horizontal)
         self.horizontalSlider.valueChanged.connect(self.get_horizontal)
 
-        # 翻译框透明度设定标签2
         self.tab4_label_2 = QtWidgets.QLabel(self.tab_4)
-        self.tab4_label_2.setGeometry(QtCore.QRect(30*self.rate, 120*self.rate, 61*self.rate, 20*self.rate))
+        self.tab4_label_2.setGeometry(QtCore.QRect(30, 85, 61, 20))
+        self.tab4_label_2.setStyleSheet("background: transparent;")
         self.tab4_label_2.setObjectName("tab4_label_2")
-        self.tab4_label_2.setText("完全透明")
         
-        # 翻译框透明度设定标签3
         self.tab4_label_3 = QtWidgets.QLabel(self.tab_4)
-        self.tab4_label_3.setGeometry(QtCore.QRect(310*self.rate, 120*self.rate, 71*self.rate, 20*self.rate))
-        self.tab4_label_3.setText("完全不透明")
+        self.tab4_label_3.setGeometry(QtCore.QRect(310, 85, 71, 20))
+        self.tab4_label_3.setStyleSheet("background: transparent;")
+        self.tab4_label_3.setObjectName("tab4_label_3")
 
-        # 竖排文字翻译模式checkBox
-        self.TranslateRow_checkBox = QtWidgets.QCheckBox(self.tab_4)
-        self.TranslateRow_checkBox.setGeometry(QtCore.QRect(30*self.rate, 165*self.rate, 340*self.rate, 16*self.rate))
-        self.TranslateRow_checkBox.setChecked(self.showTranslateRow)
-        self.TranslateRow_checkBox.setText("启用竖排文字翻译模式（额度为每天500次）")
+        self.tab4_label_4 = QtWidgets.QLabel(self.tab_4)
+        self.tab4_label_4.setGeometry(QtCore.QRect(30, 120, 201, 16))
+        self.tab4_label_4.setStyleSheet("background: transparent;")
+        self.tab4_label_4.setObjectName("tab4_label_4")
+        
+        self.Clipboard_checkBox = QtWidgets.QCheckBox(self.tab_4)
+        self.Clipboard_checkBox.setGeometry(QtCore.QRect(30, 155, 231, 16))
+        self.Clipboard_checkBox.setStyleSheet("background: transparent;")
+        self.Clipboard_checkBox.setObjectName("Clipboard_checkBox")
+        self.Clipboard_checkBox.setChecked(self.showClipboard)
 
-        # 竖排高精度翻译模式checkBox
-        self.highPrecision_checkBox = QtWidgets.QCheckBox(self.tab_4)
-        self.highPrecision_checkBox.setGeometry(QtCore.QRect(30*self.rate, 200*self.rate, 340*self.rate, 16*self.rate))
-        self.highPrecision_checkBox.setChecked(self.highPrecision)
-        self.highPrecision_checkBox.setText("启用高精度翻译模式（额度为每天500次）")
+        self.Clipboard_checkBox_2 = QtWidgets.QCheckBox(self.tab_4)
+        self.Clipboard_checkBox_2.setGeometry(QtCore.QRect(30, 190, 171, 16))
+        self.Clipboard_checkBox_2.setStyleSheet("background: transparent;")
+        self.Clipboard_checkBox_2.setObjectName("Clipboard_checkBox_2")
+        self.Clipboard_checkBox_2.setChecked(self.showHotKey)
+        
+        self.textEdit = QtWidgets.QTextEdit(self.tab_4)
+        self.textEdit.setGeometry(QtCore.QRect(200, 185, 51, 21))
+        self.textEdit.setStyleSheet("background: transparent;")
+        self.textEdit.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.textEdit.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.textEdit.setObjectName("textEdit")
 
-        # 高精度模式额度说明标签
-        self.highPrecisionlabel = QtWidgets.QLabel(self.tab_4)
-        self.highPrecisionlabel.setGeometry(QtCore.QRect(30*self.rate, 225*self.rate, 340*self.rate, 20*self.rate))
-        self.highPrecisionlabel.setStyleSheet("color: #f00000")
-        self.highPrecisionlabel.setText("* 高精度和竖排文字翻译模式共享每天500次的额度")
+        self.tab4_label_7 = QtWidgets.QLabel(self.tab_4)
+        self.tab4_label_7.setGeometry(QtCore.QRect(30, 220, 351, 41))
+        self.tab4_label_7.setStyleSheet("background: transparent;")
+        self.tab4_label_7.setObjectName("tab4_label_7")
 
-        # 翻译键快捷键checkBox
-        self.shortcutKey1_checkBox = QtWidgets.QCheckBox(self.tab_4)
-        self.shortcutKey1_checkBox.setGeometry(QtCore.QRect(30*self.rate, 275*self.rate, 160*self.rate, 16*self.rate))
-        self.shortcutKey1_checkBox.setStyleSheet("background: transparent;")
-        self.shortcutKey1_checkBox.setChecked(self.showHotKey1)
-        self.shortcutKey1_checkBox.setText("是否启用翻译键快捷键：")
-
-        # 翻译键的快捷键
-        self.HotKey1_ComboBox = QtWidgets.QComboBox(self.tab_4)
-        self.HotKey1_ComboBox.setGeometry(QtCore.QRect(200*self.rate, 270*self.rate, 120*self.rate, 21*self.rate))
-        self.HotKey1_ComboBox.setStyleSheet("background: rgba(255, 255, 255, 0.4);")
-        for index,HotKey in enumerate(self.HotKeys):
-            self.HotKey1_ComboBox.addItem("")
-            self.HotKey1_ComboBox.setItemText(index, HotKey)
-        self.HotKey1_ComboBox.setCurrentIndex(self.showHotKey1Value1)
-
-        # 范围键快捷键checkBox
-        self.shortcutKey2_checkBox = QtWidgets.QCheckBox(self.tab_4)
-        self.shortcutKey2_checkBox.setGeometry(QtCore.QRect(30*self.rate, 315*self.rate, 160*self.rate, 16*self.rate))
-        self.shortcutKey2_checkBox.setStyleSheet("background: transparent;")
-        self.shortcutKey2_checkBox.setChecked(self.showHotKey2)
-        self.shortcutKey2_checkBox.setText("是否启用范围键快捷键：")
-
-        # 范围键的快捷键
-        self.HotKey2_ComboBox = QtWidgets.QComboBox(self.tab_4)
-        self.HotKey2_ComboBox.setGeometry(QtCore.QRect(200*self.rate, 310*self.rate, 120*self.rate, 21*self.rate))
-        self.HotKey2_ComboBox.setStyleSheet("background: rgba(255, 255, 255, 0.4);")
-        for index,HotKey in enumerate(self.HotKeys):
-            self.HotKey2_ComboBox.addItem("")
-            self.HotKey2_ComboBox.setItemText(index, HotKey)
-        self.HotKey2_ComboBox.setCurrentIndex(self.showHotKey1Value2)
-
-
-        # 背景设定标签
         self.tab4_label_5 = QtWidgets.QLabel(self.tab_4)
-        self.tab4_label_5.setGeometry(QtCore.QRect(30*self.rate, 355*self.rate, 261*self.rate, 16*self.rate))
-        self.tab4_label_5.setText("自定义背景：设置你喜欢的图片作为背景")
+        self.tab4_label_5.setGeometry(QtCore.QRect(30, 280, 261, 16))
+        self.tab4_label_5.setStyleSheet("background: transparent;")
+        self.tab4_label_5.setObjectName("tab4_label_5")
         
-        # 选择背景图按钮
         self.openfileButton = QtWidgets.QPushButton(self.tab_4)
-        self.openfileButton.setGeometry(QtCore.QRect(30*self.rate, 380*self.rate, 75*self.rate, 23*self.rate))
-        self.openfileButton.setStyleSheet("background: rgba(255, 255, 255, 0.4);")
+        self.openfileButton.setGeometry(QtCore.QRect(30, 310, 75, 23))
+        self.openfileButton.setStyleSheet("background-image: url(:/image/Wechat.png);")
+        self.openfileButton.setObjectName("openfileButton")
         self.openfileButton.clicked.connect(self.Select_background)
-        self.openfileButton.setText("浏览文件")
         
-        # 背景图路径显示框
         self.openfileText = QtWidgets.QTextBrowser(self.tab_4)
-        self.openfileText.setGeometry(QtCore.QRect(120*self.rate, 382*self.rate, 251*self.rate, 21*self.rate))
+        self.openfileText.setGeometry(QtCore.QRect(120, 310, 251, 21))
         self.openfileText.setStyleSheet("background: transparent;")
         self.openfileText.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.openfileText.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.openfileText.setObjectName("openfileText")
         
-        # 背景图设定说明标签
         self.tab4_label_6 = QtWidgets.QLabel(self.tab_4)
-        self.tab4_label_6.setGeometry(QtCore.QRect(30*self.rate, 390*self.rate, 340*self.rate, 100*self.rate))
-        self.tab4_label_6.setText("<html><head/><body><p>说明：不支持png格式的图片；\
-                                   </p><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;以分辨率408 x 578时效果最佳；</p></body></html>")
+        self.tab4_label_6.setGeometry(QtCore.QRect(30, 350, 331, 16))
+        self.tab4_label_6.setStyleSheet("background: transparent;")
+        self.tab4_label_6.setObjectName("tab4_label_6")
         
-        # 工具栏5
+        self.tabWidget.addTab(self.tab_4, "")
         self.tab_5 = QtWidgets.QWidget()
-        self.tabWidget.addTab(self.tab_5, "")
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_5), "支持作者")
-
-        # 此Label用于雾化工具栏5的背景图
-        self.bgImage5 = QLabel(self.tab_5)
-        self.bgImage5.setGeometry(QRect(0, 0, 408*self.rate, 578*self.rate))
-        self.bgImage5.setStyleSheet("background: rgba(255, 255, 255, 0.3);")
-
-        # 充电独白标签
-        self.Mysay_label = QtWidgets.QLabel(self.tab_5)
-        self.Mysay_label.setGeometry(QtCore.QRect(40*self.rate, 10*self.rate, 281*self.rate, 141*self.rate))
-        self.Mysay_label.setText("<html><head/><body><p>大家好，我是胖次团子 ❤\
-                                  </p><p>谢谢大家使用团子翻译器Ver3.3 ~\
-                                  </p><p>软件是免费的，但是若能收到你的充电支持 ~\
-                                  </p><p>我会非常开心的，这会是我后续更新的动力 ~\
-                                  </p><p>联系方式 ———— QQ 394883561</p></body></html>")
-
-        self.Mysay2_label = QtWidgets.QLabel(self.tab_5)
-        self.Mysay2_label.setGeometry(QtCore.QRect(40*self.rate, 120*self.rate, 340*self.rate, 141*self.rate))
-        self.Mysay2_label.setStyleSheet("color: red")
-        self.Mysay2_label.setText("<html><head/><body><p>说明：①团子翻译器从不设置强制收费或购买\
-                                  </p><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;②如你是通过第三方购买的方式获得，请联系我\
-                                  </p><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;③请加群获取最新版本以及一切交流解惑</p></body></html>")
-
-        # 放置微信收款图片
+        self.tab_5.setObjectName("tab_5")
         self.WechatImage_label = QtWidgets.QLabel(self.tab_5)
-        self.WechatImage_label.setGeometry(QtCore.QRect(20*self.rate, 240*self.rate, 170*self.rate, 170*self.rate))
-
-        # 放置支付宝收款图片
+        self.WechatImage_label.setGeometry(QtCore.QRect(20, 170, 170, 170))
+        self.WechatImage_label.setText("")
+        self.WechatImage_label.setTextFormat(QtCore.Qt.AutoText)
+        self.WechatImage_label.setObjectName("WechatImage_label")
         self.AlipayImage_label = QtWidgets.QLabel(self.tab_5)
-        self.AlipayImage_label.setGeometry(QtCore.QRect(215*self.rate, 240*self.rate, 170*self.rate, 170*self.rate))
-
-        # 微信充电标签
+        self.AlipayImage_label.setGeometry(QtCore.QRect(215, 170, 170, 170))
+        self.AlipayImage_label.setText("")
+        self.AlipayImage_label.setTextFormat(QtCore.Qt.AutoText)
+        self.AlipayImage_label.setObjectName("AlipayImage_label")
         self.Wechat_label = QtWidgets.QLabel(self.tab_5)
-        self.Wechat_label.setGeometry(QtCore.QRect(60*self.rate, 420*self.rate, 81*self.rate, 20*self.rate))
-        self.Wechat_label.setStyleSheet("font: 14pt")
-        self.Wechat_label.setText("微信充电")
-        
-        # 支付宝充电标签
+        self.Wechat_label.setGeometry(QtCore.QRect(60, 350, 81, 16))
+        font = QtGui.QFont()
+        font.setFamily("华康方圆体W7")
+        font.setPointSize(14)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.Wechat_label.setFont(font)
+        self.Wechat_label.setStyleSheet("background: transparent;\n"
+"font: 14pt \"华康方圆体W7\";")
+        self.Wechat_label.setObjectName("Wechat_label")
         self.Alipay_label = QtWidgets.QLabel(self.tab_5)
-        self.Alipay_label.setGeometry(QtCore.QRect(250*self.rate, 420*self.rate, 101*self.rate, 20*self.rate))
-        self.Alipay_label.setStyleSheet("font: 14pt")
-        self.Alipay_label.setText("支付宝充电")
-
-        # 设置保存按钮
+        self.Alipay_label.setGeometry(QtCore.QRect(250, 350, 101, 16))
+        self.Alipay_label.setStyleSheet("font: 14pt \"华康方圆体W7\";\n"
+"background: transparent;")
+        self.Alipay_label.setObjectName("Alipay_label")
+        self.Mysay_label = QtWidgets.QLabel(self.tab_5)
+        self.Mysay_label.setGeometry(QtCore.QRect(40, 10, 281, 141))
+        self.Mysay_label.setStyleSheet("background: transparent;")
+        self.Mysay_label.setObjectName("Mysay_label")
+        self.tabWidget.addTab(self.tab_5, "")
+        
         self.SaveButton = QtWidgets.QPushButton(self)
-        self.SaveButton.setGeometry(QtCore.QRect(85*self.rate, 515*self.rate, 90*self.rate, 30*self.rate))
-        self.SaveButton.setStyleSheet("background: rgba(255, 255, 255, 0.4);font: 12pt;")
-        self.SaveButton.setText("保存设置")
+        self.SaveButton.setGeometry(QtCore.QRect(85, 420, 90, 30))
+        font = QtGui.QFont()
+        font.setFamily("华康方圆体W7")
+        font.setPointSize(12)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.SaveButton.setFont(font)
+        self.SaveButton.setStyleSheet("background-image: url(:/image/Wechat.png);")
+        self.SaveButton.setObjectName("SaveButton")
+        self.SaveButton.clicked.connect(lambda:message_thread(self.save_settin))
 
-        # 设置返回按钮
         self.CancelButton = QtWidgets.QPushButton(self)
-        self.CancelButton.setGeometry(QtCore.QRect(232*self.rate, 515*self.rate, 90*self.rate, 30*self.rate))
-        self.CancelButton.setStyleSheet("background: rgba(255, 255, 255, 0.4);font: 12pt")
-        self.CancelButton.setText("退 出")
+        self.CancelButton.setGeometry(QtCore.QRect(232, 420, 90, 30))
+        font = QtGui.QFont()
+        font.setFamily("华康方圆体W7")
+        font.setPointSize(12)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.CancelButton.setFont(font)
+        self.CancelButton.setStyleSheet("background-image: url(:/image/Wechat.png);")
+        self.CancelButton.setObjectName("CancelButton")
+
+        self.retranslateUi()
+        self.tabWidget.setCurrentIndex(0)
+        QtCore.QMetaObject.connectSlotsByName(self)
+        self.setTabOrder(self.OCR_Key_Text, self.OCR_Secret_Text)
+        self.setTabOrder(self.OCR_Secret_Text, self.baidu_Key_Text)
+        self.setTabOrder(self.baidu_Key_Text, self.baidu_Secret_Text)
+        self.setTabOrder(self.baidu_Secret_Text, self.tencent_Key_Text)
+        self.setTabOrder(self.tencent_Key_Text, self.tencent_Secret_Text)
+        self.setTabOrder(self.tencent_Secret_Text, self.SaveButton)
+        self.setTabOrder(self.SaveButton, self.CancelButton)
+        self.setTabOrder(self.CancelButton, self.OCRRegister_Button)
+        self.setTabOrder(self.OCRRegister_Button, self.baiduRegister_Button)
+        self.setTabOrder(self.baiduRegister_Button, self.tencentSelect_Button_2)
+        self.setTabOrder(self.tencentSelect_Button_2, self.baiduSelect_Button)
+        self.setTabOrder(self.baiduSelect_Button, self.tencentSelect_Button)
+        self.setTabOrder(self.tencentSelect_Button, self.tabWidget)
+        self.setTabOrder(self.tabWidget, self.youdao_checkBox)
+        self.setTabOrder(self.youdao_checkBox, self.caiyun_checkBox)
+        self.setTabOrder(self.caiyun_checkBox, self.jinshan_checkBox)
+        self.setTabOrder(self.jinshan_checkBox, self.baidu_checkBox)
+        self.setTabOrder(self.baidu_checkBox, self.tencent_checkBox)
+        self.setTabOrder(self.tencent_checkBox, self.manual_radioButton)
+        self.setTabOrder(self.manual_radioButton, self.auto_radioButton)
+        self.setTabOrder(self.auto_radioButton, self.autoSpeed_spinBox)
+        self.setTabOrder(self.autoSpeed_spinBox, self.fontComboBox_1)
+        self.setTabOrder(self.fontComboBox_1, self.fontComboBox_2)
+        self.setTabOrder(self.fontComboBox_2, self.fontComboBox_3)
+        self.setTabOrder(self.fontComboBox_3, self.fontComboBox_4)
+        self.setTabOrder(self.fontComboBox_4, self.fontComboBox_5)
+        self.setTabOrder(self.fontComboBox_5, self.fontComboBox_6)
+        self.setTabOrder(self.fontComboBox_6, self.youdaoSize_spinBox)
+        self.setTabOrder(self.youdaoSize_spinBox, self.youdaoColour_toolButton)
+        self.setTabOrder(self.youdaoColour_toolButton, self.caiyunColour_toolButton)
+        self.setTabOrder(self.caiyunColour_toolButton, self.jinshanColour_toolButton)
+        self.setTabOrder(self.jinshanColour_toolButton, self.tencentColour_toolButton)
+        self.setTabOrder(self.tencentColour_toolButton, self.originalColour_toolButton)
+        self.setTabOrder(self.originalColour_toolButton, self.baiduColour_toolButton)
+        self.setTabOrder(self.baiduColour_toolButton, self.caiyunSize_spinBox)
+        self.setTabOrder(self.caiyunSize_spinBox, self.jinshanSize_spinBox)
+        self.setTabOrder(self.jinshanSize_spinBox, self.baiduSize_spinBox)
+        self.setTabOrder(self.baiduSize_spinBox, self.tencentSize_spinBox)
+        self.setTabOrder(self.tencentSize_spinBox, self.originalSize_spinBox)
+        self.setTabOrder(self.originalSize_spinBox, self.showOriginal_checkBox)
+        self.setTabOrder(self.showOriginal_checkBox, self.horizontalSlider)
+        self.setTabOrder(self.horizontalSlider, self.Clipboard_checkBox)
+
+        self.OCR_Key_Text.setPlainText(self.OCR_Key)
+        self.OCR_Secret_Text.setPlainText(self.OCR_Secret)
+        self.baidu_Key_Text.setPlainText(self.baidu_Key)
+        self.baidu_Secret_Text.setPlainText(self.baidu_Secret)
+        self.tencent_Key_Text.setPlainText(self.tencent_Key)
+        self.tencent_Secret_Text.setPlainText(self.tencent_Secret)
+
+
+    def retranslateUi(self):
+        _translate = QtCore.QCoreApplication.translate
+        self.setWindowTitle(_translate("self", "团子翻译器 Ver3.0 - 设置"))
+        self.OCR_Key_Text.setHtml(_translate("self", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'华康方圆体W7\'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'SimSun\'; font-size:9pt;\"><br /></p></body></html>"))
+        self.OCR_label_1.setText(_translate("self", "（必填）OCR API：用于识别要翻译的文字"))
+        self.OCR_Secret_Text.setHtml(_translate("self", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'华康方圆体W7\'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'SimSun\';\"><br /></p></body></html>"))
+        self.OCR_label_2.setText(_translate("self", "Key："))
+        self.OCR_label_3.setText(_translate("self", "Secret Key："))
+        self.OCR_label_4.setText(_translate("self", "*"))
+        self.OCR_label_5.setText(_translate("self", "*"))
+        self.OCRRegister_Button.setText(_translate("self", "注册OCR"))
+        self.baiduAPI_label_1.setText(_translate("self", "（选填）百度翻译 API：每月额度200万字符"))
+        self.baiduAPI_label_2.setText(_translate("self", "APP ID："))
+        self.baiduAPI_label_3.setText(_translate("self", "密钥："))
+        self.baidu_Key_Text.setHtml(_translate("self", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'华康方圆体W7\'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'SimSun\'; font-size:9pt;\"><br /></p></body></html>"))
+        self.baidu_Secret_Text.setHtml(_translate("self", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'华康方圆体W7\'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'SimSun\'; font-size:9pt;\"><br /></p></body></html>"))
+        self.baiduRegister_Button.setText(_translate("self", "注册百度"))
+        self.baiduSelect_Button.setText(_translate("self", "额度查询"))
+        self.TencentAPI_laber_1.setText(_translate("self", "（选填）腾讯翻译 API：每月额度500万字符"))
+        self.TencentAPI_laber_2.setText(_translate("self", "Secretld："))
+        self.TencentAPI_laber_3.setText(_translate("self", "SecretKey："))
+        self.tencent_Key_Text.setHtml(_translate("self", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'华康方圆体W7\'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'SimSun\'; font-size:9pt;\"><br /></p></body></html>"))
+        self.tencent_Secret_Text.setHtml(_translate("self", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'华康方圆体W7\'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'SimSun\'; font-size:9pt;\"><br /></p></body></html>"))
+        self.tencentSelect_Button_2.setText(_translate("self", "注册腾讯"))
+        self.tencentSelect_Button.setText(_translate("self", "额度查询"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_1), _translate("self", "API设定"))
+        self.translateSource_label_1.setText(_translate("self", "翻译源：选择你想使用的翻译"))
+        self.youdao_checkBox.setText(_translate("self", "有道翻译"))
+        self.caiyun_checkBox.setText(_translate("self", "彩云小泽"))
+        self.jinshan_checkBox.setText(_translate("self", "金山词霸"))
+        self.translateSource_label_2.setText(_translate("self", "公共（可直接使用，但可能会失效）"))
+        self.translateSource_label_3.setText(_translate("self", "私人API（使用稳定，但需注册后才可使用）"))
+        self.baidu_checkBox.setText(_translate("self", "百度翻译"))
+        self.tencent_checkBox.setText(_translate("self", "腾讯翻译"))
+        self.translateMode_label_1.setText(_translate("self", "翻译模式：选择你喜欢的翻译方式"))
+        self.manual_radioButton.setText(_translate("self", "手动翻译（每次翻译需点击翻译键）"))
+        self.auto_radioButton.setText(_translate("self", "自动翻译（按照设定的时间自动刷新翻译）"))
+        self.translateMode_label_2.setText(_translate("self", "自动模式下每"))
+        self.translateMode_label_3.setText(_translate("self", "秒刷新一次翻译"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("self", "翻译方式"))
+        self.colour_label_1.setText(_translate("self", "自定义译文字体的颜色、字型、大小"))
+        self.youdaoColour_label.setText(_translate("self", "有道翻译："))
+        self.caiyunColour_label.setText(_translate("self", "彩云小泽："))
+        self.jinshanColour_label.setText(_translate("self", "金山词霸："))
+        self.baiduColour_label.setText(_translate("self", "百度翻译："))
+        self.tencentColour_label.setText(_translate("self", "腾讯翻译："))
+        self.colour_label_2.setText(_translate("self", "颜色"))
+        self.colour_label_4.setText(_translate("self", "字型"))
+        self.colour_label_3.setText(_translate("self", "大小"))
+        self.originalColour_label.setText(_translate("self", "原    文："))
+        self.youdaoColour_toolButton.setText(_translate("self", "样 式"))
+        self.caiyunColour_toolButton.setText(_translate("self", "样 式"))
+        self.jinshanColour_toolButton.setText(_translate("self", "样 式"))
+        self.tencentColour_toolButton.setText(_translate("self", "样 式"))
+        self.originalColour_toolButton.setText(_translate("self", "样 式"))
+        self.baiduColour_toolButton.setText(_translate("self", "样 式"))
+        self.showOriginal_checkBox.setText(_translate("self", "是否显示原文"))
+        self.originalColour_label_2.setText(_translate("SettinInterface", "我的电脑屏幕显示比例为：         %"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("self", "字体设定"))
+        self.tab4_label_1.setText(_translate("self", "翻译框透明度：调节其背景色深度"))
+        self.tab4_label_2.setText(_translate("self", "完全透明"))
+        self.tab4_label_3.setText(_translate("self", "完全不透明"))
+        self.Clipboard_checkBox.setText(_translate("self", "是否启用将原文自动复制到剪贴板"))
+        self.tab4_label_4.setText(_translate("self", "其他设定：一些独立的其他设定"))
+        self.Clipboard_checkBox_2.setText(_translate("SettinInterface", "是否启用快捷键：alt + "))
+        self.textEdit.setHtml(_translate("SettinInterface", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'华康方圆体W7\'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">%s</p></body></html>"%(self.showHotKeyValue)))
+        self.tab4_label_7.setText(_translate("SettinInterface", "<html><head/><body><p>说明：仅支持space、a-z、0-9，alt+所填键按下后生效</p><p> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;如无效则表示与电脑其他快捷键冲突</p></body></html>"))
+
+        self.tab4_label_5.setText(_translate("self", "自定义背景：设置你喜欢的图片作为背景"))
+        self.openfileButton.setText(_translate("self", "浏览文件"))
+        self.openfileText.setHtml(_translate("self", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'华康方圆体W7\'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>"))
+        self.tab4_label_6.setText(_translate("self", "说明：选择的背景图片以分辨率407 x 475时效果最佳"))
+
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_4), _translate("self", "翻译框设定"))
+        self.Wechat_label.setText(_translate("self", "微信充电"))
+        self.Alipay_label.setText(_translate("self", "支付宝充电"))
+        self.Mysay_label.setText(_translate("self", "<html><head/><body><p>大家好，我是胖次团子 ❤</p><p>谢谢大家使用团子翻译器Ver3.0 ~</p><p>软件是免费的，但是若能收到你的充电支持 ~</p><p>我会非常开心的，这会是我后续更新的动力 ~ </p><p>联系方式：QQ 394883561</p></body></html>"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_5), _translate("self", "我要充电"))
+        self.SaveButton.setText(_translate("self", "保存设置"))
+        self.CancelButton.setText(_translate("self", "关 闭"))
 
 
     def get_settin(self):  # 获取所有预设值
@@ -788,29 +974,25 @@ class SettinInterface(QWidget):
         self.youdaoColor = self.data["fontColor"]["youdao"]
         self.caiyunColor = self.data["fontColor"]["caiyun"]
         self.jinshanColor = self.data["fontColor"]["jinshan"]
-        self.yeekitColor = self.data["fontColor"]["yeekit"]
-        self.ALAPIColor = self.data["fontColor"]["ALAPI"]
-        self.baiduwebColor = self.data["fontColor"]["baiduweb"]
-        self.tencentwebColor = self.data["fontColor"]["tencentweb"]
-        self.googleColor = self.data["fontColor"]["google"]
-        self.BingColor = self.data["fontColor"]["Bing"]
         self.baiduColor = self.data["fontColor"]["baidu"]
         self.tencentColor = self.data["fontColor"]["tencent"]
-        self.caiyunPrivateColor = self.data["fontColor"]["caiyunPrivate"]
         self.originalColor = self.data["fontColor"]["original"]
 
-        # 获取翻译字体大小预设值
-        self.fontSize = self.data["fontSize"]
+        # 获取各翻译源字体大小预设值
+        self.youdaoSize = int(self.data["fontSize"]["youdao"])
+        self.caiyunSize = int(self.data["fontSize"]["caiyun"])
+        self.jinshanSize = int(self.data["fontSize"]["jinshan"])
+        self.baiduSize = int(self.data["fontSize"]["baidu"])
+        self.tencentSize = int(self.data["fontSize"]["tencent"])
+        self.originalSize = int(self.data["fontSize"]["original"])
 
-        # 获取翻译字体样式预设值
-        self.fontType = self.data["fontType"]
-
-        # 获取颜色样式预设值
-        self.showColorType = self.data["showColorType"]
-        if self.showColorType == "True":
-            self.showColorType = True
-        else:
-            self.showColorType = False
+        # 获取各翻译源字体样式预设值
+        self.youdaoFont = self.data["fontType"]["youdao"]
+        self.caiyunFont = self.data["fontType"]["caiyun"]
+        self.jinshanFont = self.data["fontType"]["jinshan"]
+        self.baiduFont = self.data["fontType"]["baidu"]
+        self.tencentFont = self.data["fontType"]["tencent"]
+        self.originalFont = self.data["fontType"]["original"]
 
         # 获取是否显示原文预设值
         self.showOriginal = self.data["showOriginal"]
@@ -826,52 +1008,25 @@ class SettinInterface(QWidget):
         else:
             self.showClipboard = False
 
-        # 获取是否启用竖排文本翻译模式预设值
-        self.showTranslateRow = self.data["showTranslateRow"]
-        if self.showTranslateRow == "True":
-            self.showTranslateRow = True
+        # 获取快捷键的热键预设值
+        self.showHotKeyValue = self.data["showHotKeyValue"]
+
+        # 获取是否启用快捷键预设值
+        self.showHotKey = self.data["showHotKey"]
+        if self.showHotKey == "True":
+            self.showHotKey = True
         else:
-            self.showTranslateRow = False
-
-        # 获取是否启用高精度翻译模式预设值
-        self.highPrecision = self.data["highPrecision"]
-        if self.highPrecision == "True":
-            self.highPrecision = True
-        else:
-            self.highPrecision = False
-
-        # 所有可设置的快捷键
-        self.HotKeys = ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12',
-                        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-                        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 
-                        'Back', 'Tab', 'Space', 'Left', 'Up', 'Right', 'Down', 'Delete',
-                        'Numpad0', 'Numpad1', 'Numpad2', 'Numpad3', 'Numpad4', 'Numpad5', 'Numpad6', 'Numpad7', 'Numpad8', 'Numpad9']
-        
-        # 获取翻译键快捷键的热键预设值
-        self.showHotKey1Value1 = self.data["showHotKeyValue1"]
-        self.showHotKey1Value1 = self.HotKeys.index(self.showHotKey1Value1)
-
-        # 获取范围键快捷键的热键预设值
-        self.showHotKey1Value2 = self.data["showHotKeyValue2"]
-        self.showHotKey1Value2 = self.HotKeys.index(self.showHotKey1Value2)
-
-        
-        # 获取是否启用翻译键快捷键预设值
-        self.showHotKey1 = self.data["showHotKey1"]
-        if self.showHotKey1 == "True":
-            self.showHotKey1 = True
-        else:
-            self.showHotKey1 = False
-
-        # 获取是否启用范围键快捷键预设值
-        self.showHotKey2 = self.data["showHotKey2"]
-        if self.showHotKey2 == "True":
-            self.showHotKey2 = True
-        else:
-            self.showHotKey2 = False
+            self.showHotKey = False
 
         # 获取文本框透明度预设值
         self.horizontal = self.data["horizontal"]
+
+        # 获取是否使用有道翻译预设值
+        self.youdaoUse = self.data["youdaoUse"]
+        if self.youdaoUse == "True":
+            self.youdaoUse = True
+        else:
+            self.youdaoUse = False
 
         # 获取是否使用有道翻译预设值
         self.youdaoUse = self.data["youdaoUse"]
@@ -894,48 +1049,6 @@ class SettinInterface(QWidget):
         else:
             self.jinshanUse = False
 
-        # 获取是否使用yeekit翻译预设值
-        self.yeekitUse = self.data["yeekitUse"]
-        if self.yeekitUse == "True":
-            self.yeekitUse = True
-        else:
-            self.yeekitUse = False
-
-        # 获取是否使用alapi翻译预设值
-        self.alapiUse = self.data["alapiUse"]
-        if self.alapiUse == "True":
-            self.alapiUse = True
-        else:
-            self.alapiUse = False
-
-        # 获取是否使用百度翻译网页版预设值
-        self.baiduwebUse = self.data["baiduwebUse"]
-        if self.baiduwebUse == "True":
-            self.baiduwebUse = True
-        else:
-            self.baiduwebUse = False
-
-        # 获取是否使用腾讯翻译网页版预设值
-        self.tencentwebUse = self.data["tencentwebUse"]
-        if self.tencentwebUse == "True":
-            self.tencentwebUse = True
-        else:
-            self.tencentwebUse = False
-
-        # 获取是否使用谷歌翻译网页版预设值
-        self.googleUse = self.data["googleUse"]
-        if self.googleUse == "True":
-            self.googleUse = True
-        else:
-            self.googleUse = False
-
-        # 获取是否使用Bing翻译网页版预设值
-        self.BingUse = self.data["BingUse"]
-        if self.BingUse == "True":
-            self.BingUse = True
-        else:
-            self.BingUse = False
-
         # 获取是否使用百度翻译预设值
         self.baiduUse = self.data["baiduUse"]
         if self.baiduUse == "True":
@@ -950,12 +1063,14 @@ class SettinInterface(QWidget):
         else:
             self.tencentUse = False
 
-        # 获取是否使用私人彩云翻译预设值
-        self.caiyunPrivateUse = self.data["caiyunPrivateUse"]
-        if self.caiyunPrivateUse == "True":
-            self.caiyunPrivateUse = True
+        # 获取翻译模式预设值
+        self.translateMode = self.data["translateMode"]
+        if self.translateMode == "auto":
+            self.autoMode = True
+            self.manualMode = False
         else:
-            self.caiyunPrivateUse = False
+            self.autoMode = False
+            self.manualMode = True
 
         # 获取自动翻译时的刷新间隔预设值
         self.translateSpeed = self.data["translateSpeed"]
@@ -967,16 +1082,9 @@ class SettinInterface(QWidget):
         self.baidu_Secret = self.data["baiduAPI"]["Secret"]
         self.tencent_Key = self.data["tencentAPI"]["Key"]
         self.tencent_Secret = self.data["tencentAPI"]["Secret"]
-        self.caiyun_token = self.data["caiyunAPI"]
 
-        # 获取翻译语言预设值
-        self.language = self.data["language"]
-        if self.language == 'ENG':
-            self.language = 1
-        elif self.language == 'KOR':
-            self.language = 2
-        else:
-            self.language = 0
+        # 获取屏幕比例预设值
+        self.screenSize = self.data["screenSize"] * 100
 
 
     def Select_background(self):  # 将背景图片路径打印在显示框
@@ -985,63 +1093,33 @@ class SettinInterface(QWidget):
         if self.image_path:
             self.openfileText.setText(self.image_path)
 
-
     def get_font_color(self, sign):  # 各翻译源字体颜色
 
         color = QColorDialog.getColor()
         if sign == 1 :
             self.youdaoColor = color.name()
-            self.youdaoColour_toolButton.setStyleSheet("background: rgba(255, 255, 255, 0.4);color: {};".format(color.name()))
+            self.youdaoColour_toolButton.setStyleSheet("background-image: url(:/image/Wechat.png);color: {};".format(color.name()))
             self.data["fontColor"]["youdao"] = self.youdaoColor
         elif sign == 2 :
             self.caiyunColor = color.name()
-            self.caiyunColour_toolButton.setStyleSheet("background: rgba(255, 255, 255, 0.4);color: {};".format(color.name()))
+            self.caiyunColour_toolButton.setStyleSheet("background-image: url(:/image/Wechat.png);color: {};".format(color.name()))
             self.data["fontColor"]["caiyun"] = self.caiyunColor
         elif sign == 3 :
             self.jinshanColor = color.name()
-            self.jinshanColour_toolButton.setStyleSheet("background: rgba(255, 255, 255, 0.4);color: {};".format(color.name()))
+            self.jinshanColour_toolButton.setStyleSheet("background-image: url(:/image/Wechat.png);color: {};".format(color.name()))
             self.data["fontColor"]["jinshan"] = self.jinshanColor
         elif sign == 4 :
-            self.yeekitColor = color.name()
-            self.yeekitColour_toolButton.setStyleSheet("background: rgba(255, 255, 255, 0.4);color: {};".format(color.name()))
-            self.data["fontColor"]["yeekit"] = self.yeekitColor
-        elif sign == 5 :
-            self.ALAPIColor = color.name()
-            self.alapiColour_toolButton.setStyleSheet("background: rgba(255, 255, 255, 0.4);color: {};".format(color.name()))
-            self.data["fontColor"]["ALAPI"] = self.ALAPIColor
-        elif sign == 6 :
-            self.baiduwebColor = color.name()
-            self.baiduwebColour_toolButton.setStyleSheet("background: rgba(255, 255, 255, 0.4);color: {};".format(color.name()))
-            self.data["fontColor"]["baiduweb"] = self.baiduwebColor
-        elif sign == 7 :
-            self.tencentwebColor = color.name()
-            self.tencentwebColour_toolButton.setStyleSheet("background: rgba(255, 255, 255, 0.4);color: {};".format(color.name()))
-            self.data["fontColor"]["tencentweb"] = self.tencentwebColor
-        elif sign == 8 :
-            self.googleColor = color.name()
-            self.googleColour_toolButton.setStyleSheet("background: rgba(255, 255, 255, 0.4);color: {};".format(color.name()))
-            self.data["fontColor"]["google"] = self.googleColor
-        elif sign == 9 :
-            self.BingColor = color.name()
-            self.BingColour_toolButton.setStyleSheet("background: rgba(255, 255, 255, 0.4);color: {};".format(color.name()))
-            self.data["fontColor"]["Bing"] = self.BingColor
-        elif sign == 10 :
             self.baiduColor = color.name()
-            self.baiduColour_toolButton.setStyleSheet("background: rgba(255, 255, 255, 0.4);color: {};".format(color.name()))
+            self.baiduColour_toolButton.setStyleSheet("background-image: url(:/image/Wechat.png);color: {};".format(color.name()))
             self.data["fontColor"]["baidu"] = self.baiduColor
-        elif sign == 11 :
+        elif sign == 5 :
             self.tencentColor = color.name()
-            self.tencentColour_toolButton.setStyleSheet("background: rgba(255, 255, 255, 0.4);color: {};".format(color.name()))
+            self.tencentColour_toolButton.setStyleSheet("background-image: url(:/image/Wechat.png);color: {};".format(color.name()))
             self.data["fontColor"]["tencent"] = self.tencentColor
-        elif sign == 12 :
-            self.caiyunPrivateColor = color.name()
-            self.caiyunPrivateColour_toolButton.setStyleSheet("background: rgba(255, 255, 255, 0.4);color: {};".format(color.name()))
-            self.data["fontColor"]["caiyunPrivate"] = self.caiyunPrivateColor
-        elif sign == 13 :
+        elif sign == 6 :
             self.originalColor = color.name()
-            self.originalColour_toolButton.setStyleSheet("background: rgba(255, 255, 255, 0.4);color: {};".format(color.name()))
+            self.originalColour_toolButton.setStyleSheet("background-image: url(:/image/Wechat.png);color: {};".format(color.name()))
             self.data["fontColor"]["original"] = self.originalColor
-
 
     def change_background(self):  # 改变背景图片
 
@@ -1051,45 +1129,48 @@ class SettinInterface(QWidget):
         except AttributeError:
             pass
         else:
-            with open('./config/Background%d.jpg'%self.image_sign, 'wb') as file:
+            with open('Background.jpg', 'wb') as file:
                 file.write(self.new_image)
-            
-        self.setStyleSheet("QWidget {""font: 10pt \"华康方圆体W7\";"
-                                      "background-image: url(./config/Background%d.jpg);"
-                                      "background-repeat: no-repeat;"
-                                      "background-size:cover;""}"%self.image_sign)
-
-        self.tabWidget.setStyleSheet("QTabBar::tab {""min-width:%dpx;"
-                                                     "background: rgba(255, 255, 255, 1);"
-                                                     "}"
-                                     "QTabBar::tab:selected {""border-bottom: 2px solid #4796f0;""}"
-                                     "QLabel{""background: transparent;""}"
-                                     "QCheckBox{""background: transparent;""}"%(self.px))
+            self.tabWidget.setStyleSheet("background-image: url(Background.jpg); background-repeat: no-repeat;font: 10pt \"华康方圆体W7\"; border-width:0;")
 
 
-    def get_fontType(self, text):  # 字体样式
+    def get_font_youdao(self, text):  # 有道字体样式
         
-        self.fontType = text
-        self.data["fontType"] = self.fontType
+        self.youdaoFont = text
+        self.data["fontType"]["youdao"] = self.youdaoFont
 
+    def get_font_caiyun(self, text):  # 彩云字体样式
+        
+        self.caiyunFont = text
+        self.data["fontType"]["caiyun"] = self.caiyunFont
 
-    def showOriginal_state(self):  # 颜色样式
+    def get_font_jinshan(self, text):  # 金山字体样式
+        
+        self.jinshanFont = text
+        self.data["fontType"]["jinshan"] = self.jinshanFont
 
-        if self.showColorType_checkBox.isChecked():
-            self.showColorType = "True"
-        else:
-            self.showColorType = "False"
-        self.data["showColorType"] = self.showColorType
+    def get_font_baidu(self, text):   # 百度字体样式
+        
+        self.baiduFont = text
+        self.data["fontType"]["baidu"] = self.baiduFont
 
-    
-    def showColorType_state(self):  # 是否显示原文
+    def get_font_tencent(self, text):  # 腾讯字体样式
+        
+        self.tencentFont = text
+        self.data["fontType"]["tencent"] = self.tencentFont
+
+    def get_font_original(self, text):  # 原文字体样式
+        
+        self.originalFont = text
+        self.data["fontType"]["original"] = self.originalFont
+
+    def showOriginal_state(self):  # 是否显示原文
 
         if self.showOriginal_checkBox.isChecked():
             self.showOriginal = "True"
         else:
             self.showOriginal = "False"
         self.data["showOriginal"] = self.showOriginal
-
 
     def showClipboard_state(self):  # 是否将原文自动复制到剪贴板
 
@@ -1099,53 +1180,35 @@ class SettinInterface(QWidget):
             self.showClipboard = "False"
         self.data["showClipboard"] = self.showClipboard
 
+    def showHotKey_state(self):  # 是否启用快捷键
 
-    def showTranslateRow_state(self):  # 是否启用竖排文字翻译模式
-
-        if self.TranslateRow_checkBox.isChecked():
-            self.showTranslateRow = "True"
+        if self.Clipboard_checkBox_2.isChecked():
+            self.showHotKey = "True"
         else:
-            self.showTranslateRow = "False"
-        self.data["showTranslateRow"] = self.showTranslateRow
-
-
-    def highPrecision_state(self):  # 是否启用高精度翻译模式
-
-        if self.highPrecision_checkBox.isChecked():
-            self.highPrecision = "True"
-        else:
-            self.highPrecision = "False"
-        self.data["highPrecision"] = self.highPrecision
-
-
-    def showHotKey1_state(self):  # 是否启用翻译键快捷键
-
-        if self.shortcutKey1_checkBox.isChecked():
-            self.showHotKey1 = "True"
-        else:
-            self.showHotKey1 = "False"
-        self.data["showHotKey1"] = self.showHotKey1
-
-
-    def showHotKey2_state(self):  # 是否启用范围键快捷键
-
-        if self.shortcutKey2_checkBox.isChecked():
-            self.showHotKey2 = "True"
-        else:
-            self.showHotKey2 = "False"
-        self.data["showHotKey2"] = self.showHotKey2
+            self.showHotKey = "False"
+        self.data["showHotKey"] = self.showHotKey
         
+        self.showHotKeyValue = self.textEdit.toPlainText().replace(' ','').replace('\n','').replace('\t','')
+        char = 'zxcvbnmasdfghjklqwertyuiop1234567890'
+        if (self.showHotKeyValue in char) or (self.showHotKeyValue == 'space'):
+            self.data["showHotKeyValue"] = self.showHotKeyValue
+        else:
+            message_thread(message, "无效的快捷键", "你要设定的快捷键无效哦 (〃'▽'〃)")
+
 
     def get_horizontal(self):  # 文本框透明度
 
         self.horizontal = self.horizontalSlider.value()
         self.data["horizontal"] = self.horizontal
 
-
     def save_fontSize(self):  # 翻译源字体大小
 
-        self.data["fontSize"] = self.fontSize_spinBox.value()
-
+        self.data["fontSize"]["youdao"] = self.youdaoSize_spinBox.value()
+        self.data["fontSize"]["caiyun"] = self.caiyunSize_spinBox.value()
+        self.data["fontSize"]["jinshan"] = self.jinshanSize_spinBox.value()
+        self.data["fontSize"]["baidu"] = self.baiduSize_spinBox.value()
+        self.data["fontSize"]["tencent"] = self.tencentSize_spinBox.value()
+        self.data["fontSize"]["original"] = self.originalSize_spinBox.value()
 
     def youdaoUse_state(self):  # 是否使用有道翻译
 
@@ -1155,7 +1218,6 @@ class SettinInterface(QWidget):
             self.youdaoUse = "False"
         self.data["youdaoUse"] = self.youdaoUse
 
-
     def caiyunUse_state(self):  # 是否使用彩云翻译
 
         if self.caiyun_checkBox.isChecked():
@@ -1163,7 +1225,6 @@ class SettinInterface(QWidget):
         else:
             self.caiyunUse = "False"
         self.data["caiyunUse"] = self.caiyunUse
-
 
     def jinshanUse_state(self):  # 是否使用金山翻译
 
@@ -1173,59 +1234,6 @@ class SettinInterface(QWidget):
             self.jinshanUse = "False"
         self.data["jinshanUse"] = self.jinshanUse
 
-
-    def yeekitUse_state(self):  # 是否使用yeekit翻译
-
-        if self.yeekit_checkBox.isChecked():
-            self.yeekitUse = "True"
-        else:
-            self.yeekitUse = "False"
-        self.data["yeekitUse"] = self.yeekitUse
-
-
-    def alapiUse_state(self):  # 是否使用ALAPI翻译
-
-        if self.ALAPI_checkBox.isChecked():
-            self.alapiUse = "True"
-        else:
-            self.alapiUse = "False"
-        self.data["alapiUse"] = self.alapiUse
-
-
-    def baiduwebUse_state(self):  # 是否使用百度翻译网页版
-
-        if self.baiduweb_checkBox.isChecked():
-            self.baiduwebUse = "True"
-        else:
-            self.baiduwebUse = "False"
-        self.data["baiduwebUse"] = self.baiduwebUse
-
-
-    def tencentwebUse_state(self):  # 是否使用腾讯翻译网页版
-
-        if self.tencentweb_checkBox.isChecked():
-            self.tencentwebUse = "True"
-        else:
-            self.tencentwebUse = "False"
-        self.data["tencentwebUse"] = self.tencentwebUse
-
-
-    def googlewebUse_state(self):  # 是否使用谷歌翻译网页版
-
-        if self.google_checkBox.isChecked():
-            self.googleUse = "True"
-        else:
-            self.googleUse = "False"
-        self.data["googleUse"] = self.googleUse
-
-    def BingwebUse_state(self):  # 是否使用Bing翻译网页版
-
-        if self.Bing_checkBox.isChecked():
-            self.BingUse = "True"
-        else:
-            self.BingUse = "False"
-        self.data["BingUse"] = self.BingUse
-
     def baiduUse_state(self):  # 是否使用百度翻译
 
         if self.baidu_checkBox.isChecked():
@@ -1233,7 +1241,6 @@ class SettinInterface(QWidget):
         else:
             self.baiduUse = "False"
         self.data["baiduUse"] = self.baiduUse
-
 
     def tencentUse_state(self):  # 是否使用腾讯翻译
 
@@ -1243,15 +1250,13 @@ class SettinInterface(QWidget):
             self.tencentUse = "False"
         self.data["tencentUse"] = self.tencentUse
 
+    def translateMode_state(self):  # 是否使用腾讯翻译
 
-    def caiyunPrivateUse_state(self):  # 是否使用私人彩云翻译
-
-        if self.caiyunPrivate_checkBox.isChecked():
-            self.caiyunPrivateUse = "True"
+        if self.manual_radioButton.isChecked():
+            self.translateMode = "manual"
         else:
-            self.caiyunPrivateUse = "False"
-        self.data["caiyunPrivateUse"] = self.caiyunPrivateUse
-
+            self.translateMode = "auto"
+        self.data["translateMode"] = self.translateMode
 
     def saveAPI(self):
 
@@ -1261,7 +1266,6 @@ class SettinInterface(QWidget):
         self.baidu_Secret = self.baidu_Secret_Text.toPlainText().replace(' ','').replace('\n','').replace('\t','')
         self.tencent_Key = self.tencent_Key_Text.toPlainText().replace(' ','').replace('\n','').replace('\t','')
         self.tencent_Secret = self.tencent_Secret_Text.toPlainText().replace(' ','').replace('\n','').replace('\t','')
-        self.caiyun_token = self.caiyun_token_Text.toPlainText().replace(' ','').replace('\n','').replace('\t','')
 
         self.data["OCR"]["Key"] = self.OCR_Key
         self.data["OCR"]["Secret"] = self.OCR_Secret
@@ -1269,7 +1273,6 @@ class SettinInterface(QWidget):
         self.data["baiduAPI"]["Secret"] = self.baidu_Secret
         self.data["tencentAPI"]["Key"] = self.tencent_Key
         self.data["tencentAPI"]["Secret"] = self.tencent_Secret
-        self.data["caiyunAPI"] = self.caiyun_token
 
     def range(self):
 
@@ -1281,83 +1284,35 @@ class SettinInterface(QWidget):
             self.data["range"]["X2"] = data1["range"]["X2"]
             self.data["range"]["Y2"] = data1["range"]["Y2"]
 
-    def save_language(self): # 保存翻译语种
-
-        if self.language_comboBox.currentIndex() == 1:
-            self.data["language"] = 'ENG'
-            self.data["yeekitLanguage"] = "nen"
-            self.data["BingLanguage"] = "en"
-        elif self.language_comboBox.currentIndex() == 2:
-            self.data["language"] = 'KOR'
-            self.data["yeekitLanguage"] = "nko"
-            self.data["BingLanguage"] = "ko"
-        else:
-            self.data["language"] = 'JAP'
-            self.data["yeekitLanguage"] = "nja"
-            self.data["BingLanguage"] = "ja"
-
-
-    def save_showHotKeyValue1(self): # 保存翻译键快捷键
-
-        HotKey_index = self.HotKey1_ComboBox.currentIndex()
-        self.data["showHotKeyValue1"] = self.HotKeys[HotKey_index]
-
-
-    def save_showHotKeyValue2(self): # 保存范围键快捷键
-
-        HotKey_index = self.HotKey2_ComboBox.currentIndex()
-        self.data["showHotKeyValue2"] = self.HotKeys[HotKey_index]
-
-
     def save_settin(self):
 
         self.range()
         self.change_background()
-        self.get_horizontal()
         self.save_fontSize()
-        
-        self.showColorType_state()
         self.showOriginal_state()
         self.showClipboard_state()
-        self.showTranslateRow_state()
-        self.highPrecision_state()
-        
+        self.get_horizontal()
         self.youdaoUse_state()
         self.caiyunUse_state()
         self.jinshanUse_state()
-        self.yeekitUse_state()
-        self.alapiUse_state()
-        self.baiduwebUse_state()
-        self.tencentwebUse_state()
-        self.googlewebUse_state()
-        self.BingwebUse_state()
         self.baiduUse_state()
         self.tencentUse_state()
-        self.caiyunPrivateUse_state()
-
-        self.save_language()
-        
-        self.showHotKey1_state()
-        self.showHotKey2_state()
-        self.save_showHotKeyValue1()
-        self.save_showHotKeyValue2()
-        
+        self.translateMode_state()
+        self.showHotKey_state()
         self.data["translateSpeed"] = self.autoSpeed_spinBox.value()
+        self.data["screenSize"] = self.spinBox.value() / 100
         self.saveAPI()
 
         with open('.\\config\\settin.json','w') as file:
             json.dump(self.data,file)
 
-        sign = get_Access_Token()
-        if sign == 1:
-            MessageBox('保存设置', '保存成功啦 ヾ(๑╹◡╹)ﾉ"')
+        get_Access_Token(self)
 
 
 if __name__ == "__main__":
     
     import sys
-    screen_scale_rate = get_screen_rate()
     APP = QApplication(sys.argv)
-    Settin = SettinInterface(screen_scale_rate)
+    Settin = SettinInterface()
     Settin.show()
     sys.exit(APP.exec_())
