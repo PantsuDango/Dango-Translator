@@ -9,8 +9,12 @@
 <br/>
 
 ### 效果截图：
++ 翻译界面：
 ![](https://github.com/PantsuDango/Dango-Translator/blob/master/git_image/Ver3.3/1.png)
+
++ 翻译样式
 ![](https://github.com/PantsuDango/Dango-Translator/blob/master/git_image/Ver3.3/2.png)
+
 ![](https://github.com/PantsuDango/Dango-Translator/blob/master/git_image/Ver3.3/3.png)
 ![](https://github.com/PantsuDango/Dango-Translator/blob/master/git_image/Ver3.3/4.png)
 ![](https://github.com/PantsuDango/Dango-Translator/blob/master/git_image/Ver3.3/5.png)
