@@ -18,13 +18,13 @@
 + 设置-API设定：    
 ![](https://github.com/PantsuDango/Dango-Translator/blob/master/git_image/Ver3.3/3.png)
 
-+ 设置-翻译源：
++ 设置-翻译源：  
 ![](https://github.com/PantsuDango/Dango-Translator/blob/master/git_image/Ver3.3/4.png)
 
-+ 设置-翻译样式：
++ 设置-翻译样式：  
 ![](https://github.com/PantsuDango/Dango-Translator/blob/master/git_image/Ver3.3/5.png)
 
-+ 设置-其他设定：
++ 设置-其他设定：  
 ![](https://github.com/PantsuDango/Dango-Translator/blob/master/git_image/Ver3.3/6.png)
 
 <br/>
