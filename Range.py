@@ -64,16 +64,6 @@ class WScreenShot(QWidget):
         X2 = int(end[0])
         Y2 = int(end[1])
 
-        if X1 > X2:
-            tmp = X1
-            X1 = X2
-            X2 = tmp
-
-        if Y1 > Y2:
-            tmp = Y1
-            Y1 = Y2
-            Y2 = tmp
-
         with open('.\\config\\settin.json') as file:
             data = json.load(file)
 
