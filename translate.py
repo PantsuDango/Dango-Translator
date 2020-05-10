@@ -53,7 +53,7 @@ def translate(window, data):
 
     text = window.translateText.toPlainText()
     if text[:5] == "团子翻译器" or (not text[:1]):
-        score = 0.98
+        score = 0.97
         image_cut(window, data)
     else:
         imageA = imread('.\\config\\image.jpg')
@@ -62,12 +62,13 @@ def translate(window, data):
         try:
             score = compare_image(imageA, imageB)
         except Exception:
-            score = 0.98
+            score = 0.97
     
-    if score < 0.99:
+    if score < 0.98:
 
-        original = baidu_orc(data)
-        if original and (original != window.original):
+        sign, original = baidu_orc(data)
+        
+        if sign and original and (original != window.original):
             
             # 过滤不需要加入翻译的字符
             try:
@@ -179,7 +180,7 @@ def translate(window, data):
             result_baidu = ''
             result_tencent = ''
             result_caiyunPrivate = ''
-            original = ''
+
     else:
         result_youdao = ''
         result_caiyun = ''
@@ -194,6 +195,7 @@ def translate(window, data):
         result_tencent = ''
         result_caiyunPrivate = ''
         original = ''
+        sign = True
 
     result = dict()
     result["youdao"] = result_youdao
@@ -209,5 +211,6 @@ def translate(window, data):
     result["tencent"] = result_tencent
     result["caiyunPrivate"] = result_caiyunPrivate
     result["original"] = original
+    result["sign"] = sign
 
     return result

@@ -134,7 +134,7 @@ class MainInterface(QMainWindow):
         self.format = QTextCharFormat()
         self.format.setTextOutline(QPen(QColor('#FF69B4'), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
         self.translateText.mergeCurrentCharFormat(self.format)
-        self.translateText.append("团子翻译器 ver3.2 --- By：胖次团子   更新时间：2020-05-04")
+        self.translateText.append("团子翻译器 ver3.3 --- By：胖次团子   更新时间：2020-05-07")
         self.translateText.append("交流群：1050705995   加群可获取最新版本并解惑翻译器一切问题")
         self.translateText.append("喜欢这个软件可以点击上方的电池按钮给团子个充电支持吗 ❤")
         self.translateText.append("团子会努力保持更新让大家用上更好的团子翻译器哒！")
@@ -353,7 +353,6 @@ class MainInterface(QMainWindow):
         if self.horizontal == 0:
             self.horizontal = 0.01
 
-
     def start_login(self):
 
         with open('.\\config\\settin.json') as file:
@@ -367,11 +366,6 @@ class MainInterface(QMainWindow):
             self.StartButton.setIcon(qtawesome.icon('fa.play', color='white'))
         else:
             try:
-                Font = QFont()
-                Font.setFamily(data["fontType"])
-                Font.setPointSize(data["fontSize"])
-                self.translateText.setFont(Font)
-
                 self.thread = Runthread(self, self.mode)
                 self.thread._signal.connect(self.call_backlog)
                 self.thread.start()
@@ -390,9 +384,11 @@ class MainInterface(QMainWindow):
         with open('.\\config\\settin.json') as file:
             data = json.load(file)
 
-        if not result["original"]:
-            pass
-        else:
+        self.Font.setFamily(data["fontType"])
+        self.Font.setPointSize(data["fontSize"])
+        self.translateText.setFont(self.Font)
+
+        if result["original"] and result["sign"]:
             self.original = result["original"]
             self.translateText.clear()
 
@@ -499,7 +495,18 @@ class MainInterface(QMainWindow):
                     self.translateText.append(result["youdao"])
                 else:
                     self.translateText.append("<font color=%s>%s</font>"%(data["fontColor"]["youdao"], result["youdao"]))
-            
+       
+        # 如果OCR出错，则打印错误信息
+        elif result["original"] and not result["sign"]:
+            self.translateText.clear()
+
+            if data["showColorType"] == "False":
+                self.format.setTextOutline(QPen(QColor(data["fontColor"]["original"]), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+                self.translateText.mergeCurrentCharFormat(self.format)
+                self.translateText.append(result["original"])
+            else:
+                self.translateText.append("<font color=%s>%s</font>"%(data["fontColor"]["original"], result["original"]))
+
 
     # 语音朗读
     def play_voice(self):
