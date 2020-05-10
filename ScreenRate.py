@@ -30,12 +30,7 @@ def get_screen_rate():
     screen_size = get_screen_size()
     screen_scale_rate = round(real_resolution[0] / screen_size[0], 2)
     
-    with open('.\\config\\settin.json') as file:
-        data = json.load(file)
-    data["screenSize"] = screen_scale_rate
-
-    with open('.\\config\\settin.json','w') as file:
-        json.dump(data,file)
+    return screen_scale_rate
     
 
 if __name__ == '__main__':
