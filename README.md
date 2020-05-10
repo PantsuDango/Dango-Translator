@@ -1,6 +1,7 @@
 # Dango-Translator —— 团子翻译器
 + 目前最新版本 Ver3.3
 + 交流QQ群：1050705995（获取最新版本、翻译器交流、解惑）
++ 联系我：QQ 394883561  or  94883561@qq.com
 + 百度盘下载：https://pan.baidu.com/s/1B874q1S7OjtBZNHErvJ86A
 + 提取码：2d59
 + 解压密码：Dango
