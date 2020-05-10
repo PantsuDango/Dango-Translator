@@ -15,7 +15,7 @@
 + 翻译效果（翻译源为彩云小泽）：
 ![](https://github.com/PantsuDango/Dango-Translator/blob/master/git_image/Ver3.3/2.png)
 
-+ 设置-API设定：
++ 设置-API设定：  
 ![](https://github.com/PantsuDango/Dango-Translator/blob/master/git_image/Ver3.3/3.png)
 
 + 设置-翻译源：
