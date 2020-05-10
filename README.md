@@ -9,7 +9,7 @@
 <br/>
 
 ### 效果截图：
-+ 翻译界面：
+#### 翻译界面：
 ![](https://github.com/PantsuDango/Dango-Translator/blob/master/git_image/Ver3.3/1.png)
 
 + 翻译效果（翻译源为彩云小泽）：
