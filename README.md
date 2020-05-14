@@ -3,8 +3,8 @@
 + 交流QQ群：1050705995（获取最新版本、翻译器交流、解惑）
 + 联系方式：QQ 394883561 —— Email 394883561@qq.com
 + 演示视频：https://www.bilibili.com/video/BV1gp4y1Q7Ts?from=search&seid=2515920591076249883
-+ 百度盘下载：https://pan.baidu.com/s/1B874q1S7OjtBZNHErvJ86A
-+ 提取码：2d59
++ 百度盘下载：https://pan.baidu.com/s/1AD9JWSAKS69gOawwvMXXQw
++ 提取码：975h
 + 解压密码：Dango
 
 <br/>
