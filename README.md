@@ -1,5 +1,5 @@
 # Dango-Translator —— 团子翻译器
-+ 目前最新版本：Ver3.3
++ 目前最新版本：Ver3.4（更新时间2020.05.29）
 + 交流QQ群：1050705995（获取最新版本、翻译器交流、解惑）
 + 联系方式：QQ 394883561 —— Email 394883561@qq.com
 + 演示视频：https://www.bilibili.com/video/BV1gp4y1Q7Ts?from=search&seid=2515920591076249883
