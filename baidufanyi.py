@@ -74,7 +74,7 @@ class BaiduWeb():
         self.result = trans_json["trans_result"]["data"][0]["dst"]
 
 
-    def run(self):
+    def translate(self):
 
         try:
             """实现逻辑"""

@@ -9,11 +9,12 @@ from js2py import EvalJs
 
 class GoogleTranslate():
 
-    def __init__(self):
+    def __init__(self, text):
 
         self.headers={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36'}
         self.session = Session()
         self.session.keep_alive = False
+        self.text = text
         
 
     def getTk(self, text):
@@ -71,7 +72,7 @@ class GoogleTranslate():
             return None
 
 
-    def translate(self, text):
+    def translate(self):
         
         tk = self.getTk(text)
         url = self.buildUrl(text, tk)
