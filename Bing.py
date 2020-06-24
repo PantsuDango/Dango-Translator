@@ -13,16 +13,16 @@ class BingTranslate(object):
     
     def translate(self, BingLanguage, content):
 
-        data = {}
-        data['from'] = '"' + BingLanguage + '"'
-        data['to'] = '"' + 'zh' + '"'
-        data['texts'] = '["'
-        data['texts'] += content
-        data['texts'] += '"]'
-        data['options'] = "{}"
-        data['oncomplete'] = 'onComplete_3'
-        data['onerror'] = 'onError_3'
-        data['_'] = '1430745999189'
+        # data = {}
+        # data['from'] = '"' + BingLanguage + '"'
+        # data['to'] = '"' + 'zh' + '"'
+        # data['texts'] = '["'
+        # data['texts'] += content
+        # data['texts'] += '"]'
+        # data['options'] = "{}"
+        # data['oncomplete'] = 'onComplete_3'
+        # data['onerror'] = 'onError_3'
+        # data['_'] = '1430745999189'
 
         data = {
             'from': f'"{BingLanguage}"',
