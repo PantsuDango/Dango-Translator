@@ -23,6 +23,16 @@ class BingTranslate(object):
         data['oncomplete'] = 'onComplete_3'
         data['onerror'] = 'onError_3'
         data['_'] = '1430745999189'
+
+        data = {
+            'from': f'"{BingLanguage}"',
+            'to': '"zh"',
+            'texts': f'"[{content}]"',
+            'options': '{}',
+            'oncomplete': 'onComplete_3',
+            'onerror': 'onError_3',
+            '_': '1430745999189',
+        }
         
         try:
             data = urllib.parse.urlencode(data).encode('utf-8')
