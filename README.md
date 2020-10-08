@@ -7,8 +7,7 @@
 + 提取码：975h
 + 解压密码：Dango
 
-### 交流QQ群：（获取最新版本、翻译器交流、解惑）    
-乙游等女性向游戏交流群：787553599（只收女性乙游玩家）  
+### 交流QQ群：（获取最新版本、翻译器交流、解惑）     
 ⑫群：152979089【可加】  
 ①群：779594427【满】  
 ②群：1038904947【满】  
@@ -26,24 +25,26 @@
 
 
 ### 更新内容（相比较上一个版本）：
-#### 更新时间：2020-05-29
+#### 更新时间：2020-10-08
 #### 新增的地方：
-+ 点击翻译界面的最小化后，翻译器会隐藏至右下角系统托盘；
-+ 加入了程序启动音（Dango~）；
++ 新增可视化范围框，可手动隐藏；
++ 新增自动保存翻译结果   【结果固定保存至: xxx\DangoTranslate-Ver3.5\Ver3.5\config\翻译历史.txt】；
++ 加入了登录界面，账户功能   【船新的账号系统，后面可以延伸很多东西】；
++ 加了可以锁定翻译界面的功能，锁定后翻译界面不可被操作；
++ 新增可以导入导出配置文件的功能 ，直接切换账号就可以导入该账号的全部配置   【可以借人家号来玩了】；
 
 #### 功能优化的地方：
-+ 大大优化了翻译速度，多开翻译源时采用并行翻译；
-+ 说明：假如你同时开了腾讯0.7s+百度1.1s+彩云0.8s，老版本需要2.6秒才会出翻译，新版本会在0.7秒先打印出腾讯翻译，1.1秒打印完全部翻译。3.4版本可同时打开所有翻译源，整体翻译时间约2s左右；
-+ 翻译的时候，会根据文字内容，自动调整翻译框的大小，总之每次都会完整得显示完所有翻译的结果；
-+ 点击保存设置后，提示成功的弹窗现在优先级会高于翻译框，解决了之前被挡住点不到的问题；
-+ 高精度和竖排模式用光额度后现在会给出准确的提示；
-+ 修复了某些高缩放比例的屏幕下会导致点击不到设置页面的保存按键的问题；
-+ 更换背景图片现在会自动根据翻译界面的尺寸自动缩放和适配；
++ 优化网页版百度翻译的速度，归功于github上的@zxjlm大大技术支持；
++ 优化了翻译时偶尔会出现的长时间等待问题，现在最多等待5秒不出结果就放弃；
++ 优化了自动模式下偶尔会出现某句不翻译的问题；
++ 优化了自动模式下，如果是动态画面，文字会不停闪动的问题   【依旧可能会闪动只是没那么高频】；
++ 现在每次调用范围键后会自动翻译，无需再按一次翻译键；
 
 #### bug修复的地方：
-+ 修复了3.3版本翻译有时候会消失的问题；
-+ 修复了频繁弹出ocr代理错误的问题；
-+ 修复了点击充电按钮时，会自动关闭翻译界面的bug；
++ 修复快捷键会失效的问题   【我不确定会不会还有问题 ....】；
++ 修复了在高比例屏幕下，文字会过长不会自动分段的问题；
++ 修复了手动翻译偶尔会卡死的问题；
++ 点击翻译键时，上次选择的范围不会高亮且不可选择；
 <br/>
 
 #### 和其他翻译软件比较有什么优缺点：
@@ -58,23 +59,30 @@
 <br/>
 
 ### 效果截图：
+#### 登录界面：
+![](https://github.com/PantsuDango/Dango-Translator/blob/master/git_image/Ver3.5/1.png)
+
 #### 翻译界面：
-![](https://github.com/PantsuDango/Dango-Translator/blob/master/git_image/Ver3.3/1.png)
+![](https://github.com/PantsuDango/Dango-Translator/blob/master/git_image/Ver3.5/2.png)
+![](https://github.com/PantsuDango/Dango-Translator/blob/master/git_image/Ver3.5/3.png)
 
 #### 翻译效果（翻译源为彩云小泽）：
 ![](https://github.com/PantsuDango/Dango-Translator/blob/master/git_image/Ver3.3/2.png)
 
 #### 设置-API设定：    
-![](https://github.com/PantsuDango/Dango-Translator/blob/master/git_image/Ver3.3/3.png)
+![](https://github.com/PantsuDango/Dango-Translator/blob/master/git_image/Ver3.5/4.png)
 
 #### 设置-翻译源：  
-![](https://github.com/PantsuDango/Dango-Translator/blob/master/git_image/Ver3.3/4.png)
+![](https://github.com/PantsuDango/Dango-Translator/blob/master/git_image/Ver3.5/5.png)
 
 #### 设置-翻译样式：  
-![](https://github.com/PantsuDango/Dango-Translator/blob/master/git_image/Ver3.3/5.png)
+![](https://github.com/PantsuDango/Dango-Translator/blob/master/git_image/Ver3.5/6.png)
 
 #### 设置-其他设定：  
-![](https://github.com/PantsuDango/Dango-Translator/blob/master/git_image/Ver3.3/6.png)
+![](https://github.com/PantsuDango/Dango-Translator/blob/master/git_image/Ver3.5/7.png)
+
+#### 设置-支持作者：  
+![](https://github.com/PantsuDango/Dango-Translator/blob/master/git_image/Ver3.5/8.png)
 
 <br/>
 
