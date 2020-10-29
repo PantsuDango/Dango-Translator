@@ -7,17 +7,29 @@ from PyQt5.QtCore import *
 import re
 import sys
 import json
- 
- 
+
+
 class WScreenShot(QWidget):
- 
+
     def __init__(self, parent=None):
-        
+
         super(WScreenShot, self).__init__(parent)
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         self.setStyleSheet('''background-color:black; ''')
         self.setWindowOpacity(0.6)
-        desktopRect = QDesktopWidget().screenGeometry()
+
+        desktopWidget = QDesktopWidget()
+
+        screenCount = desktopWidget.screenCount()
+        maxWidth, maxHeight = 0, 0
+        for i in range(screenCount):
+            tempScreen = desktopWidget.screenGeometry(i)
+            if tempScreen.width() > maxWidth:
+                maxWidth = tempScreen.width()
+            if tempScreen.height() > maxHeight:
+                maxHeight = tempScreen.height()
+
+        desktopRect = QRect(0, 0, maxWidth * screenCount, maxHeight * screenCount)
         self.setGeometry(desktopRect)
         self.setCursor(Qt.CrossCursor)
         self.blackMask = QBitmap(desktopRect.size())
@@ -26,9 +38,9 @@ class WScreenShot(QWidget):
         self.isDrawing = False
         self.startPoint = QPoint()
         self.endPoint = QPoint()
- 
+
     def paintEvent(self, event):
-        
+
         if self.isDrawing:
             self.mask = self.blackMask.copy()
             pp = QPainter(self.mask)
@@ -39,20 +51,20 @@ class WScreenShot(QWidget):
             pp.setBrush(brush)
             pp.drawRect(QRect(self.startPoint, self.endPoint))
             self.setMask(QBitmap(self.mask))
- 
+
     def mousePressEvent(self, event):
-        
+
         if event.button() == Qt.LeftButton:
             self.startPoint = event.pos()
             self.endPoint = self.startPoint
             self.isDrawing = True
- 
+
     def mouseMoveEvent(self, event):
-        
+
         if self.isDrawing:
             self.endPoint = event.pos()
             self.update()
-    
+
     def getRange(self):
 
         start = re.findall(r'(\d+), (\d+)', str(self.startPoint))[0]
@@ -82,23 +94,22 @@ class WScreenShot(QWidget):
         data["range"]["X2"] = X2
         data["range"]["Y2"] = Y2
 
-        with open('.\\config\\settin.json','w') as file:
-            json.dump(data,file)
-    
+        with open('.\\config\\settin.json', 'w') as file:
+            json.dump(data, file)
+
     def mouseReleaseEvent(self, event):
-        
+
         if event.button() == Qt.LeftButton:
             self.endPoint = event.pos()
             screenshot = QApplication.primaryScreen().grabWindow(QApplication.desktop().winId())
             rect = QRect(self.startPoint, self.endPoint)
             outputRegion = screenshot.copy(rect)
-            #outputRegion.save('.\\config\\image.jpg', format='JPG', quality=100)
+            # outputRegion.save('.\\config\\image.jpg', format='JPG', quality=100)
             self.getRange()
             self.close()
 
- 
+
 if __name__ == '__main__':
- 
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
     app = QApplication(sys.argv)
     win = WScreenShot()

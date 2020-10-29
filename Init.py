@@ -7,7 +7,7 @@ from PyQt5.QtWebEngineWidgets import *
 import qtawesome
 
 import json
-from Translate import translate
+from translate import translate
 from switch import SwitchBtn
 
 from traceback import print_exc
