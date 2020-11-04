@@ -50,7 +50,7 @@ class GoogleTranslate():
 
         baseUrl = f'{baseUrl}?{"&".join([f"{x}={y}" if isinstance(y, str) else "&".join(map(lambda m : f"{x}={m}", y)) for x, y in base_data.items()])}'
         content = urllib.parse.quote(text)
-        baseUrl += 'q=' + content
+        baseUrl += '&q=' + content
 
         return baseUrl
 
