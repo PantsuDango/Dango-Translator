@@ -9,60 +9,53 @@ from js2py import EvalJs
 
 class GoogleTranslate():
 
-    def __init__(self):
+    def __init__(self, text):
 
-        self.headers={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36'}
+        self.headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36'}
         self.session = Session()
         self.session.keep_alive = False
-        
+        self.text = text
 
     def getTk(self, text):
-        
+
         with open('.\\config\\GoogleJS.js', encoding='utf8') as f:
             js_data = f.read()
 
         context = EvalJs()
         context.execute(js_data)
         tk = context.TL(text)
-        
         return tk
 
+    def buildUrl(self, text, tk):
 
-    def buildUrl(self, text ,tk):
-        
         baseUrl = 'http://translate.google.cn/translate_a/single'
-        baseUrl += '?client=webapp&'
-        baseUrl += 'sl=auto&'
-        baseUrl += 'tl=' + 'zh-CN' + '&'
-        baseUrl += 'hl=zh-CN&'
-        baseUrl += 'dt=at&'
-        baseUrl += 'dt=bd&'
-        baseUrl += 'dt=ex&'
-        baseUrl += 'dt=ld&'
-        baseUrl += 'dt=md&'
-        baseUrl += 'dt=qca&'
-        baseUrl += 'dt=rw&'
-        baseUrl += 'dt=rm&'
-        baseUrl += 'dt=ss&'
-        baseUrl += 'dt=t&'
-        baseUrl += 'ie=UTF-8&'
-        baseUrl += 'oe=UTF-8&'
-        baseUrl += 'clearbtn=1&'
-        baseUrl += 'otf=1&'
-        baseUrl += 'pc=1&'
-        baseUrl += 'srcrom=0&'
-        baseUrl += 'ssel=0&'
-        baseUrl += 'tsel=0&'
-        baseUrl += 'kc=2&'
-        baseUrl += 'tk=' + str(tk) + '&'
+        base_data = {
+            'client': 'webapp',
+            'sl': 'auto',
+            'tl': 'zh-CN',
+            'hl': 'zh-CN',
+            'dt': ['at', 'bd', 'ex', 'ld', 'md', 'qca', 'rw', 'rm', 'ss', 't'],
+            'ie': 'UTF-8',
+            'oe': 'UTF-8',
+            'clearbtn': '1',
+            'otf': '1',
+            'pc': '1',
+            'srcrom': '0',
+            'ssel': '0',
+            'tsel': '0',
+            'kc': '2',
+            'tk': f'{tk}',
+        }
+
+        baseUrl = f'{baseUrl}?{"&".join([f"{x}={y}" if isinstance(y, str) else "&".join(map(lambda m : f"{x}={m}", y)) for x, y in base_data.items()])}'
         content = urllib.parse.quote(text)
-        baseUrl += 'q=' + content
-        
+        baseUrl += '&q=' + content
+
         return baseUrl
 
-
     def getHtml(self, session, url, headers):
-        
+
         try:
             html = session.get(url, headers=headers)
             return html.json()
@@ -70,15 +63,14 @@ class GoogleTranslate():
             print_exc()
             return None
 
+    def translate(self):
 
-    def translate(self, text):
-        
         tk = self.getTk(text)
         url = self.buildUrl(text, tk)
-        
+
         try:
             result = self.getHtml(self.session, url, self.headers)
-       
+
             if result != None:
                 sentence = ''
                 for i in result[0]:
@@ -86,7 +78,7 @@ class GoogleTranslate():
                         sentence += i[0]
             else:
                 sentence = "谷歌：我抽风啦！"
-        
+
         except Exception:
             print_exc()
             sentence = "谷歌：我抽风啦！"
@@ -95,7 +87,6 @@ class GoogleTranslate():
 
 
 if __name__ == '__main__':
-
     text = "そうすると、可笑しいことや変なこと、滑稽なことや正しくないこと、反対にやるべきことが见えてくるから。とにかく、何かにどっぷりはまっていると、周りのことが见えなくなってしまう。だから、时々一歩引くと物事が见えてくる。"
-    google = GoogleTranslate()
-    print(google.translate(text))
+    google = GoogleTranslate(text)
+    print(google.translate())

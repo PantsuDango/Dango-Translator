@@ -56,7 +56,7 @@ def getHtml(url,headers,data):
 
 class TencentTrans(object):
     
-    def __init__(self):
+    def __init__(self, text):
         
         self.api_url = 'https://fanyi.qq.com/api/translate'
         self.headers = {
@@ -83,9 +83,10 @@ class TencentTrans(object):
         self.headers['Cookie'] = self.headers['Cookie'].replace(
             'wfMmjh3k/7Sr2xVNg/LtITgPRlnvGWBzP9a4FN0dn9PE7L5jDYiYJnW03MJLRUGHEFNCRhTfrp/V+wUj0dun1KkKNUUmS86A/wGVf6ydzhwboelTOs0hfHuF0ndtSoX+N3486tUMlm62VU4i856mqw==',
             self.qtk)
+        self.text = text
 
 
-    def get_trans_result(self, text):
+    def translate(self, ):
         
         data = {
                 'source': self.fromlang,
