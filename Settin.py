@@ -3,18 +3,18 @@
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from PyQt5.QtWebEngineWidgets import *
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-import image
 import json
 import webbrowser
 from os import startfile
+import os
 
 from API import get_Access_Token, MessageBox
 from ScreenRate import get_screen_rate
 
 from traceback import print_exc
+import requests
 
 
 def register_OCR():
@@ -22,7 +22,8 @@ def register_OCR():
     try:
         startfile('.\\各种API注册教程\\（必填）OCR API注册方法.docx')
     except Exception:
-        pass
+        path = os.path.join(os.getcwd(), "各种API注册教程", "（必填）OCR API注册方法.docx")
+        MessageBox('打开教程失败', '打开注册教程失败啦 _(:з」∠)_"\n可能是电脑没有默认打开word的软件, 手动去如下路径打开吧\n%s   '%path)
 
 
 def select_baidu():
@@ -31,7 +32,7 @@ def select_baidu():
     try:
         webbrowser.open(url, new=0, autoraise=True)
     except Exception:
-        pass
+        print_exc()
 
 
 def register_baidu():
@@ -39,7 +40,8 @@ def register_baidu():
     try:
         startfile('.\\各种API注册教程\\百度翻译API注册方法.docx')
     except Exception:
-        pass
+        path = os.path.join(os.getcwd(), "各种API注册教程", "百度翻译API注册方法.docx")
+        MessageBox('打开教程失败', '打开注册教程失败啦 _(:з」∠)_"\n可能是电脑没有默认打开word的软件, 手动去如下路径打开吧\n%s   ' % path)
 
 
 def register_tencent():
@@ -47,7 +49,8 @@ def register_tencent():
     try:
         startfile('.\\各种API注册教程\\腾讯翻译API注册方法.docx')
     except Exception:
-        pass
+        path = os.path.join(os.getcwd(), "各种API注册教程", "腾讯翻译API注册方法.docx")
+        MessageBox('打开教程失败', '打开注册教程失败啦 _(:з」∠)_"\n可能是电脑没有默认打开word的软件, 手动去如下路径打开吧\n%s   ' % path)
 
 
 def register_caiyun():
@@ -55,7 +58,8 @@ def register_caiyun():
     try:
         startfile('.\\各种API注册教程\\彩云翻译API注册方法.docx')
     except Exception:
-        pass
+        path = os.path.join(os.getcwd(), "各种API注册教程", "彩云翻译API注册方法.docx")
+        MessageBox('打开教程失败', '打开注册教程失败啦 _(:з」∠)_"\n可能是电脑没有默认打开word的软件, 手动去如下路径打开吧\n%s   ' % path)
 
 
 def select_tencent():
@@ -64,7 +68,7 @@ def select_tencent():
     try:
         webbrowser.open(url, new=0, autoraise=True)
     except Exception:
-        pass
+        print_exc()
 
 
 def select_caiyun():
@@ -73,7 +77,7 @@ def select_caiyun():
     try:
         webbrowser.open(url, new=0, autoraise=True)
     except Exception:
-        pass
+        print_exc()
 
 
 class SettinInterface(QWidget):
@@ -82,14 +86,28 @@ class SettinInterface(QWidget):
         
         super(SettinInterface, self).__init__()
         
-        if 1.01 <= screen_scale_rate <= 1.49:
-            self.rate = 1.25
-            self.px = 80
-            self.image_sign = 2
-        else:
-            self.rate = 1
+        if screen_scale_rate == 1.0:
             self.px = 75
-            self.image_sign = 1
+        elif screen_scale_rate == 1.25:
+            self.px = 80
+        elif screen_scale_rate == 1.5:
+            self.px = 118
+        elif screen_scale_rate == 1.75:
+            self.px = 135
+        elif screen_scale_rate == 2.0:
+            self.px = 150
+        elif screen_scale_rate == 2.25:
+            self.px = 178
+        elif screen_scale_rate == 2.5:
+            self.px = 198
+        elif screen_scale_rate == 2.75:
+            self.px = 210
+        elif screen_scale_rate == 3.0:
+            self.px = 238
+        else:
+            self.px = 80  # 工具栏间隔
+        self.image_sign = int(screen_scale_rate * 100)
+        self.rate = screen_scale_rate
         
         self.get_settin()
         self.setupUi()
@@ -104,14 +122,14 @@ class SettinInterface(QWidget):
         self.setWindowFlags(QtCore.Qt.WindowMinimizeButtonHint)
 
         # 窗口标题
-        self.setWindowTitle("团子翻译器 Ver3.2 - 设置")
+        self.setWindowTitle("团子翻译器 Ver3.6 - 设置")
 
         # 窗口样式
         self.setStyleSheet("QWidget {""font: 10pt \"华康方圆体W7\";"
                                       "background-image: url(./config/Background%d.jpg);"
                                       "background-repeat: no-repeat;"
                                       "background-size:cover;""}"%self.image_sign)
-        
+
         # 窗口图标
         self.icon = QtGui.QIcon()
         self.icon.addPixmap(QtGui.QPixmap("./config/图标.ico"), QtGui.QIcon.Normal, QtGui.QIcon.On)
@@ -129,12 +147,10 @@ class SettinInterface(QWidget):
 
         # 工具栏样式
         self.tabWidget.setStyleSheet("QTabBar::tab {""min-width:%dpx;"
-                                                     "background: rgba(255, 255, 255, 1);"
-                                                     "}"
+                                                     "background: rgba(255, 255, 255, 1);""}"
                                      "QTabBar::tab:selected {""border-bottom: 2px solid #4796f0;""}"
                                      "QLabel{""background: transparent;""}"
-                                     "QCheckBox{""background: transparent;""}"%(self.px)
-                                     )
+                                     "QCheckBox{""background: transparent;""}"%(self.px))
 
         
         # 工具栏1
@@ -145,12 +161,18 @@ class SettinInterface(QWidget):
         # 此Label用于雾化工具栏1的背景图
         self.bgImage1 = QLabel(self.tab_1)
         self.bgImage1.setGeometry(QRect(0, 0, 408*self.rate, 578*self.rate))
-        self.bgImage1.setStyleSheet("background: rgba(255, 255, 255, 0.3);")
+        self.bgImage1.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
+
+        # 同步配置按钮
+        self.GetSettin_Button = QtWidgets.QPushButton(self.tab_1)
+        self.GetSettin_Button.setGeometry(QtCore.QRect(324*self.rate, 0, 80*self.rate, 30*self.rate))
+        self.GetSettin_Button.setStyleSheet("background: rgba(255, 255, 255, 0.4);")
+        self.GetSettin_Button.setText("同步设置")
         
         # OCR API标签
         self.OCR_label_1 = QtWidgets.QLabel(self.tab_1)
         self.OCR_label_1.setGeometry(QtCore.QRect(20*self.rate, 20*self.rate, 340*self.rate, 16*self.rate))
-        self.OCR_label_1.setText("<font color=red>（必填）</font><font >OCR API：用于识别要翻译的文字</font>")
+        self.OCR_label_1.setText("（选填）百度OCR API：用于识别要翻译的文字")
 
         # OCR API Key输入框
         self.OCR_Key_Text = QtWidgets.QTextEdit(self.tab_1)
@@ -164,12 +186,6 @@ class SettinInterface(QWidget):
         self.OCR_Key_Text.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.OCR_Key_Text.setPlainText(self.OCR_Key)
 
-        # OCR API Key输入框右侧红点标签
-        self.OCR_label_4 = QtWidgets.QLabel(self.tab_1)
-        self.OCR_label_4.setGeometry(QtCore.QRect(370*self.rate, 50*self.rate, 16*self.rate, 16*self.rate))
-        self.OCR_label_4.setStyleSheet("color: #f00000")
-        self.OCR_label_4.setText("*")
-
         # OCR API Secret输入框
         self.OCR_Secret_Text = QtWidgets.QTextEdit(self.tab_1)
         self.OCR_Secret_Text.setGeometry(QtCore.QRect(30*self.rate, 70*self.rate, 330*self.rate, 22*self.rate))
@@ -182,18 +198,12 @@ class SettinInterface(QWidget):
         self.OCR_Secret_Text.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.OCR_Secret_Text.setPlainText(self.OCR_Secret)
 
-        # OCR API Secret输入框右侧红点标签
-        self.OCR_label_5 = QtWidgets.QLabel(self.tab_1)
-        self.OCR_label_5.setGeometry(QtCore.QRect(370*self.rate, 75*self.rate, 16*self.rate, 16*self.rate))
-        self.OCR_label_5.setStyleSheet("color: #f00000")
-        self.OCR_label_5.setText("*")
-        
-        # 注册OCR API按钮
-        self.OCRRegister_Button = QtWidgets.QPushButton(self.tab_1)
-        self.OCRRegister_Button.setGeometry(QtCore.QRect(160*self.rate, 95*self.rate, 80*self.rate, 30*self.rate))
-        self.OCRRegister_Button.setStyleSheet("background: rgba(255, 255, 255, 0.4);")
-        self.OCRRegister_Button.clicked.connect(register_OCR)
-        self.OCRRegister_Button.setText("注册OCR")
+        # OCR选择checkBox
+        self.ocr_checkBox = QtWidgets.QCheckBox(self.tab_1)
+        self.ocr_checkBox.setGeometry(QtCore.QRect(30*self.rate, 95*self.rate, 300*self.rate, 30*self.rate))
+        self.ocr_checkBox.setChecked(self.ocrUse)
+        self.ocr_checkBox.setStyleSheet("color: #f00000")
+        self.ocr_checkBox.setText("是否使用百度OCR, 不勾选则使用团子离线OCR")
         
         # 百度翻译API标签
         self.baiduAPI_label_1 = QtWidgets.QLabel(self.tab_1)
@@ -321,13 +331,13 @@ class SettinInterface(QWidget):
         # 此Label用于雾化工具栏2的背景图
         self.bgImage2 = QLabel(self.tab_2)
         self.bgImage2.setGeometry(QRect(0, 0, 408*self.rate, 578*self.rate))
-        self.bgImage2.setStyleSheet("background: rgba(255, 255, 255, 0.3);")
+        self.bgImage2.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
         
         # 翻译源标签
         self.translateSource_label_1 = QtWidgets.QLabel(self.tab_2)
         self.translateSource_label_1.setGeometry(QtCore.QRect(30*self.rate, 20*self.rate, 340*self.rate, 40*self.rate))
         self.translateSource_label_1.setText("<html><head/><body><p>选择你想使用的翻译源，可多选，多选会同时显示每\
-                                              </p><p>个翻译源的翻译结果，但翻译时间会变慢</p><p></p></body></html>")
+                                              </p><p>个翻译源的翻译结果</p><p></p></body></html>")
         
         # 公共翻译接口标签
         self.translateSource_label_2 = QtWidgets.QLabel(self.tab_2)
@@ -442,7 +452,7 @@ class SettinInterface(QWidget):
         self.autoSpeed_spinBox = QtWidgets.QDoubleSpinBox(self.tab_2)
         self.autoSpeed_spinBox.setGeometry(QtCore.QRect(155*self.rate, 435*self.rate, 45*self.rate, 25*self.rate))
         self.autoSpeed_spinBox.setDecimals(1)
-        self.autoSpeed_spinBox.setMinimum(1.0)
+        self.autoSpeed_spinBox.setMinimum(0.5)
         self.autoSpeed_spinBox.setMaximum(15.0)
         self.autoSpeed_spinBox.setSingleStep(0.1)
         self.autoSpeed_spinBox.setStyleSheet("background: transparent;")
@@ -461,7 +471,7 @@ class SettinInterface(QWidget):
         # 此Label用于雾化工具栏3的背景图
         self.bgImage3 = QLabel(self.tab_3)
         self.bgImage3.setGeometry(QRect(0, 0, 408*self.rate, 578*self.rate))
-        self.bgImage3.setStyleSheet("background: rgba(255, 255, 255, 0.3);")
+        self.bgImage3.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
 
         # 翻译字体颜色设定标签
         self.colour_label = QtWidgets.QLabel(self.tab_3)
@@ -612,7 +622,7 @@ class SettinInterface(QWidget):
         # 此Label用于雾化工具栏4的背景图
         self.bgImage4 = QLabel(self.tab_4)
         self.bgImage4.setGeometry(QRect(0, 0, 408*self.rate, 578*self.rate))
-        self.bgImage4.setStyleSheet("background: rgba(255, 255, 255, 0.3);")
+        self.bgImage4.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
         
         # 其他设定标签
         self.tab4_label_4 = QtWidgets.QLabel(self.tab_4)
@@ -718,33 +728,7 @@ class SettinInterface(QWidget):
         self.tab4_label_6 = QtWidgets.QLabel(self.tab_4)
         self.tab4_label_6.setGeometry(QtCore.QRect(30*self.rate, 390*self.rate, 340*self.rate, 100*self.rate))
         self.tab4_label_6.setText("<html><head/><body><p>说明：不支持png格式的图片；\
-                                   </p><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;以分辨率408 x 578时效果最佳；</p></body></html>")
-        
-        # 工具栏5
-        self.tab_5 = QtWidgets.QWidget()
-        self.tabWidget.addTab(self.tab_5, "")
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_5), "支持作者")
-
-        # 此Label用于雾化工具栏5的背景图
-        self.bgImage5 = QLabel(self.tab_5)
-        self.bgImage5.setGeometry(QRect(0, 0, 408*self.rate, 578*self.rate))
-        self.bgImage5.setStyleSheet("background: rgba(255, 255, 255, 0.3);")
-
-        # 充电独白标签
-        self.Mysay_label = QtWidgets.QLabel(self.tab_5)
-        self.Mysay_label.setGeometry(QtCore.QRect(40*self.rate, 10*self.rate, 281*self.rate, 141*self.rate))
-        self.Mysay_label.setText("<html><head/><body><p>大家好，我是胖次团子 ❤\
-                                  </p><p>谢谢大家使用团子翻译器Ver3.3 ~\
-                                  </p><p>软件是免费的，但是若能收到你的充电支持 ~\
-                                  </p><p>我会非常开心的，这会是我后续更新的动力 ~\
-                                  </p><p>联系方式 ———— QQ 394883561</p></body></html>")
-
-        self.Mysay2_label = QtWidgets.QLabel(self.tab_5)
-        self.Mysay2_label.setGeometry(QtCore.QRect(40*self.rate, 120*self.rate, 340*self.rate, 141*self.rate))
-        self.Mysay2_label.setStyleSheet("color: red")
-        self.Mysay2_label.setText("<html><head/><body><p>说明：①团子翻译器从不设置强制收费或购买\
-                                  </p><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;②如你是通过第三方购买的方式获得，请联系我\
-                                  </p><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;③请加群获取最新版本以及一切交流解惑</p></body></html>")
+                                   </p><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;尺寸以宽 x 高的比例为408 x 578时效果最佳；</p></body></html>")
 
         # 设置保存按钮
         self.SaveButton = QtWidgets.QPushButton(self)
@@ -852,6 +836,13 @@ class SettinInterface(QWidget):
 
         # 获取文本框透明度预设值
         self.horizontal = self.data["horizontal"]
+
+        # 获取是否ocr使用预设值
+        self.ocrUse = self.data.get("ocrUse", "False")
+        if self.ocrUse == "True":
+            self.ocrUse = True
+        else:
+            self.ocrUse = False
 
         # 获取是否使用有道翻译预设值
         self.youdaoUse = self.data["youdaoUse"]
@@ -1031,15 +1022,23 @@ class SettinInterface(QWidget):
         except AttributeError:
             pass
         else:
-            with open('./config/Background%d.jpg'%self.image_sign, 'wb') as file:
+            with open('./config/Background.jpg', 'wb') as file:
                 file.write(self.new_image)
+
+            try:
+                from ScreenRate import Background
+                Background(self.rate)
+                for count in [1.0, 1.25, 1.5 ,1.75]:
+                    Background(count)
+            except Exception:
+                print_exc()
             
-        self.setStyleSheet("QWidget {""font: 10pt \"华康方圆体W7\";"
+            self.setStyleSheet("QWidget {""font: 10pt \"华康方圆体W7\";"
                                       "background-image: url(./config/Background%d.jpg);"
                                       "background-repeat: no-repeat;"
                                       "background-size:cover;""}"%self.image_sign)
 
-        self.tabWidget.setStyleSheet("QTabBar::tab {""min-width:%dpx;"
+            self.tabWidget.setStyleSheet("QTabBar::tab {""min-width:%dpx;"
                                                      "background: rgba(255, 255, 255, 1);"
                                                      "}"
                                      "QTabBar::tab:selected {""border-bottom: 2px solid #4796f0;""}"
@@ -1125,6 +1124,15 @@ class SettinInterface(QWidget):
     def save_fontSize(self):  # 翻译源字体大小
 
         self.data["fontSize"] = self.fontSize_spinBox.value()
+
+
+    def ocrUse_state(self):  # ocr选择
+
+        if self.ocr_checkBox.isChecked():
+            self.ocrUse = "True"
+        else:
+            self.ocrUse = "False"
+        self.data["ocrUse"] = self.ocrUse
 
 
     def youdaoUse_state(self):  # 是否使用有道翻译
@@ -1289,7 +1297,29 @@ class SettinInterface(QWidget):
         self.data["showHotKeyValue2"] = self.HotKeys[HotKey_index]
 
 
-    def save_settin(self):
+    def checkTranslateUse(self) :
+
+        if self.youdaoUse == "False" \
+                and self.caiyunUse == "False" \
+                and self.jinshanUse == "False" \
+                and self.caiyunUse == "False" \
+                and self.yeekitUse == "False" \
+                and self.alapiUse == "False" \
+                and self.baiduwebUse == "False" \
+                and self.tencentwebUse == "False" \
+                and self.googleUse == "False" \
+                and self.BingUse == "False" \
+                and self.baiduUse == "False" \
+                and self.tencentUse == "False" \
+                and self.caiyunPrivateUse == "False" :
+            MessageBox('保存设置', '未选择使用任何翻译源_(:з」∠)_\n请在翻译源设定中勾选要使用的翻译源哦   ')
+
+            return 0
+        else :
+            return 1
+
+
+    def save_settin(self, user, password):
 
         self.range()
         self.change_background()
@@ -1301,7 +1331,8 @@ class SettinInterface(QWidget):
         self.showClipboard_state()
         self.showTranslateRow_state()
         self.highPrecision_state()
-        
+
+        self.ocrUse_state()
         self.youdaoUse_state()
         self.caiyunUse_state()
         self.jinshanUse_state()
@@ -1324,13 +1355,37 @@ class SettinInterface(QWidget):
         
         self.data["translateSpeed"] = self.autoSpeed_spinBox.value()
         self.saveAPI()
+        self.data["user"] = user
+        self.data["password"] = password
 
         with open('.\\config\\settin.json','w') as file:
-            json.dump(self.data,file)
+            json.dump(self.data, file)
 
-        sign = get_Access_Token()
+
+        sign = self.checkTranslateUse()
+        if not sign :
+            return
+
+        if self.ocrUse == "True" :
+            sign = get_Access_Token()
+        else :
+            sign = 1
+
         if sign == 1:
-            MessageBox('保存设置', '保存成功啦 ヾ(๑╹◡╹)ﾉ"')
+            url = "http://120.24.146.175:3000/DangoTranslate/SaveSettin"
+            formdata = json.dumps({
+                "User": user,
+                "Data": json.dumps(self.data)
+            })
+            try:
+                res = requests.post(url, data=formdata).json()
+                result = res.get("Result", "")
+                if result == "OK":
+                    MessageBox('保存设置', '保存本地成功啦 ヾ(๑╹◡╹)ﾉ"\nps: 设置也已同步至服务器   ')
+                else:
+                    MessageBox('保存设置', '保存本地成功啦 ヾ(๑╹◡╹)ﾉ"\nps: 但是设置同步至服务器失败惹   ')
+            except Exception as err:
+                MessageBox('保存设置', '保存本地成功啦 ヾ(๑╹◡╹)ﾉ"\nps: 但是设置同步至服务器失败惹\n原因: %s   '%err)
 
 
 if __name__ == "__main__":

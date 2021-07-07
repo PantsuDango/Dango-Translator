@@ -1,6 +1,5 @@
 import urllib.parse
 from requests import Session
-import execjs
 from playsound import playsound
 from traceback import print_exc
 import json
@@ -36,9 +35,6 @@ class Voice():
 
 
     def play_voice(self):
-  
-        
-
 
         with open('.\\config\\settin.json') as file:
             data = json.load(file)

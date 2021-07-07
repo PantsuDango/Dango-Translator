@@ -40,17 +40,12 @@ def get_qtv_qtk():
 
 def getHtml(url,headers,data):
 
-    try:
-        html= requests.post(url=url,data= data,headers=headers)
-        datas = html.json()['translate']['records']
+    html= requests.post(url=url,data= data,headers=headers, timeout=5)
+    datas = html.json()['translate']['records']
         
-        if html!=None and datas != None :
-            trans_result = ''.join([data['targetText'] for data in datas])
-
-    except Exception:
-        print_exc()
-        trans_result = '网页腾讯：我抽风啦！'
-    
+    if html!=None and datas != None :
+        trans_result = ''.join([data['targetText'] for data in datas])
+  
     return trans_result
 
 
@@ -71,32 +66,35 @@ class TencentTrans(object):
 
         self.fromlang = 'auto'
         self.tolang = 'zh'
-        self.sessionUuid = str(int(time.time() * 1000))
-
-        self.fy_guid, self.qtv, self.qtk = get_qtv_qtk()
-
-        self.headers['Cookie'] = self.headers['Cookie'].replace(
-            '605ead81-f210-47eb-bd80-ac6ae5e7a2d8', self.fy_guid)
-
-        self.headers['Cookie'] = self.headers['Cookie'].replace(
-            'ed286a053ae88763', self.qtv)
-        self.headers['Cookie'] = self.headers['Cookie'].replace(
-            'wfMmjh3k/7Sr2xVNg/LtITgPRlnvGWBzP9a4FN0dn9PE7L5jDYiYJnW03MJLRUGHEFNCRhTfrp/V+wUj0dun1KkKNUUmS86A/wGVf6ydzhwboelTOs0hfHuF0ndtSoX+N3486tUMlm62VU4i856mqw==',
-            self.qtk)
-
+        
 
     def get_trans_result(self, text):
         
-        data = {
-                'source': self.fromlang,
-                'target': self.tolang,
-                'sourceText': text,
-                'qtv': self.qtv,
-                'qtk': self.qtk,
-                'sessionUuid': self.sessionUuid
-               }
+        try:
+            self.sessionUuid = str(int(time.time() * 1000))
+            self.fy_guid, self.qtv, self.qtk = get_qtv_qtk()
+            self.headers['Cookie'] = self.headers['Cookie'].replace(
+                '605ead81-f210-47eb-bd80-ac6ae5e7a2d8', self.fy_guid)
+            self.headers['Cookie'] = self.headers['Cookie'].replace(
+                'ed286a053ae88763', self.qtv)
+            self.headers['Cookie'] = self.headers['Cookie'].replace(
+                'wfMmjh3k/7Sr2xVNg/LtITgPRlnvGWBzP9a4FN0dn9PE7L5jDYiYJnW03MJLRUGHEFNCRhTfrp/V+wUj0dun1KkKNUUmS86A/wGVf6ydzhwboelTOs0hfHuF0ndtSoX+N3486tUMlm62VU4i856mqw==',
+                self.qtk)
 
-        trans_result = getHtml(self.api_url, self.headers, data)
+            data = {
+                    'source': self.fromlang,
+                    'target': self.tolang,
+                    'sourceText': text,
+                    'qtv': self.qtv,
+                    'qtk': self.qtk,
+                    'sessionUuid': self.sessionUuid
+                }
+
+            trans_result = getHtml(self.api_url, self.headers, data)
+
+        except Exception:
+            print_exc()
+            trans_result = '网页腾讯：我抽风啦！'
         
         return trans_result
 
