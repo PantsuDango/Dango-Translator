@@ -1,113 +1,157 @@
-# 面向对象
-# 百度翻译 -- 网页版(自动获取token,sign)
-import requests
-import js2py
-import json
+'''
+    @author: harumonia
+    :@url: http://harumonia.top
+    :copyright: © 2020 harumonia<zxjlm233@gmail.com>
+    :@site:
+    :@datetime: 2020/7/9 21:05
+    :@software: PyCharm
+    :@description: None
+'''
+
+import ctypes
+import math
 import re
 from traceback import print_exc
 
+import requests
 
-class BaiduWeb():
-    
-    """百度翻译网页版爬虫"""
-    
-    def __init__(self, query_str):
-        self.session = requests.session()
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36",
+
+class BaiduTranslator:
+    """
+    通过JS解密实现的百度翻译
+    """
+
+    def __init__(self):
+        self.req = requests.Session()
+        self.req.headers = {
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36',
+            'cookie': 'BAIDUID=B27294F1569BB6465ED40FF870EF88C8:FG=1;',
         }
-        self.session.headers = headers
-        self.baidu_url = "https://www.baidu.com/"
-        self.root_url = "https://fanyi.baidu.com/"
-        self.lang_url = "https://fanyi.baidu.com/langdetect"
-        self.trans_url = "https://fanyi.baidu.com/v2transapi"
-        self.query_str = query_str
 
-
-    def get_token_gtk(self):
-        
-        '''获取token和gtk(用于合成Sign)'''
-        
-        self.session.get(self.root_url)
-        resp = self.session.get(self.root_url)
-        html_str = resp.content.decode()
-        token = re.findall(r"token: '(.*?)'", html_str)[0]
-        gtk = re.findall(r"window.gtk = '(.*?)'", html_str)[0]
-        
-        return token,gtk
-
-
-    def generate_sign(self,gtk):
-        
-        """生成sign"""
-        # 1. 准备js编译环境
-        
-        context = js2py.EvalJs()
-        with open('.\\config\\webtrans.js', encoding='utf8') as f:
-            js_data = f.read()
-            js_data = re.sub("window\[l\]",'"'+gtk+'"',js_data)
-            # js_data = re.sub("window\[l\]", "\"{}\"".format(gtk), js_data)
-            # print(js_data)
-            context.execute(js_data)
-        sign = context.e(self.query_str)
-       
-        return sign
-
-
-    def lang_detect(self):
-        
-        '''获取语言转换类型.eg: zh-->en'''
-        
-        lang_resp = self.session.post(self.lang_url,data={"query":self.query_str})
-        lang_json_str = lang_resp.content.decode()  # {"error":0,"msg":"success","lan":"zh"}
-        lan = json.loads(lang_json_str)['lan']
-        to = "en" if lan == "zh" else "zh"
-        
-        return lan,to
-
-
-    def parse_url(self,post_data):
-        
-        trans_resp = self.session.post(self.trans_url,data=post_data)
-        trans_json_str = trans_resp.content.decode()
-        trans_json = json.loads(trans_json_str)
-        self.result = trans_json["trans_result"]["data"][0]["dst"]
-
-
-    def run(self):
-
+    def run(self, query):
+        """
+        执行函数
+        @param query: 查询的语句 （一行）
+        @return:
+        """
         try:
-            """实现逻辑"""
-            # 1.获取百度的cookie,(缺乏百度首页的cookie会始终报错998)
-            self.session.get(self.baidu_url)
-            # 2. 获取百度翻译的token和gtk(用于合成sign)
-            token, gtk = self.get_token_gtk()
-            # 3. 生成sign
-            sign = self.generate_sign(gtk)
-            # 4. 获取语言转换类型.eg: zh-->en
-            lan, to = self.lang_detect()
-            # 5. 发送请求,获取响应,输出结果
-            post_data = {
-                #"from": lan,
-                "from": lan,
-                "to": to,
-                "query": self.query_str,
-                "transtype": "realtime",
-                "simple_means_flag": 3,
-                "sign": sign,
-                "token": token
+            # 尚未明确cookie的生命周期，暂且写死，观察后续
+            # req.get('https://www.baidu.com/')
+            response_gtk = self.req.get('https://fanyi.baidu.com/')
+            gtk = re.findall(r"gtk = '(\d+.\d+)'", response_gtk.text)[0]
+            token = re.findall(r"token: '(.*)'", response_gtk.text)[0]
+
+            lan, to = self.lang_detect(query)
+
+            params = (
+                ('from', lan),
+                ('to', to),
+            )
+
+            data = {
+                'from': lan,
+                'to': 'zh',
+                'query': query,
+                'transtype': 'realtime',
+                'simple_means_flag': '3',
+                'sign': self.e_encryption(query, gtk),
+                'token': token,
+                'domain': 'common'
             }
-            self.parse_url(post_data)
-        
-        except Exception:
+
+            response = self.req.post('https://fanyi.baidu.com/v2transapi', params=params, data=data, timeout=5)
+            result = response.json()["trans_result"]["data"][0]["dst"]
+        except Exception as _e:
+            print(_e)
             print_exc()
-            self.result = '网页百度：我抽风啦！'
-        
-        return self.result
+            result = '网页百度：我抽风啦！'
+
+        return result
+
+    def lang_detect(self, query):
+        """
+        获取带翻译语种
+        @param query:
+        @return:
+        """
+
+        lang_resp = self.req.post("https://fanyi.baidu.com/langdetect", data={"query": query})
+        lan = lang_resp.json()["lan"]
+        to = "en" if lan == "zh" else "zh"
+
+        return lan, to
+
+    @staticmethod
+    def int_overflow(val):
+        maxint = 2147483647
+        if not -maxint - 1 <= val <= maxint:
+            val = (val + (maxint + 1)) % (2 * (maxint + 1)) - maxint - 1
+        return val
+
+    @staticmethod
+    def unsigned_left_shitf(n, i):
+        if n < 0:
+            n = ctypes.c_uint32(n).value
+        if i < 0:
+            return -(BaiduTranslator.int_overflow(n >> abs(i)))
+        return BaiduTranslator.int_overflow(n << i)
+
+    def e_encryption(self, r_mat, gtk):
+        """
+        js解密
+        @param r_mat:
+        @param gtk:
+        @return:
+        """
+
+        def n_encryption(r_sub, o):
+            for t in range(0, len(o) - 2, 3):
+                a = o[t + 2]
+                a = ord(a) - 87 if a >= "a" else int(a)
+                a = r_sub >> a if o[t + 1] == "+" else BaiduTranslator.unsigned_left_shitf(r_sub, a)
+                r_sub = r_sub + a & 4294967295 if o[t] == "+" else r_sub ^ a
+            return r_sub
+
+        if len(r_mat) > 30:
+            r_mat = "" + r_mat[:10] + r_mat[math.floor(len(r_mat) / 2) - 5: math.floor(len(r_mat) / 2) + 5] + r_mat[
+                                                                                                              -10:]
+        u = gtk
+        m, s = u.split('.')
+        ss, c, v = [], 0, 0
+        while v < len(r_mat):
+            aa = ord(r_mat[v])
+            if aa < 128:
+                ss.append(aa)
+            else:
+                if 2048 > aa:
+                    ss.append(aa >> 6 | 192)  # 考虑无符号
+                else:
+                    if 55296 == (64512 & aa) and v + 1 < len(r_mat) and 56320 == (64512 & ord(r_mat[v + 1])):
+                        v += 1
+                        aa = 65536 + ((1023 & aa) << 10) + (1023 & ord(r_mat[v]))
+                        ss.append(aa >> 18 | 240)
+                        ss.append(aa >> 12 & 64 | 128)
+                    else:
+                        ss.append(aa >> 12 | 224)
+                        ss.append(aa >> 6 & 63 | 128)
+                        ss.append(63 & aa | 128)
+            v += 1
+        F = "+-a^+6"
+        D = "+-3^+b+-f"
+        p = int(m)
+        for b in range(len(ss)):
+            p += ss[b]
+            p = n_encryption(p, F)
+        p = n_encryption(p, D)
+        p ^= int(s)
+        if 0 > p:
+            p = (2147483647 & p) + 2147483648
+        p %= int(1e6)
+        return str(p) + "." + str(p ^ int(m))
 
 
 if __name__ == '__main__':
-    
-    webfanyi = BaiduWeb('一歩ひくと见えてくる 何かの中にどっぷり浸かっていると何がなんだか分からなくなってしまうことがある。')
-    a = webfanyi.run()
-    print(a)
+    r = "ブリテンの伝説の王。騎士王とも。アルトリアは幼名であり、王として起ってからは アーサー王と呼ばれる事になった。"
+
+    res = BaiduTranslator().run(r)
+    print(res)

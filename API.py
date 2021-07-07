@@ -8,6 +8,8 @@ from hashlib import md5
 from urllib import parse
 from random import randint
 import json
+import os
+
 
 from tencentcloud.common import credential
 from tencentcloud.common.profile.client_profile import ClientProfile
@@ -19,8 +21,7 @@ import re
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from PyQt5.QtWebEngineWidgets import *
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtGui
 
 from traceback import print_exc
 
@@ -42,6 +43,7 @@ def MessageBox(title, text):
     error_stop()  # 停止翻译状态
     
     messageBox = QMessageBox()
+    messageBox.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowMaximizeButtonHint | Qt.MSWindowsFixedSizeDialogHint)
     # 窗口图标
     icon = QtGui.QIcon()
     icon.addPixmap(QtGui.QPixmap("./config/图标.ico"), QtGui.QIcon.Normal, QtGui.QIcon.On)
@@ -139,8 +141,8 @@ def baidu_orc(data):
         
         except Exception:
             print_exc()
-            sentence = 'OCR连接失败：请打开【网络和Internet设置】的【代理】页面，将其中的全部代理设置开关都关掉'
-            error_stop()
+            sentence = 'OCR连接失败：请打开【网络和Internet设置】的【代理】页面，将其中的全部代理设置开关都关掉，保证关闭后请重试'
+            #error_stop()
             return None, sentence
         else:
             if response:
@@ -157,12 +159,18 @@ def baidu_orc(data):
                         return None, sentence
 
                     elif error_code == 17:
-                        sentence = 'OCR错误：OCR额度用光了，每天五万次的额度你是怎么用光的，是不是开着自动模式挂机呢？只有等明天再玩了'
+                        if showTranslateRow == 'True':
+                            sentence = 'OCR错误：竖排翻译模式每日额度已用光，请取消竖排翻译模式'
+                        elif  highPrecision == 'True':
+                            sentence = 'OCR错误：高精度翻译模式每日额度已用光，请取消高精度翻译模式'
+                        else:
+                            sentence = 'OCR错误：OCR无额度，可使用团子离线ocr'
                         error_stop()
                         return None, sentence
 
                     elif error_code == 18:
-                        baidu_orc(data)
+                        sign, sentence = baidu_orc(data)
+                        return sign, sentence
                     
                     elif error_code == 111:
                         sentence = 'OCR错误：密钥过期了，请进入设置页面后按一次保存设置，以重新生成密钥'
@@ -193,11 +201,51 @@ def baidu_orc(data):
                     else:
                         for word in words:
                             sentence += word['words']
+                        if sentence :
+                            print("百度OCR: %s"%sentence)
                     
                     return True, sentence
             else:
                 sentence = 'OCR错误：response无响应'
                 return None, sentence
+
+
+def dango_ocr(data) :
+
+    url = 'http://127.0.0.1:6666/ocr/api'
+    imagePath = os.path.join(os.getcwd(), "config", "image.jpg")
+    language = data["language"]
+
+    data = {
+        'ImagePath': imagePath,
+        'Language': language
+    }
+
+    try :
+        res = requests.post(url, data=json.dumps(data))
+        res.encoding = "utf-8"
+        result = json.loads(res.text)
+
+    except Exception :
+        print_exc()
+        error_stop()
+        return None, "OCR错误：团子离线ocr未启动或运行失败"
+
+    if result["Code"] == -1 :
+        error_stop()
+        return None, "OCR错误：%s"%result["Message"]
+
+    else :
+        sentence = ""
+        for tmp in result["Data"] :
+            if language == "ENG" :
+                sentence += tmp["Words"] + " "
+            else :
+                sentence += tmp["Words"]
+
+        if sentence :
+            print("团子OCR: %s"%sentence)
+        return True, sentence
 
 
 # 有道翻译
@@ -254,7 +302,7 @@ def caiyun(sentence):
     
     except Exception:
         print_exc()
-        result = "彩云翻译：我抽风啦！"
+        result = "公共彩云：我抽风啦！"
 
     return result
 
@@ -270,12 +318,10 @@ def jinshan(sentence):
             'w': sentence
            }
     try:
-        response = requests.post(url, data=data)
+        response = requests.post(url, data=data, headers=headers)
         info = response.text
         data_list = json.loads(info)
         result = data_list['content']['out']
-        if not result:
-            result = "金山：我抽风啦！"
     
     except Exception:
         print_exc()
@@ -285,13 +331,13 @@ def jinshan(sentence):
 
 
 # yeekit翻译
-def yeekit(sentence, yeekitLanguage):
+def yeekit(sentence, data):
 
     url = 'https://www.yeekit.com/site/dotranslate' 
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.97 Safari/537.36'}
     data = {
             'content[]': sentence,
-            'sourceLang': yeekitLanguage,
+            'sourceLang': data["yeekitLanguage"],
             'targetLang': "nzh"
             }
     try:    
@@ -303,7 +349,6 @@ def yeekit(sentence, yeekitLanguage):
 
     except Exception:
         print_exc()
-        print(res.text)
         result = "yeekit：我抽风啦！"
 
     return result
@@ -402,7 +447,7 @@ def tencent(sentence, data):
     secretKey = data['tencentAPI']['Secret']
 
     if (not secretId) or (not secretKey):
-        string = '私人腾讯：还未注册私人腾讯API，不可使用'
+        result = '私人腾讯：还未注册私人腾讯API，不可使用'
     else:
         try: 
             cred = credential.Credential(secretId, secretKey) 
@@ -416,63 +461,71 @@ def tencent(sentence, data):
             req = models.TextTranslateRequest()
             sentence = sentence.replace('"',"'")
             params = '''{"SourceText":"%s","Source":"auto","Target":"zh","ProjectId":0}'''%(sentence)
+            params = params.replace('\r', '\\r').replace('\n', '\\n')
             req.from_json_string(params)
 
             resp = client.TextTranslate(req)
             result = re.findall(r'"TargetText": "(.+?)"', resp.to_json_string())[0]
 
         except TencentCloudSDKException as err: 
-            
-            err = str(err)
-            code = re.findall(r'code:(.*?) message', err)[0]
-            error = re.findall(r'message:(.+?) requestId', err)[0]
-            
-            if code == 'MissingParameter':
-                pass
-            
-            elif code == 'FailedOperation.NoFreeAmount':
-                result = "私人腾讯：本月免费额度已经用完"
-            
-            elif code == 'FailedOperation.ServiceIsolate':
-                result = "私人腾讯：账号欠费停止服务"
-            
-            elif code == 'FailedOperation.UserNotRegistered':
-                result = "私人腾讯：还没有开通机器翻译服务"
-            
-            elif code == 'InternalError':
-                result = "私人腾讯：内部错误"
-            
-            elif code == 'InternalError.BackendTimeout':
-                result = "私人腾讯：后台服务超时，请稍后重试"
-            
-            elif code == 'InternalError.ErrorUnknown':
-                result = "私人腾讯：未知错误"
 
-            elif code == 'LimitExceeded':
-                result = "私人腾讯：超过配额限制"
-            
-            elif code == 'UnsupportedOperation':
-                result = "私人腾讯：操作不支持"
-            
-            elif code == 'InvalidCredential':
-                result = "私人腾讯：secretId或secretKey错误"
-            
-            elif code == 'AuthFailure.SignatureFailure':
-                result = "私人腾讯：secretKey错误"
-            
-            elif code == 'AuthFailure.SecretIdNotFound':
-                result = "私人腾讯：secretId错误"
-            
-            elif code == 'AuthFailure.SignatureExpire':
-                result = "私人腾讯：签名过期，请将电脑系统时间调整至准确的时间后重试"
-            
-            else:
-                result = "私人腾讯：%s，%s"%(code, error)
+            try :
+                err = str(err)
+                code = re.findall(r'code:(.*?) message', err)[0]
+                error = re.findall(r'message:(.+?) requestId', err)[0]
 
-        except Exception:
+            except Exception:
+                print_exc()
+                result = '私人腾讯：我抽风啦！'
+
+            else :
+                if code == 'MissingParameter':
+                    pass
+
+                elif code == 'FailedOperation.NoFreeAmount':
+                    result = "私人腾讯：本月免费额度已经用完"
+
+                elif code == 'FailedOperation.ServiceIsolate':
+                    result = "私人腾讯：账号欠费停止服务"
+
+                elif code == 'FailedOperation.UserNotRegistered':
+                    result = "私人腾讯：还没有开通机器翻译服务"
+
+                elif code == 'InternalError':
+                    result = "私人腾讯：内部错误"
+
+                elif code == 'InternalError.BackendTimeout':
+                    result = "私人腾讯：后台服务超时，请稍后重试"
+
+                elif code == 'InternalError.ErrorUnknown':
+                    result = "私人腾讯：未知错误"
+
+                elif code == 'LimitExceeded':
+                    result = "私人腾讯：超过配额限制"
+
+                elif code == 'UnsupportedOperation':
+                    result = "私人腾讯：操作不支持"
+
+                elif code == 'InvalidCredential':
+                    result = "私人腾讯：secretId或secretKey错误"
+
+                elif code == 'AuthFailure.SignatureFailure':
+                    result = "私人腾讯：secretKey错误"
+
+                elif code == 'AuthFailure.SecretIdNotFound':
+                    result = "私人腾讯：secretId错误"
+
+                elif code == 'AuthFailure.SignatureExpire':
+                    result = "私人腾讯：签名过期，请将电脑系统时间调整至准确的时间后重试"
+
+                else:
+                    result = "私人腾讯：%s，%s"%(code, error)
+
+        except Exception :
             print_exc()
             result = '私人腾讯：我抽风啦！'
     
+    result = result.replace('\\r', '\r').replace('\\n', '\n')
     return result
 
 

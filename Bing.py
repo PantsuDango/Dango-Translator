@@ -1,7 +1,6 @@
 import urllib.request
 import urllib.parse
 from traceback import print_exc
-import re
 
 
 class BingTranslate(object):
@@ -10,11 +9,12 @@ class BingTranslate(object):
         
         self.url = "http://api.microsofttranslator.com/v2/ajax.svc/TranslateArray2?"
 
-    
-    def translate(self, BingLanguage, content):
+  
+    def translate(self, content, data):
 
+        Language = data["BingLanguage"]
         data = {}
-        data['from'] = '"' + BingLanguage + '"'
+        data['from'] = '"' + Language + '"'
         data['to'] = '"' + 'zh' + '"'
         data['texts'] = '["'
         data['texts'] += content
@@ -27,8 +27,9 @@ class BingTranslate(object):
         try:
             data = urllib.parse.urlencode(data).encode('utf-8')
             strUrl = self.url + data.decode() + "&appId=%223DAEE5B978BA031557E739EE1E2A68CB1FAD5909%22"
-            response = urllib.request.urlopen(strUrl)
+            response = urllib.request.urlopen(strUrl, timeout=5)
             str_data = response.read().decode('utf-8')
+            print(str_data)
             tmp, str_data = str_data.split('"TranslatedText":')
             translate_data = str_data[1:str_data.find('",', 1)].replace('\\"','')
 

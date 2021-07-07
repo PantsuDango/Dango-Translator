@@ -167,21 +167,3 @@ if __name__ == "__main__":
     #form = SwitchBtn()
     form.show()
     sys.exit(app.exec_())
-
-    '''
-————————————————
-PyQt switch开关切换
-https://blog.csdn.net/qq_38641985/article/details/83419268
-
-————————————————
-Toggle by Daryl / Dave
-https://codepen.io/daviddarnes/pen/LdGYVG
-
-————————————————
-pyqt5 通过QLinearGradient 绘制取色板
-https://www.cnblogs.com/zhouzhengbao-bky/p/12196673.html
-
-————————————————
-PyQt5基本控件详解之QPainter（十七）
-https://blog.csdn.net/jia666666/article/details/81566599
-    '''

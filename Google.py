@@ -64,7 +64,7 @@ class GoogleTranslate():
     def getHtml(self, session, url, headers):
         
         try:
-            html = session.get(url, headers=headers)
+            html = session.get(url, headers=headers, timeout=5)
             return html.json()
         except Exception:
             print_exc()
@@ -73,10 +73,9 @@ class GoogleTranslate():
 
     def translate(self, text):
         
-        tk = self.getTk(text)
-        url = self.buildUrl(text, tk)
-        
         try:
+            tk = self.getTk(text)
+            url = self.buildUrl(text, tk)
             result = self.getHtml(self.session, url, self.headers)
        
             if result != None:

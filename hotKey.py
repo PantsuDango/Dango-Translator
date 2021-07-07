@@ -1,7 +1,6 @@
 # _*_ coding:UTF-8 _*_  
 
 import pythoncom, PyHook3, ctypes, _thread
-import win32gui
 from threading import Thread
 import time
 
@@ -59,7 +58,8 @@ class pyhk:
 
     def start(self):
         """Start pyhk to check for hotkeys"""
-        pythoncom.PumpMessages()
+        while True :
+            pythoncom.PumpMessages()
 
 
     def end(self):
@@ -516,16 +516,6 @@ class ExecFunThread:
     def Run(self):
         self.fun()
         self.running = False
-
-
-def set_hotKey():
-
-    try:
-        self.thread = Runthread(self, self.mode)
-        self.thread._signal.connect(self.call_backlog)
-        self.thread.start()
-    except Exception:
-        print_exc()
 
 
 def test1():
