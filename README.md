@@ -1,4 +1,4 @@
-![image](http://39.108.110.77/group1/default/20210707/11/13/5/ede1ad7a134685355c57113dd1826325.png?raw=true)
+![image](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver3.6/%E5%B0%81%E9%9D%A2.png)
 
 
 ### 开头说明
