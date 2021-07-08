@@ -140,7 +140,7 @@ ps：此文档为离线文档，相关说明和问题集可能会过时，如果
 
 设定翻译模式，自动翻译就是每隔大概0.5s 会自动去对你选择的翻译区域刷新翻译（如果区域内有变化才会刷新），打开自动模式的话，还需要记得点击最左边的开始键。相对的，如果不用记得点暂停哦。然后你选择的区域有文字变化，它就会自动刷新翻译啦。
 
-![image-20210704225536996](http://39.108.110.77/group1/default/20210707/11/38/5/98b15479044d7a62637732e152c49e67.png)
+![image-20210704225536996](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver3.6/%E7%BF%BB%E8%AF%91%E6%A8%A1%E5%BC%8F.png)
 
 
 
@@ -148,7 +148,7 @@ ps：此文档为离线文档，相关说明和问题集可能会过时，如果
 
 它们两个千万不可以重叠，不然你的识别框会把翻译界面上的信息也识别进去，然后就套娃翻译了，千万注意
 
-![image-20210704225939165](http://39.108.110.77/group1/default/20210707/11/39/5/20b533a2275ed8941dbfc0bf5ad2b5e6.png)
+![image-20210704225939165](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver3.6/%E7%95%8C%E9%9D%A2%E4%B8%8D%E5%8F%AF%E4%BB%A5%E9%87%8D%E5%8F%A0.png)
 
 
 
@@ -156,7 +156,7 @@ ps：此文档为离线文档，相关说明和问题集可能会过时，如果
 
 可以通过点击此处即时复制当前识别到的原文至你的剪贴板
 
-![image-20210704230103539](http://39.108.110.77/group1/default/20210707/11/40/5/d72811f52a743a61332d9162bd853fd2.png)
+![image-20210704230103539](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver3.6/%E5%A4%8D%E5%88%B6%E5%8E%9F%E6%96%87.png)
 
 
 
@@ -166,7 +166,7 @@ ps：此文档为离线文档，相关说明和问题集可能会过时，如果
 
 比如这里就是如果翻译后的文字内有"团子"就会被替换成"奶子"，如果出现了"!"就会被直接过滤
 
-![image-20210704230245508](http://39.108.110.77/group1/default/20210707/11/41/5/6684c798c843c00f62053d8cbe4f552c.png)
+![image-20210704230245508](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver3.6/%E5%B1%8F%E8%94%BD%E8%AF%8D.png)
 
 
 
@@ -174,7 +174,7 @@ ps：此文档为离线文档，相关说明和问题集可能会过时，如果
 
 就是召唤谷歌娘朗读出当前原文
 
-![image-20210704230504130](http://39.108.110.77/group1/default/20210707/11/42/5/04be49df810d1fe43735e37756459c93.png)
+![image-20210704230504130](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver3.6/%E6%9C%97%E8%AF%BB%E5%8E%9F%E6%96%87.png)
 
 
 
@@ -182,7 +182,7 @@ ps：此文档为离线文档，相关说明和问题集可能会过时，如果
 
 锁住就不可拖动和触发了，类似网易云那类音乐软件的锁
 
-![image-20210704230609987](http://39.108.110.77/group1/default/20210707/11/42/5/04be49df810d1fe43735e37756459c93.png)
+![image-20210704230609987](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver3.6/%E9%94%81%E5%AE%9A%E7%95%8C%E9%9D%A2.png)
 
 
 
@@ -190,9 +190,9 @@ ps：此文档为离线文档，相关说明和问题集可能会过时，如果
 
 如果点击了最小化，团子翻译器不会出现在任务栏，而是出现在系统托盘，别找不到了哟~
 
-![image-20210704230701308](http://39.108.110.77/group1/default/20210707/11/46/5/af4b030b3a08f21db33d10818e267b41.png)
+![image-20210704230701308](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver3.6/%E6%9C%80%E5%B0%8F%E5%8C%961.png)
 
-![image-20210704230741259](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210704230741259.png)
+![image-20210704230741259](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver3.6/%E6%9C%80%E5%B0%8F%E5%8C%962.png)
 
 
 
@@ -200,9 +200,9 @@ ps：此文档为离线文档，相关说明和问题集可能会过时，如果
 
 真的真的真的不考虑支持一下这么奋力把软件做好的团子吗 QAQ！！！
 
-![image-20210704230840204](http://39.108.110.77/group1/default/20210707/11/47/5/726e2c0b7379ea2783e835a262093131.png)
+![image-20210704230840204](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver3.6/%E6%94%AF%E6%8C%81%E4%BD%9C%E8%80%851.png)
 
-![image-20210704230854067](http://39.108.110.77/group1/default/20210707/11/48/5/847735299b5c9dde82434d6413fb6987.png)
+![image-20210704230854067](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver3.6/%E6%94%AF%E6%8C%81%E4%BD%9C%E8%80%852.png)
 
 
 
