@@ -52,15 +52,15 @@ ps：此文档为离线文档，相关说明和问题集可能会过时，如果
 
 #### 安装字体文件
 
-![image-20210704223134576](http://39.108.110.77/group1/default/20210707/11/15/5/44adf0b1479ced50db0986fa12317f69.png)
+![image-20210704223134576](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver3.6/%E5%AD%97%E4%BD%931.png)
 
-![image-20210704223146751](http://39.108.110.77/group1/default/20210707/11/19/5/91ea55f77e9242dcce21a6fb0ad61372.png)
+![image-20210704223146751](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver3.6/%E5%AD%97%E4%BD%932.png)
 
 
 
 #### 启动翻译器
 
-![image-20210704223318260](http://39.108.110.77/group1/default/20210707/11/20/5/3a2c3f68564d62f120b750146c78419d.png)
+![image-20210704223318260](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver3.6/%E5%90%AF%E5%8A%A8.png)
 
 
 
@@ -68,7 +68,7 @@ ps：此文档为离线文档，相关说明和问题集可能会过时，如果
 
 **注意这里登录和注册公用一个页面，**输入你自己喜欢的账号密码后，点击注册即可，已有账号直接登录
 
-![image-20210704223533002](http://39.108.110.77/group1/default/20210707/11/22/5/03b810967bb48116cdfbf8bcc264d995.png)
+![image-20210704223533002](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver3.6/%E7%99%BB%E5%BD%95.png)
 
 
 
@@ -76,7 +76,7 @@ ps：此文档为离线文档，相关说明和问题集可能会过时，如果
 
 点此进入设置页面
 
-![image-20210704223920145](http://39.108.110.77/group1/default/20210707/11/23/5/e7f41c6080e4eedd49434ce18ce42cf4.png)
+![image-20210704223920145](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver3.6/%E8%AE%BE%E7%BD%AE.png)
 
 
 
@@ -86,9 +86,9 @@ ps：此文档为离线文档，相关说明和问题集可能会过时，如果
 
 另外最上面的百度OCR，是留给没有被百度OCR限额的老用户使用的，新用户直接忽略就好，直接使用红字所提及的团子离线OCR。
 
-![image-20210704224030202](http://39.108.110.77/group1/default/20210707/11/24/5/eefc295f24ebc77c52fb5b01274f50cf.png)
+![image-20210704224030202](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver3.6/%E6%B3%A8%E5%86%8C%E7%BF%BB%E8%AF%911.png)
 
-![image-20210704230958340](http://39.108.110.77/group1/default/20210707/11/27/5/448bc549632847ba9def4c0858bddd85.png)
+![image-20210704230958340](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver3.6/%E6%B3%A8%E5%86%8C%E7%BF%BB%E8%AF%912.png)
 
 
 
@@ -96,7 +96,7 @@ ps：此文档为离线文档，相关说明和问题集可能会过时，如果
 
 如图说明，公共翻译和网页翻译经常抽风，实在是不推荐使用，建议前面注册好了相应的私人翻译后，打勾使用就好。另外下面选择要翻译的语种，切记不可以选英语去翻译日语，反之亦然。
 
-![image-20210704224436932](http://39.108.110.77/group1/default/20210707/11/29/5/e4716c75c495a89dd55faf720e30f67a.png)
+![image-20210704224436932](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver3.6/%E7%BF%BB%E8%AF%91%E6%BA%90%E9%80%89%E6%8B%A9.png)
 
 
 
@@ -104,7 +104,7 @@ ps：此文档为离线文档，相关说明和问题集可能会过时，如果
 
 字面意思，按照自己喜好设置就好
 
-![image-20210704224616755](http://39.108.110.77/group1/default/20210707/11/30/5/a287c4b989f87fe67436f5ddd0335584.png)
+![image-20210704224616755](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver3.6/%E7%BF%BB%E8%AF%91%E6%A0%B7%E5%BC%8F.png)
 
 #### 其他设定
 
@@ -112,7 +112,7 @@ ps：此文档为离线文档，相关说明和问题集可能会过时，如果
 
 其他地方字面意思，根据个人喜好配置就好。
 
-![image-20210704224658034](http://39.108.110.77/group1/default/20210707/11/32/5/0e4a6baa31d337954548b6c55b70bc29.png)
+![image-20210704224658034](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver3.6/%E5%85%B6%E4%BB%96%E8%AE%BE%E5%AE%9A.png)
 
 
 
@@ -120,19 +120,19 @@ ps：此文档为离线文档，相关说明和问题集可能会过时，如果
 
 弄完保存，切记哦~ 保存好后点退出就好
 
-![image-20210704224948130](http://39.108.110.77/group1/default/20210707/11/33/5/813cdcd719b30b37a5813b5634120767.png)
+![image-20210704224948130](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver3.6/%E4%BF%9D%E5%AD%98%E8%AE%BE%E5%AE%9A.png)
 
 #### 选择翻译区域
 
 需要告诉翻译器，你要翻译的文字区域在哪里。点击此处后，就像截图那种感觉拖出一个区域框住文字区域就好。
 
-![image-20210704225139140](http://39.108.110.77/group1/default/20210707/11/34/5/f5c43e3c7835bb4084e40eaa4e739da6.png)
+![image-20210704225139140](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver3.6/%E7%BF%BB%E8%AF%91%E5%8C%BA%E5%9F%9F1.png)
 
-![image-20210704225243375](http://39.108.110.77/group1/default/20210707/11/35/5/36d008b0c8e009f269451ce8e1f134e8.png)
+![image-20210704225243375](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver3.6/%E7%BF%BB%E8%AF%91%E5%8C%BA%E5%9F%9F2.png)
 
 当然它是可以隐藏的，如果你决定好了你的翻译区域就是这里，隐藏了就好。也可以随意拖动改变位置，或者重新框一个。
 
-![image-20210704225342690](http://39.108.110.77/group1/default/20210707/11/37/5/ace0925b0f51805dfb0ca89f46255cf4.png)
+![image-20210704225342690](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver3.6/%E7%BF%BB%E8%AF%91%E5%8C%BA%E5%9F%9F3.png)
 
 
 
