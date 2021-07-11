@@ -32,7 +32,7 @@
   
 ## 更新日志
 
-### 翻译器相关 
+#### 翻译器相关 
 
 [![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver3.6-ff69b4)]()
 [![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2021--07--04-ff69b4)]()
@@ -43,7 +43,7 @@
 + 偷偷修复了一些不为人知的bug；
 + 更多更新日志：[查看]()
 
-### OCR相关
+#### OCR相关
 
 [![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver1.1-ff69b4)]()
 [![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2021--07--09-ff69b4)]()
