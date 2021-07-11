@@ -55,7 +55,7 @@
   
 ## 使用教程
 
-[翻译器教程]()
+[翻译器教程](https://github.com/PantsuDango/Dango-Translator/blob/master/docx/%E7%BF%BB%E8%AF%91%E5%99%A8%E6%95%99%E7%A8%8B.md)
 
 [离线OCR教程]()
 
@@ -88,6 +88,15 @@
 - [ ] 修复快捷键会失效的问题
 - [ ] 修复手动模式下，程序概率卡死的问题
 - [ ] 修复多屏模式下，副屏幕无法截图的问题
+
+  
+ ## 特别鸣谢
+
+[PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)  离线OCR基于此框架搭建
+
+[QPT 打包工具](https://github.com/GT-ZhangAcer/QPT)  离线OCR基于此工具打包
+
+[GT-Zhang](https://github.com/GT-ZhangAcer) 离线OCR开发过程给予了诸多帮助的大佬
 
   
 ## 软件预览
