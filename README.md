@@ -51,7 +51,7 @@
 
 ## 使用教程
 
-[翻译器教程]()
+[翻译器教程](https://github.com/PantsuDango/Dango-Translator/blob/master/docx/%E7%BF%BB%E8%AF%91%E5%99%A8%E6%95%99%E7%A8%8B.md)
 
 [离线OCR教程]()
 
@@ -116,4 +116,4 @@ F -- 自动模式 --> C
 
 #### 支持作者
 
-![](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E8%AE%BE%E7%BD%AE5.png)
+![](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E6%94%AF%E6%8C%81%E4%BD%9C%E8%80%85.png)
