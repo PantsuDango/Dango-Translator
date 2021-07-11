@@ -1,14 +1,18 @@
 # 团子翻译器 - 基于OCR的生肉翻译软件
 
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver3.6.1-ff69b4)](https://github.com/PantsuDango/Dango-Translator)[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2021--07--04-ff69b4)]()[![更新时间](https://img.shields.io/badge/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-win7--10-ff69b4)]()[![GitHubStars](https://img.shields.io/github/stars/PantsuDango/Dango-Translator)]()[![GitHub forks](https://img.shields.io/github/forks/PantsuDango/Dango-Translator)]()[![作者](https://img.shields.io/badge/QQ-%E8%83%96%E6%AC%A1%E5%9B%A2%E5%AD%90-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E4%BD%9C%E8%80%85.png)[![作者](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-16%E7%BE%A4-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/16%E7%BE%A4.png)
 
+[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver3.6.1-ff69b4)](https://github.com/PantsuDango/Dango-Translator)
+[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2021--07--04-ff69b4)]()
+[![更新时间](https://img.shields.io/badge/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-win7--10-ff69b4)]()
+[![GitHubStars](https://img.shields.io/github/stars/PantsuDango/Dango-Translator)]()
+[![GitHub forks](https://img.shields.io/github/forks/PantsuDango/Dango-Translator)]()
+[![作者](https://img.shields.io/badge/QQ-%E8%83%96%E6%AC%A1%E5%9B%A2%E5%AD%90-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E4%BD%9C%E8%80%85.png)
+[![作者](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-16%E7%BE%A4-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/16%E7%BE%A4.png)
 
-
+  
 ## 简介
 
 团子翻译器是一款生肉翻译软件，通过OCR识别屏幕特定范围内的文字，然后将识别到的文字调取各大厂的翻译，并输出翻译结果。
-
-#### 优势
 
 + 搭载了离线OCR，项目地址：[DangoOCR](https://github.com/PantsuDango/DangoOCR) 
 + 实现自动模式，循环识别区域内的文本并翻译
@@ -16,7 +20,7 @@
 + 账号系统，能够自动云端保存配置
 
 
-
+  
 ## 安装版下载
 
 - 群文件下载：[![作者](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-16%E7%BE%A4-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/16%E7%BE%A4.png)  
@@ -25,10 +29,10 @@
 - 解压密码：Dango
 
 
-
+  
 ## 更新日志
 
-#### 翻译器相关 
+### 翻译器相关 
 
 [![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver3.6-ff69b4)]()
 [![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2021--07--04-ff69b4)]()
@@ -39,7 +43,7 @@
 + 偷偷修复了一些不为人知的bug；
 + 更多更新日志：[查看]()
 
-#### OCR相关
+### OCR相关
 
 [![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver1.1-ff69b4)]()
 [![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2021--07--09-ff69b4)]()
@@ -48,27 +52,21 @@
 + 修复了安装OCR时会报：DLL load faild: 找不到指定的模块；
 
 
-
+  
 ## 使用教程
 
-[翻译器教程](https://github.com/PantsuDango/Dango-Translator/blob/master/docx/%E7%BF%BB%E8%AF%91%E5%99%A8%E6%95%99%E7%A8%8B.md)
+[翻译器教程]()
 
 [离线OCR教程]()
 
 
-
+  
 ## 原理说明
 
-```mermaid
-graph LR
-A(框选识别区) --> C(识别区截图)
-D(OCR提取文本) --> E(文本翻译) --> F(结果显示)
-C --> G(与上一次截图对比)
-G --> |无变化|C
-G --> |有变化|D
-F -- 自动模式 --> C
-```
+![](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E6%B5%81%E7%A8%8B%E5%9B%BE.png)
 
+
+  
 ## 更新计划
 
 #### 新增项
@@ -91,8 +89,7 @@ F -- 自动模式 --> C
 - [ ] 修复手动模式下，程序概率卡死的问题
 - [ ] 修复多屏模式下，副屏幕无法截图的问题
 
-
-
+  
 ## 软件预览
 
 #### 使用效果
