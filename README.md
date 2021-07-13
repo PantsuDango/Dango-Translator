@@ -106,20 +106,17 @@
 ![](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E4%BD%BF%E7%94%A8%E6%95%88%E6%9E%9C.png)
 
 #### 登录界面
-
-![](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E7%99%BB%E5%BD%95.png)
+<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E7%99%BB%E5%BD%95.png" width="50%" height="50%">
 
 #### 主界面
 
 ![](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E4%B8%BB%E7%95%8C%E9%9D%A2.png)
 
 #### 设置界面
-
-![](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E8%AE%BE%E7%BD%AE1.png)
-![](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E8%AE%BE%E7%BD%AE2.png)
-![](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E8%AE%BE%E7%BD%AE3.png)
-![](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E8%AE%BE%E7%BD%AE4.png)
+<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E8%AE%BE%E7%BD%AE1.png" width="50%" height="50%">
+<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E8%AE%BE%E7%BD%AE2.png" width="50%" height="50%">
+<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E8%AE%BE%E7%BD%AE4.png" width="50%" height="50%">
+<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E8%AE%BE%E7%BD%AE5.png" width="50%" height="50%">
 
 #### 支持作者
-
-![](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E6%94%AF%E6%8C%81%E4%BD%9C%E8%80%85.png)
+<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E6%94%AF%E6%8C%81%E4%BD%9C%E8%80%85.png" width="50%" height="50%">
