@@ -41,7 +41,7 @@
 + 登录时对密码做了不可见处理；
 + 增加了屏蔽词和替换词功能，可对翻译的结果进行自定义屏蔽和替换；
 + 偷偷修复了一些不为人知的bug；
-+ 更多更新日志：[查看]()
++ 更多更新日志：[查看](https://github.com/PantsuDango/Dango-Translator/blob/master/docx/%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97.md)
 
 #### OCR相关
 
@@ -50,6 +50,7 @@
 
 + 修复了安装OCR时会报：No module named 'paddle.fluid.core_noavx'；
 + 修复了安装OCR时会报：DLL load faild: 找不到指定的模块；
++ 更多更新日志：[查看]()
 
 
   
