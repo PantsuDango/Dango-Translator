@@ -1,13 +1,13 @@
 # 团子翻译器 - 基于OCR的生肉翻译软件
 
 
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver3.6.1-ff69b4)](https://github.com/PantsuDango/Dango-Translator)
-[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2021--07--04-ff69b4)]()
+[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver3.6.2-ff69b4)](https://github.com/PantsuDango/Dango-Translator)
+[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2021--08--19-ff69b4)]()
 [![更新时间](https://img.shields.io/badge/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-win7--10-ff69b4)]()
 [![GitHubStars](https://img.shields.io/github/stars/PantsuDango/Dango-Translator)]()
 [![GitHubForks](https://img.shields.io/github/forks/PantsuDango/Dango-Translator)]()
 [![作者](https://img.shields.io/badge/QQ-%E8%83%96%E6%AC%A1%E5%9B%A2%E5%AD%90-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E4%BD%9C%E8%80%85.png)
-[![作者](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-16%E7%BE%A4-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/16%E7%BE%A4.png)
+[![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-4%E7%BE%A4-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/4%E7%BE%A4.jpg)
 
   
 ## 简介
@@ -23,9 +23,9 @@
   
 ## 安装版下载
 
-- 群文件下载：[![作者](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-16%E7%BE%A4-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/16%E7%BE%A4.png)  
+- 群文件下载：[![作者](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-4%E7%BE%A4-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/4%E7%BE%A4.jpg)  
 - 百度网盘下载（提取码-975h）：[下载地址](https://pan.baidu.com/s/1AD9JWSAKS69gOawwvMXXQw)
-- GitHub下载：[下载地址](https://github.com/PantsuDango/Dango-Translator/releases/download/Ver3.6.1/DangoTranslate-Ver3.6.1.zip)
+- GitHub下载：[下载地址](https://github.com/PantsuDango/Dango-Translator/releases/download/Ver3.6.2/DangoTranslate-Ver3.6.2.zip)
 - 解压密码：Dango
 
 
@@ -34,7 +34,7 @@
 
 #### 翻译器相关 
 
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver3.6-ff69b4)]()
+[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver3.6.2-ff69b4)]()
 [![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2021--07--04-ff69b4)]()
 
 + 新增了离线ocr，可替代百度的在线ocr；
