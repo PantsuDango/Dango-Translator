@@ -37,19 +37,23 @@
 [![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver3.6.2-ff69b4)]()
 [![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2021--08--19-ff69b4)]()
 
-+ 新增了离线ocr，可替代百度的在线ocr；
-+ 登录时对密码做了不可见处理；
-+ 增加了屏蔽词和替换词功能，可对翻译的结果进行自定义屏蔽和替换；
-+ 偷偷修复了一些不为人知的bug；
-+ 更多更新日志：[查看](https://github.com/PantsuDango/Dango-Translator/blob/master/docx/%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97.md)
++ 修复如果挂了代理可能会导致无法注册和登录的问题；  
++ 修复了离线OCR在识别到个别异体繁体字可能导致出错的问题；  
++ 翻译器上各翻译API的注册按钮，由原来的弹出本地教程文档，改为弹出在线文档的网页；  
++ 更多更新日志：[查看](https://github.com/PantsuDango/Dango-Translator/blob/master/docx/%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97.md)  
 
 #### OCR相关
 
 [![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver1.2-ff69b4)]()
 [![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2021--08--19-ff69b4)]()
 
-+ 修复了安装OCR时会报：No module named 'paddle.fluid.core_noavx'；
-+ 修复了安装OCR时会报：DLL load faild: 找不到指定的模块；
++ 大幅度加快了识别速度;
++ 识别准确度略有提高;
++ 对环境的适配稳定性更好了；
++ 安装时会输出一堆红色ERROR的吓人信息；
++ 修复了安装时会报 'No module named 'cv2' 的问题;
++ 修复了安装时会报 'No module named 'paddle.fluid.core_noavx' 的问题;
+
 + 更多更新日志：[查看]()
 
 
