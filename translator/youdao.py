@@ -137,7 +137,10 @@ if __name__ == "__main__" :
         "마지막으로 더 크고 더 많고 더 자유롭고 더 편한것이 행복지수와 비례하지 않다는 것."
     ]
 
-    obj = Youdao(None)
+    import utils
+
+    logger = utils.setLog()
+    obj = Youdao(logger)
     for content in jap_content_list+eng_content_list+kor_content_list :
         start = time.time()
         result = obj.translater(content)

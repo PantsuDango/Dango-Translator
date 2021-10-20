@@ -130,7 +130,9 @@ if __name__ == "__main__" :
         "돈 버는 것보다 쓰는게 훨씬 쉽다는 것."
     ]
 
-    obj = Baidu(None)
+    import utils
+    logger = utils.setLog()
+    obj = Baidu(logger)
     for content in (jap_content_list+eng_content_list+kor_content_list) :
         start = time.time()
         result = obj.translater(content)
