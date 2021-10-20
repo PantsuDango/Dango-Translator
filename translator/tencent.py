@@ -80,8 +80,7 @@ class Tencent() :
                 try :
                     outputText = self.browser.find_element_by_xpath('/html/body/div[2]/div[2]/div[2]/div[2]/div[2]').text
                     if outputText and outputText != self.content :
-                        outputText = "".join(outputText.split())
-                        self.content = outputText
+                        self.content = "".join(outputText.split())
                         return self.content
                 except Exception :
                     pass
@@ -127,7 +126,9 @@ if __name__ == "__main__" :
         "돈 버는 것보다 쓰는게 훨씬 쉽다는 것."
     ]
 
-    obj = Tencent(None)
+    import utils
+    logger = utils.setLog()
+    obj = Tencent(logger)
     for content in (jap_content_list+eng_content_list+kor_content_list) :
         start = time.time()
         result = obj.translater(content)
