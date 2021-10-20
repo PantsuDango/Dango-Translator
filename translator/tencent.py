@@ -79,7 +79,7 @@ class Tencent() :
                 # 提取翻译信息
                 try :
                     outputText = self.browser.find_element_by_xpath('/html/body/div[2]/div[2]/div[2]/div[2]/div[2]').text
-                    if outputText and outputText != self.content :
+                    if outputText and "".join(outputText.split()) != self.content :
                         self.content = "".join(outputText.split())
                         return self.content
                 except Exception :

@@ -9,6 +9,7 @@ import requests
 import json
 import subprocess
 from traceback import format_exc, print_exc
+from difflib import SequenceMatcher
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -354,3 +355,9 @@ def postSaveSettin(config, logger) :
         requests.post(save_settin_url, data=formdata, proxies=proxies).json()
     except Exception:
         logger.error(format_exc())
+
+
+# 判断原文相似度
+def get_equal_rate(str1, str2):
+
+    return SequenceMatcher(None, str1, str2).quick_ratio()
