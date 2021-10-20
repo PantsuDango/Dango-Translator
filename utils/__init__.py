@@ -51,7 +51,7 @@ def setLog() :
 def openConfig() :
 
     try :
-        with open(YAML_PATH, "w", encoding="utf-8") as file :
+        with open(YAML_PATH, "r", encoding="utf-8") as file :
             config = yaml.load(file.read(), Loader=yaml.FullLoader)
     except Exception :
         config = {}
