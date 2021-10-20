@@ -1,22 +1,23 @@
 from selenium import webdriver
 from traceback import format_exc
 import time
+import utils
 
 
-# DeepL翻译模块实例化
-def createDeepL(obj, logger) :
+# 谷歌翻译模块实例化
+def createTencent(obj, logger) :
 
-    obj.deepl_web = DeepL(logger)
+    obj.tencent_web = Google(logger)
 
 
-# DeepL翻译模块
-class DeepL() :
+# 谷歌翻译模块
+class Google() :
 
     def __init__(self, logger) :
 
         self.content = ""
         self.logger = logger
-        url = "https://www.deepl.com/translator"
+        url = "https://translate.google.cn/?sl=auto&tl=zh-CN"
 
         try :
             # 使用谷歌浏览器
@@ -53,8 +54,8 @@ class DeepL() :
                             ]}
                     }
                     self.browser = webdriver.Edge(executable_path="../config/tools/msedgedriver.exe",
-                                                  service_log_path="../logs/geckodriver.log",
-                                                  capabilities=EDGE)
+                                                     service_log_path="../logs/geckodriver.log",
+                                                     capabilities=EDGE)
                 except Exception:
                     self.logger.error(format_exc())
                     self.close()
@@ -68,34 +69,31 @@ class DeepL() :
 
         try :
             # 清空翻译框
-            self.browser.find_element_by_xpath('//*[@id="dl_translator"]/div[3]/div[4]/div[1]/div[2]/div[2]/textarea').clear()
+            self.browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[2]/div[2]/c-wiz[1]/span/span/div/textarea').clear()
             # 输入要翻译的文本
-            self.browser.find_element_by_xpath('//*[@id="dl_translator"]/div[3]/div[4]/div[1]/div[2]/div[2]/textarea').send_keys(content)
+            self.browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[2]/div[2]/c-wiz[1]/span/span/div/textarea').send_keys(content)
 
             start = time.time()
             while True :
                 time.sleep(0.1)
                 # 提取翻译信息
                 try :
-                    # 提取翻译信息
-                    outputText = self.browser.find_element_by_id("target-dummydiv").get_attribute("textContent")
-                    if not outputText.isspace() \
-                            and outputText.strip() \
-                            and outputText.strip() != self.content \
-                            and "[...]" not in "".join(outputText.split()) \
-                            and (len(content) > 5 and len("".join(outputText.split())) > 3 ) :
-                        self.content = outputText.strip()
+                    outputText = self.browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[2]/div[2]/c-wiz[2]/div[5]/div/div[1]').text
+                    # 原文相似度
+                    str_score = utils.get_equal_rate("".join(outputText.split()), self.content)
+                    if outputText and str_score < 0.9 :
+                        self.content = "".join(outputText.split())
                         return self.content
                 except Exception :
                     pass
                 # 判断超时
                 end = time.time()
                 if (end - start) > 10 :
-                    return "公共DeepL: 我超时啦!"
+                    return "公共谷歌: 我超时啦!"
 
         except Exception :
             self.logger.error(format_exc())
-            return "公共DeepL: 我抽风啦!"
+            return "公共谷歌: 我抽风啦!"
 
 
     def close(self) :
@@ -122,10 +120,18 @@ if __name__ == "__main__" :
         "To regret one's errors to the point of not repeating them is true repentance.There is nothing noble in being superior to some other man. The true nobility is in being superior to your previous self.",
     ]
 
+    kor_content_list = [
+        "스무살이 되어야 이해하는 것",
+        "밥은 엄마가 해주시는 집밥이 최고.",
+        "그래도 교복 입고 다닐 때가 좋았던 것.",
+        "친구의 관계가 아닌 사람사이 관계가 참 어렵고 힘들다는 것.",
+        "돈 버는 것보다 쓰는게 훨씬 쉽다는 것."
+    ]
+
     import utils
     logger = utils.setLog()
-    obj = DeepL(logger)
-    for content in (jap_content_list+eng_content_list) :
+    obj = Google(logger)
+    for content in (jap_content_list+eng_content_list+kor_content_list) :
         start = time.time()
         result = obj.translater(content)
         print(content)
