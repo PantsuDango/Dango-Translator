@@ -6,7 +6,7 @@ import time
 # 有道翻译模块实例化
 def createYoudao(obj, logger) :
 
-    obj.youdao = Youdao(logger)
+    obj.youdao_web = Youdao(logger)
 
 
 # 有道翻译模块
@@ -44,8 +44,6 @@ class Youdao() :
                         "browserName": "MicrosoftEdge",
                         "version": "",
                         "platform": "WINDOWS",
-
-                        # 关键是下面这个
                         "ms:edgeOptions": {
                             'extensions': [],
                             'args': [
@@ -76,7 +74,8 @@ class Youdao() :
             self.browser.find_element_by_xpath('//*[@id="transMachine"]').click()
 
             start = time.time()
-            while True:
+            while True :
+                time.sleep(0.1)
                 # 提取翻译信息
                 outputText = self.browser.find_element_by_id("transTarget").get_attribute("textContent")
                 if not outputText.isspace() and len(outputText.strip()) > 1 and "".join(outputText.split()) != self.content :
