@@ -630,7 +630,7 @@ class Settin(QMainWindow):
         # 私人百度翻译开关
         self.baidu_private_switch = SwitchOCR(self.tab_2, sign=self.baidu_use, startX=(65-20)*self.rate)
         self.customSetGeometry(self.baidu_private_switch, 65, 280, 65, 20)
-        self.baidu_private_switch.checkedChanged.connect(self.changeBaiduSwitch)
+        self.baidu_private_switch.checkedChanged.connect(self.changeBaiduTranslaterSwitch)
         self.baidu_private_switch.setCursor(QCursor(Qt.PointingHandCursor))
 
         # 私人百度翻译颜色选择
@@ -1427,7 +1427,7 @@ class Settin(QMainWindow):
 
 
     # 改变私人百度翻译开关状态
-    def changeBaiduSwitch(self, checked):
+    def changeBaiduTranslaterSwitch(self, checked):
 
         if checked :
             self.baidu_use = True
