@@ -50,10 +50,10 @@ def setLog() :
 # 打开配置文件
 def openConfig() :
 
-    with open(YAML_PATH, "r", encoding="utf-8") as file :
-        config = yaml.load(file.read(), Loader=yaml.FullLoader)
-
-    if not config :
+    try :
+        with open(YAML_PATH, "w", encoding="utf-8") as file :
+            config = yaml.load(file.read(), Loader=yaml.FullLoader)
+    except Exception :
         config = {}
 
     return config
