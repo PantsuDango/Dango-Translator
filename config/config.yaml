@@ -1,0 +1,71 @@
+AccessToken: 24.23f5239a848d3b3f2239a9adc998cded.2592000.1637005339.282335-18341401
+BingLanguage: ja
+BingUse: 'False'
+OCR:
+  Key: gxkDTaAVdYr7pgAP9uVHYogC
+  Secret: 4avxV6GTdiZGqRlyPQ1O12Mu7aOqS7R2
+alapiUse: 'False'
+baiduAPI:
+  Key: '20200122000377291'
+  Secret: UV1etFSuBKvUm_BR8wha
+baiduOCR: false
+baiduUse: 'False'
+baiduwebUse: 'False'
+caiyunAPI: bmxnwpowqa641wmt0oqs
+caiyunPrivateUse: 'False'
+caiyunUse: 'False'
+deeplUse: 'False'
+fontColor:
+  ALAPI: '#0000ff'
+  Bing: '#0000ff'
+  baidu: '#5b8ff9'
+  baiduweb: '#5b8ff9'
+  caiyun: '#5b8ff9'
+  caiyunPrivate: '#5b8ff9'
+  deepl: '#5b8ff9'
+  google: '#5b8ff9'
+  jinshan: '#0000ff'
+  original: '#ff00ff'
+  tencent: '#5b8ff9'
+  tencentweb: '#5b8ff9'
+  yeekit: '#0000ff'
+  youdao: '#5b8ff9'
+fontSize: 15
+fontType: "\u534E\u5EB7\u65B9\u5706\u4F53W7"
+googleUse: 'False'
+highPrecision: 'False'
+horizontal: 30
+imageSimilarity: 95.0
+jinshanUse: 'False'
+language: JAP
+ocrUse: 'True'
+offlineOCR: false
+onlineOCR: false
+password: '36939771'
+range:
+  X1: 338
+  X2: 1710
+  Y1: 352
+  Y2: 1166
+screenScaleRate: 1.5
+showClipboard: 'False'
+showColorType: 'False'
+showHotKey1: 'False'
+showHotKey2: 'False'
+showHotKeyValue1: F1
+showHotKeyValue2: F2
+showOriginal: 'False'
+showTranslateRow: 'False'
+sign: 1
+tencentAPI:
+  Key: AKID7XijOng5pIuGTOnamifMnz3sqY2OsndD
+  Secret: TkCOL2Wjf6NUP50SQ7euuvgAcqnVynMY
+tencentUse: 'False'
+tencentwebUse: 'False'
+textSimilarity: 85.0
+translateMode: auto
+translateSpeed: 0.5
+user: liangsuyuan1
+yeekitLanguage: nja
+yeekitUse: 'False'
+youdaoUse: 'False'
