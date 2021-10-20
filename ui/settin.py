@@ -1767,6 +1767,19 @@ class Settin(QMainWindow):
         self.hotkey.show()
 
 
+    def checkTranslaterUse(self) :
+
+        translater_use_list = [self.youdao_use, self.baidu_web_use, self.tencent_web_use,
+                               self.deepl_use, self.google_use, self.caiyun_web_use,
+                               self.tencent_use, self.baidu_use, self.caiyun_use]
+        count = 0
+        for val in translater_use_list :
+            if val == True :
+                count += 1
+        if count >= 2 :
+            pass
+
+
     # 退出前保存设置
     def saveConfig(self) :
 
