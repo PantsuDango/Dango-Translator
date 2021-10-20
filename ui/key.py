@@ -1,0 +1,167 @@
+# -*- coding: utf-8 -*-
+
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+
+
+LOGO_PATH = "./config/icon/logo.ico"
+PIXMAP_PATH = "./config/icon/pixmap.png"
+
+
+class Key(QWidget) :
+
+    def __init__(self, config, window) :
+
+        super(Key, self).__init__()
+
+        self.config = config
+        self.window = window
+        self.getInitConfig()
+
+        self.ui()
+
+
+    def ui(self) :
+
+        # 窗口尺寸及不可拉伸
+        self.resize(self.window_width, self.window_height)
+        self.setMinimumSize(QSize(self.window_width, self.window_height))
+        self.setMaximumSize(QSize(self.window_width, self.window_height))
+        self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowCloseButtonHint)
+
+        # 窗口标题
+        self.setWindowTitle("说明")
+
+        # 窗口图标
+        self.icon = QIcon()
+        self.icon.addPixmap(QPixmap(LOGO_PATH), QIcon.Normal, QIcon.On)
+        self.setWindowIcon(self.icon)
+
+        # 鼠标样式
+        pixmap = QPixmap(PIXMAP_PATH)
+        pixmap = pixmap.scaled(int(30*self.rate),
+                               int(34*self.rate),
+                               Qt.KeepAspectRatio,
+                               Qt.SmoothTransformation)
+        cursor = QCursor(pixmap, 0, 0)
+        self.setCursor(cursor)
+
+        self.setStyleSheet("QWidget { font: 9pt '华康方圆体W7';"
+                                     "color: %s;"
+                                     "background: rgba(255, 255, 255, 1); }"
+                           "QTextEdit { background: transparent;"
+                                       "border-width:0;"
+                                       "border-style:outset;"
+                                       "border-bottom: 2px solid %s; }"
+                          "QTextEdit:focus { border-bottom: 2px "
+                                            "dashed %s; }"
+                           %(self.color, self.color, self.color))
+
+        # 百度OCR API Key 输入框
+        self.baidu_ocr_key_textEdit = QTextEdit(self)
+        self.customSetGeometry(self.baidu_ocr_key_textEdit, 20, 10, 330, 25)
+        self.baidu_ocr_key_textEdit.setPlaceholderText("百度OCR API Key")
+        self.baidu_ocr_key_textEdit.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.baidu_ocr_key_textEdit.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.baidu_ocr_key_textEdit.setText(self.config["OCR"]["Key"])
+        self.baidu_ocr_key_textEdit.hide()
+
+        # 百度OCR Secret Key 输入框
+        self.baidu_ocr_secret_textEdit = QTextEdit(self)
+        self.customSetGeometry(self.baidu_ocr_secret_textEdit, 20, 45, 330, 25)
+        self.baidu_ocr_secret_textEdit.setPlaceholderText("百度OCR Secret Key")
+        self.baidu_ocr_secret_textEdit.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.baidu_ocr_secret_textEdit.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.baidu_ocr_secret_textEdit.setText(self.config["OCR"]["Secret"])
+        self.baidu_ocr_secret_textEdit.hide()
+
+        # 私人腾讯 SecretId 输入框
+        self.tencent_private_key_textEdit = QTextEdit(self)
+        self.customSetGeometry(self.tencent_private_key_textEdit, 20, 10, 330, 25)
+        self.tencent_private_key_textEdit.setPlaceholderText("私人腾讯 SecretId")
+        self.tencent_private_key_textEdit.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.tencent_private_key_textEdit.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.tencent_private_key_textEdit.setText(self.config["tencentAPI"]["Key"])
+        self.tencent_private_key_textEdit.hide()
+
+        # 私人腾讯 SecretKey 输入框
+        self.tencent_private_secret_textEdit = QTextEdit(self)
+        self.customSetGeometry(self.tencent_private_secret_textEdit, 20, 45, 330, 25)
+        self.tencent_private_secret_textEdit.setPlaceholderText("私人腾讯 SecretKey")
+        self.tencent_private_secret_textEdit.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.tencent_private_secret_textEdit.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.tencent_private_secret_textEdit.setText(self.config["tencentAPI"]["Secret"])
+        self.tencent_private_secret_textEdit.hide()
+
+        # 私人百度 APP ID 输入框
+        self.baidu_private_key_textEdit = QTextEdit(self)
+        self.customSetGeometry(self.baidu_private_key_textEdit, 20, 10, 330, 25)
+        self.baidu_private_key_textEdit.setPlaceholderText("私人百度 APP ID")
+        self.baidu_private_key_textEdit.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.baidu_private_key_textEdit.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.baidu_private_key_textEdit.setText(self.config["baiduAPI"]["Key"])
+        self.baidu_private_key_textEdit.hide()
+
+        # 私人百度 密钥 输入框
+        self.baidu_private_secret_textEdit = QTextEdit(self)
+        self.customSetGeometry(self.baidu_private_secret_textEdit, 20, 45, 330, 25)
+        self.baidu_private_secret_textEdit.setPlaceholderText("私人百度 密钥")
+        self.baidu_private_secret_textEdit.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.baidu_private_secret_textEdit.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.baidu_private_secret_textEdit.setText(self.config["baiduAPI"]["Secret"])
+        self.baidu_private_secret_textEdit.hide()
+
+        # 私人彩云 APP ID 输入框
+        self.caiyun_private_key_textEdit = QTextEdit(self)
+        self.customSetGeometry(self.caiyun_private_key_textEdit, 20, 20, 330, 25)
+        self.caiyun_private_key_textEdit.setPlaceholderText("私人彩云 令牌")
+        self.caiyun_private_key_textEdit.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.caiyun_private_key_textEdit.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.caiyun_private_key_textEdit.setText(self.config["caiyunAPI"])
+        self.caiyun_private_key_textEdit.hide()
+
+
+    # 初始化配置
+    def getInitConfig(self) :
+
+        # 界面缩放比例
+        self.rate = self.config["screenScaleRate"]
+        # 界面尺寸
+        self.window_width = int(370 * self.rate)
+        self.window_height = int(95 * self.rate)
+        # 颜色
+        self.color = "#5B8FF9"
+
+
+    # 根据分辨率定义控件位置尺寸
+    def customSetGeometry(self, object, x, y, w, h) :
+
+        object.setGeometry(QRect(int(x * self.rate),
+                                 int(y * self.rate), int(w * self.rate),
+                                 int(h * self.rate)))
+
+
+    def filterNullWord(self, obj) :
+
+        return obj.toPlainText().replace(' ', '').replace('\n', '').replace('\t', '')
+
+
+    # 窗口关闭处理
+    def closeEvent(self, event) :
+
+        self.window.config["OCR"]["Key"] = self.filterNullWord(self.baidu_ocr_key_textEdit)
+        self.window.config["OCR"]["Secret"] = self.filterNullWord(self.baidu_ocr_secret_textEdit)
+        self.window.config["tencentAPI"]["Key"] = self.filterNullWord(self.tencent_private_key_textEdit)
+        self.window.config["tencentAPI"]["Secret"] = self.filterNullWord(self.tencent_private_secret_textEdit)
+        self.window.config["baiduAPI"]["Key"] = self.filterNullWord(self.baidu_private_key_textEdit)
+        self.window.config["baiduAPI"]["Secret"] = self.filterNullWord(self.baidu_private_secret_textEdit)
+        self.window.config["caiyunAPI"] = self.filterNullWord(self.caiyun_private_key_textEdit)
+
+        self.baidu_ocr_key_textEdit.hide()
+        self.baidu_ocr_secret_textEdit.hide()
+        self.tencent_private_key_textEdit.hide()
+        self.tencent_private_secret_textEdit.hide()
+        self.baidu_private_key_textEdit.hide()
+        self.baidu_private_secret_textEdit.hide()
+        self.caiyun_private_key_textEdit.hide()
