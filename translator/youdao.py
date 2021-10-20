@@ -37,7 +37,29 @@ class Youdao() :
                                                  options=option)
             except Exception :
                 self.logger.error(format_exc())
-                self.close()
+
+                try :
+                    # 使用Edge浏览器
+                    EDGE = {
+                        "browserName": "MicrosoftEdge",
+                        "version": "",
+                        "platform": "WINDOWS",
+
+                        # 关键是下面这个
+                        "ms:edgeOptions": {
+                            'extensions': [],
+                            'args': [
+                                '--headless',
+                                '--disable-gpu',
+                                '--remote-debugging-port=9222',
+                            ]}
+                    }
+                    self.browser = webdriver.Edge(executable_path="../config/tools/msedgedriver.exe",
+                                                     service_log_path="../logs/geckodriver.log",
+                                                     capabilities=EDGE)
+                except Exception:
+                    self.logger.error(format_exc())
+                    self.close()
 
         self.browser.get(url)
         self.browser.maximize_window()

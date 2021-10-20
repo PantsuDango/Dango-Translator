@@ -18,7 +18,7 @@ class Baidu() :
         self.logger = logger
         url = "https://fanyi.baidu.com/?aldtype=16047#auto/zh"
 
-        try:
+        try :
             # 使用谷歌浏览器
             option = webdriver.ChromeOptions()
             option.add_argument("--headless")
@@ -28,7 +28,7 @@ class Baidu() :
         except Exception:
             self.logger.error(format_exc())
 
-            try:
+            try :
                 # 使用火狐浏览器
                 option = webdriver.FirefoxOptions()
                 option.add_argument("--headless")
@@ -37,7 +37,29 @@ class Baidu() :
                                                  options=option)
             except Exception:
                 self.logger.error(format_exc())
-                self.close()
+
+                try :
+                    # 使用Edge浏览器
+                    EDGE = {
+                        "browserName": "MicrosoftEdge",
+                        "version": "",
+                        "platform": "WINDOWS",
+
+                        # 关键是下面这个
+                        "ms:edgeOptions": {
+                            'extensions': [],
+                            'args': [
+                                '--headless',
+                                '--disable-gpu',
+                                '--remote-debugging-port=9222',
+                            ]}
+                    }
+                    self.browser = webdriver.Edge(executable_path="../config/tools/msedgedriver.exe",
+                                                     service_log_path="../logs/geckodriver.log",
+                                                     capabilities=EDGE)
+                except Exception:
+                    self.logger.error(format_exc())
+                    self.close()
 
         self.browser.get(url)
         self.browser.maximize_window()
