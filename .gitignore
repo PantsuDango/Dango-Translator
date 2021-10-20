@@ -2,3 +2,4 @@
 /.vscode
 /.idea
 /logs
+/config/config.yaml
