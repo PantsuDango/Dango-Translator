@@ -432,7 +432,7 @@ class Translation(QMainWindow):
     def playSound(self) :
 
         try :
-            playSoundThread = threading.Thread(target=self.sound.playSound, args=(self.original, self.config["Language"]))
+            playSoundThread = threading.Thread(target=self.sound.playSound, args=(self.original, self.config["language"]))
             playSoundThread.setDaemon(True)
             playSoundThread.start()
         except Exception :

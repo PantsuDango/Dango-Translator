@@ -21,8 +21,8 @@ class Sound() :
             # 使用谷歌浏览器
             option = webdriver.ChromeOptions()
             option.add_argument("--headless")
-            self.browser = webdriver.Chrome(executable_path="../config/tools/chromedriver.exe",
-                                            service_log_path="../logs/geckodriver.log",
+            self.browser = webdriver.Chrome(executable_path="./config/tools/chromedriver.exe",
+                                            service_log_path="./logs/geckodriver.log",
                                             options=option)
         except Exception:
             self.logger.error(format_exc())
@@ -31,8 +31,8 @@ class Sound() :
                 # 使用火狐浏览器
                 option = webdriver.FirefoxOptions()
                 option.add_argument("--headless")
-                self.browser = webdriver.Firefox(executable_path="../config/tools/geckodriver.exe",
-                                                 service_log_path="../logs/geckodriver.log",
+                self.browser = webdriver.Firefox(executable_path="./config/tools/geckodriver.exe",
+                                                 service_log_path="./logs/geckodriver.log",
                                                  options=option)
             except Exception:
                 self.logger.error(format_exc())
