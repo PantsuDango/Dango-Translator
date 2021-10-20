@@ -43,8 +43,6 @@ class Sound() :
                         "browserName": "MicrosoftEdge",
                         "version": "",
                         "platform": "WINDOWS",
-
-                        # 关键是下面这个
                         "ms:edgeOptions": {
                             'extensions': [],
                             'args': [

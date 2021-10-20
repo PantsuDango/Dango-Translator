@@ -3,13 +3,13 @@ from traceback import format_exc
 import time
 
 
-# 有道翻译模块实例化
-def createYoudao(obj, logger) :
+# 百度翻译模块实例化
+def createBaidu(obj, logger) :
 
-    obj.youdao = Baidu(logger)
+    obj.baidu_web = Baidu(logger)
 
 
-# 有道翻译模块
+# 百度翻译模块
 class Baidu() :
 
     def __init__(self, logger) :
@@ -44,8 +44,6 @@ class Baidu() :
                         "browserName": "MicrosoftEdge",
                         "version": "",
                         "platform": "WINDOWS",
-
-                        # 关键是下面这个
                         "ms:edgeOptions": {
                             'extensions': [],
                             'args': [
