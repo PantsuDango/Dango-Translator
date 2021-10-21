@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import *
 from ui.switch import SwitchButton
 from translator import sound
 import utils
+from utils.translater import Translater
 
 from traceback import format_exc, print_exc
 import qtawesome
@@ -114,7 +115,7 @@ class Translation(QMainWindow):
         self.customSetGeometry(self.startButton, 173, 5, 20, 20)
         self.startButton.setToolTip("<b>翻译键 Translate</b><br>点击后翻译（手动模式）")
         self.startButton.setStyleSheet("background: transparent")
-        #self.startButton.clicked.connect(self.start_login)
+        self.startButton.clicked.connect(self.startTranslater)
         self.startButton.setCursor(QCursor(Qt.PointingHandCursor))
         self.startButton.hide()
 
@@ -234,6 +235,8 @@ class Translation(QMainWindow):
         self.translateMode = False
         # 原文
         self.original = "ところで今日の最高気温、何度だと思う？37度だぜ、37度。夏にしても暑すぎる。これじゃオーブンだ。37度っていえば一人でじっとしてるより女の子と抱き合ってた方が涼しいくらいの温度だ。"
+        # 初始标志
+        self.first_sign = True
 
 
     # 根据分辨率定义控件位置尺寸
@@ -439,6 +442,13 @@ class Translation(QMainWindow):
             self.logger.error(format_exc())
 
 
+    def startTranslater(self) :
+
+        thread = Translater(self)
+        thread.start()
+        thread.exec()
+
+
     # 退出程序
     def quit(self) :
 
@@ -449,8 +459,8 @@ class Translation(QMainWindow):
             self.logger.error(format_exc())
         finally :
             # 关闭selenuim的driver引擎
-            os.system("taskkill /im chromedriver.exe /F")
-            os.system("taskkill /im geckodriver.exe /F")
+            os.popen("taskkill /im chromedriver.exe /F")
+            os.popen("taskkill /im geckodriver.exe /F")
 
         # 退出程序前保存设置
         utils.postSaveSettin(self.config, self.logger)

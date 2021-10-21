@@ -92,6 +92,7 @@ class WScreenShot(QWidget):
         config["range"]["Y1"] = Y1
         config["range"]["X2"] = X2
         config["range"]["Y2"] = Y2
+        self.Init.config = config
         utils.saveConfig(config)
 
         self.chooseRange.setGeometry(X1, Y1, X2 - X1, Y2 - Y1)

@@ -63,7 +63,12 @@ class DangoTranslator() :
     # 进入范围框选
     def chooseRange(self) :
 
-        self.WScreenShot =ui.range. WScreenShot(self.Translation, self.Range)
+        # 关闭自动开关
+        if self.Translation.translateMode :
+            self.Translation.switchBtn.mousePressEvent(1)
+            self.Translation.switchBtn.updateValue()
+
+        self.WScreenShot = ui.range. WScreenShot(self.Translation, self.Range)
         self.WScreenShot.show()
         self.Translation.show()
 
