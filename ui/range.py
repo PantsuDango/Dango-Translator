@@ -100,15 +100,6 @@ class WScreenShot(QWidget):
         self.chooseRange.show()
 
 
-    def updata_Init(self):
-
-        try:
-            if self.Init.mode == False:
-                self.Init.start_login()
-        except Exception:
-            pass
-
-
     def mouseReleaseEvent(self, event):
 
         try:
@@ -117,19 +108,21 @@ class WScreenShot(QWidget):
                 self.getRange()
 
                 self.close()
-                #self.updata_Init()
-        except Exception:
+                self.Init.first_sign = True
+                self.Init.startTranslater()
+        except Exception :
             pass
 
 
 # 范围框
 class Range(QMainWindow):
 
-    def __init__(self, X1, Y1, X2, Y2, ScreenScaleRate):
+    def __init__(self, X1, Y1, X2, Y2, ScreenScaleRate, window):
 
         super(Range, self).__init__()
 
         self.rate = ScreenScaleRate
+        self.window = window
         self.setGeometry(X1, Y1, X2-X1, Y2-Y1)
 
         # 窗口无标题栏、窗口置顶、窗口透明
@@ -242,4 +235,5 @@ class Range(QMainWindow):
         config["range"]["Y1"] = Y1
         config["range"]["X2"] = X2
         config["range"]["Y2"] = Y2
+        self.window.config = config
         utils.saveConfig(config)

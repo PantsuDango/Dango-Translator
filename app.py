@@ -44,7 +44,8 @@ class DangoTranslator() :
                                     self.config["range"]['Y1'],
                                     self.config["range"]['X2'],
                                     self.config["range"]['Y2'],
-                                    self.config["screenScaleRate"])
+                                    self.config["screenScaleRate"],
+                                    self.Translation)
 
         self.Login.close()
         self.Translation.show()
