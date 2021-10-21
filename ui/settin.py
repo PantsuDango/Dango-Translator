@@ -1212,6 +1212,8 @@ class Settin(QMainWindow):
         # 所使用的颜色
         self.color_1 = "#595959"  # 灰色
         self.color_2 = "#5B8FF9"  # 蓝色
+        # 存被开启的翻译源
+        self.translate_list = []
 
         # OCR各开关
         self.offline_ocr_use = False
@@ -1220,22 +1222,40 @@ class Settin(QMainWindow):
 
         # 公共有道翻译开关
         self.youdao_use = eval(self.config["youdaoUse"])
+        if self.youdao_use :
+            self.translate_list.append("youdao")
         # 公共百度翻译开关
         self.baidu_web_use = eval(self.config["baiduwebUse"])
+        if self.baidu_web_use :
+            self.translate_list.append("baidu")
         # 公共腾讯翻译开关
         self.tencent_web_use = eval(self.config["tencentwebUse"])
+        if self.tencent_web_use :
+            self.translate_list.append("tencent")
         # 公共DeepL翻译开关
         self.deepl_use = eval(self.config["deeplUse"])
+        if self.deepl_use :
+            self.translate_list.append("deepl")
         # 公共谷歌翻译开关
         self.google_use = eval(self.config["googleUse"])
+        if self.google_use :
+            self.translate_list.append("google")
         # 公共彩云翻译开关
         self.caiyun_web_use = eval(self.config["caiyunUse"])
+        if self.caiyun_web_use :
+            self.translate_list.append("caiyun")
         # 私人腾讯翻译开关
         self.tencent_use = eval(self.config["tencentUse"])
+        if self.tencent_use :
+            self.translate_list.append("tencent_private")
         # 私人百度翻译开关
         self.baidu_use = eval(self.config["baiduUse"])
+        if self.baidu_use :
+            self.translate_list.append("baidu_private")
         # 私人彩云翻译开关
         self.caiyun_use = eval(self.config["caiyunPrivateUse"])
+        if self.caiyun_use :
+            self.translate_list.append("caiyun_private")
 
         # 字体颜色 公共有道
         self.youdao_color = self.config["fontColor"]["youdao"]
@@ -1368,8 +1388,11 @@ class Settin(QMainWindow):
 
         if checked :
             self.youdao_use = True
+            self.translate_list.append("youdao")
+            self.checkTranslaterUse()
         else:
             self.youdao_use = False
+            self.translate_list.remove("youdao")
 
 
     # 改变公共百度翻译开关状态
@@ -1377,8 +1400,11 @@ class Settin(QMainWindow):
 
         if checked :
             self.baidu_web_use = True
+            self.translate_list.append("baidu")
+            self.checkTranslaterUse()
         else:
             self.baidu_web_use = False
+            self.translate_list.remove("baidu")
 
 
     # 改变公共腾讯翻译开关状态
@@ -1386,8 +1412,11 @@ class Settin(QMainWindow):
 
         if checked :
             self.tencent_web_use = True
+            self.translate_list.append("tencent")
+            self.checkTranslaterUse()
         else:
             self.tencent_web_use = False
+            self.translate_list.remove("tencent")
 
 
     # 改变公共DeepL翻译开关状态
@@ -1395,8 +1424,11 @@ class Settin(QMainWindow):
 
         if checked :
             self.deepl_use = True
+            self.translate_list.append("deepl")
+            self.checkTranslaterUse()
         else:
             self.deepl_use = False
+            self.translate_list.remove("deepl")
 
 
     # 改变公共Google翻译开关状态
@@ -1404,8 +1436,11 @@ class Settin(QMainWindow):
 
         if checked :
             self.google_use = True
+            self.translate_list.append("google")
+            self.checkTranslaterUse()
         else:
             self.google_use = False
+            self.translate_list.remove("google")
 
 
     # 改变公共彩云翻译开关状态
@@ -1413,8 +1448,11 @@ class Settin(QMainWindow):
 
         if checked :
             self.caiyun_web_use = True
+            self.translate_list.append("caiyun")
+            self.checkTranslaterUse()
         else:
             self.caiyun_web_use = False
+            self.translate_list.remove("caiyun")
 
 
     # 改变私人腾讯翻译开关状态
@@ -1422,8 +1460,11 @@ class Settin(QMainWindow):
 
         if checked :
             self.tencent_use = True
+            self.translate_list.append("tencent_private")
+            self.checkTranslaterUse()
         else:
             self.tencent_use = False
+            self.translate_list.remove("tencent_private")
 
 
     # 改变私人百度翻译开关状态
@@ -1431,17 +1472,23 @@ class Settin(QMainWindow):
 
         if checked :
             self.baidu_use = True
+            self.translate_list.append("baidu_private")
+            self.checkTranslaterUse()
         else:
             self.baidu_use = False
+            self.translate_list.remove("baidu_private")
 
 
-    # 改变私人百度翻译开关状态
+    # 改变私人彩云翻译开关状态
     def changeCaiyunSwitch(self, checked):
 
         if checked :
             self.caiyun_use = True
+            self.translate_list.append("caiyun_private")
+            self.checkTranslaterUse()
         else:
             self.caiyun_use = False
+            self.translate_list.remove("caiyun_private")
 
 
     # 改变字体样式开关状态
@@ -1767,17 +1814,52 @@ class Settin(QMainWindow):
         self.hotkey.show()
 
 
+    # 校验翻译开关状态
     def checkTranslaterUse(self) :
 
-        translater_use_list = [self.youdao_use, self.baidu_web_use, self.tencent_web_use,
-                               self.deepl_use, self.google_use, self.caiyun_web_use,
-                               self.tencent_use, self.baidu_use, self.caiyun_use]
-        count = 0
-        for val in translater_use_list :
-            if val == True :
-                count += 1
-        if count >= 2 :
-            pass
+        if len(self.translate_list) <= 2 :
+            return
+
+        tmp = []
+        for val in self.translate_list :
+            if val == "baidu" :
+                self.baidu_switch.mousePressEvent(1)
+                self.baidu_switch.updateValue()
+
+            elif val == "tencent" :
+                self.tencent_switch.mousePressEvent(1)
+                self.tencent_switch.updateValue()
+
+            elif val == "caiyun" :
+                self.caiyun_switch.mousePressEvent(1)
+                self.caiyun_switch.updateValue()
+
+            elif val == "deepl" :
+                self.deepl_switch.mousePressEvent(1)
+                self.deepl_switch.updateValue()
+
+            elif val == "google" :
+                self.google_switch.mousePressEvent(1)
+                self.google_switch.updateValue()
+
+            elif val == "youdao" :
+                self.youdao_switch.mousePressEvent(1)
+                self.youdao_switch.updateValue()
+
+            elif val == "tencent_private" :
+                self.tencent_private_switch.mousePressEvent(1)
+                self.tencent_private_switch.updateValue()
+
+            elif val == "baidu_private" :
+                self.baidu_private_switch.mousePressEvent(1)
+                self.baidu_private_switch.updateValue()
+
+            elif val == "caiyun_private" :
+                self.caiyun_private_switch.mousePressEvent(1)
+                self.caiyun_private_switch.updateValue()
+
+            if len(self.translate_list) <= 2:
+                break
 
 
     # 退出前保存设置

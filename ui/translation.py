@@ -25,7 +25,7 @@ class Translation(QMainWindow):
         self.logger = logger
         self.getInitConfig()
         self.ui()
-        self.stratSoundThread(logger)
+        #self.stratSoundThread(logger)
 
 
     # 开启音乐朗读线程

@@ -198,6 +198,19 @@ def configConvert(config, oldConfig) :
     # 私人彩云翻译开关
     config["caiyunPrivateUse"] = oldConfig.get("caiyunPrivateUse", "False")
 
+    # 确保版本转换后至多只有2个翻译源能被同时开始
+    tmp = []
+    for val in ["youdaoUse", "baiduwebUse", "tencentwebUse", "deeplUse", "googleUse", "caiyunUse", "tencentUse", "baiduUse", "caiyunPrivateUse"] :
+        if config[val] == "True" :
+            tmp.append(val)
+    if len(tmp) > 2 :
+        count = 0
+        for val in tmp :
+            config[val] = "False"
+            count += 1
+            if len(tmp) - count <= 2 :
+                break
+
     # 私人腾讯翻译密钥
     config["tencentAPI"] = oldConfig.get("tencentAPI", {})
     config["tencentAPI"]["Secret"] = config["tencentAPI"].get("Secret", "")
