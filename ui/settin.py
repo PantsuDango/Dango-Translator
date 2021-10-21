@@ -12,6 +12,8 @@ import utils
 from utils import MessageBox, detectPort, testOfflineOCR, postConfigURL
 from utils import image
 
+from translator.ocr.baidu import getAccessToken
+
 import os
 import qtawesome
 import webbrowser
@@ -1949,6 +1951,12 @@ class Settin(QMainWindow):
         # 窗口关闭处理
     def closeEvent(self, event) :
 
+        if self.baidu_ocr_use :
+            sign, access_token = getAccessToken(self.config["OCR"]["Key"], self.config["OCR"]["Secret"], self.logger)
+            if sign :
+                self.config["AccessToken"] = access_token
+
+        # 保存设置至本地文件
         self.saveConfig()
         self.translation_ui.config = self.config
 

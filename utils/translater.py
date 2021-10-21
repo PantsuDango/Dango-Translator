@@ -1,13 +1,14 @@
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import QApplication
 
-from skimage.measure import compare_ssim
-from cv2 import imread,cvtColor,COLOR_BGR2GRAY
+from skimage.metrics import structural_similarity
+from cv2 import imread, cvtColor, COLOR_BGR2GRAY
 
 from traceback import print_exc, format_exc
 
 
 IMAGE_PATH = ".\config\image.jpg"
+
 
 class Translater(QThread):
 
@@ -43,7 +44,7 @@ class Translater(QThread):
         grayA = cvtColor(imageA, COLOR_BGR2GRAY)
         grayB = cvtColor(imageB, COLOR_BGR2GRAY)
 
-        (score, diff) = compare_ssim(grayA, grayB, full=True)
+        (score, diff) = structural_similarity(grayA, grayB, full=True)
         score = float(score)
 
         return score
@@ -67,6 +68,7 @@ class Translater(QThread):
                 print_exc()
                 self.window.logger.error(format_exc())
 
+        print(score)
         # 如果相似度过高则不检测
         if score > self.window.config["imageSimilarity"] :
             return

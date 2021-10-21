@@ -3,37 +3,34 @@ from base64 import b64encode
 import json
 
 from utils import MessageBox, saveConfig
-from traceback import print_exc
-
-
+from traceback import print_exc, format_exc
 
 
 # 获取访问百度OCR用的token
-def get_Access_Token(config):
-
-    # 获取密钥id和secret
-    client_id = config["OCR"]["Key"]
-    client_secret = config["OCR"]["Secret"]
+def getAccessToken(client_id, client_secret, logger):
 
     host = "https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=%s&client_secret=%s"%(client_id, client_secret)
+    proxies = {"http": None, "https": None}
+
     try:
-        response = requests.get(host)
+        response = requests.get(host, proxies=proxies, timeout=10)
 
     except TypeError :
-        print_exc()
-        MessageBox("文件路径错误", "请将翻译器目录的路径设置为纯英文\n否则无法在非简中区的电脑系统下运行使用")
-        return False
+        logger.error(format_exc())
+        MessageBox("翻译器安装路径错误", "请将翻译器目录的路径设置为纯英文\n否则无法在非简中区的电脑系统下运行使用")
+        return False, None
 
     except Exception :
-        print_exc()
-        MessageBox("OCR错误", "啊咧... Σ(っ°Д°;)っ OCR连接失败惹 (つД`)\n请打开[网络和Internet设置]的代理页面\n将其中的全部代理设置开关都关掉呢 (˘•ω•˘)")
-        return False
+        logger.error(format_exc())
+        MessageBox("百度OCR错误", "啊咧... Σ(っ°Д°;)っ OCR连接失败惹 (つД`)\n请打开[网络和Internet设置]的代理页面\n将其中的全部代理设置开关都关掉呢 (˘•ω•˘)")
+        return False, None
+
     else:
-        if response:
+        if response :
             try:
                 access_token = response.json()['access_token']
             except Exception :
-                print_exc()
+                logger.error(format_exc())
                 error = response.json()["error"]
                 error_description = response.json()["error_description"]
 
@@ -46,16 +43,13 @@ def get_Access_Token(config):
                 else:
                     MessageBox("OCR错误", "啊咧... Σ(っ°Д°;)っ！！！  OCR连接失败惹... (つД`)\nerror：%s\nerror_description：%s"%(error, error_description))
 
-                return False
+                return False, None
 
             else :
-                # 保存AccessToken
-                config["AccessToken"] = access_token
-                saveConfig(config)
-                return True
+                return True, access_token
         else:
             MessageBox("OCR错误", "啊咧... Σ(っ°Д°;)っ！！！  OCR连接失败惹... (つД`)\n好好检查一下你的OCR API Key和Secret Key哪里填错了喔 (˘•ω•˘)")
-            return False
+            return False, None
 
 
 # 百度ocr
