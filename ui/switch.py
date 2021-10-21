@@ -70,12 +70,12 @@ class SwitchButton(QWidget):
     def mousePressEvent(self, event):
 
         self.checked = not self.checked
-        #发射信号
+        # 发射信号
         self.checkedChanged.emit(self.checked)
 
         # 每次移动的步长为宽度的50分之一
         self.step = self.width() / 50
-        #状态切换改变后自动计算终点坐标
+        # 状态切换改变后自动计算终点坐标
         if self.checked:
             self.endX = self.width() - self.height()
         else:
@@ -85,16 +85,16 @@ class SwitchButton(QWidget):
 
     def paintEvent(self, evt):
 
-        #绘制准备工作, 启用反锯齿
+        # 绘制准备工作, 启用反锯齿
         painter = QPainter()
         painter.begin(self)
         painter.setRenderHint(QPainter.Antialiasing)
 
-        #绘制背景
+        # 绘制背景
         self.drawBg(evt, painter)
-        #绘制滑块
+        # 绘制滑块
         self.drawSlider(evt, painter)
-        #绘制文字
+        # 绘制文字
         self.drawText(evt, painter)
 
         painter.end()
@@ -126,9 +126,9 @@ class SwitchButton(QWidget):
 
         rect = QRect(0, 0, self.width(), self.height())
 
-        #半径为高度的一半
+        # 半径为高度的一半
         radius = rect.height() / 2
-        #圆的宽度为高度
+        # 圆的宽度为高度
         circleWidth = rect.height()
 
         path = QPainterPath()
@@ -237,12 +237,12 @@ class OfflineSwitch(QWidget):
             return
 
         self.checked = not self.checked
-        #发射信号
+        # 发射信号
         self.checkedChanged.emit(self.checked)
 
         # 每次移动的步长为宽度的50分之一
         self.step = self.width() / 50
-        #状态切换改变后自动计算终点坐标
+        # 状态切换改变后自动计算终点坐标
         if self.checked:
             self.endX = self.width() - self.height()
         else:
@@ -252,16 +252,16 @@ class OfflineSwitch(QWidget):
 
     def paintEvent(self, evt):
 
-        #绘制准备工作, 启用反锯齿
+        # 绘制准备工作, 启用反锯齿
         painter = QPainter()
         painter.begin(self)
         painter.setRenderHint(QPainter.Antialiasing)
 
-        #绘制背景
+        # 绘制背景
         self.drawBg(evt, painter)
-        #绘制滑块
+        # 绘制滑块
         self.drawSlider(evt, painter)
-        #绘制文字
+        # 绘制文字
         self.drawText(evt, painter)
 
         painter.end()
@@ -292,9 +292,9 @@ class OfflineSwitch(QWidget):
             painter.setBrush(self.bgColorOff)
 
         rect = QRect(0, 0, self.width(), self.height())
-        #半径为高度的一半
+        # 半径为高度的一半
         radius = rect.height() / 2
-        #圆的宽度为高度
+        # 圆的宽度为高度
         circleWidth = rect.height()
 
         path = QPainterPath()
@@ -391,12 +391,12 @@ class SwitchOCR(QWidget):
     def mousePressEvent(self, event) :
 
         self.checked = not self.checked
-        #发射信号
+        # 发射信号
         self.checkedChanged.emit(self.checked)
 
         # 每次移动的步长为宽度的50分之一
         self.step = self.width() / 50
-        #状态切换改变后自动计算终点坐标
+        # 状态切换改变后自动计算终点坐标
         if self.checked:
             self.endX = self.width() - self.height()
         else:
@@ -406,16 +406,16 @@ class SwitchOCR(QWidget):
 
     def paintEvent(self, evt):
 
-        #绘制准备工作, 启用反锯齿
+        # 绘制准备工作, 启用反锯齿
         painter = QPainter()
         painter.begin(self)
         painter.setRenderHint(QPainter.Antialiasing)
 
-        #绘制背景
+        # 绘制背景
         self.drawBg(evt, painter)
-        #绘制滑块
+        # 绘制滑块
         self.drawSlider(evt, painter)
-        #绘制文字
+        # 绘制文字
         self.drawText(evt, painter)
 
         painter.end()
@@ -446,9 +446,9 @@ class SwitchOCR(QWidget):
             painter.setBrush(self.bgColorOff)
 
         rect = QRect(0, 0, self.width(), self.height())
-        #半径为高度的一半
+        # 半径为高度的一半
         radius = rect.height() / 2
-        #圆的宽度为高度
+        # 圆的宽度为高度
         circleWidth = rect.height()
 
         path = QPainterPath()
@@ -546,12 +546,12 @@ class SwitchFontType(QWidget):
     def mousePressEvent(self, event) :
 
         self.checked = not self.checked
-        #发射信号
+        # 发射信号
         self.checkedChanged.emit(self.checked)
 
         # 每次移动的步长为宽度的50分之一
         self.step = self.width() / 50
-        #状态切换改变后自动计算终点坐标
+        # 状态切换改变后自动计算终点坐标
         if self.checked:
             self.endX = self.width() - self.height()
         else:
@@ -561,16 +561,16 @@ class SwitchFontType(QWidget):
 
     def paintEvent(self, evt):
 
-        #绘制准备工作, 启用反锯齿
+        # 绘制准备工作, 启用反锯齿
         painter = QPainter()
         painter.begin(self)
         painter.setRenderHint(QPainter.Antialiasing)
 
-        #绘制背景
+        # 绘制背景
         self.drawBg(evt, painter)
-        #绘制滑块
+        # 绘制滑块
         self.drawSlider(evt, painter)
-        #绘制文字
+        # 绘制文字
         self.drawText(evt, painter)
 
         painter.end()
@@ -601,9 +601,9 @@ class SwitchFontType(QWidget):
             painter.setBrush(self.bgColorOff)
 
         rect = QRect(0, 0, self.width(), self.height())
-        #半径为高度的一半
+        # 半径为高度的一半
         radius = rect.height() / 2
-        #圆的宽度为高度
+        # 圆的宽度为高度
         circleWidth = rect.height()
 
         path = QPainterPath()
@@ -700,12 +700,12 @@ class ShowSwitch(QWidget):
     def mousePressEvent(self, event) :
 
         self.checked = not self.checked
-        #发射信号
+        # 射信号
         self.checkedChanged.emit(self.checked)
 
         # 每次移动的步长为宽度的50分之一
         self.step = self.width() / 50
-        #状态切换改变后自动计算终点坐标
+        # 状态切换改变后自动计算终点坐标
         if self.checked:
             self.endX = self.width() - self.height()
         else:
@@ -715,16 +715,16 @@ class ShowSwitch(QWidget):
 
     def paintEvent(self, evt):
 
-        #绘制准备工作, 启用反锯齿
+        # 绘制准备工作, 启用反锯齿
         painter = QPainter()
         painter.begin(self)
         painter.setRenderHint(QPainter.Antialiasing)
 
-        #绘制背景
+        # 绘制背景
         self.drawBg(evt, painter)
-        #绘制滑块
+        # 绘制滑块
         self.drawSlider(evt, painter)
-        #绘制文字
+        # 绘制文字
         self.drawText(evt, painter)
 
         painter.end()
@@ -755,9 +755,9 @@ class ShowSwitch(QWidget):
             painter.setBrush(self.bgColorOff)
 
         rect = QRect(0, 0, self.width(), self.height())
-        #半径为高度的一半
+        # 半径为高度的一半
         radius = rect.height() / 2
-        #圆的宽度为高度
+        # 圆的宽度为高度
         circleWidth = rect.height()
 
         path = QPainterPath()
@@ -854,12 +854,12 @@ class SwitchDirection(QWidget):
     def mousePressEvent(self, event) :
 
         self.checked = not self.checked
-        #发射信号
+        # 发射信号
         self.checkedChanged.emit(self.checked)
 
         # 每次移动的步长为宽度的50分之一
         self.step = self.width() / 50
-        #状态切换改变后自动计算终点坐标
+        # 状态切换改变后自动计算终点坐标
         if self.checked:
             self.endX = self.width() - self.height()
         else:
@@ -869,16 +869,16 @@ class SwitchDirection(QWidget):
 
     def paintEvent(self, evt):
 
-        #绘制准备工作, 启用反锯齿
+        # 绘制准备工作, 启用反锯齿
         painter = QPainter()
         painter.begin(self)
         painter.setRenderHint(QPainter.Antialiasing)
 
-        #绘制背景
+        # 绘制背景
         self.drawBg(evt, painter)
-        #绘制滑块
+        # 绘制滑块
         self.drawSlider(evt, painter)
-        #绘制文字
+        # 绘制文字
         self.drawText(evt, painter)
 
         painter.end()
@@ -909,9 +909,9 @@ class SwitchDirection(QWidget):
             painter.setBrush(self.bgColorOff)
 
         rect = QRect(0, 0, self.width(), self.height())
-        #半径为高度的一半
+        # 半径为高度的一半
         radius = rect.height() / 2
-        #圆的宽度为高度
+        # 圆的宽度为高度
         circleWidth = rect.height()
 
         path = QPainterPath()
