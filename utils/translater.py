@@ -4,12 +4,15 @@ from PyQt5.QtWidgets import QApplication
 from skimage.measure import compare_ssim
 from cv2 import imread,cvtColor,COLOR_BGR2GRAY
 
+from traceback import print_exc, format_exc
+
+
+IMAGE_PATH = ".\config\image.jpg"
 
 class Translater(QThread):
 
     def __init__(self, window):
         self.window = window
-        self.config = window.config
         self.use_translate_signal = pyqtSignal(list, str, dict)
         super(Translater, self).__init__()
 
@@ -24,14 +27,14 @@ class Translater(QThread):
     # 截图
     def image_cut(self):
 
-        x1 = self.config["range"]['X1']
-        y1 = self.config["range"]['Y1']
-        x2 = self.config["range"]['X2']
-        y2 = self.config["range"]['Y2']
+        x1 = self.window.config["range"]["X1"]
+        y1 = self.window.config["range"]["Y1"]
+        x2 = self.window.config["range"]["X2"]
+        y2 = self.window.config["range"]["Y2"]
 
         screen = QApplication.primaryScreen()
         pix = screen.grabWindow(QApplication.desktop().winId(), x1, y1, x2-x1, y2-y1)
-        pix.save(".\config\image.jpg")
+        pix.save(IMAGE_PATH)
 
 
     # 判断图片相似度
@@ -49,17 +52,22 @@ class Translater(QThread):
     def translate(self) :
 
         score = 0
+        # 跳过图片判断
         if self.window.first_sign :
             self.image_cut()
             self.window.first_sign = False
         else :
             try :
-                imageA = imread('.\config\image.jpg')
+                # 判断两张图片的相似度
+                imageA = imread(IMAGE_PATH)
                 self.image_cut()
-                imageB = imread('.\config\image.jpg')
+                imageB = imread(IMAGE_PATH)
                 score = self.compare_image(imageA, imageB)
             except :
-                import traceback
-                traceback.print_exc()
+                print_exc()
+                self.window.logger.error(format_exc())
 
-        print(score)
+        # 如果相似度过高则不检测
+        if score > self.window.config["imageSimilarity"] :
+            return
+

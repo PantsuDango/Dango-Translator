@@ -234,7 +234,7 @@ class Translation(QMainWindow):
         # 翻译模式
         self.translateMode = False
         # 原文
-        self.original = "ところで今日の最高気温、何度だと思う？37度だぜ、37度。夏にしても暑すぎる。これじゃオーブンだ。37度っていえば一人でじっとしてるより女の子と抱き合ってた方が涼しいくらいの温度だ。"
+        self.original = ""
         # 初始标志
         self.first_sign = True
 
@@ -442,6 +442,7 @@ class Translation(QMainWindow):
             self.logger.error(format_exc())
 
 
+    # 按下翻译键
     def startTranslater(self) :
 
         thread = Translater(self)
