@@ -1381,7 +1381,7 @@ class Settin(QMainWindow):
             if self.online_ocr_use == True :
                 self.resetSwitch("onlineOCR")
             self.baidu_ocr_use = True
-        else:
+        else :
             self.baidu_ocr_use = False
 
 
