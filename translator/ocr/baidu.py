@@ -72,26 +72,32 @@ def getAccessToken(client_id, client_secret, logger):
 
 
 # 百度ocr
-def baidu_orc(config, logger) :
+def baiduOCR(config, logger) :
 
-    language = config["language"]  # 翻译语种
-    access_token = config['AccessToken']  # token
-    showTranslateRow = config["showTranslateRow"]  # 是否使用竖排翻译
+    language = config["language"]
+    access_token = config['AccessToken']
+    showTranslateRow = config["showTranslateRow"]
 
     if not access_token :
         sentence = "百度OCR错误：还未注册OCR API，不可使用"
-        return None, sentence
 
     else:
-        url = "https://aip.baidubce.com/rest/2.0/ocr/v1/general_basic?access_token=" + access_token
+        if showTranslateRow == "True" :
+            # 高精度
+            request_url = "https://aip.baidubce.com/rest/2.0/ocr/v1/accurate_basic"
+        else :
+            # 普通
+            request_url = "https://aip.baidubce.com/rest/2.0/ocr/v1/general_basic"
+
         with open(".\\config\\image.jpg", "rb") as file :
             image = b64encode(file.read())
         params = {"image": image, "language_type": language}
         headers = {"content-type": "application/x-www-form-urlencoded"}
         proxies = {"http": None, "https": None}
+        request_url = request_url + "?access_token=" + access_token
 
         try:
-            response = requests.post(url, data=params, headers=headers, proxies=proxies, timeout=10)
+            response = requests.post(request_url, data=params, headers=headers, proxies=proxies, timeout=10)
 
         except TypeError:
             logger.error(format_exc())
@@ -99,75 +105,57 @@ def baidu_orc(config, logger) :
                        "需要翻译器目录的路径设置为纯英文\n"
                        "否则无法在非简中区的电脑系统下运行使用     ")
 
-            sentence = "百度OCR错误：需要翻译器目录的路径设置为纯英文，否则无法在非简中区的电脑系统下运行使用"
-            return None, sentence
+            sentence = "百度OCR错误: 需要翻译器目录的路径设置为纯英文, 否则无法在非简中区的电脑系统下运行使用"
 
         except Exception:
-            print_exc()
-            sentence = 'OCR连接失败：请打开【网络和Internet设置】的【代理】页面，将其中的全部代理设置开关都关掉，保证关闭后请重试'
-            # error_stop()
-            return None, sentence
+            logger.error(format_exc())
+            sentence = "百度OCR错误: 请打开[网络和Internet设置]的[代理]页面, 将其中的全部代理设置开关都关掉, 保证关闭后请重试"
+
         else:
             if response:
                 try:
-                    words = response.json()['words_result']
-                except Exception:
-                    print()
+                    words = response.json()["words_result"]
+
+                except Exception :
+                    logger.error(format_exc())
                     error_code = response.json()["error_code"]
                     error_msg = response.json()["error_msg"]
 
-                    if error_code == 6:
-                        sentence = 'OCR错误：检查一下你的OCR注册网页，注册的类型是不是文字识别，你可能注册到语音技术还是其它什么奇怪的东西了'
-                        error_stop()
-                        return None, sentence
+                    if error_code == 6 :
+                        sentence = "百度OCR错误: 检查一下你的OCR注册网页, 注册的类型是不是文字识别, 你可能注册到语音技术还是其它什么奇怪的东西了"
 
-                    elif error_code == 17:
-                        if showTranslateRow == 'True':
-                            sentence = 'OCR错误：竖排翻译模式每日额度已用光，请取消竖排翻译模式'
-                        elif  highPrecision == 'True':
-                            sentence = 'OCR错误：高精度翻译模式每日额度已用光，请取消高精度翻译模式'
+                    elif error_code == 17 :
+                        if showTranslateRow == "True":
+                            sentence = "百度OCR错误：竖排翻译模式每日额度已用光, 请取消竖排翻译模式"
                         else:
-                            sentence = 'OCR错误：OCR无额度，可使用团子离线ocr'
-                        error_stop()
-                        return None, sentence
+                            sentence = "百度OCR错误: 无额度, 可使用离线ocr"
 
-                    elif error_code == 18:
-                        sign, sentence = baidu_orc(config)
-                        return sign, sentence
-
-                    elif error_code == 111:
-                        sentence = 'OCR错误：密钥过期了，请进入设置页面后按一次保存设置，以重新生成密钥'
-                        error_stop()
-                        return None, sentence
+                    elif error_code == 111 :
+                        sentence = "百度OCR错误: 密钥过期了, 请进入设置页面后保存一次设置, 以重新生成密钥"
 
                     elif error_code == 216202:
-                        sentence = 'OCR错误：范围截取过小无法识别，请重新框选一下你要翻译的区域'
-                        error_stop()
-                        return None, sentence
+                        sentence = "百度OCR错误：范围截取过小无法识别，请重新框选一下你要翻译的区域"
 
                     else:
-                        sentence = 'OCR错误：%s，%s ' %(error_code, error_msg)
-                        error_stop()
-                        return None, sentence
+                        sentence = "百度OCR错误：%s, %s"%(error_code, error_msg)
 
                 else:
-                    sentence = ''
+                    sentence = ""
 
                     # 竖排翻译模式
-                    if showTranslateRow == 'True':
-                        if words:
-                            for word in words[::-1]:
-                                sentence += word['words'] + '，'
-                            sentence = sentence.replace(',' ,'')
+                    if showTranslateRow == "True":
+                        if words :
+                            for word in words[::-1] :
+                                sentence += word["words"] + ","
+                            sentence = sentence.replace(",", "")
 
                     # 普通翻译模式
                     else:
                         for word in words:
-                            sentence += word['words']
-                        if sentence :
-                            print("百度OCR: %s " %sentence)
-
+                            sentence += word["words"]
                     return True, sentence
+
             else:
-                sentence = 'OCR错误：response无响应'
-                return None, sentence
+                sentence = "OCR错误: response无响应"
+
+    return False, sentence
