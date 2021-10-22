@@ -445,7 +445,7 @@ class Translation(QMainWindow):
     # 按下翻译键
     def startTranslater(self) :
 
-        thread = Translater(self)
+        thread = Translater(self, self.logger)
         thread.start()
         thread.exec()
 
