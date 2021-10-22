@@ -2,7 +2,7 @@ import requests
 from base64 import b64encode
 import json
 
-from utils import MessageBox, saveConfig
+from utils import MessageBox
 from traceback import print_exc, format_exc
 
 
@@ -17,72 +17,89 @@ def getAccessToken(client_id, client_secret, logger):
 
     except TypeError :
         logger.error(format_exc())
-        MessageBox("翻译器安装路径错误", "请将翻译器目录的路径设置为纯英文\n否则无法在非简中区的电脑系统下运行使用")
-        return False, None
+        MessageBox("百度OCR错误",
+                   "需要翻译器目录的路径设置为纯英文\n"
+                   "否则无法在非简中区的电脑系统下运行使用     ")
 
     except Exception :
         logger.error(format_exc())
-        MessageBox("百度OCR错误", "啊咧... Σ(っ°Д°;)っ OCR连接失败惹 (つД`)\n请打开[网络和Internet设置]的代理页面\n将其中的全部代理设置开关都关掉呢 (˘•ω•˘)")
-        return False, None
+        MessageBox("百度OCR错误",
+                   "啊咧... 百度OCR连接失败惹 (つД`)\n"
+                   "你可能会无法使用百度OCR\n"
+                   "1. 可能开了代理或者加速器, 请尝试关闭它们\n"
+                   "2. 可能是校园网屏蔽或者是自身网络断开了\n"
+                   "3. 如都无法解决, 请更换使用团子离线或在线OCR     ")
 
-    else:
-        if response :
-            try:
-                access_token = response.json()['access_token']
-            except Exception :
-                logger.error(format_exc())
+    else :
+        try :
+            response.encoding = "utf-8"
+            result_json = response.json()
+
+            access_token = result_json.get("access_token", "")
+            if access_token :
+                return True, access_token
+
+            else :
                 error = response.json()["error"]
                 error_description = response.json()["error_description"]
 
-                if error_description == 'unknown client id':
-                    MessageBox("OCR错误", "你的OCR API Key填错啦 ヽ(#`Д´)ﾉ")
+                if error_description == "unknown client id":
+                    MessageBox("百度OCR错误",
+                               "你可能会无法使用百度OCR\n"
+                               "你的百度OCR API Key填错啦 ヽ(#`Д´)ﾉ     ")
 
-                elif error_description == 'Client authentication failed':
-                    MessageBox("OCR错误", "你的OCR Secret Key填错啦 ヽ(#`Д´)ﾉ")
+                elif error_description == "Client authentication failed":
+                    MessageBox("百度OCR错误",
+                               "你可能会无法使用百度OCR\n"
+                               "你的百度OCR Secret Key填错啦 ヽ(#`Д´)ﾉ     ")
 
                 else:
-                    MessageBox("OCR错误", "啊咧... Σ(っ°Д°;)っ！！！  OCR连接失败惹... (つД`)\nerror：%s\nerror_description：%s"%(error, error_description))
+                    MessageBox("百度OCR错误",
+                               "啊咧...OCR连接失败惹... (つД`)\n"
+                               "你可能会无法使用百度OCR\n"
+                               "error：%s\n"
+                               "error_description：%s     "
+                               %(error, error_description))
 
-                return False, None
+        except Exception :
+            logger.error(format_exc())
+            MessageBox("百度OCR错误",
+                       "出现了出乎意料的问题..."
+                       "你可能会无法使用百度OCR\n"
+                       "%s"%(format_exc()))
 
-            else :
-                return True, access_token
-        else:
-            MessageBox("OCR错误", "啊咧... Σ(っ°Д°;)っ！！！  OCR连接失败惹... (つД`)\n好好检查一下你的OCR API Key和Secret Key哪里填错了喔 (˘•ω•˘)")
-            return False, None
+    return False, None
 
 
 # 百度ocr
-def baidu_orc(data):
+def baidu_orc(config, logger) :
 
-    language = data["language"]  # 翻译语种
-    access_token = data['AccessToken']  # token
-    highPrecision = data["highPrecision"]  # 是否使用高精度模式
-    showTranslateRow = data["showTranslateRow"]  # 是否使用竖排翻译
+    language = config["language"]  # 翻译语种
+    access_token = config['AccessToken']  # token
+    showTranslateRow = config["showTranslateRow"]  # 是否使用竖排翻译
 
-    if not access_token:
-        sentence = 'OCR连接失败：还未注册OCR API，不可使用'
-        error_stop()
+    if not access_token :
+        sentence = "百度OCR错误：还未注册OCR API，不可使用"
         return None, sentence
-    else:
-        if showTranslateRow == 'True' or highPrecision == 'True':
-            request_url = "https://aip.baidubce.com/rest/2.0/ocr/v1/accurate_basic" # 高精度
-        else:
-            request_url = "https://aip.baidubce.com/rest/2.0/ocr/v1/general_basic" # 普通
 
-        f = open('.\\config\\image.jpg', 'rb')
-        img = b64encode(f.read())
-        params = {"image": img, "language_type": language}
-        request_url = request_url + "?access_token=" + access_token
-        headers = {'content-type': 'application/x-www-form-urlencoded'}
+    else:
+        url = "https://aip.baidubce.com/rest/2.0/ocr/v1/general_basic?access_token=" + access_token
+        with open(".\\config\\image.jpg", "rb") as file :
+            image = b64encode(file.read())
+        params = {"image": image, "language_type": language}
+        headers = {"content-type": "application/x-www-form-urlencoded"}
+        proxies = {"http": None, "https": None}
 
         try:
-            response = requests.post(request_url, data=params, headers=headers)
+            response = requests.post(url, data=params, headers=headers, proxies=proxies, timeout=10)
 
         except TypeError:
-            print_exc()
-            sentence = '路径错误：请将翻译器目录的路径设置为纯英文，否则无法在非简中区的电脑系统下运行使用'
-            error_stop()
+            logger.error(format_exc())
+            MessageBox("百度OCR错误",
+                       "需要翻译器目录的路径设置为纯英文\n"
+                       "否则无法在非简中区的电脑系统下运行使用     ")
+
+            sentence = "百度OCR错误：需要翻译器目录的路径设置为纯英文，否则无法在非简中区的电脑系统下运行使用"
             return None, sentence
 
         except Exception:
@@ -115,7 +132,7 @@ def baidu_orc(data):
                         return None, sentence
 
                     elif error_code == 18:
-                        sign, sentence = baidu_orc(data)
+                        sign, sentence = baidu_orc(config)
                         return sign, sentence
 
                     elif error_code == 111:
