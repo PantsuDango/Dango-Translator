@@ -67,6 +67,10 @@ class Youdao() :
     def translater(self, content) :
 
         try :
+            try:
+                self.browser.find_element_by_xpath('/html/body/div[7]/div/span').click()
+            except Exception:
+                pass
             # 清空文本框
             self.browser.find_element_by_xpath('//*[@id="inputOriginal"]').clear()
             # 输入要翻译的文本
