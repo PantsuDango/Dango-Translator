@@ -253,6 +253,8 @@ def configConvert(config, oldConfig) :
     config["textSimilarity"] = oldConfig.get("textSimilarity", 90)
     # 范围坐标
     config["range"] = oldConfig.get("range", {"X1": 0, "Y1": 0, "X2": 500, "Y2": 500})
+    # 字典表
+    config["dictInfo"] = getDictInfo()
 
     return config
 
@@ -376,11 +378,12 @@ def get_equal_rate(str1, str2) :
     return SequenceMatcher(None, str1, str2).quick_ratio()
 
 
+# 获取字典表
 def getDictInfo() :
 
     try :
         res = requests.post("http://120.24.146.175:3000/DangoTranslate/ShowDict")
         res.encoding = "utf-8"
-        return res.json()
+        return res.json()["Result"]
     except Exception :
         return {}

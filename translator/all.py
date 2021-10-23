@@ -1,12 +1,13 @@
 from selenium import webdriver
-from traceback import format_exc
+from traceback import format_exc, print_exc
 import time
 
 class Webdriver() :
 
-    def __init__(self, logger) :
+    def __init__(self, config, logger) :
 
         self.content = ""
+        self.config = config
         self.logger = logger
         self.url_map = {
             "youdao" : "https://fanyi.youdao.com/",
@@ -21,8 +22,8 @@ class Webdriver() :
             # 使用谷歌浏览器
             option = webdriver.ChromeOptions()
             option.add_argument("--headless")
-            self.browser = webdriver.Chrome(executable_path="../config/tools/chromedriver.exe",
-                                            service_log_path="../logs/geckodriver.log",
+            self.browser = webdriver.Chrome(executable_path="./config/tools/chromedriver.exe",
+                                            service_log_path="./logs/geckodriver.log",
                                             options=option)
         except Exception :
             self.logger.error(format_exc())
@@ -31,8 +32,8 @@ class Webdriver() :
                 # 使用火狐浏览器
                 option = webdriver.FirefoxOptions()
                 option.add_argument("--headless")
-                self.browser = webdriver.Firefox(executable_path="../config/tools/geckodriver.exe",
-                                                 service_log_path="../logs/geckodriver.log",
+                self.browser = webdriver.Firefox(executable_path="./config/tools/geckodriver.exe",
+                                                 service_log_path="./logs/geckodriver.log",
                                                  options=option)
             except Exception :
                 self.logger.error(format_exc())
@@ -51,8 +52,8 @@ class Webdriver() :
                                 '--remote-debugging-port=9222',
                             ]}
                     }
-                    self.browser = webdriver.Edge(executable_path="../config/tools/msedgedriver.exe",
-                                                     service_log_path="../logs/geckodriver.log",
+                    self.browser = webdriver.Edge(executable_path="./config/tools/msedgedriver.exe",
+                                                     service_log_path="./logs/geckodriver.log",
                                                      capabilities=EDGE)
                 except Exception:
                     self.logger.error(format_exc())
@@ -71,9 +72,10 @@ class Webdriver() :
 
         try:
             try:
-                self.browser.find_element_by_xpath('/html/body/div[7]/div/span').click()
+                self.browser.find_element_by_xpath(self.config["dictInfo"]["youdao_xpath"]).click()
             except Exception:
                 pass
+
             # 清空文本框
             self.browser.find_element_by_xpath('//*[@id="inputOriginal"]').clear()
             # 输入要翻译的文本
@@ -92,9 +94,11 @@ class Webdriver() :
                 # 判断超时
                 end = time.time()
                 if (end - start) > 10:
+                    self.browser.refresh()
                     return "公共有道: 我超时啦!"
 
         except Exception :
+            self.browser.refresh()
             self.logger.error(format_exc())
             return "公共有道: 我抽风啦!"
 
@@ -102,18 +106,11 @@ class Webdriver() :
     # 百度翻译
     def baidu(self, content):
 
-        try:
-            # try:
-            #     self.browser.find_element_by_xpath('/html/body/div[1]/div[7]/div/div/a[2]').click()
-            # except Exception:
-            #     pass
-            # try:
-            #     self.browser.find_element_by_xpath('/html/body/div[1]/div[7]/div/div/div/a[2]').click()
-            # except Exception:
-            #     pass
-
-            html = self.browser.find_element_by_xpath("//*").get_attribute("outerHTML")
-            print(html)
+        try :
+            try :
+                self.browser.find_element_by_xpath(self.config["dictInfo"]["baidu_xpath"]).click()
+            except Exception :
+                pass
 
             # 清空翻译框
             self.browser.find_element_by_xpath('//*[@id="baidu_translate_input"]').clear()
@@ -135,9 +132,11 @@ class Webdriver() :
                 # 判断超时
                 end = time.time()
                 if (end - start) > 10:
+                    self.browser.refresh()
                     return "公共百度: 我超时啦!"
 
         except Exception :
+            self.browser.refresh()
             self.logger.error(format_exc())
             return "公共百度: 我抽风啦!"
 
@@ -146,6 +145,11 @@ class Webdriver() :
     def tencent(self, content) :
 
         try :
+            try :
+                self.browser.find_element_by_xpath(self.config["dictInfo"]["tencent_xpath"]).click()
+            except Exception :
+                pass
+
             # 清空翻译框
             self.browser.find_element_by_xpath('/html/body/div[2]/div[2]/div[2]/div[1]/div[1]/textarea').clear()
             # 输入要翻译的文本
@@ -166,9 +170,11 @@ class Webdriver() :
                 # 判断超时
                 end = time.time()
                 if (end - start) > 10 :
+                    self.browser.refresh()
                     return "公共腾讯: 我超时啦!"
 
         except Exception :
+            self.browser.refresh()
             self.logger.error(format_exc())
             return "公共腾讯: 我抽风啦!"
 
@@ -177,6 +183,11 @@ class Webdriver() :
     def caiyun(self, content) :
 
         try :
+            try:
+                self.browser.find_element_by_xpath(self.config["dictInfo"]["caiyun_xpath"]).click()
+            except Exception:
+                pass
+
             # 清空翻译框
             self.browser.find_element_by_xpath('//*[@id="textarea"]').clear()
             # 输入要翻译的文本
@@ -198,9 +209,11 @@ class Webdriver() :
                 # 判断超时
                 end = time.time()
                 if (end - start) > 10 :
+                    self.browser.refresh()
                     return "公共彩云: 我超时啦!"
 
         except Exception :
+            self.browser.refresh()
             self.logger.error(format_exc())
             return "公共彩云: 我抽风啦!"
 
@@ -209,6 +222,11 @@ class Webdriver() :
     def google(self, content) :
 
         try :
+            try:
+                self.browser.find_element_by_xpath(self.config["dictInfo"]["google_xpath"]).click()
+            except Exception:
+                pass
+
             # 清空翻译框
             self.browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[2]/div[2]/c-wiz[1]/span/span/div/textarea').clear()
             # 输入要翻译的文本
@@ -230,9 +248,11 @@ class Webdriver() :
                 # 判断超时
                 end = time.time()
                 if (end - start) > 10 :
+                    self.browser.refresh()
                     return "公共谷歌: 我超时啦!"
 
         except Exception :
+            self.browser.refresh()
             self.logger.error(format_exc())
             return "公共谷歌: 我抽风啦!"
 
@@ -241,6 +261,11 @@ class Webdriver() :
     def deepl(self, content) :
 
         try :
+            try:
+                self.browser.find_element_by_xpath(self.config["dictInfo"]["deepl_xpath"]).click()
+            except Exception:
+                pass
+
             # 清空翻译框
             self.browser.find_element_by_xpath('//*[@id="dl_translator"]/div[3]/div[4]/div[1]/div[2]/div[2]/textarea').clear()
             # 输入要翻译的文本
@@ -265,9 +290,11 @@ class Webdriver() :
                 # 判断超时
                 end = time.time()
                 if (end - start) > 10 :
+                    self.browser.refresh()
                     return "公共DeepL: 我超时啦!"
 
         except Exception :
+            self.browser.refresh()
             self.logger.error(format_exc())
             return "公共DeepL: 我抽风啦!"
 
@@ -306,13 +333,18 @@ if __name__ == "__main__" :
 
     import utils
     logger = utils.setLog()
-    obj = Webdriver(logger)
-    obj.openWeb("baidu")
-    for content in (jap_content_list+eng_content_list+kor_content_list)[:1] :
+    config = {}
+    config["dictInfo"] = utils.getDictInfo()
+
+    obj = Webdriver(config, logger)
+    obj.openWeb("deepl")
+
+    for content in (jap_content_list+eng_content_list+kor_content_list) :
         start = time.time()
-        result = obj.baidu(content)
+        result = obj.deepl(content)
         print(content)
         print(result)
         print(time.time()-start)
         print()
+
     obj.close()
