@@ -371,6 +371,16 @@ def postSaveSettin(config, logger) :
 
 
 # 判断原文相似度
-def get_equal_rate(str1, str2):
+def get_equal_rate(str1, str2) :
 
     return SequenceMatcher(None, str1, str2).quick_ratio()
+
+
+def getDictInfo() :
+
+    try :
+        res = requests.post("http://120.24.146.175:3000/DangoTranslate/ShowDict")
+        res.encoding = "utf-8"
+        return res.json()
+    except Exception :
+        return {}
