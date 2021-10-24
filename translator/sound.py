@@ -4,16 +4,17 @@ import time
 
 
 # 音乐朗读模块实例化
-def createSound(obj, logger) :
+def createSound(obj, config, logger) :
 
-    obj.sound = Sound(logger)
+    obj.sound = Sound(config, logger)
 
 
 # 音乐朗读模块
 class Sound() :
 
-    def __init__(self, logger) :
+    def __init__(self, config, logger) :
 
+        self.config = config
         self.logger = logger
         url = "https://fanyi.qq.com/"
 
@@ -60,12 +61,18 @@ class Sound() :
 
         self.browser.get(url)
         self.browser.maximize_window()
+        print("音乐模块启动完成")
 
 
     # 播放音乐
     def playSound(self, content, language) :
 
         try :
+            try :
+                self.browser.find_element_by_xpath(self.config["dictInfo"]["tencent_xpath"]).click()
+            except Exception :
+                pass
+
             # 清空文本框
             self.browser.find_element_by_xpath('/html/body/div[2]/div[2]/div[2]/div[1]/div[1]/textarea').clear()
             # 输入要朗读的文本

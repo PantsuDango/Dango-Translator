@@ -73,6 +73,25 @@ class Translater(QThread):
         if self.window.config["baiduOCR"] :
             sign, original = baiduOCR(self.window.config, self.logger)
             print(original)
+        else :
+            original = ""
+
+        # 如果检测不到文字或者文字和上一次一样则跳过
+        if not original or original == self.window.original :
+            return
+
+        try :
+            self.window.original = original
+            if self.window.webdriver_1.open_sign :
+                result = self.window.webdriver_1.translater(original)
+                print("%s: %s"%(self.window.webdriver_1.web_type, result))
+            if self.window.webdriver_2.open_sign :
+                result = self.window.webdriver_2.translater(original)
+                print("%s: %s"%(self.window.webdriver_2.web_type, result))
+        except Exception :
+            print_exc()
+
+
 
 
     def run(self) :

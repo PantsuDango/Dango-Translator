@@ -3,7 +3,8 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from ui.switch import SwitchButton
-from translator import sound
+from translator.sound import createSound
+from translator.all import createWebdriver1, createWebdriver2
 import utils
 from utils.translater import Translater
 
@@ -14,6 +15,7 @@ import json
 import threading
 import os
 import pyperclip
+import time
 
 
 class Translation(QMainWindow):
@@ -25,16 +27,51 @@ class Translation(QMainWindow):
         self.config = config
         self.logger = logger
         self.getInitConfig()
+
+        self.stratSoundThread()
+        self.checkWebdriverThread()
+
         self.ui()
-        #self.stratSoundThread(logger)
 
 
     # 开启音乐朗读线程
-    def stratSoundThread(self, logger) :
+    def stratSoundThread(self) :
 
-        soundThread = threading.Thread(target=sound.createSound, args=(self, logger))
+        soundThread = threading.Thread(target=createSound, args=(self, self.config, self.logger))
         soundThread.setDaemon(True)
         soundThread.start()
+
+
+    # 开启翻译线程1
+    def stratWebdriverThread1(self) :
+
+        webdriver_thread = threading.Thread(target=createWebdriver1, args=(self, self.config, self.logger, self.webdriver_1_type))
+        webdriver_thread.setDaemon(True)
+        webdriver_thread.start()
+
+
+    # 开启翻译线程2
+    def stratWebdriverThread2(self) :
+
+        webdriver_thread = threading.Thread(target=createWebdriver2, args=(self, self.config, self.logger, self.webdriver_2_type))
+        webdriver_thread.setDaemon(True)
+        webdriver_thread.start()
+
+
+    # 开启翻译页面
+    def checkWebdriverThread(self) :
+
+        translater_list = ["youdaoUse", "baiduwebUse", "tencentwebUse", "deeplUse", "googleUse", "caiyunUse"]
+        for val in translater_list :
+            if self.config[val] == "False" :
+                continue
+            if not self.webdriver_1_type :
+                self.webdriver_1_type = val.replace("Use", "").replace("web", "")
+            else :
+                self.webdriver_2_type = val.replace("Use", "").replace("web", "")
+
+        self.stratWebdriverThread1()
+        self.stratWebdriverThread2()
 
 
     def ui(self) :
@@ -237,6 +274,14 @@ class Translation(QMainWindow):
         self.original = ""
         # 初始标志
         self.first_sign = True
+        # 翻译线程1启动成功标志
+        self.webdriver_1_sign = False
+        # 翻译线程2启动成功标志
+        self.webdriver_2_sign = False
+        # 翻译线程1翻译类型
+        self.webdriver_1_type = ""
+        # 翻译线程2翻译类型
+        self.webdriver_2_type = ""
 
 
     # 根据分辨率定义控件位置尺寸
@@ -453,9 +498,14 @@ class Translation(QMainWindow):
     # 退出程序
     def quit(self) :
 
-        # 关闭音乐模块
+        self.hide()
+
         try :
+            # 关闭引擎模块
             self.sound.close()
+            self.webdriver_1.close()
+            self.webdriver_2.close()
+            print("关闭引擎完成")
         except Exception :
             self.logger.error(format_exc())
         finally :
