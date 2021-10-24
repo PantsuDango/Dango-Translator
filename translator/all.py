@@ -2,13 +2,39 @@ from selenium import webdriver
 from traceback import format_exc, print_exc
 import time
 
+
+# 翻译模块实例化1
+def createWebdriver1(obj, config, logger, web_type) :
+
+     obj.webdriver_1 = Webdriver(config, logger)
+     if web_type :
+        obj.webdriver_1.openWeb(web_type)
+
+
+# 翻译模块实例化2
+def createWebdriver2(obj, config, logger, web_type) :
+
+     obj.webdriver_2 = Webdriver(config, logger)
+     if web_type :
+        obj.webdriver_2.openWeb(web_type)
+
+
+# 刷新翻译页面
+def resetWeb(obj, web_type) :
+
+    obj.openWeb(web_type)
+
+
+# 翻译引擎
 class Webdriver() :
 
     def __init__(self, config, logger) :
 
         self.content = ""
+        self.open_sign = False
         self.config = config
         self.logger = logger
+        self.web_type = ""
         self.url_map = {
             "youdao" : "https://fanyi.youdao.com/",
             "baidu"  : "https://fanyi.baidu.com/?aldtype=16047#auto/zh",
@@ -22,8 +48,8 @@ class Webdriver() :
             # 使用谷歌浏览器
             option = webdriver.ChromeOptions()
             option.add_argument("--headless")
-            self.browser = webdriver.Chrome(executable_path="./config/tools/chromedriver.exe",
-                                            service_log_path="./logs/geckodriver.log",
+            self.browser = webdriver.Chrome(executable_path="../config/tools/chromedriver.exe",
+                                            service_log_path="../logs/geckodriver.log",
                                             options=option)
         except Exception :
             self.logger.error(format_exc())
@@ -59,12 +85,17 @@ class Webdriver() :
                     self.logger.error(format_exc())
                     self.close()
 
+        print("翻译模块启动完成")
+
 
     # 打开翻译页面
     def openWeb(self, web_type) :
 
+        self.web_type = web_type
+        self.open_sign = True
         self.browser.get(self.url_map[web_type])
         self.browser.maximize_window()
+        print("%s翻译启动成功" % web_type)
 
 
     # 有道翻译
@@ -299,6 +330,27 @@ class Webdriver() :
             return "公共DeepL: 我抽风啦!"
 
 
+    # 翻译主函数
+    def translater(self, content) :
+
+        if self.web_type == "youdao" :
+            result = self.youdao(content)
+        elif self.web_type == "baidu" :
+            result = self.baidu(content)
+        elif self.web_type == "tencent" :
+            result = self.tencent(content)
+        elif self.web_type == "caiyun" :
+            result = self.caiyun(content)
+        elif self.web_type == "google" :
+            result = self.google(content)
+        elif self.web_type == "deepl" :
+            result = self.deepl(content)
+        else :
+            result = ""
+
+        return result
+
+
     def close(self) :
 
         self.browser.close()
@@ -341,7 +393,7 @@ if __name__ == "__main__" :
 
     for content in (jap_content_list+eng_content_list+kor_content_list) :
         start = time.time()
-        result = obj.deepl(content)
+        result = obj.translater(content)
         print(content)
         print(result)
         print(time.time()-start)

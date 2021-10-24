@@ -10,9 +10,10 @@ from ui.key import Key
 from ui.hotkey import HotKey
 import utils
 from utils import MessageBox, detectPort, testOfflineOCR, postConfigURL
-from utils import image
+import threading
 
 from translator.ocr.baidu import getAccessToken
+from translator.all import resetWeb
 
 import os
 import qtawesome
@@ -1822,7 +1823,6 @@ class Settin(QMainWindow):
         if len(self.translate_list) <= 2 :
             return
 
-        tmp = []
         for val in self.translate_list :
             if val == "baidu" :
                 self.baidu_switch.mousePressEvent(1)
@@ -1860,8 +1860,52 @@ class Settin(QMainWindow):
                 self.caiyun_private_switch.mousePressEvent(1)
                 self.caiyun_private_switch.updateValue()
 
-            if len(self.translate_list) <= 2:
+            if len(self.translate_list) <= 2 :
                 break
+
+
+    # 重置翻译引擎
+    def resetWebdriver(self) :
+
+        # 重置开关
+        tmp_sign_1 = False
+        tmp_sign_2 = False
+        self.translation_ui.webdriver_1.open_sign = False
+        self.translation_ui.webdriver_2.open_sign = False
+
+        # 刷新翻译
+        translater_list = ["youdaoUse", "baiduwebUse", "tencentwebUse", "deeplUse", "googleUse", "caiyunUse"]
+        for val in translater_list :
+            if self.config[val] == "False" :
+                continue
+
+            if not tmp_sign_2 :
+                tmp_sign_2 = True
+                self.translation_ui.webdriver_1.open_sign = True
+            else :
+                self.translation_ui.webdriver_2.open_sign = True
+
+            # 避免重复开启
+            web_type = val.replace("Use", "").replace("web", "")
+            if web_type == self.translation_ui.webdriver_1_type or web_type == self.translation_ui.webdriver_2_type :
+                continue
+
+            if not tmp_sign_1 :
+                # 刷新翻译引擎1
+                tmp_sign_1 = True
+                self.translation_ui.webdriver_1_type = web_type
+                webdriver_thread = threading.Thread(target=resetWeb,
+                                                    args=(self.translation_ui.webdriver_1, web_type))
+                webdriver_thread.setDaemon(True)
+                webdriver_thread.start()
+
+            else :
+                # 刷新翻译引擎2
+                self.translation_ui.webdriver_2_type = web_type
+                webdriver_thread = threading.Thread(target=resetWeb,
+                                                    args=(self.translation_ui.webdriver_2, web_type))
+                webdriver_thread.setDaemon(True)
+                webdriver_thread.start()
 
 
     # 退出前保存设置
@@ -1873,9 +1917,9 @@ class Settin(QMainWindow):
         self.config["baiduOCR"] = self.baidu_ocr_use
 
         # 翻译语种
-        if self.language_comboBox.currentIndex() == 1:
+        if self.language_comboBox.currentIndex() == 1 :
             self.config["language"] = "ENG"
-        elif self.language_comboBox.currentIndex() == 2:
+        elif self.language_comboBox.currentIndex() == 2 :
             self.config["language"] = "KOR"
         else:
             self.config["language"] = "JAP"
@@ -1951,13 +1995,22 @@ class Settin(QMainWindow):
         # 窗口关闭处理
     def closeEvent(self, event) :
 
+        # 保存设置至本地文件
+        self.saveConfig()
+
+        # 重置翻译引擎
+        try :
+            self.resetWebdriver()
+        except Exception :
+            pass
+
+        # 刷新百度OCR的AccessToken
         if self.baidu_ocr_use :
             sign, access_token = getAccessToken(self.config["OCR"]["Key"], self.config["OCR"]["Secret"], self.logger)
             if sign :
                 self.config["AccessToken"] = access_token
 
-        # 保存设置至本地文件
-        self.saveConfig()
+        # 设置页面配置更新至主模块
         self.translation_ui.config = self.config
 
         # 设置上传云端
