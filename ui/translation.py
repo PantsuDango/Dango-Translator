@@ -77,7 +77,7 @@ class Translation(QMainWindow):
     def ui(self) :
 
         # 窗口尺寸
-        self.resize(int(800*self.rate), int(120*self.rate))
+        self.resize(int(800*self.rate), int(130*self.rate))
 
         # 窗口无标题栏、窗口置顶、窗口透明
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
@@ -108,7 +108,7 @@ class Translation(QMainWindow):
 
         # 翻译框
         self.translateText = QTextBrowser(self)
-        self.customSetGeometry(self.translateText, 0, 30, 1500, 90)
+        self.customSetGeometry(self.translateText, 0, 30, 1500, 110)
         self.translateText.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.translateText.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.translateText.setStyleSheet("border-width:0;\
@@ -250,9 +250,11 @@ class Translation(QMainWindow):
         self.quitButton.clicked.connect(self.quit)
         self.quitButton.hide()
 
-        # 右下角用于拉伸界面的控件
+        # 右下角用于拉伸界面的控件 11447982 16777215
         self.statusbar = QStatusBar(self)
         self.setStatusBar(self.statusbar)
+        self.statusbar.setStyleSheet("color: #FFFFFF")
+        self.statusbar.showMessage("翻译模型启动中...")
 
 
     # 初始化配置
@@ -339,6 +341,12 @@ class Translation(QMainWindow):
                 self._endPos = None
         except Exception:
             pass
+
+
+    def showStatusbar(self, messgae) :
+
+        print("11111: ", messgae)
+        self.statusbar.showMessage(messgae)
 
 
     # 鼠标进入控件事件
@@ -431,7 +439,7 @@ class Translation(QMainWindow):
     # 当翻译内容改变时界面自适应窗口大小
     def textAreaChanged(self) :
 
-        newHeight = self.document.size().height()
+        newHeight = self.document.size().height()+self.statusbar.height()
         width = self.width()
         self.resize(width, newHeight + 30*self.rate)
         self.translateText.setGeometry(0, 30*self.rate, width, newHeight)
