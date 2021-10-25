@@ -1,5 +1,6 @@
 from selenium import webdriver
 from traceback import format_exc, print_exc
+from PyQt5.QtCore import *
 import time
 
 
@@ -7,6 +8,7 @@ import time
 def createWebdriver1(obj, config, logger, web_type) :
 
      obj.webdriver_1 = Webdriver(config, logger)
+     obj.webdriver_1.message_sign.connect(obj.showStatusbar)
      if web_type :
         obj.webdriver_1.openWeb(web_type)
 
@@ -15,6 +17,7 @@ def createWebdriver1(obj, config, logger, web_type) :
 def createWebdriver2(obj, config, logger, web_type) :
 
      obj.webdriver_2 = Webdriver(config, logger)
+     obj.webdriver_2.message_sign.connect(obj.showStatusbar)
      if web_type :
         obj.webdriver_2.openWeb(web_type)
 
@@ -26,10 +29,13 @@ def resetWeb(obj, web_type) :
 
 
 # 翻译引擎
-class Webdriver() :
+class Webdriver(QObject) :
+
+    message_sign = pyqtSignal(str)
 
     def __init__(self, config, logger) :
 
+        super(Webdriver, self).__init__()
         self.content = ""
         self.open_sign = False
         self.config = config
@@ -48,8 +54,8 @@ class Webdriver() :
             # 使用谷歌浏览器
             option = webdriver.ChromeOptions()
             option.add_argument("--headless")
-            self.browser = webdriver.Chrome(executable_path="../config/tools/chromedriver.exe",
-                                            service_log_path="../logs/geckodriver.log",
+            self.browser = webdriver.Chrome(executable_path="./config/tools/chromedriver.exe",
+                                            service_log_path="./logs/geckodriver.log",
                                             options=option)
         except Exception :
             self.logger.error(format_exc())
@@ -85,8 +91,6 @@ class Webdriver() :
                     self.logger.error(format_exc())
                     self.close()
 
-        print("翻译模块启动完成")
-
 
     # 打开翻译页面
     def openWeb(self, web_type) :
@@ -95,7 +99,8 @@ class Webdriver() :
         self.open_sign = True
         self.browser.get(self.url_map[web_type])
         self.browser.maximize_window()
-        print("%s翻译启动成功" % web_type)
+        print("%s翻译启动成功"%web_type)
+        self.message_sign.emit("%s翻译启动成功"%web_type)
 
 
     # 有道翻译
