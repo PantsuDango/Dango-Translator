@@ -54,6 +54,7 @@ class DangoTranslator() :
         self.Translation.settinButton.clicked.connect(self.Translation.close)
         self.Translation.settinButton.clicked.connect(self.Range.close)
         self.Translation.settinButton.clicked.connect(self.Settin.show)
+        # 翻译界面按下退出键
         self.Translation.quitButton.clicked.connect(self.Range.close)
         self.Translation.quitButton.clicked.connect(self.Translation.quit)
 
@@ -62,6 +63,9 @@ class DangoTranslator() :
         self.Translation.filterWordButton.clicked.connect(self.Filter.refreshTable)
         # 翻译界面选择范围键信号
         self.Translation.rangeButton.clicked.connect(self.chooseRange)
+
+        # 范围快捷键
+        self.Translation.range_shortcut.activated.connect(self.chooseRange)
 
 
     # 进入范围框选

@@ -10,14 +10,15 @@ from ui.key import Key
 from ui.hotkey import HotKey
 import utils
 from utils import MessageBox, detectPort, testOfflineOCR, postConfigURL
-import threading
 
 from translator.ocr.baidu import getAccessToken
 from translator.all import resetWeb
+from ui import image
 
 import os
 import qtawesome
 import webbrowser
+import threading
 
 
 OCR_CMD_PATH = "E:/DangoTranslate-Ver3.6.2/DangoOCR-Ver1.2/startOCR.cmd"
@@ -931,9 +932,6 @@ class Settin(QMainWindow):
         self.translate_hotkey_button.setCursor(QCursor(Qt.PointingHandCursor))
         self.translate_hotkey_button.setText(self.config["showHotKeyValue1"])
         self.translate_hotkey_button.clicked.connect(lambda: self.setHotKey("translate"))
-        # self.quitSc = QShortcut(QKeySequence("Ctrl+Z"), self)
-        # self.quitSc.activated.connect(self.setHotkey)
-        # self.quitSc.setKey("Ctrl+Alt+C")
 
         # 范围快捷键标签
         label = QLabel(self.tab_3)
@@ -952,9 +950,6 @@ class Settin(QMainWindow):
         self.range_hotkey_button.setCursor(QCursor(Qt.PointingHandCursor))
         self.range_hotkey_button.setText(self.config["showHotKeyValue2"])
         self.range_hotkey_button.clicked.connect(lambda: self.setHotKey("range"))
-        # self.quitSc = QShortcut(QKeySequence("Ctrl+Z"), self)
-        # self.quitSc.activated.connect(self.setHotkey)
-        # self.quitSc.setKey("Ctrl+Alt+C")
 
         # 图像相似度标签
         label = QLabel(self.tab_3)
@@ -1990,6 +1985,11 @@ class Settin(QMainWindow):
         self.config["imageSimilarity"] = self.image_refresh_spinBox.value()
         # 自动翻译文字刷新相似度
         self.config["textSimilarity"] = self.text_refresh_spinBox.value()
+
+        if self.translate_hotkey_use :
+            self.translation_ui.translate_shortcut.setKey(self.config["showHotKeyValue1"])
+        if self.range_hotkey_use :
+            self.translation_ui.range_shortcut.setKey(self.config["showHotKeyValue2"])
 
 
         # 窗口关闭处理
