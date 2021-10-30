@@ -49,6 +49,14 @@ class Webdriver(QObject) :
             "google" : "https://translate.google.cn/?sl=auto&tl=zh-CN",
             "deepl"  : "https://www.deepl.com/translator"
         }
+        self.translater_map = {
+            "youdao": "有道",
+            "baidu": "百度",
+            "tencent": "腾讯",
+            "caiyun": "彩云",
+            "google": "谷歌",
+            "deepl": "DeepL"
+        }
 
         try :
             # 使用谷歌浏览器
@@ -97,10 +105,13 @@ class Webdriver(QObject) :
 
         self.web_type = web_type
         self.open_sign = True
-        self.browser.get(self.url_map[web_type])
-        self.browser.maximize_window()
-        print("%s翻译启动成功"%web_type)
-        self.message_sign.emit("%s翻译启动成功"%web_type)
+
+        try :
+            self.browser.get(self.url_map[web_type])
+            self.browser.maximize_window()
+            self.message_sign.emit("%s翻译引擎启动成功~"%self.translater_map[web_type])
+        except Exception :
+            self.message_sign.emit("%s翻译引擎启动失败..." % self.translater_map[web_type])
 
 
     # 有道翻译
@@ -167,7 +178,7 @@ class Webdriver(QObject) :
                     pass
                 # 判断超时
                 end = time.time()
-                if (end - start) > 10:
+                if (end - start) > 10 :
                     self.browser.refresh()
                     return "公共百度: 我超时啦!"
 

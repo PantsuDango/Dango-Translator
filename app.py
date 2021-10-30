@@ -52,7 +52,10 @@ class DangoTranslator() :
 
         # 翻译界面屏蔽词按键信号
         self.Translation.settinButton.clicked.connect(self.Translation.close)
+        self.Translation.settinButton.clicked.connect(self.Range.close)
         self.Translation.settinButton.clicked.connect(self.Settin.show)
+        self.Translation.quitButton.clicked.connect(self.Range.close)
+        self.Translation.quitButton.clicked.connect(self.Translation.quit)
 
         # 翻译界面屏蔽词按键信号
         self.Translation.filterWordButton.clicked.connect(self.Filter.show)

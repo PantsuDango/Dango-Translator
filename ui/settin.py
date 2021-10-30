@@ -2024,6 +2024,10 @@ class Settin(QMainWindow):
                                                          font-weight: bold;\
                                                          background-color:rgba(62, 62, 62, %s)"
                                                         %(self.horizontal))
+        # 重置状态栏界面
+        self.translation_ui.statusbar.setStyleSheet("font: 10pt '华康方圆体W7';"
+                                                    "color: white;"
+                                                    "background-color: rgba(62, 62, 62, 0.1)")
 
         self.close()
         self.translation_ui.show()
