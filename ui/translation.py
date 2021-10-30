@@ -258,6 +258,16 @@ class Translation(QMainWindow):
         if self.webdriver_1_type or self.webdriver_2_type :
             self.statusbar.showMessage("翻译模型启动中...")
 
+        # 注册翻译快捷键
+        self.translate_shortcut = Q(QKeySequence(""), self)
+        self.translate_shortcut.activated.connect(self.startTranslater)
+        if self.config["showHotKey1"] == "True" :
+            self.translate_shortcut.setKey(self.config["showHotKeyValue1"])
+        # 注册范围快捷键
+        self.range_shortcut = QShortcut(QKeySequence(""), self)
+        if self.config["showHotKey2"] == "True":
+            self.range_shortcut.setKey(self.config["showHotKeyValue2"])
+
 
     # 初始化配置
     def getInitConfig(self):
