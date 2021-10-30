@@ -247,14 +247,16 @@ class Translation(QMainWindow):
         self.quitButton.setToolTip('<b>退出程序 Quit</b>')
         self.quitButton.setStyleSheet("background-color:rgba(62, 62, 62, 0);")
         self.quitButton.setCursor(QCursor(Qt.PointingHandCursor))
-        self.quitButton.clicked.connect(self.quit)
         self.quitButton.hide()
 
-        # 右下角用于拉伸界面的控件 11447982 16777215
+        # 右下角用于拉伸界面的控件
         self.statusbar = QStatusBar(self)
         self.setStatusBar(self.statusbar)
-        self.statusbar.setStyleSheet("color: #FFFFFF")
-        self.statusbar.showMessage("翻译模型启动中...")
+        self.statusbar.setStyleSheet("font: 10pt '华康方圆体W7';"
+                                     "color: white;"
+                                     "background-color: rgba(62, 62, 62, 0.1)")
+        if self.webdriver_1_type or self.webdriver_2_type :
+            self.statusbar.showMessage("翻译模型启动中...")
 
 
     # 初始化配置
@@ -284,6 +286,8 @@ class Translation(QMainWindow):
         self.webdriver_1_type = ""
         # 翻译线程2翻译类型
         self.webdriver_2_type = ""
+        # 状态栏是否隐藏标志
+        self.statusbar_sign = True
 
 
     # 根据分辨率定义控件位置尺寸
@@ -343,9 +347,12 @@ class Translation(QMainWindow):
             pass
 
 
+    # 状态栏显示信号槽
     def showStatusbar(self, messgae) :
 
-        print("11111: ", messgae)
+        if not self.statusbar_sign :
+            self.statusbar_sign = True
+            self.textAreaChanged()
         self.statusbar.showMessage(messgae)
 
 
@@ -439,7 +446,10 @@ class Translation(QMainWindow):
     # 当翻译内容改变时界面自适应窗口大小
     def textAreaChanged(self) :
 
-        newHeight = self.document.size().height()+self.statusbar.height()
+        newHeight = self.document.size().height()
+        if self.statusbar_sign :
+            newHeight += self.statusbar.height()
+
         width = self.width()
         self.resize(width, newHeight + 30*self.rate)
         self.translateText.setGeometry(0, 30*self.rate, width, newHeight)
@@ -497,6 +507,11 @@ class Translation(QMainWindow):
 
     # 按下翻译键
     def startTranslater(self) :
+
+        # 隐藏状态栏信息
+        if self.statusbar_sign :
+            self.statusbar.clearMessage()
+            self.statusbar_sign = False
 
         thread = Translater(self, self.logger)
         thread.start()

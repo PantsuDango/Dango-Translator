@@ -47,6 +47,7 @@ class Translater(QThread):
         return score
 
 
+    # 翻译主模块
     def translate(self) :
 
         score = 0
@@ -90,7 +91,6 @@ class Translater(QThread):
                 print("%s: %s"%(self.window.webdriver_2.web_type, result))
         except Exception :
             print_exc()
-
 
 
 
