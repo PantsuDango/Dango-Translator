@@ -2,11 +2,11 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
+import utils
+from utils.translater import Translater
 from ui.switch import SwitchButton
 from translator.sound import createSound
 from translator.all import createWebdriver1, createWebdriver2
-import utils
-from utils.translater import Translater
 
 from traceback import format_exc, print_exc
 import qtawesome
@@ -18,9 +18,11 @@ import pyperclip
 import time
 
 
-class Translation(QMainWindow):
+class Translation(QMainWindow) :
 
-    def __init__(self, config, logger):
+    hotkey_sign = pyqtSignal(str)
+
+    def __init__(self, config, logger) :
 
         super(Translation, self).__init__()
 
@@ -259,10 +261,11 @@ class Translation(QMainWindow):
             self.statusbar.showMessage("翻译模型启动中...")
 
         # 注册翻译快捷键
-        self.translate_shortcut = Q(QKeySequence(""), self)
+        self.translate_shortcut = QShortcut(QKeySequence(""), self)
         self.translate_shortcut.activated.connect(self.startTranslater)
         if self.config["showHotKey1"] == "True" :
             self.translate_shortcut.setKey(self.config["showHotKeyValue1"])
+
         # 注册范围快捷键
         self.range_shortcut = QShortcut(QKeySequence(""), self)
         if self.config["showHotKey2"] == "True":

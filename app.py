@@ -76,7 +76,7 @@ class DangoTranslator() :
             self.Translation.switchBtn.mousePressEvent(1)
             self.Translation.switchBtn.updateValue()
 
-        self.WScreenShot = ui.range. WScreenShot(self.Translation, self.Range)
+        self.WScreenShot = ui.range.WScreenShot(self.Translation, self.Range)
         self.WScreenShot.show()
         self.Translation.show()
 
