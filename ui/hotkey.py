@@ -43,24 +43,48 @@ class HotKey(QWidget):
 
         # 设置字体
         self.setStyleSheet("QWidget { font: 12pt '华康方圆体W7'; "
-                           "background: rgb(255, 255, 255); "
-                           "color: #5B8FF9; }"
+                                     "background: rgb(255, 255, 255); "
+                                     "color: #5B8FF9; }"
                            "QPushButton { background: %s;"
-                           "border-radius: %spx;"
-                           "color: rgb(255, 255, 255); }"
+                                         "border-radius: %spx;"
+                                         "color: rgb(255, 255, 255); }"
                            "QPushButton:hover { background-color: #83AAF9; }"
                            "QPushButton:pressed { background-color: #4480F9;"
-                           "padding-left:3px;"
-                           "padding-top:3px; }"
-                           % (self.color_2, 6.66 * self.rate))
+                                                 "padding-left:3px;"
+                                                 "padding-top:3px; }"
+                           % (self.color_2, 6.66*self.rate))
 
         label = QLabel(self)
-        self.customSetGeometry(label, 35, 40, 300, 20)
-        label.setText("请直接在键盘上输入新的快捷键")
+        self.customSetGeometry(label, 30, 10, 300, 50)
+        label.setText("不支持单键\n"
+                      "仅支持 ctrl/shitf/win/alt + 任意键\n"
+                      "示例 ctrl+z / alt+f1")
+        label.setStyleSheet("font: 10pt '华康方圆体W7';")
 
-        # 快捷键说明标签
-        self.label = QLabel(self)
-        self.label.setAlignment(Qt.AlignCenter)
+        # 键位一
+        comboBox_list_1 = ["ctrl", "win", "alt", "shift"]
+        self.comboBox_1 = QComboBox(self)
+        self.customSetGeometry(self.comboBox_1, 30, 80, 100, 20)
+        for index, val in enumerate(comboBox_list_1) :
+            self.comboBox_1.addItem("")
+            self.comboBox_1.setItemText(index, val)
+        self.comboBox_1.setStyleSheet("background: rgba(255, 255, 255, 1);")
+
+        label = QLabel(self)
+        self.customSetGeometry(label, 145, 80, 50, 20)
+        label.setText("+")
+
+        # 键位二
+        comboBox_list_2 = ["ctrl", "win", "alt", "shift"]
+        comboBox_list_2 += [chr(ch) for ch in range(97, 123)]
+        comboBox_list_2 += [chr(ch) for ch in range(48, 58)]
+        comboBox_list_2 += ["f"+str(ch) for ch in range(0, 10)]
+        self.comboBox_2 = QComboBox(self)
+        self.customSetGeometry(self.comboBox_2, 170, 80, 100, 20)
+        for index, val in enumerate(comboBox_list_2):
+            self.comboBox_2.addItem("")
+            self.comboBox_2.setItemText(index, val)
+        self.comboBox_2.setStyleSheet("background: rgba(255, 255, 255, 1);")
 
         # 确定按钮
         self.sure_button = QPushButton(self)
@@ -68,7 +92,7 @@ class HotKey(QWidget):
         self.sure_button.setText("确定")
         self.sure_button.setCursor(QCursor(Qt.PointingHandCursor))
 
-        # 确定按钮
+        # 取消按钮
         button = QPushButton(self)
         self.customSetGeometry(button, 210, 160, 70, 25)
         button.setText("取消")
@@ -95,33 +119,30 @@ class HotKey(QWidget):
                                  int(y * self.rate), int(w * self.rate),
                                  int(h * self.rate)))
 
-    # 检测按下的按键
-    def keyPressEvent(self, event):
-
-        # F1-F2
-        if 16777264 <= event.key() <= 16777275:
-            arr = ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12']
-            index = event.key() - 16777264
-            key = arr[index]
-            self.key = key
-        # 数字0-9
-        elif 48 <= event.key() <= 57:
-            key = chr(event.key())
-            self.key = key
-        # 字母A-Z
-        elif 65 <= event.key() <= 90:
-            key = chr(event.key())
-            self.key = key
-        else:
-            key = "无效的键位"
-
-        self.label.setText(key)
-        width = self.label.width()
-        self.customSetGeometry(self.label, (300 - width) // 2, 80, width, 20)
-
 
     # 按下确定键
-    def sure(self, object):
+    def sure(self, object, key_type):
 
-        object.setText(self.key)
+        content = self.comboBox_1.currentText() + "+" + self.comboBox_2.currentText()
+
+        if key_type == "translate" :
+            object.translate_hotkey_button.setText(content)
+            object.config["translateHotkeyValue1"] = self.comboBox_1.currentText()
+            object.config["translateHotkeyValue2"] = self.comboBox_2.currentText()
+
+        elif key_type == "range" :
+            object.range_hotkey_button.setText(content)
+            object.config["rangeHotkeyValue1"] = self.comboBox_1.currentText()
+            object.config["rangeHotkeyValue2"] = self.comboBox_2.currentText()
+
         self.close()
+
+
+if __name__ == "__main__" :
+
+    QCoreApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
+    import sys
+    app = QApplication(sys.argv)
+    obj = HotKey({"screenScaleRate": 1.5})
+    obj.show()
+    app.exit(app.exec_())

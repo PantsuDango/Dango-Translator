@@ -930,7 +930,7 @@ class Settin(QMainWindow):
         self.translate_hotkey_button = QPushButton(self.tab_3)
         self.customSetGeometry(self.translate_hotkey_button, 175, 270, 60, 20)
         self.translate_hotkey_button.setCursor(QCursor(Qt.PointingHandCursor))
-        self.translate_hotkey_button.setText(self.config["showHotKeyValue1"])
+        self.translate_hotkey_button.setText(self.config["translateHotkeyValue1"]+"+"+self.config["translateHotkeyValue2"])
         self.translate_hotkey_button.clicked.connect(lambda: self.setHotKey("translate"))
 
         # 范围快捷键标签
@@ -948,7 +948,7 @@ class Settin(QMainWindow):
         self.range_hotkey_button = QPushButton(self.tab_3)
         self.customSetGeometry(self.range_hotkey_button, 430, 270, 60, 20)
         self.range_hotkey_button.setCursor(QCursor(Qt.PointingHandCursor))
-        self.range_hotkey_button.setText(self.config["showHotKeyValue2"])
+        self.range_hotkey_button.setText(self.config["rangeHotkeyValue1"]+"+"+self.config["rangeHotkeyValue2"])
         self.range_hotkey_button.clicked.connect(lambda: self.setHotKey("range"))
 
         # 图像相似度标签
@@ -1797,18 +1797,16 @@ class Settin(QMainWindow):
 
         if key_type == "translate" :
             self.hotkey.setWindowTitle("设定翻译快捷键")
-            self.hotkey.label.setText(self.translate_hotkey_button.text())
-            self.hotkey.key = self.translate_hotkey_button.text()
-            self.hotkey.sure_button.clicked.connect(lambda: self.hotkey.sure(self.translate_hotkey_button))
+            self.hotkey.comboBox_1.setCurrentText(self.config["translateHotkeyValue1"])
+            self.hotkey.comboBox_2.setCurrentText(self.config["translateHotkeyValue2"])
+            self.hotkey.sure_button.clicked.connect(lambda: self.hotkey.sure(self, key_type))
 
         if key_type == "range" :
             self.hotkey.setWindowTitle("设定范围快捷键")
-            self.hotkey.label.setText(self.range_hotkey_button.text())
-            self.hotkey.key = self.range_hotkey_button.text()
-            self.hotkey.sure_button.clicked.connect(lambda: self.hotkey.sure(self.range_hotkey_button))
+            self.hotkey.comboBox_1.setCurrentText(self.config["rangeHotkeyValue1"])
+            self.hotkey.comboBox_2.setCurrentText(self.config["rangeHotkeyValue2"])
+            self.hotkey.sure_button.clicked.connect(lambda: self.hotkey.sure(self, key_type))
 
-        width = self.hotkey.label.width()
-        self.hotkey.customSetGeometry(self.hotkey.label, (300-width)//2, 80, width, 20)
         self.hotkey.show()
 
 
@@ -1975,21 +1973,17 @@ class Settin(QMainWindow):
         self.config["showTranslateRow"] = str(self.text_direction_use)
         # 翻译快捷键开关
         self.config["showHotKey1"] = str(self.translate_hotkey_use)
-        # 翻译快捷键
-        self.config["showHotKeyValue1"] = self.translate_hotkey_button.text()
         # 范围快捷键开关
         self.config["showHotKey2"] = str(self.range_hotkey_use)
-        # 范围快捷键
-        self.config["showHotKeyValue2"] = self.range_hotkey_button.text()
         # 自动翻译图片刷新相似度
         self.config["imageSimilarity"] = self.image_refresh_spinBox.value()
         # 自动翻译文字刷新相似度
         self.config["textSimilarity"] = self.text_refresh_spinBox.value()
 
-        if self.translate_hotkey_use :
-            self.translation_ui.translate_shortcut.setKey(self.config["showHotKeyValue1"])
-        if self.range_hotkey_use :
-            self.translation_ui.range_shortcut.setKey(self.config["showHotKeyValue2"])
+        # if self.translate_hotkey_use :
+        #     self.translation_ui.translate_shortcut.setKey(self.config["showHotKeyValue1"])
+        # if self.range_hotkey_use :
+        #     self.translation_ui.range_shortcut.setKey(self.config["showHotKeyValue2"])
 
 
         # 窗口关闭处理

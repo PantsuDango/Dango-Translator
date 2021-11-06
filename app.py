@@ -65,7 +65,8 @@ class DangoTranslator() :
         self.Translation.rangeButton.clicked.connect(self.chooseRange)
 
         # 范围快捷键
-        self.Translation.range_shortcut.activated.connect(self.chooseRange)
+        #self.Translation.range_shortcut.activated.connect(self.chooseRange)
+        # self.Translation.hotkey_sign.connect(self.chooseRange)
 
 
     # 进入范围框选

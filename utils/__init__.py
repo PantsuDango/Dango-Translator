@@ -240,13 +240,17 @@ def configConvert(config, oldConfig) :
     # 文字方向
     config["showTranslateRow"] = oldConfig.get("showTranslateRow", "False")
     # 翻译快捷键
-    config["showHotKeyValue1"] = oldConfig.get("showHotKeyValue1", "F1")
+    config["translateHotkeyValue1"] = oldConfig.get("translateHotkeyValue1", "ctrl")
+    config["translateHotkeyValue2"] = oldConfig.get("translateHotkeyValue2", "z")
     # 翻译快捷键开关
     config["showHotKey1"] = oldConfig.get("showHotKey1", "False")
     # 范围快捷键
-    config["showHotKeyValue2"] = oldConfig.get("showHotKeyValue2", "F2")
+    config["rangeHotkeyValue1"] = oldConfig.get("rangeHotkeyValue1", "ctrl")
+    config["rangeHotkeyValue2"] = oldConfig.get("rangeHotkeyValue2", "x")
     # 范围快捷键开关
     config["showHotKey2"] = oldConfig.get("showHotKey2", "False")
+
+
     # 图像相似度
     config["imageSimilarity"] = oldConfig.get("imageSimilarity", 98)
     # 文字相似度

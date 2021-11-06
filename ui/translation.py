@@ -1,6 +1,7 @@
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+from system_hotkey import SystemHotkey
 
 import utils
 from utils.translater import Translater
@@ -20,7 +21,7 @@ import time
 
 class Translation(QMainWindow) :
 
-    hotkey_sign = pyqtSignal(str)
+    hotkey_sign = pyqtSignal(bool)
 
     def __init__(self, config, logger) :
 
@@ -260,16 +261,19 @@ class Translation(QMainWindow) :
         if self.webdriver_1_type or self.webdriver_2_type :
             self.statusbar.showMessage("翻译模型启动中...")
 
-        # 注册翻译快捷键
-        self.translate_shortcut = QShortcut(QKeySequence(""), self)
-        self.translate_shortcut.activated.connect(self.startTranslater)
-        if self.config["showHotKey1"] == "True" :
-            self.translate_shortcut.setKey(self.config["showHotKeyValue1"])
+        # # 注册翻译快捷键
+        # self.translate_shortcut = QShortcut(QKeySequence(""), self)
+        # self.translate_shortcut.activated.connect(self.startTranslater)
+        # if self.config["showHotKey1"] == "True" :
+        #     self.translate_shortcut.setKey(self.config["showHotKeyValue1"])
+        #
+        # # 注册范围快捷键
+        # self.range_shortcut = QShortcut(QKeySequence(""), self)
+        # if self.config["showHotKey2"] == "True":
+        #     self.range_shortcut.setKey(self.config["showHotKeyValue2"])
 
-        # 注册范围快捷键
-        self.range_shortcut = QShortcut(QKeySequence(""), self)
-        if self.config["showHotKey2"] == "True":
-            self.range_shortcut.setKey(self.config["showHotKeyValue2"])
+        # self.translate_hotkey = SystemHotkey()
+        # self.translate_hotkey.register(("control", "z"), callback=lambda x:self.hotkey_sign.emit(True))
 
 
     # 初始化配置
