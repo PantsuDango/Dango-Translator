@@ -21,7 +21,8 @@ import time
 
 class Translation(QMainWindow) :
 
-    hotkey_sign = pyqtSignal(bool)
+    translate_hotkey_sign = pyqtSignal(bool)
+    range_hotkey_sign = pyqtSignal(bool)
 
     def __init__(self, config, logger) :
 
@@ -261,19 +262,18 @@ class Translation(QMainWindow) :
         if self.webdriver_1_type or self.webdriver_2_type :
             self.statusbar.showMessage("翻译模型启动中...")
 
-        # # 注册翻译快捷键
-        # self.translate_shortcut = QShortcut(QKeySequence(""), self)
-        # self.translate_shortcut.activated.connect(self.startTranslater)
-        # if self.config["showHotKey1"] == "True" :
-        #     self.translate_shortcut.setKey(self.config["showHotKeyValue1"])
-        #
-        # # 注册范围快捷键
-        # self.range_shortcut = QShortcut(QKeySequence(""), self)
-        # if self.config["showHotKey2"] == "True":
-        #     self.range_shortcut.setKey(self.config["showHotKeyValue2"])
+        # 注册翻译快捷键
+        self.translate_hotkey = SystemHotkey()
+        self.translate_hotkey_sign.connect(self.startTranslater)
+        if self.config["showHotKey1"] == "True" :
+            self.translate_hotkey.register((self.translate_hotkey_value1, self.translate_hotkey_value2),
+                                           callback=lambda x:self.translate_hotkey_sign.emit(True))
 
-        # self.translate_hotkey = SystemHotkey()
-        # self.translate_hotkey.register(("control", "z"), callback=lambda x:self.hotkey_sign.emit(True))
+        # 注册范围快捷键
+        self.range_hotkey = SystemHotkey()
+        if self.config["showHotKey2"] == "True":
+            self.range_hotkey.register((self.range_hotkey_value1, self.range_hotkey_value2),
+                                       callback=lambda x: self.range_hotkey_sign.emit(True))
 
 
     # 初始化配置
@@ -305,6 +305,15 @@ class Translation(QMainWindow) :
         self.webdriver_2_type = ""
         # 状态栏是否隐藏标志
         self.statusbar_sign = True
+
+        hotkey_map = {
+            "ctrl": "control",
+            "win": "super"
+        }
+        self.translate_hotkey_value1 = hotkey_map.get(self.config["translateHotkeyValue1"], self.config["translateHotkeyValue1"])
+        self.translate_hotkey_value2 = hotkey_map.get(self.config["translateHotkeyValue2"], self.config["translateHotkeyValue2"])
+        self.range_hotkey_value1 = hotkey_map.get(self.config["rangeHotkeyValue1"], self.config["rangeHotkeyValue1"])
+        self.range_hotkey_value2 = hotkey_map.get(self.config["rangeHotkeyValue2"], self.config["rangeHotkeyValue2"])
 
 
     # 根据分辨率定义控件位置尺寸
@@ -533,6 +542,16 @@ class Translation(QMainWindow) :
         thread = Translater(self, self.logger)
         thread.start()
         thread.exec()
+
+
+    # 注销快捷键
+    def unregisterHotKey(self) :
+
+        if self.config["showHotKey1"] == "True" :
+            self.translate_hotkey.unregister((self.translate_hotkey_value1, self.translate_hotkey_value2))
+
+        if self.config["showHotKey2"] == "True" :
+            self.range_hotkey.unregister((self.range_hotkey_value1, self.range_hotkey_value2))
 
 
     # 退出程序

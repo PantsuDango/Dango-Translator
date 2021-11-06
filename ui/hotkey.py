@@ -3,6 +3,7 @@
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+from utils import MessageBox
 
 LOGO_PATH = "./config/icon/logo.ico"
 PIXMAP_PATH = "./config/icon/pixmap.png"
@@ -121,7 +122,11 @@ class HotKey(QWidget):
 
 
     # 按下确定键
-    def sure(self, object, key_type):
+    def sure(self, object, key_type) :
+
+        if self.comboBox_1.currentText() == self.comboBox_2.currentText() :
+            MessageBox("这是来自团子的警告~", "键位一和键位二不可重复ヽ(･ω･´ﾒ)     ")
+            return
 
         content = self.comboBox_1.currentText() + "+" + self.comboBox_2.currentText()
 
@@ -136,13 +141,3 @@ class HotKey(QWidget):
             object.config["rangeHotkeyValue2"] = self.comboBox_2.currentText()
 
         self.close()
-
-
-if __name__ == "__main__" :
-
-    QCoreApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
-    import sys
-    app = QApplication(sys.argv)
-    obj = HotKey({"screenScaleRate": 1.5})
-    obj.show()
-    app.exit(app.exec_())

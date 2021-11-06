@@ -67,7 +67,7 @@ class Translater(QThread):
                 self.window.logger.error(format_exc())
 
         # 如果相似度过高则不检测
-        if score > self.window.config["imageSimilarity"] :
+        if score*100 > self.window.config["imageSimilarity"] :
             return
 
         # 百度OCR
