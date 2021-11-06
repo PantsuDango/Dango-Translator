@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QApplication
 
 from skimage.metrics import structural_similarity
 from cv2 import imread, cvtColor, COLOR_BGR2GRAY
+from difflib import SequenceMatcher
 
 from traceback import print_exc, format_exc
 from translator.ocr.baidu import baiduOCR
@@ -42,7 +43,16 @@ class Translater(QThread):
         grayB = cvtColor(imageB, COLOR_BGR2GRAY)
 
         (score, diff) = structural_similarity(grayA, grayB, full=True)
-        score = float(score)
+        score = float(score) * 100
+
+        return score
+
+
+    # 判断原文相似度
+    def get_equal_rate(self, str1, str2):
+
+        score = SequenceMatcher(None, str1, str2).quick_ratio()
+        score = score* 100
 
         return score
 
@@ -50,7 +60,7 @@ class Translater(QThread):
     # 翻译主模块
     def translate(self) :
 
-        score = 0
+        image_score = 0
         # 跳过图片判断
         if self.window.first_sign :
             self.image_cut()
@@ -61,13 +71,13 @@ class Translater(QThread):
                 imageA = imread(IMAGE_PATH)
                 self.image_cut()
                 imageB = imread(IMAGE_PATH)
-                score = self.compare_image(imageA, imageB)
+                image_score = self.compare_image(imageA, imageB)
             except :
                 self.logger.error(format_exc())
                 self.window.logger.error(format_exc())
 
         # 如果相似度过高则不检测
-        if score*100 > self.window.config["imageSimilarity"] :
+        if image_score > self.window.config["imageSimilarity"] :
             return
 
         # 百度OCR
@@ -77,12 +87,15 @@ class Translater(QThread):
         else :
             original = ""
 
+        # 原文相似度
+        text_score = self.get_equal_rate(original, self.window.original)
+
         # 如果检测不到文字或者文字和上一次一样则跳过
-        if not original or original == self.window.original :
+        if not original or original == self.window.original or text_score > self.window.config["textSimilarity"] :
             return
 
+        self.window.original = original
         try :
-            self.window.original = original
             if self.window.webdriver_1.open_sign :
                 result = self.window.webdriver_1.translater(original)
                 print("%s: %s"%(self.window.webdriver_1.web_type, result))
