@@ -1980,10 +1980,29 @@ class Settin(QMainWindow):
         # 自动翻译文字刷新相似度
         self.config["textSimilarity"] = self.text_refresh_spinBox.value()
 
-        # if self.translate_hotkey_use :
-        #     self.translation_ui.translate_shortcut.setKey(self.config["showHotKeyValue1"])
-        # if self.range_hotkey_use :
-        #     self.translation_ui.range_shortcut.setKey(self.config["showHotKeyValue2"])
+
+    # 注册新快捷键
+    def registerHotKey(self) :
+
+        hotkey_map = {
+            "ctrl": "control",
+            "win": "super"
+        }
+        self.translation_ui.translate_hotkey_value1 = hotkey_map.get(self.config["translateHotkeyValue1"], self.config["translateHotkeyValue1"])
+        self.translation_ui.translate_hotkey_value2 = hotkey_map.get(self.config["translateHotkeyValue2"], self.config["translateHotkeyValue2"])
+        self.translation_ui.range_hotkey_value1 = hotkey_map.get(self.config["rangeHotkeyValue1"], self.config["rangeHotkeyValue1"])
+        self.translation_ui.range_hotkey_value2 = hotkey_map.get(self.config["rangeHotkeyValue2"], self.config["rangeHotkeyValue2"])
+
+        # 注册新翻译快捷键
+        if self.translate_hotkey_use :
+            self.translation_ui.translate_hotkey.register((self.translation_ui.translate_hotkey_value1,
+                                                           self.translation_ui.translate_hotkey_value2),
+                                                          callback=lambda x: self.translation_ui.translate_hotkey_sign.emit(True))
+        # 注册新范围快捷键
+        if self.range_hotkey_use :
+            self.translation_ui.range_hotkey.register((self.translation_ui.range_hotkey_value1,
+                                                       self.translation_ui.range_hotkey_value2),
+                                                      callback=lambda x: self.translation_ui.range_hotkey_sign.emit(True))
 
 
         # 窗口关闭处理
@@ -1991,6 +2010,8 @@ class Settin(QMainWindow):
 
         # 保存设置至本地文件
         self.saveConfig()
+        # 注册新快捷键
+        self.registerHotKey()
 
         # 重置翻译引擎
         try :

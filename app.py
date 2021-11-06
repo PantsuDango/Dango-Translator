@@ -50,10 +50,9 @@ class DangoTranslator() :
         self.Login.close()
         self.Translation.show()
 
-        # 翻译界面屏蔽词按键信号
-        self.Translation.settinButton.clicked.connect(self.Translation.close)
-        self.Translation.settinButton.clicked.connect(self.Range.close)
-        self.Translation.settinButton.clicked.connect(self.Settin.show)
+        # 翻译界面设置页面按键信号
+        self.Translation.settinButton.clicked.connect(self.clickedSettin)
+
         # 翻译界面按下退出键
         self.Translation.quitButton.clicked.connect(self.Range.close)
         self.Translation.quitButton.clicked.connect(self.Translation.quit)
@@ -65,8 +64,17 @@ class DangoTranslator() :
         self.Translation.rangeButton.clicked.connect(self.chooseRange)
 
         # 范围快捷键
-        #self.Translation.range_shortcut.activated.connect(self.chooseRange)
-        # self.Translation.hotkey_sign.connect(self.chooseRange)
+        self.Translation.range_hotkey_sign.connect(self.chooseRange)
+
+
+    # 按下范围键后做的事情
+    def clickedSettin(self) :
+
+        self.Settin.config = self.Translation.config
+        self.Translation.unregisterHotKey()
+        self.Translation.close()
+        self.Range.close()
+        self.Settin.show()
 
 
     # 进入范围框选
