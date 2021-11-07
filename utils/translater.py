@@ -4,8 +4,8 @@ from PyQt5.QtWidgets import QApplication
 from skimage.metrics import structural_similarity
 from cv2 import imread, cvtColor, COLOR_BGR2GRAY
 from difflib import SequenceMatcher
-import threading
 from traceback import format_exc
+import time
 
 from translator.ocr.baidu import baiduOCR
 from translator import api
@@ -31,6 +31,7 @@ class TranslaterProccess(QThread) :
     def run(self) :
 
         result = ""
+        start = time.time()
 
         # 公共翻译一
         if self.trans_type == "webdriver_1" :
@@ -66,6 +67,7 @@ class TranslaterProccess(QThread) :
             result = self.original
 
         if result :
+            print("time: %s"%(time.time()-start))
             self.display_signal.emit(result, self.trans_type)
 
 
@@ -148,8 +150,10 @@ class Translater(QThread) :
 
         # 百度OCR
         if self.window.config["baiduOCR"] :
+            start = time.time()
             sign, original = baiduOCR(self.window.config, self.logger)
             print("百度OCR: ", original)
+            print("time: %s"%(time.time()-start))
         else :
             original = ""
 
