@@ -107,6 +107,7 @@ class Webdriver(QObject) :
         self.open_sign = True
 
         try :
+            self.message_sign.emit("%s翻译引擎启动中, 请等待完成后再操作..." % self.translater_map[web_type])
             self.browser.get(self.url_map[web_type])
             self.browser.maximize_window()
             self.message_sign.emit("%s翻译引擎启动成功~"%self.translater_map[web_type])

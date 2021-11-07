@@ -28,6 +28,15 @@ class Translation(QMainWindow) :
 
         super(Translation, self).__init__()
 
+        self.translater_yaml_map = {
+            "youdao": "youdao",
+            "baidu": "baiduweb",
+            "tencent": "tencentweb",
+            "caiyun": "caiyun",
+            "google": "google",
+            "deepl": "deepl"
+        }
+
         self.config = config
         self.logger = logger
         self.getInitConfig()
@@ -260,7 +269,7 @@ class Translation(QMainWindow) :
                                      "color: white;"
                                      "background-color: rgba(62, 62, 62, 0.1)")
         if self.webdriver_1_type or self.webdriver_2_type :
-            self.statusbar.showMessage("翻译模型启动中...")
+            self.statusbar.showMessage("翻译模型启动中, 请等待完成后再操作...")
 
         # 注册翻译快捷键
         self.translate_hotkey = SystemHotkey()
@@ -303,6 +312,8 @@ class Translation(QMainWindow) :
         self.webdriver_2_type = ""
         # 状态栏是否隐藏标志
         self.statusbar_sign = True
+        # 各翻译源线程状态标志
+        self.thread_state = 0
 
         hotkey_map = {
             "ctrl": "control",
@@ -540,8 +551,21 @@ class Translation(QMainWindow) :
             self.statusbar_sign = False
 
         thread = Translater(self, self.logger)
+        thread.clear_text_sign.connect(self.clear_text)
         thread.start()
         thread.exec()
+
+
+    # 收到翻译信息清屏
+    def clear_text(self) :
+
+        # 翻译界面清屏
+        self.translateText.clear()
+
+        # 设定翻译时的字体类型和大小
+        self.font.setFamily(self.config["fontType"])
+        self.font.setPointSize(self.config["fontSize"])
+        self.translateText.setFont(self.font)
 
 
     # 注销快捷键
@@ -552,6 +576,46 @@ class Translation(QMainWindow) :
 
         if self.config["showHotKey2"] == "True" :
             self.range_hotkey.unregister((self.range_hotkey_value1, self.range_hotkey_value2))
+
+
+    # 将翻译结果打印
+    def display_text(self, result, trans_type) :
+
+        # 公共翻译一
+        if trans_type == "webdriver_1":
+            color = self.config["fontColor"][self.translater_yaml_map[self.webdriver_1.web_type]]
+        # 公共翻译二
+        elif trans_type == "webdriver_2":
+            color = self.config["fontColor"][self.translater_yaml_map[self.webdriver_2.web_type]]
+        # 私人百度
+        elif trans_type == "baidu_private":
+            color = self.config["fontColor"]["baidu"]
+        # 私人腾讯
+        elif trans_type == "tencent_private":
+            color = self.config["fontColor"]["tencent"]
+        # 私人彩云
+        elif trans_type == "caiyun_private":
+            color = self.config["fontColor"]["caiyunPrivate"]
+        # 原文
+        elif trans_type == "original" :
+            color = self.config["fontColor"]["original"]
+
+        try:
+            if self.config["showColorType"] == "False":
+                self.format.setTextOutline(QPen(QColor(color), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+                self.translateText.mergeCurrentCharFormat(self.format)
+                self.translateText.append(result)
+            else:
+                self.translateText.append("<font color=%s>%s</font>"%(color, result))
+
+            # 保存译文
+            # self.save_text(result, translate_type)
+
+            # 线程结束，减少线程数
+            self.thread_state -= 1
+
+        except Exception:
+            self.logger.error(format_exc())
 
 
     # 退出程序
