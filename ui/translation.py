@@ -293,8 +293,6 @@ class Translation(QMainWindow) :
         self.translateMode = False
         # 原文
         self.original = ""
-        # 初始标志
-        self.first_sign = True
         # 翻译线程1启动成功标志
         self.webdriver_1_sign = False
         # 翻译线程2启动成功标志
@@ -310,8 +308,10 @@ class Translation(QMainWindow) :
             "ctrl": "control",
             "win": "super"
         }
+        # 翻译快捷键
         self.translate_hotkey_value1 = hotkey_map.get(self.config["translateHotkeyValue1"], self.config["translateHotkeyValue1"])
         self.translate_hotkey_value2 = hotkey_map.get(self.config["translateHotkeyValue2"], self.config["translateHotkeyValue2"])
+        # 范围快捷键
         self.range_hotkey_value1 = hotkey_map.get(self.config["rangeHotkeyValue1"], self.config["rangeHotkeyValue1"])
         self.range_hotkey_value2 = hotkey_map.get(self.config["rangeHotkeyValue2"], self.config["rangeHotkeyValue2"])
 
