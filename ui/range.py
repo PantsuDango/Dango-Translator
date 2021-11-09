@@ -87,17 +87,19 @@ class WScreenShot(QWidget):
             Y1 = Y2
             Y2 = tmp
 
-        config = utils.openConfig()
-        config["range"]["X1"] = X1
-        config["range"]["Y1"] = Y1
-        config["range"]["X2"] = X2
-        config["range"]["Y2"] = Y2
-        self.Init.config = config
-        utils.saveConfig(config)
+        self.Init.config["range"]["X1"] = X1
+        self.Init.config["range"]["Y1"] = Y1
+        self.Init.config["range"]["X2"] = X2
+        self.Init.config["range"]["Y2"] = Y2
 
+        # 显示范围框
         self.chooseRange.setGeometry(X1, Y1, X2 - X1, Y2 - Y1)
         self.chooseRange.Label.setGeometry(0, 0, X2 - X1, Y2 - Y1)
         self.chooseRange.show()
+
+        # 如果是自动模式下, 则解除暂停
+        if self.Init.translateMode :
+            self.Init.stop_sign = False
 
 
     def mouseReleaseEvent(self, event):
@@ -108,8 +110,9 @@ class WScreenShot(QWidget):
                 self.getRange()
 
                 self.close()
-                self.Init.first_sign = True
-                self.Init.startTranslater()
+                # 如果处于手动模式下则刷新一次翻译
+                if not self.Init.translateMode :
+                    self.Init.startTranslater()
         except Exception :
             pass
 
@@ -230,10 +233,7 @@ class Range(QMainWindow):
         X2 = rect.left() + rect.width()
         Y2 = rect.top() + rect.height()
 
-        config = utils.openConfig()
-        config["range"]["X1"] = X1
-        config["range"]["Y1"] = Y1
-        config["range"]["X2"] = X2
-        config["range"]["Y2"] = Y2
-        self.window.config = config
-        utils.saveConfig(config)
+        self.window.config["range"]["X1"] = X1
+        self.window.config["range"]["Y1"] = Y1
+        self.window.config["range"]["X2"] = X2
+        self.window.config["range"]["Y2"] = Y2

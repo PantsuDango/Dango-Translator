@@ -23,6 +23,7 @@ class Translation(QMainWindow) :
 
     translate_hotkey_sign = pyqtSignal(bool)
     range_hotkey_sign = pyqtSignal(bool)
+    auto_open_sign = pyqtSignal(bool)
 
     def __init__(self, config, logger) :
 
@@ -45,6 +46,7 @@ class Translation(QMainWindow) :
         self.checkWebdriverThread()
 
         self.ui()
+        self.auto_open_sign.connect(self.startAutoTranslater)
 
 
     # 开启音乐朗读线程
@@ -300,6 +302,8 @@ class Translation(QMainWindow) :
         self.lockSign = False
         # 翻译模式
         self.translateMode = False
+        # 自动翻译暂停标志
+        self.stop_sign = False
         # 原文
         self.original = ""
         # 翻译线程1启动成功标志
@@ -527,8 +531,17 @@ class Translation(QMainWindow) :
 
         if checked :
             self.translateMode = True
+            self.auto_open_sign.emit(True)
         else:
             self.translateMode = False
+
+
+    # 开启自动翻译
+    def startAutoTranslater(self) :
+
+        thread = threading.Thread(target=self.startTranslater)
+        thread.setDaemon(True)
+        thread.start()
 
 
     # 朗读原文
@@ -551,13 +564,13 @@ class Translation(QMainWindow) :
             self.statusbar_sign = False
 
         thread = Translater(self, self.logger)
-        thread.clear_text_sign.connect(self.clear_text)
+        thread.clear_text_sign.connect(self.clearText)
         thread.start()
         thread.exec()
 
 
     # 收到翻译信息清屏
-    def clear_text(self) :
+    def clearText(self) :
 
         # 翻译界面清屏
         self.translateText.clear()
@@ -613,6 +626,8 @@ class Translation(QMainWindow) :
 
             # 线程结束，减少线程数
             self.thread_state -= 1
+            if self.thread_state < 0 :
+                self.thread_state = 0
 
         except Exception:
             self.logger.error(format_exc())
