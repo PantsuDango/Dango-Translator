@@ -6,11 +6,11 @@ import utils
 
 class Filter(QWidget) :
 
-    def __init__(self, config) :
+    def __init__(self, window) :
 
         super(Filter, self).__init__()
 
-        self.config = config
+        self.window = window
         self.getInitConfig()
 
         self.ui()
@@ -89,7 +89,7 @@ class Filter(QWidget) :
     def getInitConfig(self):
 
         # 界面缩放比例
-        self.rate = self.config["screenScaleRate"]
+        self.rate = self.window.config["screenScaleRate"]
         # 界面尺寸
         self.windowWidth = int(230 * self.rate)
         self.windowHeight = int(300 * self.rate)
@@ -140,8 +140,7 @@ class Filter(QWidget) :
                     pass
             table.append(val)
 
-        self.config["Filter"] = table
-        utils.saveConfig(self.config)
+        self.window.config["Filter"] = table
 
 
     # 当表格的数据发生改变时
@@ -159,8 +158,7 @@ class Filter(QWidget) :
     # 更新表格信息
     def refreshTable(self) :
 
-        self.config = utils.openConfig()
-        data = self.config.get("Filter", [])
+        data = self.window.config.get("Filter", [])
         self.tableWidget.setRowCount(len(data))
 
         for i in range(len(data)) :
@@ -168,3 +166,11 @@ class Filter(QWidget) :
                 item = QTableWidgetItem("%s" % data[i][j])
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                 self.tableWidget.setItem(i, j, item)
+
+
+    # 窗口关闭处理
+    def closeEvent(self, event) :
+
+        # 如果是自动模式下, 则解除暂停
+        if self.window.translateMode :
+            self.window.stop_sign = False

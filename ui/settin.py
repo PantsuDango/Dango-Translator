@@ -2005,7 +2005,7 @@ class Settin(QMainWindow):
                                                       callback=lambda x: self.translation_ui.range_hotkey_sign.emit(True))
 
 
-        # 窗口关闭处理
+    # 窗口关闭处理
     def closeEvent(self, event) :
 
         # 保存设置至本地文件
@@ -2046,3 +2046,7 @@ class Settin(QMainWindow):
 
         self.close()
         self.translation_ui.show()
+
+        # 如果是自动模式下, 则解除暂停
+        if self.translation_ui.translateMode:
+            self.translation_ui.stop_sign = False

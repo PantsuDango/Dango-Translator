@@ -208,10 +208,30 @@ class Translater(QThread) :
 
     def run(self) :
 
-        # 如果上一次翻译未结束则直接跳过
-        if self.window.thread_state > 0 :
-            return
-
         # 手动翻译
         if not self.window.translateMode :
+            # 如果上一次翻译未结束则直接跳过
+            if self.window.thread_state > 0:
+                return
             self.translate()
+
+        else :
+            # 自动翻译
+            while True :
+                # 如果自动翻译被停止则退出循环
+                if not self.window.translateMode :
+                    print("自动翻译退出")
+                    break
+
+                # 自动翻译暂停
+                if self.window.stop_sign :
+                    print("自动翻译暂停")
+                    time.sleep(0.1)
+                    continue
+
+                # 如果上一次翻译未结束则直接跳过
+                if self.window.thread_state > 0:
+                    continue
+
+                self.translate()
+                time.sleep(self.window.config["translateSpeed"]-0.4)

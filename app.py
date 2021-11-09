@@ -38,7 +38,7 @@ class DangoTranslator() :
         # 设置界面
         self.Settin = ui.settin.Settin(self.config, self.logger, self.Translation)
         # 屏蔽词界面
-        self.Filter = ui.filter.Filter(self.config)
+        self.Filter = ui.filter.Filter(self.Translation)
         # 范围框界面
         self.Range = ui.range.Range(self.config["range"]['X1'],
                                     self.config["range"]['Y1'],
@@ -51,24 +51,57 @@ class DangoTranslator() :
         self.Translation.show()
 
         # 翻译界面设置页面按键信号
-        self.Translation.settinButton.clicked.connect(self.clickedSettin)
+        self.Translation.settinButton.clicked.connect(self.clickSettin)
 
         # 翻译界面按下退出键
         self.Translation.quitButton.clicked.connect(self.Range.close)
         self.Translation.quitButton.clicked.connect(self.Translation.quit)
 
         # 翻译界面屏蔽词按键信号
-        self.Translation.filterWordButton.clicked.connect(self.Filter.show)
-        self.Translation.filterWordButton.clicked.connect(self.Filter.refreshTable)
+        self.Translation.filterWordButton.clicked.connect(self.clickFilter)
+
         # 翻译界面选择范围键信号
         self.Translation.rangeButton.clicked.connect(self.chooseRange)
+
+        # 翻译界面充电按钮信号
+        self.Translation.batteryButton.clicked.connect(self.clickBattery)
 
         # 范围快捷键
         self.Translation.range_hotkey_sign.connect(self.chooseRange)
 
 
-    # 按下范围键后做的事情
-    def clickedSettin(self) :
+    # 按下充电键后做的事情
+    def clickBattery(self) :
+
+        # 如果处于自动模式下则暂停
+        if self.Translation.translateMode:
+            self.Translation.stop_sign = True
+
+        self.Settin.config = self.Translation.config
+        self.Translation.unregisterHotKey()
+        self.Translation.close()
+        self.Range.close()
+        self.Settin.tabWidget.setCurrentIndex(4)
+        self.Settin.show()
+
+
+    # 按下屏蔽词键后做的事情
+    def clickFilter(self) :
+
+        # 如果处于自动模式下则暂停
+        if self.Translation.translateMode:
+            self.Translation.stop_sign = True
+
+        self.Filter.refreshTable()
+        self.Filter.show()
+
+
+    # 按下设置键后做的事情
+    def clickSettin(self) :
+
+        # 如果处于自动模式下则暂停
+        if self.Translation.translateMode:
+            self.Translation.stop_sign = True
 
         self.Settin.config = self.Translation.config
         self.Translation.unregisterHotKey()
@@ -80,10 +113,9 @@ class DangoTranslator() :
     # 进入范围框选
     def chooseRange(self) :
 
-        # 关闭自动开关
+        # 如果处于自动模式下则暂停
         if self.Translation.translateMode :
-            self.Translation.switchBtn.mousePressEvent(1)
-            self.Translation.switchBtn.updateValue()
+            self.Translation.stop_sign = True
 
         self.WScreenShot = ui.range.WScreenShot(self.Translation, self.Range)
         self.WScreenShot.show()
