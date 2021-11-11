@@ -19,6 +19,7 @@ import pyperclip
 import time
 
 
+# 翻译界面
 class Translation(QMainWindow) :
 
     translate_hotkey_sign = pyqtSignal(bool)
@@ -637,6 +638,18 @@ class Translation(QMainWindow) :
 
         except Exception:
             self.logger.error(format_exc())
+
+
+    # 获取窗口坐标
+    def getWindowCoordinate(self) :
+
+        rect = self.geometry()
+        X1 = rect.left()
+        Y1 = rect.top()
+        X2 = rect.left() + rect.width()
+        Y2 = rect.top() + rect.height()
+        print(X1, Y1)
+        print(X2, Y2)
 
 
     # 退出程序

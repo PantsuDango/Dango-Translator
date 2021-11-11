@@ -9,6 +9,7 @@ def createWebdriver1(obj, config, logger, web_type) :
 
      obj.webdriver_1 = Webdriver(config, logger)
      obj.webdriver_1.message_sign.connect(obj.showStatusbar)
+     obj.webdriver_1.openWebdriver()
      if web_type :
         obj.webdriver_1.openWeb(web_type)
 
@@ -18,6 +19,7 @@ def createWebdriver2(obj, config, logger, web_type) :
 
      obj.webdriver_2 = Webdriver(config, logger)
      obj.webdriver_2.message_sign.connect(obj.showStatusbar)
+     obj.webdriver_2.openWebdriver()
      if web_type :
         obj.webdriver_2.openWeb(web_type)
 
@@ -58,29 +60,33 @@ class Webdriver(QObject) :
             "deepl": "DeepL"
         }
 
+
+    # 开启引擎
+    def openWebdriver(self) :
+
         self.message_sign.emit("翻译模块启动中, 请等待完成后再操作...")
 
-        try :
+        try:
             # 使用谷歌浏览器
             option = webdriver.ChromeOptions()
             option.add_argument("--headless")
             self.browser = webdriver.Chrome(executable_path="./config/tools/chromedriver.exe",
                                             service_log_path="./logs/geckodriver.log",
                                             options=option)
-        except Exception :
+        except Exception:
             self.logger.error(format_exc())
 
-            try :
+            try:
                 # 使用火狐浏览器
                 option = webdriver.FirefoxOptions()
                 option.add_argument("--headless")
                 self.browser = webdriver.Firefox(executable_path="./config/tools/geckodriver.exe",
                                                  service_log_path="./logs/geckodriver.log",
                                                  options=option)
-            except Exception :
+            except Exception:
                 self.logger.error(format_exc())
 
-                try :
+                try:
                     # 使用Edge浏览器
                     EDGE = {
                         "browserName": "MicrosoftEdge",
@@ -95,9 +101,9 @@ class Webdriver(QObject) :
                             ]}
                     }
                     self.browser = webdriver.Edge(executable_path="./config/tools/msedgedriver.exe",
-                                                     service_log_path="./logs/geckodriver.log",
-                                                     capabilities=EDGE)
-                except Exception :
+                                                  service_log_path="./logs/geckodriver.log",
+                                                  capabilities=EDGE)
+                except Exception:
                     self.message_sign.emit("翻译模块启动失败...")
                     self.logger.error(format_exc())
                     self.close()

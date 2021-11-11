@@ -242,6 +242,8 @@ class Range(QMainWindow):
         self.window.config["range"]["X2"] = X2
         self.window.config["range"]["Y2"] = Y2
 
+        self.window.getWindowCoordinate()
+
         # 如果是自动模式下, 则解除暂停
         if self.window.translateMode :
             self.window.stop_sign = False
