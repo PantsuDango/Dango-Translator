@@ -294,13 +294,12 @@ class Webdriver(QObject) :
 
             start = time.time()
             while True :
-                time.sleep(5)
+                time.sleep(0.1)
                 # 提取翻译信息
                 try :
                     outputText = self.browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[2]/div[2]/c-wiz[2]/div[5]/div/div[1]').text
                     # 原文相似度
-                    str_score = utils.get_equal_rate("".join(outputText.split()), self.content)
-                    if outputText and str_score < 0.9 :
+                    if outputText :
                         self.content = "".join(outputText.split())
                         return self.content
                 except Exception :
