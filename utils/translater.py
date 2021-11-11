@@ -6,6 +6,7 @@ from cv2 import imread, cvtColor, COLOR_BGR2GRAY
 from difflib import SequenceMatcher
 from traceback import format_exc
 import time
+import pyperclip
 
 from translator.ocr.baidu import baiduOCR
 from translator import api
@@ -204,6 +205,9 @@ class Translater(QThread) :
         # 更新原文
         if nothing_sign :
             self.window.original = original
+            # 是否复制到剪贴板
+            if self.window.config["showClipboard"] == "True" :
+                pyperclip.copy(original)
             # 保存识别到的原文
             with open("./config/翻译历史.txt", "a+", encoding="utf-8") as file :
                 file.write("\n\n[原文]\n%s"%original)
