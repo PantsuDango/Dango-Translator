@@ -619,7 +619,7 @@ class Translation(QMainWindow) :
             result = result.replace(val[0], val[1])
 
         # 显示在文本框上
-        try:
+        try :
             if self.config["showColorType"] == "False":
                 self.format.setTextOutline(QPen(QColor(color), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
                 self.translateText.mergeCurrentCharFormat(self.format)
@@ -628,7 +628,7 @@ class Translation(QMainWindow) :
                 self.translateText.append("<font color=%s>%s</font>"%(color, result))
 
             # 保存译文
-            # self.save_text(result, translate_type)
+            utils.saveTransHisTory(result, trans_type)
 
             # 线程结束，减少线程数
             self.thread_state -= 1

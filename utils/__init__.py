@@ -391,3 +391,31 @@ def getDictInfo() :
         return res.json()["Result"]
     except Exception :
         return {}
+
+
+# 保存翻译历史
+def saveTransHisTory(text, translate_type) :
+
+    if translate_type == "youdao" :
+        content = "\n[公共有道]\n%s"%text
+    elif translate_type == "caiyun" :
+        content = "\n[公共彩云]\n%s"%text
+    elif translate_type == "deepl" :
+        content = "\n[公共DeepL]\n%s"%text
+    elif translate_type == "baidu" :
+        content = "\n[公共百度]\n%s"%text
+    elif translate_type == "tencent" :
+        content = "\n[公共腾讯]\n%s"%text
+    elif translate_type == "google" :
+        content = "\n[公共谷歌]\n%s"%text
+    elif translate_type == "baidu_private" :
+        content = "\n[私人百度]\n%s"%text
+    elif translate_type == "tencent_private" :
+        content = "\n[私人腾讯]\n%s"%text
+    elif translate_type == "caiyun_private" :
+        content = "\n[私人彩云]\n%s"%text
+    else:
+        return
+
+    with open("./config/翻译历史.txt", "a+", encoding="utf-8") as file :
+        file.write(content)
