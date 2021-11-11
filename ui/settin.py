@@ -2008,8 +2008,6 @@ class Settin(QMainWindow):
     # 窗口关闭处理
     def closeEvent(self, event) :
 
-        # 保存设置至本地文件
-        self.saveConfig()
         # 注册新快捷键
         self.registerHotKey()
 
@@ -2024,6 +2022,9 @@ class Settin(QMainWindow):
             sign, access_token = getAccessToken(self.config["OCR"]["Key"], self.config["OCR"]["Secret"], self.logger)
             if sign :
                 self.config["AccessToken"] = access_token
+
+        # 保存设置至本地文件
+        self.saveConfig()
 
         # 设置页面配置更新至主模块
         self.translation_ui.config = self.config
