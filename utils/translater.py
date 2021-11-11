@@ -204,6 +204,9 @@ class Translater(QThread) :
         # 更新原文
         if nothing_sign :
             self.window.original = original
+            # 保存识别到的原文
+            with open("./config/翻译历史.txt", "a+", encoding="utf-8") as file :
+                file.write("\n\n[原文]\n%s"%original)
 
 
     def run(self) :
