@@ -249,8 +249,8 @@ def configConvert(config, oldConfig) :
     config["rangeHotkeyValue2"] = oldConfig.get("rangeHotkeyValue2", "x")
     # 范围快捷键开关
     config["showHotKey2"] = oldConfig.get("showHotKey2", "False")
-
-
+    # 屏蔽词
+    config["Filter"] = oldConfig.get("Filter", [])
     # 图像相似度
     config["imageSimilarity"] = oldConfig.get("imageSimilarity", 98)
     # 文字相似度

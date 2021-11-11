@@ -41,11 +41,10 @@ class Translation(QMainWindow) :
         self.config = config
         self.logger = logger
         self.getInitConfig()
-
+        self.ui()
         self.stratSoundThread()
         self.checkWebdriverThread()
 
-        self.ui()
         self.auto_open_sign.connect(self.startAutoTranslater)
 
 
@@ -613,6 +612,13 @@ class Translation(QMainWindow) :
         elif trans_type == "original" :
             color = self.config["fontColor"]["original"]
 
+        # 根据屏蔽词过滤
+        for val in self.config["Filter"] :
+            if not val[0] :
+                continue
+            result = result.replace(val[0], val[1])
+
+        # 显示在文本框上
         try:
             if self.config["showColorType"] == "False":
                 self.format.setTextOutline(QPen(QColor(color), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))

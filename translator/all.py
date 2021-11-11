@@ -58,6 +58,8 @@ class Webdriver(QObject) :
             "deepl": "DeepL"
         }
 
+        self.message_sign.emit("翻译模块启动中, 请等待完成后再操作...")
+
         try :
             # 使用谷歌浏览器
             option = webdriver.ChromeOptions()
@@ -95,9 +97,13 @@ class Webdriver(QObject) :
                     self.browser = webdriver.Edge(executable_path="./config/tools/msedgedriver.exe",
                                                      service_log_path="./logs/geckodriver.log",
                                                      capabilities=EDGE)
-                except Exception:
+                except Exception :
+                    self.message_sign.emit("翻译模块启动失败...")
                     self.logger.error(format_exc())
                     self.close()
+                    return
+
+        self.message_sign.emit("翻译模块启动完成~")
 
 
     # 打开翻译页面

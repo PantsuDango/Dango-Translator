@@ -219,6 +219,10 @@ class Range(QMainWindow):
         self.Button.show()
         self.dragLabel.setStyleSheet("background-color:rgba(62, 62, 62, 0.1)")
 
+        # 如果处于自动模式下则暂停
+        if self.window.translateMode :
+            self.window.stop_sign = True
+
 
     # 鼠标离开控件事件
     def leaveEvent(self, QEvent):
@@ -237,3 +241,7 @@ class Range(QMainWindow):
         self.window.config["range"]["Y1"] = Y1
         self.window.config["range"]["X2"] = X2
         self.window.config["range"]["Y2"] = Y2
+
+        # 如果是自动模式下, 则解除暂停
+        if self.window.translateMode :
+            self.window.stop_sign = False
