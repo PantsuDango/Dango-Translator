@@ -46,7 +46,7 @@ class Translation(QMainWindow) :
         self.stratSoundThread()
         self.checkWebdriverThread()
 
-        self.auto_open_sign.connect(self.startAutoTranslater)
+        self.auto_open_sign.connect(lambda: self.createThread(self.startTranslater))
 
 
     # 开启音乐朗读线程
@@ -151,6 +151,24 @@ class Translation(QMainWindow) :
             self.format.setTextOutline(QPen(QColor('#FF69B4'), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
             self.translateText.mergeCurrentCharFormat(self.format)
             self.translateText.append("喜欢的话能不能点击上方的电池图标支持一下团子，真心感谢你❤")
+
+        # 重叠提示消息框
+        self.tempText = QTextBrowser(self)
+        self.customSetGeometry(self.tempText, 0, 30, 1500, 110)
+        self.tempText.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.tempText.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.tempText.setStyleSheet("border-width:0;\
+                                     border-style:outset;\
+                                     border-top:0px solid #e8f3f9;\
+                                     color:white;\
+                                     font-weight: bold;\
+                                     background-color:rgba(62, 62, 62, %s)"
+                                    %(self.horizontal))
+        self.tempText.setFont(self.font)
+        self.format.setTextOutline(QPen(QColor('#1E90FF'), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+        self.tempText.mergeCurrentCharFormat(self.format)
+        self.tempText.append("翻译框和范围区域重叠, 请挪开翻译框!!!")
+        self.tempText.hide()
 
         # 翻译框根据内容自适应大小
         self.document = self.translateText.document()
@@ -358,6 +376,8 @@ class Translation(QMainWindow) :
         except Exception:
             pass
 
+        self.checkOverlap()
+
 
     # 鼠标按下事件
     def mousePressEvent(self, e: QMouseEvent) :
@@ -536,11 +556,11 @@ class Translation(QMainWindow) :
             self.translateMode = False
 
 
-    # 开启自动翻译
-    def startAutoTranslater(self) :
+    # 创建线程
+    def createThread(self, func, daemon=True) :
 
-        thread = threading.Thread(target=self.startTranslater)
-        thread.setDaemon(True)
+        thread = threading.Thread(target=func)
+        thread.setDaemon(daemon)
         thread.start()
 
 
@@ -557,11 +577,6 @@ class Translation(QMainWindow) :
 
     # 按下翻译键
     def startTranslater(self) :
-
-        # 隐藏状态栏信息
-        if self.statusbar_sign :
-            self.statusbar.clearMessage()
-            self.statusbar_sign = False
 
         thread = Translater(self, self.logger)
         thread.clear_text_sign.connect(self.clearText)
@@ -640,29 +655,46 @@ class Translation(QMainWindow) :
             self.logger.error(format_exc())
 
 
-    # 获取窗口坐标
-    def getWindowCoordinate(self) :
+    # 检测范围区域和翻译区域是否有重叠
+    def checkOverlap(self) :
 
+        # 翻译框坐标
         rect = self.geometry()
         X1 = rect.left()
         Y1 = rect.top()
         X2 = rect.left() + rect.width()
         Y2 = rect.top() + rect.height()
-        print(X1, Y1)
-        print(X2, Y2)
+
+        # 范围框坐标
+        rect = self.range_window.geometry()
+        x1 = rect.left()
+        y1 = rect.top()
+        x2 = rect.left() + rect.width()
+        y2 = rect.top() + rect.height()
+
+        rr1 = utils.Rectangular(X1, Y1, X2-X1, Y2-Y1)
+        rr2 = utils.Rectangular(x1, y1, x2-x1, y2-y1)
+
+        if rr2.collision(rr1) :
+            self.customSetGeometry(self.tempText, 0, 30, self.translateText.width(), self.translateText.height())
+            self.translateText.hide()
+            self.tempText.show()
+        else :
+            self.tempText.hide()
+            self.translateText.show()
 
 
     # 退出程序
     def quit(self) :
 
         self.hide()
+        self.unregisterHotKey()
 
         try :
             # 关闭引擎模块
-            self.sound.close()
-            self.webdriver_1.close()
-            self.webdriver_2.close()
-            print("关闭引擎完成")
+            self.createThread(self.sound.close, False)
+            self.createThread(self.webdriver_1.close, False)
+            self.createThread(self.webdriver_2.close, False)
         except Exception :
             self.logger.error(format_exc())
         finally :

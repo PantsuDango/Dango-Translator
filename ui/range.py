@@ -110,6 +110,7 @@ class WScreenShot(QWidget):
                 self.getRange()
 
                 self.close()
+                self.Init.checkOverlap()
                 # 如果处于手动模式下则刷新一次翻译
                 if not self.Init.translateMode :
                     self.Init.startTranslater()
@@ -177,18 +178,22 @@ class Range(QMainWindow):
 
 
     # 鼠标移动事件
-    def mouseMoveEvent(self, e: QMouseEvent):
+    def mouseMoveEvent(self, e: QMouseEvent) :
+
         try :
             self._endPos = e.pos() - self._startPos
             self.move(self.pos() + self._endPos)
         except Exception :
             pass
 
+        self.window.checkOverlap()
+
 
     # 鼠标按下事件
-    def mousePressEvent(self, e: QMouseEvent):
+    def mousePressEvent(self, e: QMouseEvent) :
+
         try :
-            if e.button() == Qt.LeftButton:
+            if e.button() == Qt.LeftButton :
                 self._isTracking = True
                 self._startPos = QPoint(e.x(), e.y())
         except Exception :
@@ -196,7 +201,8 @@ class Range(QMainWindow):
 
 
     # 鼠标松开事件
-    def mouseReleaseEvent(self, e: QMouseEvent):
+    def mouseReleaseEvent(self, e: QMouseEvent) :
+
         try :
             if e.button() == Qt.LeftButton:
                 self._isTracking = False
@@ -241,8 +247,6 @@ class Range(QMainWindow):
         self.window.config["range"]["Y1"] = Y1
         self.window.config["range"]["X2"] = X2
         self.window.config["range"]["Y2"] = Y2
-
-        self.window.getWindowCoordinate()
 
         # 如果是自动模式下, 则解除暂停
         if self.window.translateMode :

@@ -1,5 +1,5 @@
 from selenium import webdriver
-from traceback import format_exc, print_exc
+from traceback import format_exc
 from PyQt5.QtCore import *
 import time
 
@@ -426,6 +426,7 @@ class Webdriver(QObject) :
 
         self.browser.close()
         self.browser.quit()
+        print("翻译模块关闭")
 
 
 if __name__ == "__main__" :

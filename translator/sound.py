@@ -125,3 +125,4 @@ class Sound() :
 
         self.browser.close()
         self.browser.quit()
+        print("音乐模块关闭")

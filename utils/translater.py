@@ -202,9 +202,14 @@ class Translater(QThread) :
         if self.window.config["showOriginal"] == "True" or not nothing_sign :
             self.create_trans_sign.emit("original")
 
-        # 更新原文
+        # 翻译成功
         if nothing_sign :
+            # 更新原文
             self.window.original = original
+            # 隐藏状态栏信息
+            if self.window.statusbar_sign:
+                self.window.statusbar.clearMessage()
+                self.window.statusbar_sign = False
             # 是否复制到剪贴板
             if self.window.config["showClipboard"] == "True" :
                 pyperclip.copy(original)
