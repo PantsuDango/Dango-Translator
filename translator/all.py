@@ -14,8 +14,8 @@ def createWebdriver1(obj, config, logger, web_type) :
      obj.webdriver_1.message_sign.emit(message)
      if web_type :
          obj.webdriver_1.message_sign.emit("%s翻译引擎启动中, 请等待完成后再操作..."%obj.webdriver_1.translater_map[web_type])
-         obj.webdriver_1.openWeb(web_type)
-         obj.webdriver_1.message_sign.emit("%s翻译引擎启动成功~"%obj.webdriver_1.translater_map[web_type])
+         message = obj.webdriver_1.openWeb(web_type)
+         obj.webdriver_1.message_sign.emit(message)
 
 
 # 翻译模块实例化2
@@ -29,7 +29,7 @@ def createWebdriver2(obj, config, logger, web_type) :
      if web_type :
           obj.webdriver_2.message_sign.emit("%s翻译引擎启动中, 请等待完成后再操作..."%obj.webdriver_2.translater_map[web_type])
           obj.webdriver_2.openWeb(web_type)
-          obj.webdriver_2.message_sign.emit("%s翻译引擎启动成功~"%obj.webdriver_2.translater_map[web_type])
+          obj.webdriver_2.message_sign.emit(message)
 
 
 # 刷新翻译页面
@@ -131,7 +131,7 @@ class Webdriver(QObject) :
             return "%s翻译引擎启动中, 请等待完成后再操作..."%self.translater_map[web_type]
         except Exception :
             self.logger.error(format_exc())
-            return "%s翻译引擎启动失败..." % self.translater_map[web_type]
+            return "%s翻译引擎启动失败..."%self.translater_map[web_type]
 
 
     # 有道翻译
