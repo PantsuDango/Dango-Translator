@@ -701,6 +701,7 @@ class Translation(QMainWindow) :
             # 关闭selenuim的driver引擎
             os.popen("taskkill /im chromedriver.exe /F")
             os.popen("taskkill /im geckodriver.exe /F")
+            os.popen("taskkill /im msedgedriver.exe /F")
 
         # 退出程序前保存设置
         utils.postSaveSettin(self.config, self.logger)
