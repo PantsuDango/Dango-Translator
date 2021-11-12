@@ -123,6 +123,9 @@ class Sound() :
 
     def close(self) :
 
-        self.browser.close()
-        self.browser.quit()
+        try :
+            self.browser.close()
+            self.browser.quit()
+        except Exception :
+            self.logger.error(format_exc())
         print("音乐模块关闭")

@@ -424,8 +424,11 @@ class Webdriver(QObject) :
 
     def close(self) :
 
-        self.browser.close()
-        self.browser.quit()
+        try :
+            self.browser.close()
+            self.browser.quit()
+        except Exception :
+            self.logger.error(format_exc())
         print("翻译模块关闭")
 
 

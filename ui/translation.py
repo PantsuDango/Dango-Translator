@@ -690,18 +690,15 @@ class Translation(QMainWindow) :
         self.hide()
         self.unregisterHotKey()
 
-        try :
-            # 关闭引擎模块
-            self.createThread(self.sound.close, False)
-            self.createThread(self.webdriver_1.close, False)
-            self.createThread(self.webdriver_2.close, False)
-        except Exception :
-            self.logger.error(format_exc())
-        finally :
-            # 关闭selenuim的driver引擎
-            os.popen("taskkill /im chromedriver.exe /F")
-            os.popen("taskkill /im geckodriver.exe /F")
-            os.popen("taskkill /im msedgedriver.exe /F")
+        # 关闭引擎模块
+        self.createThread(self.sound.close, False)
+        self.createThread(self.webdriver_1.close, False)
+        self.createThread(self.webdriver_2.close, False)
+
+        # 关闭selenuim的driver引擎
+        os.popen("taskkill /im chromedriver.exe /F")
+        os.popen("taskkill /im geckodriver.exe /F")
+        os.popen("taskkill /im msedgedriver.exe /F")
 
         # 退出程序前保存设置
         utils.postSaveSettin(self.config, self.logger)
