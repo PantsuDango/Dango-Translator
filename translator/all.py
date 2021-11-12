@@ -9,9 +9,13 @@ def createWebdriver1(obj, config, logger, web_type) :
 
      obj.webdriver_1 = Webdriver(config, logger)
      obj.webdriver_1.message_sign.connect(obj.showStatusbar)
-     obj.webdriver_1.openWebdriver()
+     obj.webdriver_1.message_sign.emit("翻译模块启动中, 请等待完成后再操作...")
+     message = obj.webdriver_1.openWebdriver()
+     obj.webdriver_1.message_sign.emit(message)
      if web_type :
-        obj.webdriver_1.openWeb(web_type)
+         obj.webdriver_1.message_sign.emit("%s翻译引擎启动中, 请等待完成后再操作..."%obj.webdriver_1.translater_map[web_type])
+         obj.webdriver_1.openWeb(web_type)
+         obj.webdriver_1.message_sign.emit("%s翻译引擎启动成功~"%obj.webdriver_1.translater_map[web_type])
 
 
 # 翻译模块实例化2
@@ -19,9 +23,13 @@ def createWebdriver2(obj, config, logger, web_type) :
 
      obj.webdriver_2 = Webdriver(config, logger)
      obj.webdriver_2.message_sign.connect(obj.showStatusbar)
-     obj.webdriver_2.openWebdriver()
+     obj.webdriver_2.message_sign.emit("翻译模块启动中, 请等待完成后再操作...")
+     message = obj.webdriver_2.openWebdriver()
+     obj.webdriver_2.message_sign.emit(message)
      if web_type :
-        obj.webdriver_2.openWeb(web_type)
+          obj.webdriver_2.message_sign.emit("%s翻译引擎启动中, 请等待完成后再操作..."%obj.webdriver_2.translater_map[web_type])
+          obj.webdriver_2.openWeb(web_type)
+          obj.webdriver_2.message_sign.emit("%s翻译引擎启动成功~"%obj.webdriver_2.translater_map[web_type])
 
 
 # 刷新翻译页面
@@ -49,7 +57,8 @@ class Webdriver(QObject) :
             "tencent": "https://fanyi.qq.com/",
             "caiyun" : "https://fanyi.caiyunapp.com/#/",
             "google" : "https://translate.google.cn/?sl=auto&tl=zh-CN",
-            "deepl"  : "https://www.deepl.com/translator"
+            "deepl"  : "https://www.deepl.com/translator",
+            "xiaoniu": "https://niutrans.com/trans?type=text"
         }
         self.translater_map = {
             "youdao": "有道",
@@ -57,14 +66,13 @@ class Webdriver(QObject) :
             "tencent": "腾讯",
             "caiyun": "彩云",
             "google": "谷歌",
-            "deepl": "DeepL"
+            "deepl": "DeepL",
+            "xiaoniu": "小牛"
         }
 
 
     # 开启引擎
     def openWebdriver(self) :
-
-        self.message_sign.emit("翻译模块启动中, 请等待完成后再操作...")
 
         try:
             # 使用谷歌浏览器
@@ -103,13 +111,12 @@ class Webdriver(QObject) :
                     self.browser = webdriver.Edge(executable_path="./config/tools/msedgedriver.exe",
                                                   service_log_path="./logs/geckodriver.log",
                                                   capabilities=EDGE)
-                except Exception:
-                    self.message_sign.emit("翻译模块启动失败...")
+                except Exception :
                     self.logger.error(format_exc())
                     self.close()
-                    return
+                    return "翻译模块启动失败..."
 
-        self.message_sign.emit("翻译模块启动完成~")
+        return "翻译模块启动完成~"
 
 
     # 打开翻译页面
@@ -119,12 +126,12 @@ class Webdriver(QObject) :
         self.open_sign = True
 
         try :
-            self.message_sign.emit("%s翻译引擎启动中, 请等待完成后再操作..." % self.translater_map[web_type])
             self.browser.get(self.url_map[web_type])
             self.browser.maximize_window()
-            self.message_sign.emit("%s翻译引擎启动成功~"%self.translater_map[web_type])
+            return "%s翻译引擎启动中, 请等待完成后再操作..."%self.translater_map[web_type]
         except Exception :
-            self.message_sign.emit("%s翻译引擎启动失败..." % self.translater_map[web_type])
+            self.logger.error(format_exc())
+            return "%s翻译引擎启动失败..." % self.translater_map[web_type]
 
 
     # 有道翻译
@@ -358,6 +365,42 @@ class Webdriver(QObject) :
             return "公共DeepL: 我抽风啦!"
 
 
+    # 小牛翻译
+    def xiaoniu(self, content):
+
+        try:
+            try:
+                self.browser.find_element_by_xpath(self.config["dictInfo"]["xiaoniu_xpath"]).click()
+            except Exception:
+                pass
+
+            # 清空文本框
+            self.browser.find_element_by_xpath('//*[@id="textarea"]').clear()
+            # 输入要翻译的文本
+            self.browser.find_element_by_xpath('//*[@id="textarea"]').send_keys(content)
+            self.browser.find_element_by_xpath('//*[@id="textTrans"]/div[2]/div/div[2]/div/div/div/p/button').click()
+
+            start = time.time()
+            while True:
+                time.sleep(0.1)
+                # 提取翻译信息
+                outputText = self.browser.find_element_by_xpath('//*[@id="textTrans"]/div[3]/div/div[2]/div/div[1]').text
+                if not outputText.isspace() and len(outputText.strip()) > 1 and "".join(
+                        outputText.split()) != self.content:
+                    self.content = "".join(outputText.split())
+                    return self.content
+                # 判断超时
+                end = time.time()
+                if (end - start) > 10:
+                    self.browser.refresh()
+                    return "公共小牛: 我超时啦!"
+
+        except Exception:
+            self.browser.refresh()
+            self.logger.error(format_exc())
+            return "公共小牛: 我抽风啦!"
+
+
     # 翻译主函数
     def translater(self, content) :
 
@@ -417,11 +460,12 @@ if __name__ == "__main__" :
     config["dictInfo"] = utils.getDictInfo()
 
     obj = Webdriver(config, logger)
-    obj.openWeb("deepl")
+    obj.openWebdriver()
+    obj.openWeb("xiaoniu")
 
     for content in (jap_content_list+eng_content_list+kor_content_list) :
         start = time.time()
-        result = obj.translater(content)
+        result = obj.xiaoniu(content)
         print(content)
         print(result)
         print(time.time()-start)
