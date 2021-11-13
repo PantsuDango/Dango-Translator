@@ -46,6 +46,7 @@ class Translation(QMainWindow) :
         self.stratSoundThread()
         self.checkWebdriverThread()
 
+        # 开启自动翻译信号
         self.auto_open_sign.connect(lambda: self.createThread(self.startTranslater))
 
 
@@ -75,6 +76,8 @@ class Translation(QMainWindow) :
 
     # 开启翻译页面
     def checkWebdriverThread(self) :
+
+        self.statusbar.showMessage("翻译模块启动中, 请等待完成后再操作...")
 
         translater_list = ["youdaoUse", "baiduwebUse", "tencentwebUse", "deeplUse", "googleUse", "caiyunUse"]
         for val in translater_list :
