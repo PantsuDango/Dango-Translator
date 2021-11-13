@@ -31,6 +31,7 @@ class DangoTranslator() :
 
         # 从云端获取配置信息
         self.config = utils.getSettin(self.config, self.logger)
+        self.config = utils.loginDangoOCR(self.config, self.logger)
         utils.saveConfig(self.config)
 
         # 翻译界面
@@ -90,7 +91,7 @@ class DangoTranslator() :
     def clickFilter(self) :
 
         # 如果处于自动模式下则暂停
-        if self.Translation.translateMode:
+        if self.Translation.translateMode :
             self.Translation.stop_sign = True
 
         self.Filter.refreshTable()
@@ -101,7 +102,7 @@ class DangoTranslator() :
     def clickSettin(self) :
 
         # 如果处于自动模式下则暂停
-        if self.Translation.translateMode:
+        if self.Translation.translateMode :
             self.Translation.stop_sign = True
 
         self.Settin.config = self.Translation.config

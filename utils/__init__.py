@@ -8,6 +8,7 @@ import tkinter.font
 import requests
 import json
 import subprocess
+import hashlib
 from traceback import format_exc, print_exc
 from difflib import SequenceMatcher
 
@@ -266,7 +267,6 @@ def configConvert(config, oldConfig) :
 # 从云端获取配置信息
 def getSettin(config, logger) :
 
-
     getSettinURL = "http://120.24.146.175:3000/DangoTranslate/GetSettin"
 
     params = json.dumps({"User": config["user"]})
@@ -285,6 +285,32 @@ def getSettin(config, logger) :
 
         else :
             pass
+
+    except Exception :
+        logger.error(format_exc())
+
+    return config
+
+
+# 登录ocr服务器
+def loginDangoOCR(config, logger) :
+
+    url = config["dictInfo"]["ocr_login"]
+
+    params = json.dumps({
+        "User": config["user"],
+        "Password": hashlib.md5(config["password"].encode(encoding='UTF-8')).hexdigest()
+    })
+    proxies = {"http": None, "https": None}
+
+    try:
+        res = requests.post(url, data=params, proxies=proxies, timeout=10)
+        res.encoding = "utf-8"
+        result = json.loads(res.text)
+        if result["Code"] == 0 :
+            config["DangoToken"] = result["Token"]
+        else :
+            logger.error(result["ErrorMsg"])
 
     except Exception :
         logger.error(format_exc())

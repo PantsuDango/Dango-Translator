@@ -156,6 +156,6 @@ def baiduOCR(config, logger) :
                     return True, sentence
 
             else:
-                sentence = "OCR错误: response无响应"
+                sentence = "百度OCR: response无响应"
 
     return False, sentence
