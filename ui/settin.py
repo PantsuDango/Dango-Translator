@@ -19,6 +19,7 @@ import os
 import qtawesome
 import webbrowser
 import threading
+from traceback import format_exc
 
 
 OCR_CMD_PATH = "E:/DangoTranslate-Ver3.6.2/DangoOCR-Ver1.2/startOCR.cmd"
@@ -308,13 +309,14 @@ class Settin(QMainWindow):
         self.online_ocr_switch.checkedChanged.connect(self.changeOnlineSwitch)
         self.online_ocr_switch.setCursor(QCursor(Qt.PointingHandCursor))
 
-        # 在线OCR测试按钮
+        # 在线OCR购买按钮
         button = QPushButton(self.tab_1)
         self.customSetGeometry(button, 105, 155, 60, 20)
         button.setText("购买")
         button.setCursor(QCursor(Qt.PointingHandCursor))
+        button.clicked.connect(self.openDangoBuyPage)
 
-        # 在线OCR购买按钮
+        # 在线OCR测试按钮
         button = QPushButton(self.tab_1)
         self.customSetGeometry(button, 185, 155, 60, 20)
         button.setText("测试")
@@ -1596,6 +1598,20 @@ class Settin(QMainWindow):
         else :
             url = config_json.get("ocr_register", {}).get("offline_ocr", "https://docs.ayano.top/#/basic/ocr?id=%e7%a6%bb%e7%ba%bfocr%e8%af%b4%e6%98%8e")
             webbrowser.open(url, new=0, autoraise=True)
+
+
+    # 打开团子在线OCR购买页面
+    def openDangoBuyPage(self):
+
+        try :
+            ocr_login_html = self.config["dictInfo"]["ocr_login_html"]
+            token = self.config["DangoToken"]
+            ocr_buy_html_base64 = self.config["dictInfo"]["ocr_buy_html_base64"]
+
+            url = "%s?token=%s&jump=%s"%(ocr_login_html, token, ocr_buy_html_base64)
+            webbrowser.open(url, new=0, autoraise=True)
+        except Exception :
+            self.logger.error(format_exc())
 
 
     # 翻译源字体颜色
