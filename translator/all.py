@@ -7,29 +7,37 @@ import time
 # 翻译模块实例化1
 def createWebdriver1(obj, config, logger, web_type) :
 
-     obj.webdriver_1 = Webdriver(config, logger)
-     obj.webdriver_1.message_sign.connect(obj.showStatusbar)
-     obj.webdriver_1.message_sign.emit("翻译模块启动中, 请等待完成后再操作...")
-     message = obj.webdriver_1.openWebdriver()
-     obj.webdriver_1.message_sign.emit(message)
-     if web_type :
-         obj.webdriver_1.message_sign.emit("%s翻译引擎启动中, 请等待完成后再操作..."%obj.webdriver_1.translater_map[web_type])
-         message = obj.webdriver_1.openWeb(web_type)
-         obj.webdriver_1.message_sign.emit(message)
+    obj.webdriver_1 = Webdriver(config, logger)
+    obj.webdriver_1.message_sign.connect(obj.showStatusbar)
+
+    # 加载翻译引擎
+    obj.webdriver_1.openWebdriver()
+    if obj.webdriver_2.browser_sign == 2 :
+        obj.webdriver_1.message_sign.emit("翻译模块启动失败...")
+    elif obj.webdriver_2.browser_sign == 1 :
+        obj.webdriver_1.message_sign.emit("翻译模块启动完成~")
+
+    # 开启翻译页面
+    if web_type :
+        obj.webdriver_1.openWeb(web_type)
 
 
 # 翻译模块实例化2
 def createWebdriver2(obj, config, logger, web_type) :
 
-     obj.webdriver_2 = Webdriver(config, logger)
-     obj.webdriver_2.message_sign.connect(obj.showStatusbar)
-     obj.webdriver_2.message_sign.emit("翻译模块启动中, 请等待完成后再操作...")
-     message = obj.webdriver_2.openWebdriver()
-     obj.webdriver_2.message_sign.emit(message)
-     if web_type :
-          obj.webdriver_2.message_sign.emit("%s翻译引擎启动中, 请等待完成后再操作..."%obj.webdriver_2.translater_map[web_type])
-          obj.webdriver_2.openWeb(web_type)
-          obj.webdriver_2.message_sign.emit(message)
+    obj.webdriver_2 = Webdriver(config, logger)
+    obj.webdriver_2.message_sign.connect(obj.showStatusbar)
+
+    # 加载翻译引擎
+    obj.webdriver_2.openWebdriver()
+    if obj.webdriver_1.browser_sign == 2:
+        obj.webdriver_2.message_sign.emit("翻译模块启动失败...")
+    elif obj.webdriver_1.browser_sign == 1:
+        obj.webdriver_2.message_sign.emit("翻译模块启动完成~")
+
+    # 开启翻译页面
+    if web_type :
+        obj.webdriver_2.openWeb(web_type)
 
 
 # 刷新翻译页面
@@ -56,7 +64,7 @@ class Webdriver(QObject) :
             "baidu"  : "https://fanyi.baidu.com/?aldtype=16047#auto/zh",
             "tencent": "https://fanyi.qq.com/",
             "caiyun" : "https://fanyi.caiyunapp.com/#/",
-            "google" : "https://translate.google.cn/?sl=auto&tl=zh-CN",
+            "google" : "https://translate.google.cn",
             "deepl"  : "https://www.deepl.com/translator",
             "xiaoniu": "https://niutrans.com/trans?type=text"
         }
@@ -69,6 +77,8 @@ class Webdriver(QObject) :
             "deepl": "DeepL",
             "xiaoniu": "小牛"
         }
+        # 翻译引擎启动情况: 0-启动中, 1-启动成功, 2-启动失败
+        self.browser_sign = 0
 
 
     # 开启引擎
@@ -112,26 +122,33 @@ class Webdriver(QObject) :
                                                   service_log_path="./logs/geckodriver.log",
                                                   capabilities=EDGE)
                 except Exception :
+                    self.browser_sign = 2
                     self.logger.error(format_exc())
                     self.close()
-                    return "翻译模块启动失败..."
+                    return
 
-        return "翻译模块启动完成~"
+        self.browser_sign = 1
+        print("翻译引擎启动")
 
 
     # 打开翻译页面
     def openWeb(self, web_type) :
 
         self.web_type = web_type
-        self.open_sign = True
+        self.message_sign.emit("%s翻译引擎启动中, 请等待完成后再操作..."%self.translater_map[self.web_type])
+        print("%s翻译引擎启动中, 请等待完成后再操作..."%self.translater_map[self.web_type])
 
         try :
             self.browser.get(self.url_map[web_type])
             self.browser.maximize_window()
-            return "%s翻译引擎启动中, 请等待完成后再操作..."%self.translater_map[web_type]
+            self.open_sign = True
+            self.message_sign.emit("%s翻译引擎启动完成~"%self.translater_map[web_type])
+            print("%s翻译引擎启动完成~"%self.translater_map[web_type])
+
         except Exception :
             self.logger.error(format_exc())
-            return "%s翻译引擎启动失败..."%self.translater_map[web_type]
+            self.message_sign.emit("%s翻译引擎启动失败..."%self.translater_map[web_type])
+            print("%s翻译引擎启动失败..."%self.translater_map[web_type])
 
 
     # 有道翻译
