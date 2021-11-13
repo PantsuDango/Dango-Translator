@@ -581,6 +581,7 @@ class Translation(QMainWindow) :
     # 按下翻译键
     def startTranslater(self) :
 
+        # 如果处于自动模式下则暂停
         thread = Translater(self, self.logger)
         thread.clear_text_sign.connect(self.clearText)
         thread.start()

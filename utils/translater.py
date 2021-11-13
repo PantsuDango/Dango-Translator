@@ -9,6 +9,7 @@ import time
 import pyperclip
 
 from translator.ocr.baidu import baiduOCR
+from translator.ocr.dango import dangoOCR
 from translator import api
 
 
@@ -132,6 +133,16 @@ class Translater(QThread) :
     # 翻译主模块
     def translate(self) :
 
+        # 如果还未选取范围就操作翻译
+        if self.window.config["range"] == {"X1": 0, "Y1": 0, "X2": 0, "Y2": 0} :
+            self.clear_text_sign.emit(True)
+            self.window.original = "还未选取翻译范围, 请先使用范围键框选要翻译的屏幕区域"
+            self.create_trans_sign.emit("original")
+            # 关闭翻译界面自动开关
+            self.window.switchBtn.mousePressEvent(1)
+            self.window.switchBtn.updateValue()
+            return
+
         try:
             # 首次执行或手动模式下, 直接跳过图片相似度检测
             if not self.window.original or not self.window.translateMode :
@@ -152,11 +163,27 @@ class Translater(QThread) :
         # 百度OCR
         if self.window.config["baiduOCR"] :
             start = time.time()
-            sign, original = baiduOCR(self.window.config, self.logger)
+            ocr_sign, original = baiduOCR(self.window.config, self.logger)
             print("百度OCR: ", original)
             print("time: %s"%(time.time()-start))
+
+        # 团子OCR
+        elif self.window.config["onlineOCR"] :
+            start = time.time()
+            ocr_sign, original = dangoOCR(self.window.config, self.logger)
+            print("团子OCR: ", original)
+            print("time: %s" % (time.time()-start))
+
         else :
             original = ""
+            ocr_sign = False
+
+        # 如果出错就显示原文
+        if not ocr_sign :
+            self.clear_text_sign.emit(True)
+            self.window.original = original
+            self.create_trans_sign.emit("original")
+            return
 
         # 如果检测不到文字或者文字和上一次一样则跳过
         if not original or original == self.window.original :
