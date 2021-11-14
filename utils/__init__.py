@@ -9,6 +9,7 @@ import requests
 import json
 import subprocess
 import hashlib
+import threading
 from traceback import format_exc, print_exc
 from difflib import SequenceMatcher
 
@@ -57,6 +58,9 @@ def openConfig() :
             config = yaml.load(file.read(), Loader=yaml.FullLoader)
     except Exception :
         config = {}
+
+    # 字典表
+    config["dictInfo"] = getDictInfo()
 
     return config
 
@@ -258,8 +262,6 @@ def configConvert(config, oldConfig) :
     config["textSimilarity"] = oldConfig.get("textSimilarity", 90)
     # 范围坐标
     config["range"] = {"X1": 0, "Y1": 0, "X2": 0, "Y2": 0}
-    # 字典表
-    config["dictInfo"] = getDictInfo()
 
     return config
 
@@ -478,3 +480,30 @@ class Rectangular :
         if self.x0 < r2.x1 and self.y0 < r2.y1 and self.x1 > r2.x0 and self.y1 > r2.y0:
             return True
         return False
+
+
+# 发送验证码邮件
+def sendEmail(config, user, email, code_key, logger) :
+
+    url = config["dictInfo"].get("send_key_email", "https://stariver.c4a15wh.cn/OCR/Admin/SendDangoEmail")
+    formdata = json.dumps({
+        "User": user,
+        "Email": email,
+        "CodeKey": code_key
+    })
+    proxies = {"http": None, "https": None}
+    try:
+        response = requests.post(url, data=formdata, proxies=proxies)
+        result = json.loads(response.text)
+        if result["Code"] != 0 :
+            logger.error(result["ErrorMsg"])
+    except Exception :
+        logger.error(format_exc())
+
+
+# 发送验证码邮件线程
+def createSendEmailThread(config, user, email, code_key, logger) :
+
+    thread = threading.Thread(target=sendEmail, args=(config, user, email, code_key, logger))
+    thread.setDaemon(True)
+    thread.start()
