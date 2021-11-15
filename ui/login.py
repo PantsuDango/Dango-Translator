@@ -2,6 +2,8 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
+from ui.register import Register
+
 from utils import MessageBox
 from traceback import format_exc
 
@@ -150,7 +152,7 @@ class Login(QWidget):
         self.registerButton = QPushButton(self)
         self.customSetGeometry(self.registerButton, 220, 495, 50, 35)
         self.registerButton.setCursor(QCursor(Qt.PointingHandCursor))
-        self.registerButton.clicked.connect(self.register)
+        self.registerButton.clicked.connect(self.openRegister)
         self.registerButton.setText("注册")
         self.registerButton.setStyleSheet('background: rgba(255, 255, 255, 0);'
                                           'color: %s;'
@@ -247,6 +249,12 @@ class Login(QWidget):
                 self.passwordEdit.setEchoMode(QLineEdit.Password)
 
             return QWidget.eventFilter(self, object, event)
+
+
+    def openRegister(self) :
+
+        self.Register = Register(self.config)
+        self.Register.show()
 
 
     # 注册
