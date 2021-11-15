@@ -253,7 +253,7 @@ class Login(QWidget):
 
     def openRegister(self) :
 
-        self.Register = Register(self.config)
+        self.Register = Register(self.config, self.logger)
         self.Register.show()
 
 
@@ -273,7 +273,7 @@ class Login(QWidget):
         if re.findall("\s", user) :
             MessageBox("注册失败", "用户名含有不合法的字符ヽ(`Д´)ﾉ     ")
             return
-        if re.findall("\s", password):
+        if re.findall("\s", password) :
             MessageBox("注册失败", "密码含有不合法的字符ヽ(`Д´)ﾉ     ")
             return
         if len(user) < 6 or len(user) > 18 :
