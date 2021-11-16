@@ -301,7 +301,7 @@ def loginDangoOCR(config, logger) :
 
     params = json.dumps({
         "User": config["user"],
-        "Password": hashlib.md5(config["password"].encode(encoding='UTF-8')).hexdigest()
+        "Password": config["password"]
     })
     proxies = {"http": None, "https": None}
 
