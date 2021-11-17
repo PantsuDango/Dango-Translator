@@ -339,6 +339,8 @@ class Translation(QMainWindow) :
         self.statusbar_sign = True
         # 各翻译源线程状态标志
         self.thread_state = 0
+        # 自动翻译线程存在标志
+        self.auto_trans_exist = False
 
         hotkey_map = {
             "ctrl": "control",
@@ -581,7 +583,10 @@ class Translation(QMainWindow) :
     # 按下翻译键
     def startTranslater(self) :
 
-        # 如果处于自动模式下则暂停
+        # 如果已处在自动翻译模式下则直接退出
+        if self.auto_trans_exist :
+            return
+
         thread = Translater(self, self.logger)
         thread.clear_text_sign.connect(self.clearText)
         thread.start()

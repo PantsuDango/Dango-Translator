@@ -252,14 +252,19 @@ class Translater(QThread) :
             # 如果上一次翻译未结束则直接跳过
             if self.window.thread_state > 0:
                 return
-            self.translate()
+            try:
+                self.translate()
+            except Exception:
+                self.logger.error(format_exc())
 
         else :
             # 自动翻译
+            self.window.auto_trans_exist = True
             while True :
                 # 如果自动翻译被停止则退出循环
                 if not self.window.translateMode :
                     print("自动翻译退出")
+                    self.window.auto_trans_exist = False
                     break
 
                 # 自动翻译暂停
@@ -267,10 +272,13 @@ class Translater(QThread) :
                     print("自动翻译暂停")
                     time.sleep(0.1)
                     continue
-
                 # 如果上一次翻译未结束则直接跳过
                 if self.window.thread_state > 0:
                     continue
 
-                self.translate()
+                try :
+                    self.translate()
+                except Exception :
+                    self.logger.error(format_exc())
+
                 time.sleep(self.window.config["translateSpeed"]-0.4)
