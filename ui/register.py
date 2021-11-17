@@ -5,12 +5,14 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from utils import MessageBox, createSendEmailThread
+from utils import http
 
 import qtawesome
 import threading
 import time
 import re
 import random
+from traceback import format_exc
 
 
 LOGO_PATH = "./config/icon/logo.ico"
@@ -20,12 +22,14 @@ BG_IMAGE_PATH = "./config/background/register.gif"
 
 class Register(QWidget) :
 
-    def __init__(self, config, logger) :
+    def __init__(self, window) :
 
         super(Register, self).__init__()
 
-        self.config = config
-        self.logger = logger
+        # 登录页面
+        self.window = window
+        self.config = window.config
+        self.logger = window.logger
         self.getInitConfig()
 
         self.ui()
@@ -56,8 +60,20 @@ class Register(QWidget) :
         cursor = QCursor(pixmap, 0, 0)
         self.setCursor(cursor)
 
+        font = QFont()
+        font.setFamily(self.font)
+        font.setPointSize(10)
+        self.setFont(font)
+
         # 设置字体
-        self.setStyleSheet("font: 10pt '华康方圆体W7';")
+        self.setStyleSheet("QLineEdit { background: transparent;"
+                                       "border-width:0; "
+                                       "border-style:outset; "
+                                       "color: %s; "
+                                       "font-weight: bold;"
+                                       "border-bottom: 2px solid %s; }"
+                           "QTextEdit:focus { border-bottom: 2px dashed %s; }"
+                           %(self.color, self.color, self.color))
 
         # 背景图
         image_label = QLabel(self)
@@ -73,27 +89,15 @@ class Register(QWidget) :
         label.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
 
         # 账号输入框
-        self.user_text = QTextEdit(self)
+        self.user_text = QLineEdit(self)
         self.customSetGeometry(self.user_text, 30, 10, 300, 30)
         self.user_text.setPlaceholderText("请输入账号:")
-        self.user_text.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.user_text.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.user_text.setStyleSheet("QTextEdit {""background: transparent;"
-                                     "border-width:0; border-style:outset; color: %s; font-weight: bold;"
-                                     "border-bottom: 2px solid %s;""}"
-                                     "QTextEdit:focus {""border-bottom: 2px dashed %s;""}"
-                                     %(self.color, self.color, self.color))
 
         # 密码输入框
         self.password_text = QLineEdit(self)
         self.customSetGeometry(self.password_text, 30, 50, 300, 30)
         self.password_text.setPlaceholderText("请输入密码:")
         self.password_text.setEchoMode(QLineEdit.Password)
-        self.password_text.setStyleSheet("QLineEdit {""background: transparent;"
-                                        "border-width:0; border-style:outset; color: %s; font-weight: bold;"
-                                        "border-bottom: 2px solid %s;""}"
-                                        "QLineEdit:focus {""border-bottom: 2px dashed %s;""}"
-                                         % (self.color, self.color, self.color))
 
         # 是否显示密码
         self.eye_button = QPushButton(qtawesome.icon("fa.eye-slash", color=self.color), "", self)
@@ -104,28 +108,14 @@ class Register(QWidget) :
         self.eye_button.installEventFilter(self)
 
         # 邮箱输入框
-        self.email_text = QTextEdit(self)
+        self.email_text = QLineEdit(self)
         self.customSetGeometry(self.email_text, 30, 90, 300, 30)
         self.email_text.setPlaceholderText("请输入绑定的邮箱:")
-        self.email_text.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.email_text.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.email_text.setStyleSheet("QTextEdit {""background: transparent;"
-                                      "border-width:0; border-style:outset; color: %s; font-weight: bold;"
-                                      "border-bottom: 2px solid %s;""}"
-                                      "QTextEdit:focus {""border-bottom: 2px dashed %s;""}"
-                                      %(self.color, self.color, self.color))
 
         # 验证码输入框
-        self.code_key_text = QTextEdit(self)
+        self.code_key_text = QLineEdit(self)
         self.customSetGeometry(self.code_key_text, 30, 130, 300, 30)
         self.code_key_text.setPlaceholderText("请输入邮箱验证码:")
-        self.code_key_text.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.code_key_text.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.code_key_text.setStyleSheet("QTextEdit {""background: transparent;"
-                                         "border-width:0; border-style:outset; color: %s; font-weight: bold;"
-                                         "border-bottom: 2px solid %s;""}"
-                                         "QTextEdit:focus {""border-bottom: 2px dashed %s;""}"
-                                         % (self.color, self.color, self.color))
 
         # 获取验证码按钮
         self.send_email_button = QPushButton(self)
@@ -141,9 +131,12 @@ class Register(QWidget) :
         self.register_button.setCursor(QCursor(Qt.PointingHandCursor))
         self.register_button.clicked.connect(self.register)
         self.register_button.setText("确定")
-        self.register_button.setStyleSheet('background: rgba(255, 255, 255, 0.5);'
-                                           'color: %s;'
-                                           'font: 15pt %s;'%(self.color, self.font))
+        self.register_button.setStyleSheet("background: rgba(255, 255, 255, 0.5);"
+                                           "font: 15pt %s;"%(self.font))
+
+        self.setTabOrder(self.user_text, self.password_text)
+        self.setTabOrder(self.password_text, self.email_text)
+        self.setTabOrder(self.email_text, self.code_key_text)
 
 
     # 初始化配置
@@ -213,8 +206,8 @@ class Register(QWidget) :
     # 点击发送验证码按钮
     def sendEmail(self) :
 
-        user = self.user_text.toPlainText()
-        email = self.email_text.toPlainText()
+        user = self.user_text.text()
+        email = self.email_text.text()
 
         if not user or re.findall("\s", user):
             MessageBox("注册失败", "用户名为空或含有不合法字符!     ")
@@ -235,22 +228,74 @@ class Register(QWidget) :
     # 注册
     def register(self) :
 
-        user = self.user_text.toPlainText()
+        user = self.user_text.text()
         password = self.password_text.text()
-        email = self.email_text.toPlainText()
-        code_key = self.code_key_text.toPlainText()
+        email = self.email_text.text()
+        code_key = self.code_key_text.text()
 
+        # 校验注册参数合法性
         if not user or re.findall("\s", user) :
-            MessageBox("注册失败", "用户名为空或含有不合法字符!     ")
+            MessageBox("注册失败",
+                       "用户名为空或含有不合法字符!     ")
             return
         if not password or re.findall("\s", password) :
-            MessageBox("注册失败", "密码为空或含有不合法字符!     ")
+            MessageBox("注册失败",
+                       "密码为空或含有不合法字符!     ")
             return
         if not self.checkEmailValidity(email) :
-            MessageBox("注册失败", "邮箱地址不合法!     ")
+            MessageBox("注册失败",
+                       "邮箱地址不合法!     ")
             return
         if code_key != self.code_key :
-            MessageBox("注册失败", "邮箱验证码错误!     ")
+            MessageBox("注册失败",
+                       "邮箱验证码错误!     ")
             return
 
-        MessageBox("注册成功", "注册成功啦，直接登录吧(〃'▽'〃)     ")
+        url = self.config["dictInfo"]["dano_register"]
+        body = {
+            "User": user,
+            "Password": password,
+            "Email": email
+        }
+
+        # 请求注册服务器
+        res, err = http.post(url, body)
+        if err :
+            self.logger.error(err)
+            MessageBox("注册失败", err)
+            return
+        result = res.get("Result", "")
+
+        if result == "User already exists":
+            MessageBox("注册失败",
+                       "用户名已存在啦，再想一个吧!     ")
+
+        elif result == "OK":
+            MessageBox("注册成功",
+                       "注册成功啦，直接登录吧~     ")
+
+            self.window.user_text.setText(user)
+            self.window.password_text.setText(password)
+            self.window.user = user
+            self.window.password = password
+            self.close()
+            self.window.show()
+
+        else:
+            self.logger.error(format_exc())
+            MessageBox("注册失败", "出现了出乎意料的情况\n请联系团子解决!\n错误: {}".format(res))
+
+
+    # 热键检测
+    def keyPressEvent(self, event) :
+
+        # 如果按下回车键
+        if event.key() == 16777220 :
+            self.register()
+
+
+    # 窗口关闭处理
+    def closeEvent(self, event):
+
+        self.close()
+        self.window.show()

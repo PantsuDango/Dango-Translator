@@ -2,8 +2,6 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from ui.register import Register
-
 from utils import MessageBox
 from traceback import format_exc
 
@@ -76,95 +74,93 @@ class Login(QWidget):
                                         "border-radius:15px;"%self.color)
 
         # Logo
-        self.logoButton = QPushButton(self)
-        self.customSetGeometry(self.logoButton, 80, 365, 35, 35)
-        self.logoButton.setStyleSheet("border-image: url(./config/icon/logo.ico);")
-        self.logoButton.setCursor(QCursor(Qt.PointingHandCursor))
+        label = QLabel(self)
+        self.customSetGeometry(label, 80, 365, 35, 35)
+        label.setStyleSheet("border-image: url(./config/icon/logo.ico);")
 
         # 标题
-        self.titleLabel = QLabel(self)
-        self.customSetGeometry(self.titleLabel, 130, 370, 250, 30)
-        self.titleLabel.setText("团子翻译器")
-        self.titleLabel.setStyleSheet("color: %s;"
-                                      "background: transparent;"
-                                      "font: 20pt %s;"
-                                      "font-weight:bold;"%(self.color, self.font))
+        label = QLabel(self)
+        self.customSetGeometry(label, 130, 370, 250, 30)
+        label.setText("团子翻译器")
+        label.setStyleSheet("color: %s;"
+                            "background: transparent;"
+                            "font: 20pt %s;"
+                            "font-weight:bold;"%(self.color, self.font))
 
         # 最小化按钮
-        self.minimizeButton = QPushButton(qtawesome.icon("fa.minus", color=self.color), "", self)
-        self.customSetIconSize(self.minimizeButton, 20, 20)
-        self.customSetGeometry(self.minimizeButton, 345, 360, 20, 20)
-        self.minimizeButton.setStyleSheet("background-color:rgba(62, 62, 62, 0);")
-        self.minimizeButton.setCursor(QCursor(Qt.PointingHandCursor))
-        self.minimizeButton.clicked.connect(self.showMinimized)
+        self.minimize_button = QPushButton(qtawesome.icon("fa.minus", color=self.color), "", self)
+        self.customSetIconSize(self.minimize_button, 20, 20)
+        self.customSetGeometry(self.minimize_button, 345, 360, 20, 20)
+        self.minimize_button.setStyleSheet("background-color:rgba(62, 62, 62, 0);")
+        self.minimize_button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.minimize_button.clicked.connect(self.showMinimized)
 
         # 退出按钮
-        self.quitButton = QPushButton(qtawesome.icon("fa.times", color=self.color), "", self)
-        self.customSetIconSize(self.quitButton, 20, 20)
-        self.customSetGeometry(self.quitButton, 370, 360, 20, 20)
-        self.quitButton.setStyleSheet("background-color:rgba(62, 62, 62, 0);")
-        self.quitButton.setCursor(QCursor(Qt.PointingHandCursor))
-        self.quitButton.clicked.connect(QCoreApplication.instance().quit)
+        self.quit_button = QPushButton(qtawesome.icon("fa.times", color=self.color), "", self)
+        self.customSetIconSize(self.quit_button, 20, 20)
+        self.customSetGeometry(self.quit_button, 370, 360, 20, 20)
+        self.quit_button.setStyleSheet("background-color:rgba(62, 62, 62, 0);")
+        self.quit_button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.quit_button.clicked.connect(QCoreApplication.instance().quit)
 
         # 账号输入框
-        self.userEdit = QTextEdit(self)
-        self.customSetGeometry(self.userEdit, 40, 410, 315, 30)
-        self.userEdit.setPlaceholderText("请输入账号:")
-        self.userEdit.setText(self.username)
-        self.userEdit.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.userEdit.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.userEdit.setStyleSheet("QTextEdit {""background: transparent;"
+        self.user_text = QTextEdit(self)
+        self.customSetGeometry(self.user_text, 40, 410, 315, 30)
+        self.user_text.setPlaceholderText("请输入账号:")
+        self.user_text.setText(self.username)
+        self.user_text.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.user_text.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.user_text.setStyleSheet("QTextEdit {""background: transparent;"
                                     "border-width:0; border-style:outset; color: %s; font-weight: bold;"
                                     "border-bottom: 2px solid %s;""}"
                                     "QTextEdit:focus {""border-bottom: 2px dashed %s;""}"
-                                    %(self.color, self.color, self.color))
+                                     % (self.color, self.color, self.color))
 
         # 密码输入框
-        self.passwordEdit = QLineEdit(self)
-        self.customSetGeometry(self.passwordEdit, 40, 455, 315, 30)
-        self.passwordEdit.setPlaceholderText("请输入密码:")
-        self.passwordEdit.setEchoMode(QLineEdit.Password)
-        self.passwordEdit.setText(self.password)
-        self.passwordEdit.setStyleSheet("QLineEdit {""background: transparent;"
+        self.password_text = QLineEdit(self)
+        self.customSetGeometry(self.password_text, 40, 455, 315, 30)
+        self.password_text.setPlaceholderText("请输入密码:")
+        self.password_text.setEchoMode(QLineEdit.Password)
+        self.password_text.setText(self.password)
+        self.password_text.setStyleSheet("QLineEdit {""background: transparent;"
                                          "border-width:0; border-style:outset; color: %s; font-weight: bold;"
                                          "border-bottom: 2px solid %s;""}"
                                          "QLineEdit:focus {""border-bottom: 2px dashed %s;""}"
-                                        %(self.color, self.color, self.color))
+                                         % (self.color, self.color, self.color))
 
         # 是否显示密码
-        self.eyeButton = QPushButton(qtawesome.icon("fa.eye-slash", color=self.color), "", self)
-        self.customSetIconSize(self.eyeButton, 25, 25)
-        self.customSetGeometry(self.eyeButton, 330, 455, 30, 30)
-        self.eyeButton.setStyleSheet("background-color:rgba(62, 62, 62, 0);")
-        self.eyeButton.setCursor(QCursor(Qt.PointingHandCursor))
-        self.eyeButton.installEventFilter(self)
+        self.eye_button = QPushButton(qtawesome.icon("fa.eye-slash", color=self.color), "", self)
+        self.customSetIconSize(self.eye_button, 25, 25)
+        self.customSetGeometry(self.eye_button, 330, 455, 30, 30)
+        self.eye_button.setStyleSheet("background-color:rgba(62, 62, 62, 0);")
+        self.eye_button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.eye_button.installEventFilter(self)
 
         # 登录按钮
-        self.loginButton = QPushButton(self)
-        self.customSetGeometry(self.loginButton, 130, 495, 50, 35)
-        self.loginButton.setCursor(QCursor(Qt.PointingHandCursor))
-        self.loginButton.setText("登录")
-        self.loginButton.setStyleSheet('background: rgba(255, 255, 255, 0);'
+        self.login_button = QPushButton(self)
+        self.customSetGeometry(self.login_button, 130, 495, 50, 35)
+        self.login_button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.login_button.setText("登录")
+        self.login_button.setStyleSheet('background: rgba(255, 255, 255, 0);'
                                        'color: %s;'
-                                       'font: 15pt %s;'%(self.color, self.font))
+                                       'font: 15pt %s;' % (self.color, self.font))
 
         # 注册按钮
-        self.registerButton = QPushButton(self)
-        self.customSetGeometry(self.registerButton, 220, 495, 50, 35)
-        self.registerButton.setCursor(QCursor(Qt.PointingHandCursor))
-        self.registerButton.clicked.connect(self.openRegister)
-        self.registerButton.setText("注册")
-        self.registerButton.setStyleSheet('background: rgba(255, 255, 255, 0);'
+        self.register_button = QPushButton(self)
+        self.customSetGeometry(self.register_button, 220, 495, 50, 35)
+        self.register_button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.register_button.setText("注册")
+        self.register_button.setStyleSheet('background: rgba(255, 255, 255, 0);'
                                           'color: %s;'
-                                          'font: 15pt %s;'%(self.color, self.font))
+                                          'font: 15pt %s;' % (self.color, self.font))
 
         # 忘记密码按钮
-        self.registerButton = QPushButton(self)
-        self.customSetGeometry(self.registerButton, 305, 490, 60, 15)
-        self.registerButton.setCursor(QCursor(Qt.PointingHandCursor))
-        self.registerButton.clicked.connect(self.register)
-        self.registerButton.setText("忘记密码")
-        self.registerButton.setStyleSheet('background: rgba(255, 255, 255, 0);'
+        self.forget_password_button = QPushButton(self)
+        self.customSetGeometry(self.forget_password_button, 305, 490, 60, 15)
+        self.forget_password_button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.forget_password_button.clicked.connect(self.register)
+        self.forget_password_button.setText("忘记密码")
+        self.forget_password_button.setStyleSheet('background: rgba(255, 255, 255, 0);'
                                           'color: %s;'
                                           'font: 8pt %s;' % (self.color, self.font))
 
@@ -239,21 +235,20 @@ class Login(QWidget):
     # 鼠标移动到眼睛上时对密码的处理
     def eventFilter(self, object, event):
 
-        if object == self.eyeButton :
+        if object == self.eye_button :
             if event.type() == QEvent.Enter:
-                self.eyeButton.setIcon(qtawesome.icon('fa.eye', color=self.color))
-                self.passwordEdit.setEchoMode(QLineEdit.Normal)
+                self.eye_button.setIcon(qtawesome.icon('fa.eye', color=self.color))
+                self.password_text.setEchoMode(QLineEdit.Normal)
 
             if event.type() == QEvent.Leave:
-                self.eyeButton.setIcon(qtawesome.icon('fa.eye-slash', color=self.color))
-                self.passwordEdit.setEchoMode(QLineEdit.Password)
+                self.eye_button.setIcon(qtawesome.icon('fa.eye-slash', color=self.color))
+                self.password_text.setEchoMode(QLineEdit.Password)
 
             return QWidget.eventFilter(self, object, event)
 
 
     def openRegister(self) :
 
-        self.Register = Register(self.config, self.logger)
         self.Register.show()
 
 
@@ -261,8 +256,8 @@ class Login(QWidget):
     def register(self):
 
         # 检查用户名和密码是否合法
-        user = self.userEdit.toPlainText()
-        password = self.passwordEdit.text()
+        user = self.user_text.toPlainText()
+        password = self.password_text.text()
 
         if user == "" :
             MessageBox("注册失败", "用户名不能为空ヽ(`Д´)ﾉ     ")
@@ -310,8 +305,8 @@ class Login(QWidget):
     def login(self) :
 
         # 检查用户名和密码是否合法
-        self.user = self.userEdit.toPlainText()
-        self.password = self.passwordEdit.text()
+        self.user = self.user_text.toPlainText()
+        self.password = self.password_text.text()
 
         if self.user == "" :
             MessageBox("登录失败", "用户名不能为空ヽ(`Д´)ﾉ     ")

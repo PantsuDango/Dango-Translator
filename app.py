@@ -7,6 +7,7 @@ import ui.translation
 import ui.filter
 import ui.range
 import ui.settin
+import ui.register
 
 import utils
 import utils.screen_rate
@@ -124,6 +125,13 @@ class DangoTranslator() :
         self.Translation.show()
 
 
+    # 点击注册
+    def clickRegister(self) :
+
+        self.Login.hide()
+        self.Register.show()
+
+
     def main(self) :
 
         # 记录日志
@@ -142,7 +150,11 @@ class DangoTranslator() :
         # 登录界面
         self.Login = ui.login.Login(self.config, self.logger)
         self.Login.show()
-        self.Login.loginButton.clicked.connect(self.login)
+        self.Login.login_button.clicked.connect(self.login)
+
+        # 注册页面
+        self.Register = ui.register.Register(self.Login)
+        self.Login.register_button.clicked.connect(self.clickRegister)
 
         app.exit(app.exec_())
 

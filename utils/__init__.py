@@ -1,3 +1,8 @@
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+from PyQt5 import QtGui
+
 import yaml
 import os
 import sys
@@ -8,15 +13,9 @@ import tkinter.font
 import requests
 import json
 import subprocess
-import hashlib
 import threading
 from traceback import format_exc, print_exc
 from difflib import SequenceMatcher
-
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from PyQt5 import QtGui
 
 
 YAML_PATH = os.path.join(os.getcwd(), "config", "config.yaml")
