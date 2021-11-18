@@ -144,6 +144,7 @@ def MessageBox(title, text):
 # 新旧配置转换
 def configConvert(config, oldConfig) :
 
+    oldConfig["dictInfo"] = config["dictInfo"]
     config.update(oldConfig)
 
     ################### OCR设定 ###################

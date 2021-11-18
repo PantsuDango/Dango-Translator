@@ -9,6 +9,7 @@ import qtawesome
 import requests
 import json
 from utils import http
+import threading
 
 
 # 登录界面
@@ -291,23 +292,3 @@ class Login(QWidget):
             self.logger.error(format_exc())
             MessageBox("登录失败", "啊咧，出现了出乎意料的情况\n请联系团子解决!!!∑(ﾟДﾟノ)ノ\n\n%s"%format_exc())
             return
-
-
-    def checkEmail(self) :
-
-        url = self.config["dictInfo"]["dango_check_email"]
-        body = {
-            "User": self.user
-        }
-
-        # 请求注册服务器
-        res, err = http.post(url, body)
-        if err :
-            self.logger.error(err)
-            MessageBox("修改失败", err)
-            return
-
-        if res.get("Message", "") == "未绑定邮箱" :
-            print("未绑定邮箱")
-        else :
-            print("已经绑定邮箱")

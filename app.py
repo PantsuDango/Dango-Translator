@@ -8,9 +8,11 @@ import ui.filter
 import ui.range
 import ui.settin
 import ui.register
-
+import threading
 import utils
+from utils import http
 import utils.screen_rate
+from utils import MessageBox
 
 
 class DangoTranslator() :
@@ -26,8 +28,6 @@ class DangoTranslator() :
 
         if not self.Login.login() :
             return
-
-        self.Login.checkEmail()
 
         self.config["user"] = self.Login.user
         self.config["password"] = self.Login.password
@@ -73,6 +73,10 @@ class DangoTranslator() :
 
         # 范围快捷键
         self.Translation.range_hotkey_sign.connect(self.chooseRange)
+
+        # 检查邮箱
+        self.checkEmail()
+
 
 
     # 按下充电键后做的事情
@@ -145,6 +149,34 @@ class DangoTranslator() :
         self.Register.password_text.setPlaceholderText("请输入新密码:")
         self.Register.register_button.clicked.connect(self.Register.modifyPassword)
         self.Register.show()
+
+        # 检查邮箱
+
+
+    def checkEmail(self) :
+
+        url = self.config["dictInfo"]["dango_check_email"]
+        body = {
+            "User": self.config["user"]
+        }
+        # 请求注册服务器
+        res, err = http.post(url, body)
+        if err:
+            self.logger.error(err)
+            MessageBox("绑定邮箱失败", err)
+            return
+
+        if res.get("Message", "") == "未绑定邮箱":
+            MessageBox("邮箱绑定检查",
+                       "检测到您未绑定邮箱, 请先完成邮箱绑定\n"
+                       "邮箱绑定有以下好处:\n"
+                       "1. 忘记密码时用于修改密码;\n"
+                       "2. 购买在线OCR时作为接收购买成功的凭证;     ")
+            self.Register.user_text.setText(self.config["user"])
+            self.Register.password_text.setText(self.config["password"])
+            self.Register.user_text.setEnabled(False)
+            self.Register.password_text.setEnabled(False)
+            self.Register.show()
 
 
     def main(self) :
