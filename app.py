@@ -27,6 +27,8 @@ class DangoTranslator() :
         if not self.Login.login() :
             return
 
+        self.Login.checkEmail()
+
         self.config["user"] = self.Login.user
         self.config["password"] = self.Login.password
 

@@ -8,7 +8,7 @@ from traceback import format_exc
 import qtawesome
 import requests
 import json
-import re
+from utils import http
 
 
 # 登录界面
@@ -17,11 +17,9 @@ class Login(QWidget):
     def __init__(self, config, logger):
 
         super(Login, self).__init__()
-
         self.config = config
         self.logger = logger
         self.getInitConfig()
-
         self.ui()
 
 
@@ -246,61 +244,7 @@ class Login(QWidget):
             return QWidget.eventFilter(self, object, event)
 
 
-    def openRegister(self) :
-
-        self.Register.show()
-
-
-    # 注册
-    def register(self):
-
-        # 检查用户名和密码是否合法
-        user = self.user_text.toPlainText()
-        password = self.password_text.text()
-
-        if user == "" :
-            MessageBox("注册失败", "用户名不能为空ヽ(`Д´)ﾉ     ")
-            return
-        if password == "" :
-            MessageBox("注册失败", "密码不能为空ヽ(`Д´)ﾉ     ")
-            return
-        if re.findall("\s", user) :
-            MessageBox("注册失败", "用户名含有不合法的字符ヽ(`Д´)ﾉ     ")
-            return
-        if re.findall("\s", password) :
-            MessageBox("注册失败", "密码含有不合法的字符ヽ(`Д´)ﾉ     ")
-            return
-        if len(user) < 6 or len(user) > 18 :
-            MessageBox("注册失败", "用户名长度不合法ヽ(`Д´)ﾉ     \n需大于6位，小于18位")
-            return
-        if len(password) < 6 or len(password) > 18 :
-            MessageBox("注册失败", "密码长度不合法ヽ(`Д´)ﾉ     \n需大于6位，小于18位")
-            return
-
-        # 请求服务器
-        params = json.dumps({"User": user, "Password": password})
-        proxies = {"http": None, "https": None}
-
-        try:
-            res = requests.post(self.registerURL, data=params, proxies=proxies, timeout=10)
-            res.encoding = "utf-8"
-            result = json.loads(res.text).get("Result", "")
-
-            if result == "User already exists" :
-                MessageBox("注册失败", "用户名已存在啦，再想一个吧(〃'▽'〃)     ")
-
-            elif result == "OK" :
-                MessageBox("注册成功", "注册成功啦，直接登录吧(〃'▽'〃)     ")
-
-            else :
-                self.logger.error(format_exc())
-                MessageBox("注册失败", "啊咧，出现了出乎意料的情况\n请联系团子解决!!!∑(ﾟДﾟノ)ノ\n\n%s"%format_exc())
-
-        except Exception :
-            self.logger.error(format_exc())
-            MessageBox("注册失败", "啊咧，出现了出乎意料的情况\n请联系团子解决!!!∑(ﾟДﾟノ)ノ\n\n%s"%format_exc())
-
-
+    # 登录
     def login(self) :
 
         # 检查用户名和密码是否合法
@@ -335,6 +279,7 @@ class Login(QWidget):
                 return
 
             elif result == "OK" :
+
                 return True
 
             else:
@@ -346,3 +291,23 @@ class Login(QWidget):
             self.logger.error(format_exc())
             MessageBox("登录失败", "啊咧，出现了出乎意料的情况\n请联系团子解决!!!∑(ﾟДﾟノ)ノ\n\n%s"%format_exc())
             return
+
+
+    def checkEmail(self) :
+
+        url = self.config["dictInfo"]["dango_check_email"]
+        body = {
+            "User": self.user
+        }
+
+        # 请求注册服务器
+        res, err = http.post(url, body)
+        if err :
+            self.logger.error(err)
+            MessageBox("修改失败", err)
+            return
+
+        if res.get("Message", "") == "未绑定邮箱" :
+            print("未绑定邮箱")
+        else :
+            print("已经绑定邮箱")
