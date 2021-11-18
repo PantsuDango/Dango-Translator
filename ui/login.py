@@ -158,7 +158,6 @@ class Login(QWidget):
         self.forget_password_button = QPushButton(self)
         self.customSetGeometry(self.forget_password_button, 305, 490, 60, 15)
         self.forget_password_button.setCursor(QCursor(Qt.PointingHandCursor))
-        self.forget_password_button.clicked.connect(self.register)
         self.forget_password_button.setText("忘记密码")
         self.forget_password_button.setStyleSheet('background: rgba(255, 255, 255, 0);'
                                           'color: %s;'

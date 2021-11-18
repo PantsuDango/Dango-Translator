@@ -129,6 +129,19 @@ class DangoTranslator() :
     def clickRegister(self) :
 
         self.Login.hide()
+        self.Register.setWindowTitle("注册")
+        self.Register.password_text.setPlaceholderText("请输入密码:")
+        self.Register.register_button.clicked.connect(self.Register.register)
+        self.Register.show()
+
+
+    # 点击修改密码
+    def clickForgetPassword(self) :
+
+        self.Login.hide()
+        self.Register.setWindowTitle("修改密码")
+        self.Register.password_text.setPlaceholderText("请输入新密码:")
+        self.Register.register_button.clicked.connect(self.Register.modifyPassword)
         self.Register.show()
 
 
@@ -155,6 +168,7 @@ class DangoTranslator() :
         # 注册页面
         self.Register = ui.register.Register(self.Login)
         self.Login.register_button.clicked.connect(self.clickRegister)
+        self.Login.forget_password_button.clicked.connect(self.clickForgetPassword)
 
         app.exit(app.exec_())
 

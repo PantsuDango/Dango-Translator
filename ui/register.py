@@ -43,9 +43,6 @@ class Register(QWidget) :
         self.setMaximumSize(QSize(self.window_width, self.window_height))
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowCloseButtonHint)
 
-        # 窗口标题
-        self.setWindowTitle("注册")
-
         # 窗口图标
         self.icon = QIcon()
         self.icon.addPixmap(QPixmap(LOGO_PATH), QIcon.Normal, QIcon.On)
@@ -96,14 +93,13 @@ class Register(QWidget) :
         # 密码输入框
         self.password_text = QLineEdit(self)
         self.customSetGeometry(self.password_text, 30, 50, 300, 30)
-        self.password_text.setPlaceholderText("请输入密码:")
         self.password_text.setEchoMode(QLineEdit.Password)
 
         # 是否显示密码
         self.eye_button = QPushButton(qtawesome.icon("fa.eye-slash", color=self.color), "", self)
         self.customSetIconSize(self.eye_button, 25, 25)
         self.customSetGeometry(self.eye_button, 305, 50, 30, 30)
-        self.eye_button.setStyleSheet("background-color:rgba(62, 62, 62, 0);")
+        self.eye_button.setStyleSheet("background: transparent;")
         self.eye_button.setCursor(QCursor(Qt.PointingHandCursor))
         self.eye_button.installEventFilter(self)
 
@@ -129,7 +125,6 @@ class Register(QWidget) :
         self.register_button = QPushButton(self)
         self.customSetGeometry(self.register_button, 140, 175, 80, 35)
         self.register_button.setCursor(QCursor(Qt.PointingHandCursor))
-        self.register_button.clicked.connect(self.register)
         self.register_button.setText("确定")
         self.register_button.setStyleSheet("background: rgba(255, 255, 255, 0.5);"
                                            "font: 15pt %s;"%(self.font))
@@ -210,7 +205,7 @@ class Register(QWidget) :
         email = self.email_text.text()
 
         if not user or re.findall("\s", user):
-            MessageBox("注册失败", "用户名为空或含有不合法字符!     ")
+            MessageBox("发送失败", "用户名为空或含有不合法字符!     ")
             return
         if not self.checkEmailValidity(email) :
             MessageBox("发送失败", "邮箱地址不合法!     ")
@@ -246,12 +241,16 @@ class Register(QWidget) :
             MessageBox("注册失败",
                        "邮箱地址不合法!     ")
             return
+        if not code_key or re.findall("\s", code_key) :
+            MessageBox("修改失败",
+                       "邮箱验证码为空或含有不合法字符!     ")
+            return
         if code_key != self.code_key :
             MessageBox("注册失败",
                        "邮箱验证码错误!     ")
             return
 
-        url = self.config["dictInfo"]["dano_register"]
+        url = self.config["dictInfo"]["dango_register"]
         body = {
             "User": user,
             "Password": password,
@@ -266,14 +265,15 @@ class Register(QWidget) :
             return
         result = res.get("Result", "")
 
-        if result == "User already exists":
+        if result == "User already exists" :
             MessageBox("注册失败",
                        "用户名已存在啦，再想一个吧!     ")
 
-        elif result == "OK":
+        elif result == "OK" :
             MessageBox("注册成功",
                        "注册成功啦，直接登录吧~     ")
 
+            self.code_key = ""
             self.window.user_text.setText(user)
             self.window.password_text.setText(password)
             self.window.user = user
@@ -281,9 +281,72 @@ class Register(QWidget) :
             self.close()
             self.window.show()
 
-        else:
+        else :
             self.logger.error(format_exc())
             MessageBox("注册失败", "出现了出乎意料的情况\n请联系团子解决!\n错误: {}".format(res))
+
+
+    # 修改密码
+    def modifyPassword(self):
+
+        user = self.user_text.text()
+        password = self.password_text.text()
+        email = self.email_text.text()
+        code_key = self.code_key_text.text()
+
+        # 校验注册参数合法性
+        if not user or re.findall("\s", user) :
+            MessageBox("修改失败",
+                       "用户名为空或含有不合法字符!     ")
+            return
+        if not password or re.findall("\s", password) :
+            MessageBox("修改失败",
+                       "密码为空或含有不合法字符!     ")
+            return
+        if not self.checkEmailValidity(email) :
+            MessageBox("修改失败",
+                       "邮箱地址不合法!     ")
+            return
+        if not code_key or re.findall("\s", code_key) :
+            MessageBox("修改失败",
+                       "邮箱验证码为空或含有不合法字符!     ")
+            return
+        if code_key != self.code_key:
+            MessageBox("修改失败",
+                       "邮箱验证码错误!     ")
+            return
+
+        url = self.config["dictInfo"]["dango_modify_password"]
+        body = {
+            "User": user,
+            "Password": password,
+            "Email": email
+        }
+
+        # 请求注册服务器
+        res, err = http.post(url, body)
+        if err:
+            self.logger.error(err)
+            MessageBox("修改失败", err)
+            return
+        result = res.get("Status", "")
+        message = res.get("Message", "")
+
+        if result == "Success" :
+            MessageBox("修改成功",
+                       "修改密码成功啦，直接登录吧~     ")
+
+            self.code_key = ""
+            self.window.user_text.setText(user)
+            self.window.password_text.setText(password)
+            self.window.user = user
+            self.window.password = password
+            self.close()
+            self.window.show()
+
+        else :
+            MessageBox("修改失败",
+                       "%s     "%message)
 
 
     # 热键检测
