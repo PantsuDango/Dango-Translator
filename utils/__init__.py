@@ -485,7 +485,7 @@ class Rectangular :
 # 发送验证码邮件
 def sendEmail(config, user, email, code_key, logger) :
 
-    url = config["dictInfo"].get("send_key_email", "https://stariver.c4a15wh.cn/OCR/Admin/SendDangoEmail")
+    url = config["dictInfo"]["send_key_email"]
     formdata = json.dumps({
         "User": user,
         "Email": email,
