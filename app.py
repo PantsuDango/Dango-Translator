@@ -75,8 +75,7 @@ class DangoTranslator() :
         self.Translation.range_hotkey_sign.connect(self.chooseRange)
 
         # 检查邮箱
-        self.checkEmail()
-
+        #self.checkEmail()
 
 
     # 按下充电键后做的事情

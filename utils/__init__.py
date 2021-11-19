@@ -495,7 +495,7 @@ def sendEmail(config, user, email, code_key, logger) :
     try:
         response = requests.post(url, data=formdata, proxies=proxies)
         result = json.loads(response.text)
-        if result["Success"] != "Success" :
+        if result["Status"] != "Success" :
             logger.error(result["Error"])
     except Exception :
         logger.error(format_exc())
