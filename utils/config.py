@@ -1,6 +1,7 @@
 import yaml
-import utils.http
 from traceback import format_exc
+
+import utils.http
 
 
 YAML_PATH = "./config/config.yaml"
