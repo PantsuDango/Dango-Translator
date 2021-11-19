@@ -150,9 +150,8 @@ class DangoTranslator() :
         self.Register.register_button.clicked.connect(self.Register.modifyPassword)
         self.Register.show()
 
-        # 检查邮箱
 
-
+    # 检查邮箱
     def checkEmail(self) :
 
         url = self.config["dictInfo"]["dango_check_email"]
