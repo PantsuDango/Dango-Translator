@@ -1,4 +1,5 @@
 import yaml
+import json
 from traceback import format_exc
 
 import utils.http
@@ -38,7 +39,33 @@ def saveConfig(config, logger) :
 # 获取字典表
 def getDictInfo(url, logger) :
 
-    res = utils.http.post(url=url, body={}, logger=logger)
+    res = utils.http.post(url, {}, logger)
     result = res.get("Result", {})
 
     return result
+
+
+# 从服务器获取用户配置信息
+def getSettin(object) :
+
+    url = object.yaml["dict_info"]["dango_get_config"]
+    body = {
+        "User": object.yaml["user"]
+    }
+
+    res = utils.http.post(url, body, object.logger)
+    result = res.get("Result", {})
+    try :
+        result = json.loads(result)
+    except Exception :
+        return {}
+    if result == "User dose not exist" :
+        return {}
+    elif type(result) != dict :
+        return {}
+
+    return result
+
+    #config = configConvert(config, json.loads(result))
+
+

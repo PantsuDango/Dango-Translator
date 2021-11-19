@@ -137,34 +137,6 @@ def configConvert(config, oldConfig) :
     return config
 
 
-# 从云端获取配置信息
-def getSettin(config, logger) :
-
-    getSettinURL = "http://120.24.146.175:3000/DangoTranslate/GetSettin"
-
-    params = json.dumps({"User": config["user"]})
-    proxies = {"http": None, "https": None}
-
-    try:
-        res = requests.post(getSettinURL, data=params, proxies=proxies, timeout=10)
-        res.encoding = "utf-8"
-        result = json.loads(res.text).get("Result", "")
-
-        if result == "User dose not exist" :
-            pass
-
-        elif result :
-            config = configConvert(config, json.loads(result))
-
-        else :
-            pass
-
-    except Exception :
-        logger.error(format_exc())
-
-    return config
-
-
 # 登录ocr服务器
 def loginDangoOCR(config, logger) :
 

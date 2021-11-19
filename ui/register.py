@@ -161,6 +161,8 @@ class Register(QWidget) :
         self.font_size = 10
         # 验证码
         self.code_key = ""
+        # 当前页面类型
+        self.window_type = ""
 
 
     # 根据分辨率定义控件位置尺寸
@@ -370,6 +372,41 @@ class Register(QWidget) :
                                      "%s     "%message)
 
 
+    # 检查邮箱线程
+    def createBindEmailThread(self) :
+
+        thread = utils.email.BindEmail(self.object)
+        thread.signal.connect(self.showBindEmailMessage)
+        thread.start()
+        thread.exec()
+
+
+    # 检查邮箱显示消息窗口
+    def showBindEmailMessage(self, sign) :
+
+        utils.message.checkEmailMessageBox("邮箱绑定检查",
+                                           "检测到您未绑定邮箱, 请先完成邮箱绑定\n"
+                                           "邮箱绑定有以下好处:\n"
+                                           "1. 忘记密码时用于修改密码;\n"
+                                           "2. 购买在线OCR时接收购买凭证;     ",
+                                           self.object)
+
+
+    # 绑定邮箱
+    def bindEmail(self) :
+
+        #self.object.translation_ui.hide()
+        self.window_type = "bind_email"
+        self.setWindowTitle("绑定邮箱")
+        self.user_text.setText(self.object.yaml["user"])
+        self.password_text.setText(self.object.yaml["password"])
+        self.user_text.setEnabled(False)
+        self.password_text.setEnabled(False)
+        self.email_text.clear()
+        self.code_key_text.clear()
+        self.show()
+
+
     # 热键检测
     def keyPressEvent(self, event) :
 
@@ -382,4 +419,8 @@ class Register(QWidget) :
     def closeEvent(self, event) :
 
         self.close()
-        self.object.login_ui.show()
+        if self.window_type != "bind_email" :
+            self.object.login_ui.show()
+        else :
+            pass
+            #self.object.translation_ui.show()

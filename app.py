@@ -45,16 +45,14 @@ class DangoTranslator() :
         if not self.login_ui.login() :
             return
 
-        print("登录成功")
+        # 检查邮箱
+        #self.register_ui.createBindEmailThread()
 
-        # self.config["user"] = self.Login.user
-        # self.config["password"] = self.Login.password
-        #
-        # # 从云端获取配置信息
-        # self.config = utils.getSettin(self.config, self.logger)
+        # 从云端获取配置信息
+        self.config = utils.config.getSettin(self)
+        print(self.config)
         # self.config = utils.loginDangoOCR(self.config, self.logger)
-        # utils.config.saveConfig(self.config)
-        #
+
         # # 翻译界面
         # self.Translation = ui.translation.Translation(self.config, self.logger)
         # # 设置界面
@@ -91,9 +89,6 @@ class DangoTranslator() :
         #
         # # 范围快捷键
         # self.Translation.range_hotkey_sign.connect(self.chooseRange)
-
-        ## 检查邮箱
-        #self.checkEmail()
 
 
     # 按下充电键后做的事情
@@ -152,7 +147,8 @@ class DangoTranslator() :
     def clickRegister(self) :
 
         self.login_ui.hide()
-        self.register_ui.setWindowTitle("注册")
+        self.register_ui.window_type = "register"
+        self.register_ui.setWindowTitle("注册账号")
         self.register_ui.password_text.setPlaceholderText("请输入密码:")
         self.register_ui.register_button.clicked.connect(self.register_ui.register)
         self.register_ui.show()
@@ -164,6 +160,7 @@ class DangoTranslator() :
     def clickForgetPassword(self) :
 
         self.login_ui.hide()
+        self.register_ui.window_type = "modify_password"
         self.register_ui.setWindowTitle("修改密码")
         self.register_ui.password_text.clear()
         self.register_ui.password_text.setPlaceholderText("请输入新密码:")
@@ -171,33 +168,6 @@ class DangoTranslator() :
         self.register_ui.show()
         self.register_ui.register_button.hide()
         self.register_ui.modify_password_button.show()
-
-
-    # 检查邮箱
-    def checkEmail(self) :
-
-        url = self.config["dictInfo"]["dango_check_email"]
-        body = {
-            "User": self.config["user"]
-        }
-        # 请求注册服务器
-        res, err = http.post(url, body)
-        if err:
-            self.logger.error(err)
-            MessageBox("绑定邮箱失败", err)
-            return
-
-        if res.get("Message", "") == "未绑定邮箱":
-            MessageBox("邮箱绑定检查",
-                       "检测到您未绑定邮箱, 请先完成邮箱绑定\n"
-                       "邮箱绑定有以下好处:\n"
-                       "1. 忘记密码时用于修改密码;\n"
-                       "2. 购买在线OCR时作为接收购买成功的凭证;     ")
-            self.register_ui.user_text.setText(self.config["user"])
-            self.register_ui.password_text.setText(self.config["password"])
-            self.register_ui.user_text.setEnabled(False)
-            self.register_ui.password_text.setEnabled(False)
-            self.register_ui.show()
 
 
     # 主函数
