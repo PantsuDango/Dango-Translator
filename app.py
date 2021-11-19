@@ -8,6 +8,7 @@ import utils.screen_rate
 import utils.check_font
 
 import ui.login
+import ui.register
 
 
 
@@ -15,7 +16,6 @@ import ui.translation
 import ui.filter
 import ui.range
 import ui.settin
-import ui.register
 import threading
 import utils
 import utils.check_font
@@ -42,7 +42,7 @@ class DangoTranslator() :
     # 登录
     def login(self) :
 
-        if not self.Login.login() :
+        if not self.login_ui.login() :
             return
 
         print("登录成功")
@@ -151,21 +151,26 @@ class DangoTranslator() :
     # 点击注册
     def clickRegister(self) :
 
-        self.Login.hide()
-        self.Register.setWindowTitle("注册")
-        self.Register.password_text.setPlaceholderText("请输入密码:")
-        self.Register.register_button.clicked.connect(self.Register.register)
-        self.Register.show()
+        self.login_ui.hide()
+        self.register_ui.setWindowTitle("注册")
+        self.register_ui.password_text.setPlaceholderText("请输入密码:")
+        self.register_ui.register_button.clicked.connect(self.register_ui.register)
+        self.register_ui.show()
+        self.register_ui.modify_password_button.hide()
+        self.register_ui.register_button.show()
 
 
     # 点击修改密码
     def clickForgetPassword(self) :
 
-        self.Login.hide()
-        self.Register.setWindowTitle("修改密码")
-        self.Register.password_text.setPlaceholderText("请输入新密码:")
-        self.Register.register_button.clicked.connect(self.Register.modifyPassword)
-        self.Register.show()
+        self.login_ui.hide()
+        self.register_ui.setWindowTitle("修改密码")
+        self.register_ui.password_text.clear()
+        self.register_ui.password_text.setPlaceholderText("请输入新密码:")
+        self.register_ui.modify_password_button.clicked.connect(self.register_ui.modifyPassword)
+        self.register_ui.show()
+        self.register_ui.register_button.hide()
+        self.register_ui.modify_password_button.show()
 
 
     # 检查邮箱
@@ -188,11 +193,11 @@ class DangoTranslator() :
                        "邮箱绑定有以下好处:\n"
                        "1. 忘记密码时用于修改密码;\n"
                        "2. 购买在线OCR时作为接收购买成功的凭证;     ")
-            self.Register.user_text.setText(self.config["user"])
-            self.Register.password_text.setText(self.config["password"])
-            self.Register.user_text.setEnabled(False)
-            self.Register.password_text.setEnabled(False)
-            self.Register.show()
+            self.register_ui.user_text.setText(self.config["user"])
+            self.register_ui.password_text.setText(self.config["password"])
+            self.register_ui.user_text.setEnabled(False)
+            self.register_ui.password_text.setEnabled(False)
+            self.register_ui.show()
 
 
     # 主函数
@@ -206,14 +211,14 @@ class DangoTranslator() :
         utils.check_font.checkFont(self.logger)
 
         # 登录界面
-        self.Login = ui.login.Login(self)
-        self.Login.show()
-        self.Login.login_button.clicked.connect(self.login)
+        self.login_ui = ui.login.Login(self)
+        self.login_ui.show()
+        self.login_ui.login_button.clicked.connect(self.login)
 
-        # # 注册页面
-        # self.Register = ui.register.Register(self.Login)
-        # self.Login.register_button.clicked.connect(self.clickRegister)
-        # self.Login.forget_password_button.clicked.connect(self.clickForgetPassword)
+        # 注册页面
+        self.register_ui = ui.register.Register(self)
+        self.login_ui.register_button.clicked.connect(self.clickRegister)
+        self.login_ui.forget_password_button.clicked.connect(self.clickForgetPassword)
 
         app.exit(app.exec_())
 

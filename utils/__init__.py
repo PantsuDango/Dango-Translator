@@ -3,13 +3,11 @@ import time
 import requests
 import json
 import subprocess
-import threading
 from traceback import format_exc, print_exc
 from difflib import SequenceMatcher
 
 from utils.check_font import openFontFile
 from utils.config import saveConfig
-
 
 TEST_IMAGE_PATH = "C:/Users/Dango/Desktop/翻译器/4.0/config/other/image.jpg"
 
@@ -343,30 +341,3 @@ class Rectangular :
         if self.x0 < r2.x1 and self.y0 < r2.y1 and self.x1 > r2.x0 and self.y1 > r2.y0:
             return True
         return False
-
-
-# 发送验证码邮件
-def sendEmail(config, user, email, code_key, logger) :
-
-    url = config["dictInfo"]["send_key_email"]
-    formdata = json.dumps({
-        "User": user,
-        "Email": email,
-        "CodeKey": code_key
-    })
-    proxies = {"http": None, "https": None}
-    try:
-        response = requests.post(url, data=formdata, proxies=proxies)
-        result = json.loads(response.text)
-        if result["Status"] != "Success" :
-            logger.error(result["Error"])
-    except Exception :
-        logger.error(format_exc())
-
-
-# 发送验证码邮件线程
-def createSendEmailThread(config, user, email, code_key, logger) :
-
-    thread = threading.Thread(target=sendEmail, args=(config, user, email, code_key, logger))
-    thread.setDaemon(True)
-    thread.start()

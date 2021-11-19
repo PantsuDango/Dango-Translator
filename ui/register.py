@@ -4,16 +4,15 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from utils import createSendEmailThread
-from utils.message import MessageBox
-from utils import http
-
 import qtawesome
-import threading
 import time
 import re
 import random
-from traceback import format_exc
+
+import utils.email
+import utils.message
+import utils.http
+import utils.thread
 
 
 LOGO_PATH = "./config/icon/logo.ico"
@@ -21,18 +20,15 @@ PIXMAP_PATH = "./config/icon/pixmap.png"
 BG_IMAGE_PATH = "./config/background/register.gif"
 
 
+# 注册界面
 class Register(QWidget) :
 
-    def __init__(self, window) :
+    def __init__(self, object) :
 
         super(Register, self).__init__()
-
-        # 登录页面
-        self.window = window
-        self.config = window.config
-        self.logger = window.logger
+        self.object = object
+        self.logger = object.logger
         self.getInitConfig()
-
         self.ui()
 
 
@@ -61,7 +57,7 @@ class Register(QWidget) :
         # 设置字体
         font = QFont()
         font.setFamily(self.font)
-        font.setPointSize(10)
+        font.setPointSize(self.font_size)
         self.setFont(font)
 
         # 界面样式
@@ -75,11 +71,11 @@ class Register(QWidget) :
                            %(self.color, self.color, self.color))
 
         # 背景图
-        image_label = QLabel(self)
-        image_label.setGeometry(QRect(0, 0, self.window_width, self.window_height))
+        label = QLabel(self)
+        label.setGeometry(QRect(0, 0, self.window_width, self.window_height))
         gif = QMovie(BG_IMAGE_PATH)
-        image_label.setMovie(gif)
-        image_label.setScaledContents(True)
+        label.setMovie(gif)
+        label.setScaledContents(True)
         gif.start()
 
         # 此Label用于雾化工具栏1的背景图
@@ -129,7 +125,20 @@ class Register(QWidget) :
         self.register_button.setCursor(QCursor(Qt.PointingHandCursor))
         self.register_button.setText("确定")
         self.register_button.setStyleSheet("background: rgba(255, 255, 255, 0.5);"
-                                           "font: 15pt %s;"%(self.font))
+                                           "color: %s;"
+                                           "font: 15pt %s;"
+                                           %(self.color, self.font))
+
+        # 确定注册按钮
+        self.modify_password_button = QPushButton(self)
+        self.customSetGeometry(self.modify_password_button, 140, 175, 80, 35)
+        self.modify_password_button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.modify_password_button.setText("确定")
+        self.modify_password_button.setStyleSheet("background: rgba(255, 255, 255, 0.5);"
+                                           "color: %s;"
+                                           "font: 15pt %s;"
+                                           %(self.color, self.font))
+        self.modify_password_button.hide()
 
         self.setTabOrder(self.user_text, self.password_text)
         self.setTabOrder(self.password_text, self.email_text)
@@ -140,14 +149,16 @@ class Register(QWidget) :
     def getInitConfig(self):
 
         # 界面缩放比例
-        self.rate = self.config["screenScaleRate"]
+        self.rate = self.object.yaml["screen_scale_rate"]
         # 界面尺寸
-        self.window_width = int(360 * self.rate)
-        self.window_height = int(231 * self.rate)
+        self.window_width = int(360*self.rate)
+        self.window_height = int(231*self.rate)
         # 输入框颜色
         self.color = "#FF79BC"
         # 界面字体
         self.font = "华康方圆体W7"
+        # 界面字体大小
+        self.font_size = 10
         # 验证码
         self.code_key = ""
 
@@ -170,12 +181,12 @@ class Register(QWidget) :
     # 鼠标移动到眼睛上时对密码的处理
     def eventFilter(self, object, event) :
 
-        if object == self.eye_button:
-            if event.type() == QEvent.Enter:
+        if object == self.eye_button :
+            if event.type() == QEvent.Enter :
                 self.eye_button.setIcon(qtawesome.icon('fa.eye', color=self.color))
                 self.password_text.setEchoMode(QLineEdit.Normal)
 
-            if event.type() == QEvent.Leave:
+            if event.type() == QEvent.Leave :
                 self.eye_button.setIcon(qtawesome.icon('fa.eye-slash', color=self.color))
                 self.password_text.setEchoMode(QLineEdit.Password)
 
@@ -200,6 +211,18 @@ class Register(QWidget) :
         return re.match(regex, email)
 
 
+    # 显示验证码邮件发送状态
+    def showEmailMessage(self, sign, error) :
+
+        if sign :
+            utils.message.MessageBox("发送成功",
+                                     "验证码邮件已成功发送, 请注意查收~     ")
+        else :
+            self.signal.emit(True)
+            utils.message.MessageBox("发送失败",
+                                     "发送验证码邮件失败了!\n%s     "%error)
+
+
     # 点击发送验证码按钮
     def sendEmail(self) :
 
@@ -207,19 +230,25 @@ class Register(QWidget) :
         email = self.email_text.text()
 
         if not user or re.findall("\s", user):
-            MessageBox("发送失败", "用户名为空或含有不合法字符!     ")
-            return
-        if not self.checkEmailValidity(email) :
-            MessageBox("发送失败", "邮箱地址不合法!     ")
+            utils.message.MessageBox("发送失败",
+                                     "用户名为空或含有不合法字符!     ")
             return
 
-        thread = threading.Thread(target=self.buttonStatusThread)
-        thread.setDaemon(True)
-        thread.start()
+        if not self.checkEmailValidity(email) :
+            utils.message.MessageBox("发送失败",
+                                     "邮箱地址不合法!     ")
+            return
+
+        # 冻结验证码按钮
+        utils.thread.createThread(self.buttonStatusThread)
 
         # 发送邮件
         self.code_key = str(random.randint(1001, 9999))
-        createSendEmailThread(self.config, user, email, self.code_key, self.logger)
+        url = self.object.yaml["dict_info"]["send_key_email"]
+        thread = utils.email.SendEmail(url, user, email, self.code_key, self.logger)
+        thread.signal.connect(self.showEmailMessage)
+        thread.start()
+        thread.exec()
 
 
     # 注册
@@ -232,64 +261,57 @@ class Register(QWidget) :
 
         # 校验注册参数合法性
         if not user or re.findall("\s", user) :
-            MessageBox("注册失败",
-                       "用户名为空或含有不合法字符!     ")
+            utils.message.MessageBox("注册失败",
+                                     "用户名为空或含有不合法字符!     ")
             return
         if not password or re.findall("\s", password) :
-            MessageBox("注册失败",
-                       "密码为空或含有不合法字符!     ")
+            utils.message.MessageBox("注册失败",
+                                     "密码为空或含有不合法字符!     ")
             return
         if not self.checkEmailValidity(email) :
-            MessageBox("注册失败",
-                       "邮箱地址不合法!     ")
+            utils.message.MessageBox("注册失败",
+                                     "邮箱地址不合法!     ")
             return
         if not code_key or re.findall("\s", code_key) :
-            MessageBox("修改失败",
-                       "邮箱验证码为空或含有不合法字符!     ")
+            utils.message.MessageBox("修改失败",
+                                     "邮箱验证码为空或含有不合法字符!     ")
             return
         if code_key != self.code_key :
-            MessageBox("注册失败",
-                       "邮箱验证码错误!     ")
+            utils.message.MessageBox("注册失败",
+                                     "邮箱验证码错误!     ")
             return
 
-        url = self.config["dictInfo"]["dango_register"]
+        url = self.object.yaml["dict_info"]["dango_register"]
         body = {
             "User": user,
             "Password": password,
             "Email": email
         }
 
-        # 请求注册服务器
-        res, err = http.post(url, body)
-        if err :
-            self.logger.error(err)
-            MessageBox("注册失败", err)
-            return
+        # 请求服务器
+        res = utils.http.post(url, body, self.logger)
         result = res.get("Result", "")
 
         if result == "User already exists" :
-            MessageBox("注册失败",
-                       "用户名已存在啦，再想一个吧!     ")
+            utils.message.MessageBox("注册失败",
+                                     "用户名已存在啦，再想一个吧!     ")
 
         elif result == "OK" :
-            MessageBox("注册成功",
-                       "注册成功啦，直接登录吧~     ")
-
+            utils.message.MessageBox("注册成功",
+                                     "注册成功啦，直接登录吧~     ")
             self.code_key = ""
-            self.window.user_text.setText(user)
-            self.window.password_text.setText(password)
-            self.window.user = user
-            self.window.password = password
+            self.object.login_ui.user_text.setText(user)
+            self.object.login_ui.password_text.setText(password)
             self.close()
-            self.window.show()
+            self.object.login_ui.show()
 
         else :
-            self.logger.error(format_exc())
-            MessageBox("注册失败", "出现了出乎意料的情况\n请联系团子解决!\n错误: {}".format(res))
+            utils.message.MessageBox("注册失败",
+                                     "出现了出乎意料的情况\n请联系团子解决!     ")
 
 
     # 修改密码
-    def modifyPassword(self):
+    def modifyPassword(self) :
 
         user = self.user_text.text()
         password = self.password_text.text()
@@ -298,57 +320,54 @@ class Register(QWidget) :
 
         # 校验注册参数合法性
         if not user or re.findall("\s", user) :
-            MessageBox("修改失败",
-                       "用户名为空或含有不合法字符!     ")
-            return
-        if not password or re.findall("\s", password) :
-            MessageBox("修改失败",
-                       "密码为空或含有不合法字符!     ")
-            return
-        if not self.checkEmailValidity(email) :
-            MessageBox("修改失败",
-                       "邮箱地址不合法!     ")
-            return
-        if not code_key or re.findall("\s", code_key) :
-            MessageBox("修改失败",
-                       "邮箱验证码为空或含有不合法字符!     ")
-            return
-        if code_key != self.code_key:
-            MessageBox("修改失败",
-                       "邮箱验证码错误!     ")
+            utils.message.MessageBox("修改失败",
+                                     "用户名为空或含有不合法字符!     ")
             return
 
-        url = self.config["dictInfo"]["dango_modify_password"]
+        if not password or re.findall("\s", password) :
+            utils.message.MessageBox("修改失败",
+                                     "密码为空或含有不合法字符!     ")
+            return
+
+        if not self.checkEmailValidity(email) :
+            utils.message.MessageBox("修改失败",
+                                     "邮箱地址不合法!     ")
+            return
+
+        if not code_key or re.findall("\s", code_key) :
+            utils.message.MessageBox("修改失败",
+                                     "邮箱验证码为空或含有不合法字符!     ")
+            return
+
+        if code_key != self.code_key :
+            utils.message.MessageBox("修改失败",
+                                     "邮箱验证码错误!     ")
+            return
+
+        url = self.object.yaml["dict_info"]["dango_modify_password"]
         body = {
             "User": user,
             "Password": password,
             "Email": email
         }
 
-        # 请求注册服务器
-        res, err = http.post(url, body)
-        if err:
-            self.logger.error(err)
-            MessageBox("修改失败", err)
-            return
+        # 请求服务器
+        res = utils.http.post(url, body, self.logger)
         result = res.get("Status", "")
         message = res.get("Message", "")
 
         if result == "Success" :
-            MessageBox("修改成功",
-                       "修改密码成功啦，直接登录吧~     ")
-
+            utils.message.MessageBox("修改成功",
+                                     "修改密码成功啦，直接登录吧~     ")
             self.code_key = ""
-            self.window.user_text.setText(user)
-            self.window.password_text.setText(password)
-            self.window.user = user
-            self.window.password = password
+            self.object.login_ui.user_text.setText(user)
+            self.object.login_ui.password_text.setText(password)
             self.close()
-            self.window.show()
+            self.object.login_ui.show()
 
         else :
-            MessageBox("修改失败",
-                       "%s     "%message)
+            utils.message.MessageBox("修改失败",
+                                     "%s     "%message)
 
 
     # 热键检测
@@ -360,7 +379,7 @@ class Register(QWidget) :
 
 
     # 窗口关闭处理
-    def closeEvent(self, event):
+    def closeEvent(self, event) :
 
         self.close()
-        self.window.show()
+        self.object.login_ui.show()

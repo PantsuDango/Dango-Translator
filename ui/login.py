@@ -18,7 +18,7 @@ BACKGROUND_PATH = "./config/background/login.png"
 # 登录界面
 class Login(QWidget) :
 
-    def __init__(self, object):
+    def __init__(self, object) :
 
         super(Login, self).__init__()
         self.object = object
@@ -253,7 +253,7 @@ class Login(QWidget) :
 
 
     # 检查登录参数
-    def check_login(self) :
+    def checkLogin(self) :
 
         self.user = self.user_text.text()
         self.password = self.password_text.text()
@@ -274,7 +274,7 @@ class Login(QWidget) :
 
 
     # 登录请求
-    def post_login(self) :
+    def postLogin(self) :
 
         # 请求服务器
         url = self.object.yaml["dict_info"]["dango_login"]
@@ -317,11 +317,11 @@ class Login(QWidget) :
     def login(self) :
 
         # 检查登录参数
-        if not self.check_login() :
+        if not self.checkLogin() :
             return False
 
         # 登录请求
-        if not self.post_login() :
+        if not self.postLogin() :
             return False
 
         return True
