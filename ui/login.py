@@ -328,8 +328,8 @@ class Login(QWidget) :
 
 
     # 热键检测
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event) :
 
         # 如果按下回车键
-        if event.key() == 16777220:
-            self.login()
+        if event.key() == 16777220 :
+            self.object.login()
