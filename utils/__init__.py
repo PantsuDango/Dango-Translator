@@ -1,15 +1,5 @@
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from PyQt5 import QtGui
-
-import yaml
-import os
-import sys
 import re
 import time
-import logging
-import tkinter.font
 import requests
 import json
 import subprocess
@@ -17,128 +7,11 @@ import threading
 from traceback import format_exc, print_exc
 from difflib import SequenceMatcher
 
+from utils.check_font import openFontFile
+from utils.config import saveConfig
 
-YAML_PATH = os.path.join(os.getcwd(), "config", "config.yaml")
-FONT_PATH = os.path.join(os.getcwd(), "config", "other", "华康方圆体W7.TTC")
-LOGO_PATH = os.path.join(os.getcwd(), "config", "icon", "logo.ico")
+
 TEST_IMAGE_PATH = "C:/Users/Dango/Desktop/翻译器/4.0/config/other/image.jpg"
-
-
-# 设置日志文件
-def setLog() :
-
-    logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
-
-    date = time.strftime("%Y-%m-%d", time.localtime(time.time()))
-    logFileName = date + ".log"
-    logPath = os.path.join(os.getcwd(), "logs", logFileName)
-
-    try :
-        os.makedirs(os.path.join(os.getcwd(), "logs"))
-    except FileExistsError :
-        pass
-
-    fileHandler = logging.FileHandler(logPath, mode="a+", encoding="utf-8")
-    fileHandler.setLevel(logging.DEBUG)
-
-    formatter = logging.Formatter("[%(asctime)s][%(pathname)s-line:%(lineno)d][%(levelname)s]\n%(message)s")
-    fileHandler.setFormatter(formatter)
-    logger.addHandler(fileHandler)
-
-    return logger
-
-
-# 打开配置文件
-def openConfig() :
-
-    try :
-        with open(YAML_PATH, "r", encoding="utf-8") as file :
-            config = yaml.load(file.read(), Loader=yaml.FullLoader)
-    except Exception :
-        config = {}
-
-    # 字典表
-    config["dictInfo"] = getDictInfo()
-
-    return config
-
-
-# 更新配置文件
-def saveConfig(config) :
-
-    with open(YAML_PATH, "w", encoding="utf-8") as file :
-        yaml.dump(config, file)
-
-
-# 检查字体是否存在
-def checkFont(logger) :
-
-    tkinter.Tk()
-    fontList = tkinter.font.families()
-
-    if "华康方圆体W7" not in fontList :
-        checkFontMessageBox("字体文件缺失",
-                            "字体文字缺失，请先安装字体文件\n"
-                            "它会使你的界面更好看ヾ(๑╹◡╹)ﾉ\"     \n"
-                            "安装完毕后需重新打开翻译器！", logger)
-
-
-# 打开字体文件
-def openFontFile(logger) :
-
-    try :
-        os.startfile(FONT_PATH)
-    except Exception :
-        logger.error(format_exc())
-        MessageBox("打开字体文件失败",
-                   "由于某种神秘力量，打开字体文件失败了(◢д◣)\n"
-                   "请手动打开安装，字体文件路径如下:\n"
-                   "%s     "%FONT_PATH)
-
-    sys.exit()
-
-
-# 错误提示窗口-字体检查提示
-def checkFontMessageBox(title, text, logger):
-
-    messageBox = QMessageBox()
-    messageBox.setTextInteractionFlags(Qt.TextSelectableByMouse)
-    messageBox.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowMaximizeButtonHint | Qt.MSWindowsFixedSizeDialogHint)
-
-    icon = QtGui.QIcon()
-    icon.addPixmap(QtGui.QPixmap(LOGO_PATH), QtGui.QIcon.Normal, QtGui.QIcon.On)
-    messageBox.setWindowIcon(icon)
-
-    messageBox.setWindowTitle(title)
-    messageBox.setText(text)
-
-    openFontFileButton = QPushButton("好滴")
-    openFontFileButton.clicked.connect(lambda: openFontFile(logger))
-
-    messageBox.addButton(openFontFileButton, QMessageBox.YesRole)
-    messageBox.addButton(QPushButton("忽略"), QMessageBox.NoRole)
-
-    messageBox.exec_()
-
-
-# 错误提示窗口-通用
-def MessageBox(title, text):
-
-    messageBox = QMessageBox()
-    messageBox.setTextInteractionFlags(Qt.TextSelectableByMouse)
-    messageBox.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowMaximizeButtonHint | Qt.MSWindowsFixedSizeDialogHint)
-
-    icon = QtGui.QIcon()
-    icon.addPixmap(QtGui.QPixmap(LOGO_PATH), QtGui.QIcon.Normal, QtGui.QIcon.On)
-    messageBox.setWindowIcon(icon)
-
-    messageBox.setWindowTitle(title)
-    messageBox.setText(text)
-
-    messageBox.addButton(QPushButton("好滴"), QMessageBox.YesRole)
-
-    messageBox.exec_()
 
 
 # 新旧配置转换
@@ -409,16 +282,6 @@ def get_equal_rate(str1, str2) :
 
     return SequenceMatcher(None, str1, str2).quick_ratio()
 
-
-# 获取字典表
-def getDictInfo() :
-
-    try :
-        res = requests.post("http://120.24.146.175:3000/DangoTranslate/ShowDict")
-        res.encoding = "utf-8"
-        return res.json()["Result"]
-    except Exception :
-        return {}
 
 
 # 保存翻译历史

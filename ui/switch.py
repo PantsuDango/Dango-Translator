@@ -2,7 +2,8 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from utils import MessageBox, detectPort
+from utils import detectPort
+from utils.message import MessageBox
 
 
 # 只有翻译界面用

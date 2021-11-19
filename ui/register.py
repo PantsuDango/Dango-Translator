@@ -4,7 +4,8 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from utils import MessageBox, createSendEmailThread
+from utils import createSendEmailThread
+from utils.message import MessageBox
 from utils import http
 
 import qtawesome
@@ -57,12 +58,13 @@ class Register(QWidget) :
         cursor = QCursor(pixmap, 0, 0)
         self.setCursor(cursor)
 
+        # 设置字体
         font = QFont()
         font.setFamily(self.font)
         font.setPointSize(10)
         self.setFont(font)
 
-        # 设置字体
+        # 界面样式
         self.setStyleSheet("QLineEdit { background: transparent;"
                                        "border-width:0; "
                                        "border-style:outset; "

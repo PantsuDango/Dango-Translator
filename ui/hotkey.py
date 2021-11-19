@@ -3,7 +3,7 @@
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from utils import MessageBox
+from utils.message import MessageBox
 
 LOGO_PATH = "./config/icon/logo.ico"
 PIXMAP_PATH = "./config/icon/pixmap.png"

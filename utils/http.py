@@ -4,17 +4,19 @@ from traceback import format_exc
 
 
 # 发送http请求
-def post(url:str, body:dict) -> (dict, str) :
+def post(url, body, logger):
 
     proxies = {
         "http": None,
         "https": None
     }
+    result = {}
     try:
-        res = requests.post(url, data=json.dumps(body), proxies=proxies)
-        res.encoding = "utf-8"
-        result = json.loads(res.text)
-        return result, None
+        response = requests.post(url, data=json.dumps(body), proxies=proxies, timeout=10)
+        response.encoding = "utf-8"
+        result = json.loads(response.text)
 
     except Exception :
-        return format_exc()
+        logger.error(format_exc())
+
+    return result

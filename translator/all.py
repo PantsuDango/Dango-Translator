@@ -5,6 +5,10 @@ import time
 
 
 # 翻译模块实例化1
+import utils.config
+import utils.logger
+
+
 def createWebdriver1(obj, config, logger, web_type) :
 
     obj.webdriver_1 = Webdriver(config, logger)
@@ -476,9 +480,9 @@ if __name__ == "__main__" :
     ]
 
     import utils
-    logger = utils.setLog()
+    logger = utils.logger.setLog()
     config = {}
-    config["dictInfo"] = utils.getDictInfo()
+    config["dictInfo"] = utils.config.getDictInfo()
 
     obj = Webdriver(config, logger)
     obj.openWebdriver()

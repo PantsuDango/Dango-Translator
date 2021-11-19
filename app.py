@@ -2,7 +2,15 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 import sys
 
+import utils.logger
+import utils.config
+import utils.screen_rate
+import utils.check_font
+
 import ui.login
+
+
+
 import ui.translation
 import ui.filter
 import ui.range
@@ -10,17 +18,25 @@ import ui.settin
 import ui.register
 import threading
 import utils
+import utils.check_font
 from utils import http
 import utils.screen_rate
-from utils import MessageBox
+from utils.message import MessageBox
 
 
 class DangoTranslator() :
 
+    # 配置初始化
     def __init__(self) :
 
-        # 从配置文件获取配置信息
-        self.config = utils.openConfig()
+        # 错误日志
+        self.logger = utils.logger.setLog()
+        # 本地配置
+        self.yaml = utils.config.openConfig(self.logger)
+        # 配置中心
+        self.yaml["dict_info"] = utils.config.getDictInfo(self.yaml["dict_info_url"], self.logger)
+        # 屏幕分辨率
+        self.yaml["screen_scale_rate"] = utils.screen_rate.getScreenRate(self.logger)
 
 
     # 登录
@@ -29,52 +45,54 @@ class DangoTranslator() :
         if not self.Login.login() :
             return
 
-        self.config["user"] = self.Login.user
-        self.config["password"] = self.Login.password
+        print("登录成功")
 
-        # 从云端获取配置信息
-        self.config = utils.getSettin(self.config, self.logger)
-        self.config = utils.loginDangoOCR(self.config, self.logger)
-        utils.saveConfig(self.config)
+        # self.config["user"] = self.Login.user
+        # self.config["password"] = self.Login.password
+        #
+        # # 从云端获取配置信息
+        # self.config = utils.getSettin(self.config, self.logger)
+        # self.config = utils.loginDangoOCR(self.config, self.logger)
+        # utils.config.saveConfig(self.config)
+        #
+        # # 翻译界面
+        # self.Translation = ui.translation.Translation(self.config, self.logger)
+        # # 设置界面
+        # self.Settin = ui.settin.Settin(self.config, self.logger, self.Translation)
+        # # 屏蔽词界面
+        # self.Filter = ui.filter.Filter(self.Translation)
+        # # 范围框界面
+        # self.Range = ui.range.Range(self.config["range"]['X1'],
+        #                             self.config["range"]['Y1'],
+        #                             self.config["range"]['X2'],
+        #                             self.config["range"]['Y2'],
+        #                             self.config["screenScaleRate"],
+        #                             self.Translation)
+        # self.Translation.range_window = self.Range
+        #
+        # self.Login.close()
+        # self.Translation.show()
+        #
+        # # 翻译界面设置页面按键信号
+        # self.Translation.settinButton.clicked.connect(self.clickSettin)
+        #
+        # # 翻译界面按下退出键
+        # self.Translation.quitButton.clicked.connect(self.Range.close)
+        # self.Translation.quitButton.clicked.connect(self.Translation.quit)
+        #
+        # # 翻译界面屏蔽词按键信号
+        # self.Translation.filterWordButton.clicked.connect(self.clickFilter)
+        #
+        # # 翻译界面选择范围键信号
+        # self.Translation.rangeButton.clicked.connect(self.chooseRange)
+        #
+        # # 翻译界面充电按钮信号
+        # self.Translation.batteryButton.clicked.connect(self.clickBattery)
+        #
+        # # 范围快捷键
+        # self.Translation.range_hotkey_sign.connect(self.chooseRange)
 
-        # 翻译界面
-        self.Translation = ui.translation.Translation(self.config, self.logger)
-        # 设置界面
-        self.Settin = ui.settin.Settin(self.config, self.logger, self.Translation)
-        # 屏蔽词界面
-        self.Filter = ui.filter.Filter(self.Translation)
-        # 范围框界面
-        self.Range = ui.range.Range(self.config["range"]['X1'],
-                                    self.config["range"]['Y1'],
-                                    self.config["range"]['X2'],
-                                    self.config["range"]['Y2'],
-                                    self.config["screenScaleRate"],
-                                    self.Translation)
-        self.Translation.range_window = self.Range
-
-        self.Login.close()
-        self.Translation.show()
-
-        # 翻译界面设置页面按键信号
-        self.Translation.settinButton.clicked.connect(self.clickSettin)
-
-        # 翻译界面按下退出键
-        self.Translation.quitButton.clicked.connect(self.Range.close)
-        self.Translation.quitButton.clicked.connect(self.Translation.quit)
-
-        # 翻译界面屏蔽词按键信号
-        self.Translation.filterWordButton.clicked.connect(self.clickFilter)
-
-        # 翻译界面选择范围键信号
-        self.Translation.rangeButton.clicked.connect(self.chooseRange)
-
-        # 翻译界面充电按钮信号
-        self.Translation.batteryButton.clicked.connect(self.clickBattery)
-
-        # 范围快捷键
-        self.Translation.range_hotkey_sign.connect(self.chooseRange)
-
-        # 检查邮箱
+        ## 检查邮箱
         #self.checkEmail()
 
 
@@ -177,30 +195,25 @@ class DangoTranslator() :
             self.Register.show()
 
 
+    # 主函数
     def main(self) :
-
-        # 记录日志
-        self.logger = utils.setLog()
-
-        # 获取屏幕分辨率
-        self.config = utils.screen_rate.getScreenRate(self.config)
 
         # 自适应高分辨率
         QCoreApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
         app = QApplication(sys.argv)
 
         # 检查字体
-        utils.checkFont(self.logger)
+        utils.check_font.checkFont(self.logger)
 
         # 登录界面
-        self.Login = ui.login.Login(self.config, self.logger)
+        self.Login = ui.login.Login(self)
         self.Login.show()
         self.Login.login_button.clicked.connect(self.login)
 
-        # 注册页面
-        self.Register = ui.register.Register(self.Login)
-        self.Login.register_button.clicked.connect(self.clickRegister)
-        self.Login.forget_password_button.clicked.connect(self.clickForgetPassword)
+        # # 注册页面
+        # self.Register = ui.register.Register(self.Login)
+        # self.Login.register_button.clicked.connect(self.clickRegister)
+        # self.Login.forget_password_button.clicked.connect(self.clickForgetPassword)
 
         app.exit(app.exec_())
 

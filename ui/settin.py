@@ -9,7 +9,8 @@ from ui.desc import Desc
 from ui.key import Key
 from ui.hotkey import HotKey
 import utils
-from utils import MessageBox, detectPort, testOfflineOCR, postConfigURL
+from utils import detectPort, testOfflineOCR, postConfigURL
+from utils.message import MessageBox
 
 from translator.ocr.baidu import getAccessToken
 from translator.all import resetWeb
