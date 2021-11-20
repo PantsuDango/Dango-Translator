@@ -1,47 +1,7 @@
+from PyQt5.QtCore import *
 from selenium import webdriver
 from traceback import format_exc
-from PyQt5.QtCore import *
 import time
-
-
-# 翻译模块实例化1
-import utils.config
-import utils.logger
-
-
-def createWebdriver1(obj, config, logger, web_type) :
-
-    obj.webdriver_1 = Webdriver(config, logger)
-    obj.webdriver_1.message_sign.connect(obj.showStatusbar)
-
-    # 加载翻译引擎
-    obj.webdriver_1.openWebdriver()
-    if obj.webdriver_2.browser_sign == 2 :
-        obj.webdriver_1.message_sign.emit("翻译模块启动失败...")
-    elif obj.webdriver_2.browser_sign == 1 :
-        obj.webdriver_1.message_sign.emit("翻译模块启动完成~")
-
-    # 开启翻译页面
-    if web_type :
-        obj.webdriver_1.openWeb(web_type)
-
-
-# 翻译模块实例化2
-def createWebdriver2(obj, config, logger, web_type) :
-
-    obj.webdriver_2 = Webdriver(config, logger)
-    obj.webdriver_2.message_sign.connect(obj.showStatusbar)
-
-    # 加载翻译引擎
-    obj.webdriver_2.openWebdriver()
-    if obj.webdriver_1.browser_sign == 2:
-        obj.webdriver_2.message_sign.emit("翻译模块启动失败...")
-    elif obj.webdriver_1.browser_sign == 1:
-        obj.webdriver_2.message_sign.emit("翻译模块启动完成~")
-
-    # 开启翻译页面
-    if web_type :
-        obj.webdriver_2.openWeb(web_type)
 
 
 # 刷新翻译页面
@@ -50,19 +10,17 @@ def resetWeb(obj, web_type) :
     obj.openWeb(web_type)
 
 
-# 翻译引擎
+# 翻译模块
 class Webdriver(QObject) :
 
     message_sign = pyqtSignal(str)
 
-    def __init__(self, config, logger) :
+    def __init__(self, object) :
 
         super(Webdriver, self).__init__()
-        self.content = ""
-        self.open_sign = False
-        self.config = config
-        self.logger = logger
-        self.web_type = ""
+        self.object = object
+        self.logger = object.logger
+
         self.url_map = {
             "youdao" : "https://fanyi.youdao.com/",
             "baidu"  : "https://fanyi.baidu.com/?aldtype=16047#auto/zh",
@@ -83,6 +41,12 @@ class Webdriver(QObject) :
         }
         # 翻译引擎启动情况: 0-启动中, 1-启动成功, 2-启动失败
         self.browser_sign = 0
+        # 用于对比前后翻译差异
+        self.content = ""
+        # 记录当前翻译源种类
+        self.web_type = ""
+        # 翻译网页是否准备就绪
+        self.open_sign = False
 
 
     # 开启引擎
@@ -129,22 +93,24 @@ class Webdriver(QObject) :
                     self.browser_sign = 2
                     self.logger.error(format_exc())
                     self.close()
+                    self.message_sign.emit("翻译模块启动失败...")
                     return
 
         self.browser_sign = 1
+        self.message_sign.emit("翻译模块启动完成~")
         print("翻译引擎启动")
 
 
     # 打开翻译页面
     def openWeb(self, web_type) :
 
-        self.web_type = web_type
-        self.message_sign.emit("%s翻译引擎启动中, 请等待完成后再操作..."%self.translater_map[self.web_type])
-        print("%s翻译引擎启动中, 请等待完成后再操作..."%self.translater_map[self.web_type])
+        self.message_sign.emit("%s翻译引擎启动中, 请等待完成后再操作..."%self.translater_map[web_type])
+        print("%s翻译引擎启动中, 请等待完成后再操作..."%self.translater_map[web_type])
 
         try :
             self.browser.get(self.url_map[web_type])
             self.browser.maximize_window()
+            self.web_type = web_type
             self.open_sign = True
             self.message_sign.emit("%s翻译引擎启动完成~"%self.translater_map[web_type])
             print("%s翻译引擎启动完成~"%self.translater_map[web_type])
@@ -160,7 +126,7 @@ class Webdriver(QObject) :
 
         try:
             try:
-                self.browser.find_element_by_xpath(self.config["dictInfo"]["youdao_xpath"]).click()
+                self.browser.find_element_by_xpath(self.object.yaml["dict_info"]["youdao_xpath"]).click()
             except Exception:
                 pass
 
@@ -196,7 +162,7 @@ class Webdriver(QObject) :
 
         try :
             try :
-                self.browser.find_element_by_xpath(self.config["dictInfo"]["baidu_xpath"]).click()
+                self.browser.find_element_by_xpath(self.object.yaml["dict_info"]["baidu_xpath"]).click()
             except Exception :
                 pass
 
@@ -234,7 +200,7 @@ class Webdriver(QObject) :
 
         try :
             try :
-                self.browser.find_element_by_xpath(self.config["dictInfo"]["tencent_xpath"]).click()
+                self.browser.find_element_by_xpath(self.object.yaml["dict_info"]["tencent_xpath"]).click()
             except Exception :
                 pass
 
@@ -272,7 +238,7 @@ class Webdriver(QObject) :
 
         try :
             try:
-                self.browser.find_element_by_xpath(self.config["dictInfo"]["caiyun_xpath"]).click()
+                self.browser.find_element_by_xpath(self.object.yaml["dict_info"]["caiyun_xpath"]).click()
             except Exception:
                 pass
 
@@ -311,7 +277,7 @@ class Webdriver(QObject) :
 
         try :
             try:
-                self.browser.find_element_by_xpath(self.config["dictInfo"]["google_xpath"]).click()
+                self.browser.find_element_by_xpath(self.object.yaml["dict_info"]["google_xpath"]).click()
             except Exception:
                 pass
 
@@ -349,7 +315,7 @@ class Webdriver(QObject) :
 
         try :
             try:
-                self.browser.find_element_by_xpath(self.config["dictInfo"]["deepl_xpath"]).click()
+                self.browser.find_element_by_xpath(self.object.yaml["dict_info"]["deepl_xpath"]).click()
             except Exception:
                 pass
 
@@ -391,7 +357,7 @@ class Webdriver(QObject) :
 
         try:
             try:
-                self.browser.find_element_by_xpath(self.config["dictInfo"]["xiaoniu_xpath"]).click()
+                self.browser.find_element_by_xpath(self.object.yaml["dict_info"]["xiaoniu_xpath"]).click()
             except Exception:
                 pass
 

@@ -37,13 +37,13 @@ class TranslaterProccess(QThread) :
 
         # 公共翻译一
         if self.trans_type == "webdriver_1" :
-            result = self.window.webdriver_1.translater(self.original)
-            print("公共%s: %s"%(self.window.webdriver_1.web_type, result))
+            result = self.window.webdriver1.translater(self.original)
+            print("公共%s: %s" % (self.window.webdriver1.web_type, result))
 
         # 公共翻译二
         elif self.trans_type == "webdriver_2" :
-            result = self.window.webdriver_2.translater(self.original)
-            print("公共%s: %s"%(self.window.webdriver_2.web_type, result))
+            result = self.window.webdriver2.translater(self.original)
+            print("公共%s: %s" % (self.window.webdriver2.web_type, result))
 
         # 私人百度
         elif self.trans_type == "baidu_private" :
@@ -139,13 +139,13 @@ class Translater(QThread) :
             self.window.original = "还未选取翻译范围, 请先使用范围键框选要翻译的屏幕区域"
             self.create_trans_sign.emit("original")
             # 关闭翻译界面自动开关
-            self.window.switchBtn.mousePressEvent(1)
-            self.window.switchBtn.updateValue()
+            self.window.switch_button.mousePressEvent(1)
+            self.window.switch_button.updateValue()
             return
 
         try:
             # 首次执行或手动模式下, 直接跳过图片相似度检测
-            if not self.window.original or not self.window.translateMode :
+            if not self.window.original or not self.window.translate_mode :
                 self.imageCut()
             else :
                 # 判断两张图片的相似度
@@ -190,7 +190,7 @@ class Translater(QThread) :
             return
 
         # 在自动模式下, 如果如果文本相似度过高则不翻译
-        if self.window.translateMode :
+        if self.window.translate_mode :
             text_score = self.getEqualRate(original, self.window.original)
             if text_score > self.window.config["textSimilarity"] :
                 return
@@ -201,12 +201,12 @@ class Translater(QThread) :
         nothing_sign = False
 
         # 公共翻译一
-        if self.window.webdriver_1.open_sign :
+        if self.window.webdriver1.open_sign :
             self.create_trans_sign.emit("webdriver_1")
             nothing_sign = True
 
         # 公共翻译二
-        if self.window.webdriver_2.open_sign :
+        if self.window.webdriver2.open_sign :
             self.create_trans_sign.emit("webdriver_2")
             nothing_sign = True
 
@@ -248,7 +248,7 @@ class Translater(QThread) :
     def run(self) :
 
         # 手动翻译
-        if not self.window.translateMode :
+        if not self.window.translate_mode :
             # 如果上一次翻译未结束则直接跳过
             if self.window.thread_state > 0:
                 return
@@ -262,7 +262,7 @@ class Translater(QThread) :
             self.window.auto_trans_exist = True
             while True :
                 # 如果自动翻译被停止则退出循环
-                if not self.window.translateMode :
+                if not self.window.translate_mode :
                     print("自动翻译退出")
                     self.window.auto_trans_exist = False
                     break

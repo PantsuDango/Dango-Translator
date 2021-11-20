@@ -98,7 +98,7 @@ class WScreenShot(QWidget):
         self.chooseRange.show()
 
         # 如果是自动模式下, 则解除暂停
-        if self.Init.translateMode :
+        if self.Init.translate_mode :
             self.Init.stop_sign = False
 
 
@@ -112,14 +112,14 @@ class WScreenShot(QWidget):
                 self.close()
                 self.Init.checkOverlap()
                 # 如果处于手动模式下则刷新一次翻译
-                if not self.Init.translateMode :
+                if not self.Init.translate_mode :
                     self.Init.startTranslater()
         except Exception :
             pass
 
 
 # 范围框
-class Range(QMainWindow):
+class Range(QMainWindow) :
 
     def __init__(self, X1, Y1, X2, Y2, ScreenScaleRate, window):
 
@@ -226,7 +226,7 @@ class Range(QMainWindow):
         self.dragLabel.setStyleSheet("background-color:rgba(62, 62, 62, 0.1)")
 
         # 如果处于自动模式下则暂停
-        if self.window.translateMode :
+        if self.window.translate_mode :
             self.window.stop_sign = True
 
 
@@ -249,5 +249,5 @@ class Range(QMainWindow):
         self.window.config["range"]["Y2"] = Y2
 
         # 如果是自动模式下, 则解除暂停
-        if self.window.translateMode :
+        if self.window.translate_mode :
             self.window.stop_sign = False

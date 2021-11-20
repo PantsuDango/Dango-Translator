@@ -4,6 +4,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
+import utils.config
 from ui.switch import OfflineSwitch, SwitchOCR, SwitchFontType, ShowSwitch, SwitchDirection
 from ui.desc import Desc
 from ui.key import Key
@@ -1880,8 +1881,8 @@ class Settin(QMainWindow):
         # 重置开关
         tmp_sign_1 = False
         tmp_sign_2 = False
-        self.translation_ui.webdriver_1.open_sign = False
-        self.translation_ui.webdriver_2.open_sign = False
+        self.translation_ui.webdriver1.open_sign = False
+        self.translation_ui.webdriver2.open_sign = False
 
         # 刷新翻译
         translater_list = ["youdaoUse", "baiduwebUse", "tencentwebUse", "deeplUse", "googleUse", "caiyunUse"]
@@ -1891,29 +1892,29 @@ class Settin(QMainWindow):
 
             if not tmp_sign_2 :
                 tmp_sign_2 = True
-                self.translation_ui.webdriver_1.open_sign = True
+                self.translation_ui.webdriver1.open_sign = True
             else :
-                self.translation_ui.webdriver_2.open_sign = True
+                self.translation_ui.webdriver2.open_sign = True
 
             # 避免重复开启
             web_type = val.replace("Use", "").replace("web", "")
-            if web_type == self.translation_ui.webdriver_1_type or web_type == self.translation_ui.webdriver_2_type :
+            if web_type == self.translation_ui.webdriver_type1 or web_type == self.translation_ui.webdriver_type2 :
                 continue
 
             if not tmp_sign_1 :
                 # 刷新翻译引擎1
                 tmp_sign_1 = True
-                self.translation_ui.webdriver_1_type = web_type
+                self.translation_ui.webdriver_type1 = web_type
                 webdriver_thread = threading.Thread(target=resetWeb,
-                                                    args=(self.translation_ui.webdriver_1, web_type))
+                                                    args=(self.translation_ui.webdriver1, web_type))
                 webdriver_thread.setDaemon(True)
                 webdriver_thread.start()
 
             else :
                 # 刷新翻译引擎2
-                self.translation_ui.webdriver_2_type = web_type
+                self.translation_ui.webdriver_type2 = web_type
                 webdriver_thread = threading.Thread(target=resetWeb,
-                                                    args=(self.translation_ui.webdriver_2, web_type))
+                                                    args=(self.translation_ui.webdriver2, web_type))
                 webdriver_thread.setDaemon(True)
                 webdriver_thread.start()
 
@@ -2048,23 +2049,23 @@ class Settin(QMainWindow):
         self.translation_ui.config = self.config
 
         # 设置上传云端
-        utils.postSaveSettin(self.config, self.logger)
+        utils.config.postSaveSettin(self.config, self.logger)
 
         # 重置翻译界面
-        self.translation_ui.translateText.setStyleSheet("border-width:0;\
+        self.translation_ui.translate_text.setStyleSheet("border-width:0;\
                                                          border-style:outset;\
                                                          border-top:0px solid #e8f3f9;\
                                                          color:white;\
                                                          font-weight: bold;\
                                                          background-color:rgba(62, 62, 62, %s)"
-                                                        %(self.horizontal))
-        self.translation_ui.tempText.setStyleSheet("border-width:0;\
+                                                         % (self.horizontal))
+        self.translation_ui.temp_text.setStyleSheet("border-width:0;\
                                                     border-style:outset;\
                                                     border-top:0px solid #e8f3f9;\
                                                     color:white;\
                                                     font-weight: bold;\
                                                     background-color:rgba(62, 62, 62, %s)"
-                                                    %(self.horizontal))
+                                                    % (self.horizontal))
         # 重置状态栏界面
         self.translation_ui.statusbar.setStyleSheet("font: 10pt '华康方圆体W7';"
                                                     "color: white;"
@@ -2074,5 +2075,5 @@ class Settin(QMainWindow):
         self.translation_ui.show()
 
         # 如果是自动模式下, 则解除暂停
-        if self.translation_ui.translateMode:
+        if self.translation_ui.translate_mode:
             self.translation_ui.stop_sign = False

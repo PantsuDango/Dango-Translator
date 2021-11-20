@@ -1,3 +1,4 @@
+import requests
 import yaml
 import json
 from traceback import format_exc
@@ -21,7 +22,6 @@ def openConfig(logger) :
             "password": "",
             "dict_info_url": "http://120.24.146.175:3000/DangoTranslate/ShowDict",
         }
-
 
     return config
 
@@ -67,7 +67,7 @@ def getDangoSettin(object) :
     return result
 
 
-# 新旧配置转换
+# 配置转换
 def configConvert(object) :
 
     ################### OCR设定 ###################
@@ -186,3 +186,46 @@ def configConvert(object) :
     object.config["textSimilarity"] = object.config.get("textSimilarity", 90)
     # 范围坐标
     object.yaml["range"] = {"X1": 0, "Y1": 0, "X2": 0, "Y2": 0}
+
+
+# 保存配置至服务器
+def postSaveSettin(object) :
+
+    # 离线OCR开关默认关闭
+    object.config["offlineOCR"] = False
+
+    url = object.yaml["http://120.24.146.175:3000/DangoTranslate/SaveSettin"]
+    body = {
+        "User": object.yaml["user"],
+        "Data": json.dumps(object.config)
+    }
+
+    utils.http.post(url, body, object.logger)
+
+
+# 保存翻译历史
+def saveTransHisTory(text, translate_type) :
+
+    if translate_type == "youdao" :
+        content = "\n[公共有道]\n%s"%text
+    elif translate_type == "caiyun" :
+        content = "\n[公共彩云]\n%s"%text
+    elif translate_type == "deepl" :
+        content = "\n[公共DeepL]\n%s"%text
+    elif translate_type == "baidu" :
+        content = "\n[公共百度]\n%s"%text
+    elif translate_type == "tencent" :
+        content = "\n[公共腾讯]\n%s"%text
+    elif translate_type == "google" :
+        content = "\n[公共谷歌]\n%s"%text
+    elif translate_type == "baidu_private" :
+        content = "\n[私人百度]\n%s"%text
+    elif translate_type == "tencent_private" :
+        content = "\n[私人腾讯]\n%s"%text
+    elif translate_type == "caiyun_private" :
+        content = "\n[私人彩云]\n%s"%text
+    else:
+        return
+
+    with open("./config/翻译历史.txt", "a+", encoding="utf-8") as file :
+        file.write(content)

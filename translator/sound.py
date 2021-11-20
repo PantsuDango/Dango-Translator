@@ -3,20 +3,18 @@ from traceback import format_exc
 import time
 
 
-# 音乐朗读模块实例化
-def createSound(obj, config, logger) :
-
-    obj.sound = Sound(config, logger)
-
-
 # 音乐朗读模块
 class Sound() :
 
-    def __init__(self, config, logger) :
+    def __init__(self, object) :
 
-        self.config = config
-        self.logger = logger
-        url = "https://fanyi.qq.com/"
+        self.object = object
+        self.logger = object.logger
+        self.url = "https://fanyi.qq.com/"
+
+
+    # 开启引擎
+    def openWebdriver(self):
 
         try:
             # 使用谷歌浏览器
@@ -38,7 +36,7 @@ class Sound() :
             except Exception:
                 self.logger.error(format_exc())
 
-                try :
+                try:
                     # 使用Edge浏览器
                     EDGE = {
                         "browserName": "MicrosoftEdge",
@@ -53,14 +51,15 @@ class Sound() :
                             ]}
                     }
                     self.browser = webdriver.Edge(executable_path="../config/tools/msedgedriver.exe",
-                                                     service_log_path="../logs/geckodriver.log",
-                                                     capabilities=EDGE)
+                                                  service_log_path="../logs/geckodriver.log",
+                                                  capabilities=EDGE)
                 except Exception:
                     self.logger.error(format_exc())
                     self.close()
 
-        self.browser.get(url)
+        self.browser.get(self.url)
         self.browser.maximize_window()
+        print("音乐模块开启")
 
 
     # 播放音乐
@@ -68,7 +67,7 @@ class Sound() :
 
         try :
             try :
-                self.browser.find_element_by_xpath(self.config["dictInfo"]["tencent_xpath"]).click()
+                self.browser.find_element_by_xpath(self.object.yaml["dict_info"]["tencent_xpath"]).click()
             except Exception :
                 pass
 

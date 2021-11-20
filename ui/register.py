@@ -195,6 +195,33 @@ class Register(QWidget) :
             return QWidget.eventFilter(self, object, event)
 
 
+    # 登录界面点击注册
+    def clickRegister(self):
+
+        self.object.login_ui.hide()
+        self.window_type = "register"
+        self.setWindowTitle("注册账号")
+        self.password_text.setPlaceholderText("请输入密码:")
+        self.register_button.clicked.connect(self.register)
+        self.show()
+        self.modify_password_button.hide()
+        self.register_button.show()
+
+
+    # # 登录界面点击修改密码
+    def clickForgetPassword(self):
+
+        self.object.login_ui.hide()
+        self.window_type = "modify_password"
+        self.setWindowTitle("修改密码")
+        self.password_text.clear()
+        self.password_text.setPlaceholderText("请输入新密码:")
+        self.modify_password_button.clicked.connect(self.modifyPassword)
+        self.show()
+        self.register_button.hide()
+        self.modify_password_button.show()
+
+
     # 获取验证码按钮状态控制线程
     def buttonStatusThread(self) :
 

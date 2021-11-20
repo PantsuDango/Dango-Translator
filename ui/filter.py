@@ -172,5 +172,5 @@ class Filter(QWidget) :
     def closeEvent(self, event) :
 
         # 如果是自动模式下, 则解除暂停
-        if self.window.translateMode :
+        if self.window.translate_mode :
             self.window.stop_sign = False
