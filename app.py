@@ -6,6 +6,7 @@ import utils.logger
 import utils.config
 import utils.screen_rate
 import utils.check_font
+import utils.thread
 
 import ui.login
 import ui.register
@@ -49,9 +50,10 @@ class DangoTranslator() :
         #self.register_ui.createBindEmailThread()
 
         # 从云端获取配置信息
-        self.config = utils.config.getSettin(self)
-        print(self.config)
-        # self.config = utils.loginDangoOCR(self.config, self.logger)
+        self.config = utils.config.getDangoSettin(self)
+        utils.config.configConvert(self)
+        # 登录OCR服务获取token
+        utils.thread.createThread(utils.http.loginDangoOCR, self)
 
         # # 翻译界面
         # self.Translation = ui.translation.Translation(self.config, self.logger)

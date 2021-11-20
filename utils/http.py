@@ -20,3 +20,19 @@ def post(url, body, logger):
         logger.error(format_exc())
 
     return result
+
+
+# 登录ocr服务器
+def loginDangoOCR(object) :
+
+    url = object.yaml["dict_info"]["ocr_login"]
+    body = {
+        "User": object.yaml["user"],
+        "Password": object.yaml["password"],
+    }
+
+    res = post(url, body, object.logger)
+    if res.get("Code", -1) == 0 :
+        object.config["DangoToken"] = res.get("Token", "")
+    else :
+        object.logger.error(res.get("ErrorMsg", ""))
