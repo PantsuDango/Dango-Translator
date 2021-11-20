@@ -39,25 +39,16 @@ class SendEmail(QThread) :
 
 
 
-# 发送邮件线程
-class BindEmail(QThread) :
+# 检查是否绑定邮箱
+def bindEmail(object, user="") :
 
-    signal = pyqtSignal(bool)
-
-    def __init__(self, object) :
-
-        super(BindEmail, self).__init__()
-        self.object = object
-
-
-    def run(self) :
-
-        url = self.object.yaml["dict_info"]["dango_check_email"]
-        body = {
-            "User": self.object.yaml["user"]
-        }
-        # 请求注册服务器
-        res = utils.http.post(url, body, self.object.logger)
-        result = res.get("Message", "")
-        if result == "未绑定邮箱" :
-            self.signal.emit(False)
+    url = object.yaml["dict_info"]["dango_check_email"]
+    if user :
+        body = {"User": user}
+    else :
+        body = {"User": object.yaml["user"]}
+    res = utils.http.post(url, body, object.logger)
+    if res.get("Status", "") == "Success" :
+        return res.get("Result", {}).get("Email", "")
+    else :
+        return False

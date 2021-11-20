@@ -8,6 +8,8 @@ import utils.screen_rate
 import utils.check_font
 import utils.thread
 import utils.http
+import utils.email
+import utils.message
 
 import ui.login
 import ui.register
@@ -39,9 +41,6 @@ class DangoTranslator() :
         if not self.login_ui.login() :
             return
 
-        # 检查邮箱
-        #self.register_ui.createBindEmailThread()
-
         # 从云端获取配置信息
         self.config = utils.config.getDangoSettin(self)
         utils.config.configConvert(self)
@@ -62,9 +61,10 @@ class DangoTranslator() :
 
         # 屏蔽词界面
         self.filter_ui = ui.filter.Filter(self)
-
         # 范围框界面
         self.range_ui = ui.range.Range(self)
+        # 检查邮箱
+        self.register_ui.checkBindEmail()
 
 
     # 按下充电键后做的事情

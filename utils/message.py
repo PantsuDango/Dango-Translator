@@ -65,7 +65,7 @@ def checkEmailMessageBox(title, text, object) :
     message_box.setText(text)
 
     bind_email_button = QPushButton("好滴")
-    bind_email_button.clicked.connect(object.register_ui.bindEmail)
+    bind_email_button.clicked.connect(object.register_ui.clickBindEmail)
 
     message_box.addButton(bind_email_button, QMessageBox.YesRole)
     message_box.addButton(QPushButton("忽略"), QMessageBox.NoRole)

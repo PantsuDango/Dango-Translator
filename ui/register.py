@@ -120,25 +120,14 @@ class Register(QWidget) :
         self.send_email_button.clicked.connect(self.sendEmail)
 
         # 确定注册按钮
-        self.register_button = QPushButton(self)
-        self.customSetGeometry(self.register_button, 140, 175, 80, 35)
-        self.register_button.setCursor(QCursor(Qt.PointingHandCursor))
-        self.register_button.setText("确定")
-        self.register_button.setStyleSheet("background: rgba(255, 255, 255, 0.5);"
+        self.sure_button = QPushButton(self)
+        self.customSetGeometry(self.sure_button, 140, 175, 80, 35)
+        self.sure_button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.sure_button.setText("确定")
+        self.sure_button.setStyleSheet("background: rgba(255, 255, 255, 0.5);"
                                            "color: %s;"
                                            "font: 15pt %s;"
-                                           % (self.color, self.font_type))
-
-        # 确定注册按钮
-        self.modify_password_button = QPushButton(self)
-        self.customSetGeometry(self.modify_password_button, 140, 175, 80, 35)
-        self.modify_password_button.setCursor(QCursor(Qt.PointingHandCursor))
-        self.modify_password_button.setText("确定")
-        self.modify_password_button.setStyleSheet("background: rgba(255, 255, 255, 0.5);"
-                                           "color: %s;"
-                                           "font: 15pt %s;"
-                                                  % (self.color, self.font_type))
-        self.modify_password_button.hide()
+                                       % (self.color, self.font_type))
 
         self.setTabOrder(self.user_text, self.password_text)
         self.setTabOrder(self.password_text, self.email_text)
@@ -198,28 +187,76 @@ class Register(QWidget) :
     # 登录界面点击注册
     def clickRegister(self):
 
-        self.object.login_ui.hide()
         self.window_type = "register"
         self.setWindowTitle("注册账号")
         self.password_text.setPlaceholderText("请输入密码:")
-        self.register_button.clicked.connect(self.register)
-        self.show()
-        self.modify_password_button.hide()
-        self.register_button.show()
 
+        self.user_text.clear()
+        self.user_text.setEnabled(True)
+        self.password_text.clear()
+        self.password_text.setEnabled(True)
+        self.email_text.clear()
+        self.email_text.setEnabled(True)
+        self.code_key_text.clear()
+        self.code_key_text.setEnabled(True)
+        self.code_key = ""
 
-    # # 登录界面点击修改密码
-    def clickForgetPassword(self):
+        self.buttonUnbind(self.sure_button)
+        self.sure_button.clicked.connect(self.register)
 
         self.object.login_ui.hide()
+        self.show()
+
+
+    # 登录界面点击修改密码
+    def clickForgetPassword(self):
+
+        user = self.object.login_ui.user_text.text()
+        email = utils.email.bindEmail(self.object, user)
+        if not email :
+            utils.message.MessageBox("修改失败",
+                                     "用户未绑定邮箱, 请先完成绑定再修改密码     ")
+            return
+
         self.window_type = "modify_password"
         self.setWindowTitle("修改密码")
+        self.user_text.setText(user)
+        self.user_text.setEnabled(False)
         self.password_text.clear()
         self.password_text.setPlaceholderText("请输入新密码:")
-        self.modify_password_button.clicked.connect(self.modifyPassword)
+        self.email_text.setText(email)
+        self.email_text.setEnabled(False)
+        self.code_key_text.clear()
+        self.code_key_text.setEnabled(True)
+        self.code_key = ""
+
+        self.buttonUnbind(self.sure_button)
+        self.sure_button.clicked.connect(self.modifyPassword)
+
+        self.object.login_ui.hide()
         self.show()
-        self.register_button.hide()
-        self.modify_password_button.show()
+
+    # 绑定邮箱窗口
+    def clickBindEmail(self) :
+
+        self.window_type = "bind_email"
+        self.setWindowTitle("绑定邮箱")
+
+        self.user_text.setText(self.object.yaml["user"])
+        self.user_text.setEnabled(False)
+        self.password_text.setText(self.object.yaml["password"])
+        self.password_text.setEnabled(False)
+        self.email_text.clear()
+        self.email_text.setEnabled(True)
+        self.code_key_text.clear()
+        self.code_key_text.setEnabled(True)
+        self.code_key = ""
+
+        self.buttonUnbind(self.sure_button)
+        self.sure_button.clicked.connect(self.bindEmail)
+
+        self.object.translation_ui.hide()
+        self.show()
 
 
     # 获取验证码按钮状态控制线程
@@ -399,39 +436,66 @@ class Register(QWidget) :
                                      "%s     "%message)
 
 
-    # 检查邮箱线程
-    def createBindEmailThread(self) :
+    # 检查邮箱
+    def checkBindEmail(self) :
 
-        thread = utils.email.BindEmail(self.object)
-        thread.signal.connect(self.showBindEmailMessage)
-        thread.start()
-        thread.exec()
-
-
-    # 检查邮箱显示消息窗口
-    def showBindEmailMessage(self, sign) :
-
-        utils.message.checkEmailMessageBox("邮箱绑定检查",
-                                           "检测到您未绑定邮箱, 请先完成邮箱绑定\n"
-                                           "邮箱绑定有以下好处:\n"
-                                           "1. 忘记密码时用于修改密码;\n"
-                                           "2. 购买在线OCR时接收购买凭证;     ",
-                                           self.object)
+        if not utils.email.bindEmail(self.object) :
+            utils.message.checkEmailMessageBox("邮箱绑定检查",
+                                               "检测到您未绑定邮箱, 请先完成邮箱绑定     \n"
+                                               "邮箱绑定有以下好处:\n"
+                                               "1. 忘记密码时用于修改密码;\n"
+                                               "2. 购买在线OCR时接收购买凭证;",
+                                               self.object)
 
 
-    # 绑定邮箱
+    # 按键信号解绑
+    def buttonUnbind(self, button) :
+
+        try :
+            button.clicked.disconnect()
+        except Exception :
+            pass
+
+
+    # 绑定邮箱确定键
     def bindEmail(self) :
 
-        #self.object.translation_ui.hide()
-        self.window_type = "bind_email"
-        self.setWindowTitle("绑定邮箱")
-        self.user_text.setText(self.object.yaml["user"])
-        self.password_text.setText(self.object.yaml["password"])
-        self.user_text.setEnabled(False)
-        self.password_text.setEnabled(False)
-        self.email_text.clear()
-        self.code_key_text.clear()
-        self.show()
+        email = self.email_text.text()
+        code_key = self.code_key_text.text()
+
+        if not self.checkEmailValidity(email) :
+            utils.message.MessageBox("绑定失败",
+                                     "邮箱地址不合法!     ")
+            return
+
+        if not code_key or re.findall("\s", code_key) :
+            utils.message.MessageBox("绑定失败",
+                                     "邮箱验证码为空或含有不合法字符!     ")
+            return
+
+        if code_key != self.code_key :
+            utils.message.MessageBox("绑定失败",
+                                     "邮箱验证码错误!     ")
+            return
+
+        url = self.object.yaml["dict_info"]["dango_modify_email"]
+        body = {
+            "User": self.object.yaml["user"],
+            "Email": email
+        }
+
+        # 请求服务器
+        res = utils.http.post(url, body, self.logger)
+        result = res.get("Status", "")
+        message = res.get("Message", "")
+        if result == "Success" :
+            utils.message.MessageBox("绑定成功",
+                                     "你已经成功绑定邮箱啦~     ")
+        else :
+            utils.message.MessageBox("绑定失败",
+                                     "%s!     "%message)
+        self.close()
+        self.object.translation_ui.show()
 
 
     # 热键检测
@@ -449,5 +513,4 @@ class Register(QWidget) :
         if self.window_type != "bind_email" :
             self.object.login_ui.show()
         else :
-            pass
-            #self.object.translation_ui.show()
+            self.object.translation_ui.show()
