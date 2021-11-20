@@ -720,8 +720,8 @@ class Translation(QMainWindow) :
         if self.translate_mode :
             self.stop_sign = True
 
-        screen_shot = ui.range.WScreenShot(self)
-        screen_shot.show()
+        self.object.screen_shot_ui = ui.range.WScreenShot(self.object)
+        self.object.screen_shot_ui.show()
         self.show()
 
 

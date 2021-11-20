@@ -108,7 +108,6 @@ class WScreenShot(QWidget) :
             if event.button() == Qt.LeftButton:
                 self.end_point = event.pos()
                 self.getRange()
-
                 self.close()
                 self.object.translation_ui.checkOverlap()
                 # 如果处于手动模式下则刷新一次翻译
