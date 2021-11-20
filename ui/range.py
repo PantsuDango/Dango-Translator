@@ -1,45 +1,45 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-
 import re
-import utils
+
+
+PIXMAP_PATH = "./config/icon/pixmap.png"
 
 
 # 选择范围
-class WScreenShot(QWidget):
+class WScreenShot(QWidget) :
 
-    def __init__(self, Init, chooseRange, parent=None):
+    def __init__(self, object, parent=None) :
 
         super(WScreenShot, self).__init__(parent)
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.Tool)
         self.setStyleSheet('''background-color:black; ''')
         self.setWindowOpacity(0.6)
-        desktopRect = QDesktopWidget().screenGeometry()
-        self.setGeometry(desktopRect)
+        desktop_rect = QDesktopWidget().screenGeometry()
+        self.setGeometry(desktop_rect)
         self.setCursor(Qt.CrossCursor)
-        self.blackMask = QBitmap(desktopRect.size())
-        self.blackMask.fill(Qt.black)
-        self.mask = self.blackMask.copy()
-        self.isDrawing = False
-        self.startPoint = QPoint()
-        self.endPoint = QPoint()
-        self.Init = Init
-        self.chooseRange = chooseRange
+        self.black_mask = QBitmap(desktop_rect.size())
+        self.black_mask.fill(Qt.black)
+        self.mask = self.black_mask.copy()
+        self.is_drawing = False
+        self.start_point = QPoint()
+        self.end_point = QPoint()
+        self.object = object
 
 
     def paintEvent(self, event):
 
         try:
-            if self.isDrawing:
-                self.mask = self.blackMask.copy()
+            if self.is_drawing:
+                self.mask = self.black_mask.copy()
                 pp = QPainter(self.mask)
                 pen = QPen()
                 pen.setStyle(Qt.NoPen)
                 pp.setPen(pen)
                 brush = QBrush(Qt.white)
                 pp.setBrush(brush)
-                pp.drawRect(QRect(self.startPoint, self.endPoint))
+                pp.drawRect(QRect(self.start_point, self.end_point))
                 self.setMask(QBitmap(self.mask))
         except Exception:
             pass
@@ -49,9 +49,9 @@ class WScreenShot(QWidget):
 
         try:
             if event.button() == Qt.LeftButton:
-                self.startPoint = event.pos()
-                self.endPoint = self.startPoint
-                self.isDrawing = True
+                self.start_point = event.pos()
+                self.end_point = self.start_point
+                self.is_drawing = True
         except Exception:
             pass
 
@@ -59,8 +59,8 @@ class WScreenShot(QWidget):
     def mouseMoveEvent(self, event) :
 
         try:
-            if self.isDrawing:
-                self.endPoint = event.pos()
+            if self.is_drawing:
+                self.end_point = event.pos()
                 self.update()
         except Exception:
             pass
@@ -68,8 +68,8 @@ class WScreenShot(QWidget):
 
     def getRange(self) :
 
-        start = re.findall(r'(\d+), (\d+)', str(self.startPoint))[0]
-        end = re.findall(r'\d+, \d+', str(self.endPoint))[0]
+        start = re.findall(r'(\d+), (\d+)', str(self.start_point))[0]
+        end = re.findall(r'\d+, \d+', str(self.end_point))[0]
         end = end.split(', ')
 
         X1 = int(start[0])
@@ -87,33 +87,33 @@ class WScreenShot(QWidget):
             Y1 = Y2
             Y2 = tmp
 
-        self.Init.config["range"]["X1"] = X1
-        self.Init.config["range"]["Y1"] = Y1
-        self.Init.config["range"]["X2"] = X2
-        self.Init.config["range"]["Y2"] = Y2
+        self.object.yaml["range"]["X1"] = X1
+        self.object.yaml["range"]["Y1"] = Y1
+        self.object.yaml["range"]["X2"] = X2
+        self.object.yaml["range"]["Y2"] = Y2
 
         # 显示范围框
-        self.chooseRange.setGeometry(X1, Y1, X2 - X1, Y2 - Y1)
-        self.chooseRange.Label.setGeometry(0, 0, X2 - X1, Y2 - Y1)
-        self.chooseRange.show()
+        self.object.range_ui.setGeometry(X1, Y1, X2-X1, Y2-Y1)
+        self.object.range_ui.label.setGeometry(0, 0, X2-X1, Y2-Y1)
+        self.object.range_ui.show()
 
         # 如果是自动模式下, 则解除暂停
-        if self.Init.translate_mode :
-            self.Init.stop_sign = False
+        if self.object.translation_ui.translate_mode :
+            self.object.translation_ui.stop_sign = False
 
 
     def mouseReleaseEvent(self, event):
 
         try:
             if event.button() == Qt.LeftButton:
-                self.endPoint = event.pos()
+                self.end_point = event.pos()
                 self.getRange()
 
                 self.close()
-                self.Init.checkOverlap()
+                self.object.translation_ui.checkOverlap()
                 # 如果处于手动模式下则刷新一次翻译
-                if not self.Init.translate_mode :
-                    self.Init.startTranslater()
+                if not self.object.translation_ui.translate_mode :
+                    self.object.translation_ui.startTranslater()
         except Exception :
             pass
 
@@ -121,56 +121,66 @@ class WScreenShot(QWidget):
 # 范围框
 class Range(QMainWindow) :
 
-    def __init__(self, X1, Y1, X2, Y2, ScreenScaleRate, window):
+    def __init__(self, object):
 
         super(Range, self).__init__()
 
-        self.rate = ScreenScaleRate
-        self.window = window
-        self.setGeometry(X1, Y1, X2-X1, Y2-Y1)
+        self.object = object
+        self.rate = object.yaml["screen_scale_rate"]
+        self.font_type = "华康方圆体W7"
+        self.color = "#1E90FF"
+        self.font_size = 12
+        self.ui()
+
+
+    def ui(self) :
+
+        X1 = self.object.yaml["range"]["X1"]
+        Y1 = self.object.yaml["range"]["Y1"]
+        X2 = self.object.yaml["range"]["X2"]
+        Y2 = self.object.yaml["range"]["Y2"]
+
+        # 窗口大小
+        self.setGeometry(X1, Y1, X2 - X1, Y2 - Y1)
 
         # 窗口无标题栏、窗口置顶、窗口透明
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint | Qt.Tool)
         self.setAttribute(Qt.WA_TranslucentBackground)
 
         # 鼠标样式
-        pixmap = QPixmap("./config/icon/pixmap.png")
-        pixmap = pixmap.scaled(int(30*self.rate),
-                               int(34*self.rate),
+        pixmap = QPixmap(PIXMAP_PATH)
+        pixmap = pixmap.scaled(int(30 * self.rate),
+                               int(34 * self.rate),
                                Qt.KeepAspectRatio,
                                Qt.SmoothTransformation)
         cursor = QCursor(pixmap, 0, 0)
         self.setCursor(cursor)
 
-        self.Label = QLabel(self)
-        self.Label.setObjectName("dragLabel")
-        self.Label.setGeometry(0, 0, X2-X1, Y2-Y1)
-        self.Label.setStyleSheet("border-width:1;\
+        self.label = QLabel(self)
+        self.label.setGeometry(0, 0, X2 - X1, Y2 - Y1)
+        self.label.setStyleSheet("border-width:1;\
                                   border:2px dashed #1E90FF;\
                                   background-color:rgba(62, 62, 62, 0.01)")
 
         # 此Label用于当鼠标进入界面时给出颜色反应
-        self.dragLabel = QLabel(self)
-        self.dragLabel.setObjectName("dragLabel")
-        self.dragLabel.setGeometry(0, 0, 4000, 2000)
+        self.drag_label = QLabel(self)
+        self.drag_label.setGeometry(0, 0, 4000, 2000)
 
-        self.Font = QFont()
-        self.Font.setFamily("华康方圆体W7")
-        self.Font.setPointSize(12)
+        # 字体
+        self.font = QFont()
+        self.font.setFamily(self.font_type)
+        self.font.setPointSize(self.font_size)
 
         # 隐藏按钮
-        self.Button = QPushButton(self)
-        self.Button.setGeometry(QRect(int(X2-X1-40*self.rate),
-                                      0,
-                                      int(40*self.rate),
-                                      int(30*self.rate)))
-        self.Button.setStyleSheet("background-color:rgba(62, 62, 62, 0.3);"
-                                  "color:#1E90FF")
-        self.Button.setFont(self.Font)
-        self.Button.setText("隐藏")
-        self.Button.setCursor(QCursor(Qt.PointingHandCursor))
-        self.Button.clicked.connect(self.close)
-        self.Button.hide()
+        self.hide_button = QPushButton(self)
+        self.hide_button.setGeometry(QRect(int(X2-X1-40*self.rate), 0, int(40 * self.rate), int(30 * self.rate)))
+        self.hide_button.setStyleSheet("background-color:rgba(62, 62, 62, 0.3);"
+                                       "color: %s;"%self.color)
+        self.hide_button.setFont(self.font)
+        self.hide_button.setText("隐藏")
+        self.hide_button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.hide_button.clicked.connect(self.close)
+        self.hide_button.hide()
 
         # 右下角用于拉伸界面的控件
         self.statusbar = QStatusBar(self)
@@ -186,7 +196,8 @@ class Range(QMainWindow) :
         except Exception :
             pass
 
-        self.window.checkOverlap()
+        # 判断是否和翻译框碰撞
+        self.object.translation_ui.checkOverlap()
 
 
     # 鼠标按下事件
@@ -213,29 +224,26 @@ class Range(QMainWindow) :
 
 
     # 鼠标进入控件事件
-    def enterEvent(self, QEvent):
+    def enterEvent(self, QEvent) :
 
         rect = self.geometry()
         X1 = rect.left()
         X2 = rect.left() + rect.width()
-        self.Button.setGeometry(QRect(int(X2-X1-40*self.rate),
-                                      0,
-                                      int(40*self.rate),
-                                      int(30*self.rate)))
-        self.Button.show()
-        self.dragLabel.setStyleSheet("background-color:rgba(62, 62, 62, 0.1)")
+        self.hide_button.setGeometry(QRect(int(X2-X1-40*self.rate), 0, int(40*self.rate), int(30*self.rate)))
+        self.hide_button.show()
+        self.drag_label.setStyleSheet("background-color:rgba(62, 62, 62, 0.1)")
 
         # 如果处于自动模式下则暂停
-        if self.window.translate_mode :
-            self.window.stop_sign = True
+        if self.object.translation_ui.translate_mode :
+            self.object.translation_ui.stop_sign = True
 
 
     # 鼠标离开控件事件
     def leaveEvent(self, QEvent):
 
-        self.dragLabel.setStyleSheet("background-color:none")
-        self.Label.setGeometry(0, 0, self.width(), self.height())
-        self.Button.hide()
+        self.drag_label.setStyleSheet("background-color:none")
+        self.label.setGeometry(0, 0, self.width(), self.height())
+        self.hide_button.hide()
 
         rect = self.geometry()
         X1 = rect.left()
@@ -243,11 +251,11 @@ class Range(QMainWindow) :
         X2 = rect.left() + rect.width()
         Y2 = rect.top() + rect.height()
 
-        self.window.config["range"]["X1"] = X1
-        self.window.config["range"]["Y1"] = Y1
-        self.window.config["range"]["X2"] = X2
-        self.window.config["range"]["Y2"] = Y2
+        self.object.yaml["range"]["X1"] = X1
+        self.object.yaml["range"]["Y1"] = Y1
+        self.object.yaml["range"]["X2"] = X2
+        self.object.yaml["range"]["Y2"] = Y2
 
         # 如果是自动模式下, 则解除暂停
-        if self.window.translate_mode :
-            self.window.stop_sign = False
+        if self.object.translation_ui.translate_mode :
+            self.object.translation_ui.stop_sign = False

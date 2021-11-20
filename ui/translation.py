@@ -17,6 +17,7 @@ import translator.sound
 import translator.all
 
 import ui.switch
+import ui.range
 
 
 LOGO_PATH = "./config/icon/logo.ico"
@@ -49,7 +50,8 @@ class Translation(QMainWindow) :
         self.logger = object.logger
         self.getInitConfig()
         self.ui()
-
+        # 翻译界面显示通知信息
+        utils.thread.createThread(self.getDefaultMessage)
         # 开启朗读模块
         self.sound = translator.sound.Sound(self.object)
         utils.thread.createThread(self.sound.openWebdriver)
@@ -108,22 +110,6 @@ class Translation(QMainWindow) :
 
         # 翻译框加入描边文字
         self.format = QTextCharFormat()
-        # 翻译框显示通知信息
-        inform = self.getInform()
-        # 如果没有通知信息则显示默认信息
-        if not inform :
-            self.format.setTextOutline(QPen(QColor(self.font_color_1), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
-            self.translate_text.mergeCurrentCharFormat(self.format)
-            self.translate_text.append("欢迎你 ~ %s 么么哒 ~"%self.user)
-            self.format.setTextOutline(QPen(QColor(self.font_color_2), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
-            self.translate_text.mergeCurrentCharFormat(self.format)
-            self.translate_text.append("b站关注 团子翻译器 查看动态可了解翻译器最新情况 ~")
-            self.format.setTextOutline(QPen(QColor(self.font_color_1), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
-            self.translate_text.mergeCurrentCharFormat(self.format)
-            self.translate_text.append("团子一个人开发不易，这个软件真的花了很大很大的精力 _(:з」∠)_")
-            self.format.setTextOutline(QPen(QColor(self.font_color_2), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
-            self.translate_text.mergeCurrentCharFormat(self.format)
-            self.translate_text.append("喜欢的话能不能点击上方的电池图标支持一下团子，真心感谢你❤")
 
         # 重叠提示消息框
         self.temp_text = QTextBrowser(self)
@@ -178,6 +164,7 @@ class Translation(QMainWindow) :
         self.range_button.setToolTip("<b>范围 Range</b><br>框选要翻译的区域<br>需从左上到右下拖动")
         self.range_button.setStyleSheet("background: transparent;")
         self.range_button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.range_button.clicked.connect(self.clickRange)
         self.range_button.hide()
 
         # 复制按钮
@@ -197,6 +184,7 @@ class Translation(QMainWindow) :
         self.filter_word_button.setToolTip("<b>屏蔽字符 Filter</b><br>将特定翻译错误的词<br>屏蔽不显示")
         self.filter_word_button.setStyleSheet("background: transparent;")
         self.filter_word_button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.filter_word_button.clicked.connect(self.clickFilter)
         self.filter_word_button.hide()
 
         # 翻译模式按钮
@@ -266,16 +254,17 @@ class Translation(QMainWindow) :
 
         # 注册翻译快捷键
         self.translate_hotkey = SystemHotkey()
-        self.translate_hotkey_sign.connect(self.startTranslater)
         if self.object.config["showHotKey1"] == "True" :
             self.translate_hotkey.register((self.translate_hotkey_value1, self.translate_hotkey_value2),
                                            callback=lambda x:self.translate_hotkey_sign.emit(True))
+        self.translate_hotkey_sign.connect(self.startTranslater)
 
         # 注册范围快捷键
         self.range_hotkey = SystemHotkey()
         if self.object.config["showHotKey2"] == "True" :
             self.range_hotkey.register((self.range_hotkey_value1, self.range_hotkey_value2),
                                        callback=lambda x: self.range_hotkey_sign.emit(True))
+        self.range_hotkey_sign.connect(self.clickRange)
 
 
     # 初始化配置
@@ -652,7 +641,7 @@ class Translation(QMainWindow) :
             self.translate_text.show()
 
 
-    # 开启翻译页面
+    # 开启翻译模块
     def createWebdriverThread(self) :
 
         self.statusbar.showMessage("翻译模块启动中, 请等待完成后再操作...")
@@ -693,10 +682,54 @@ class Translation(QMainWindow) :
             self.statusbar.showMessage("翻译模型启动中, 请等待完成后再操作...")
 
 
+    # 翻译框显示通知信息
+    def getDefaultMessage(self) :
+
+        # 获取版本通知
+        inform = self.getInform()
+        # 如果没有通知信息则显示默认信息
+        if not inform :
+            self.format.setTextOutline(QPen(QColor(self.font_color_1), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+            self.translate_text.mergeCurrentCharFormat(self.format)
+            self.translate_text.append("欢迎你 ~ %s 么么哒 ~" % self.user)
+            self.format.setTextOutline(QPen(QColor(self.font_color_2), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+            self.translate_text.mergeCurrentCharFormat(self.format)
+            self.translate_text.append("b站关注 团子翻译器 查看动态可了解翻译器最新情况 ~")
+            self.format.setTextOutline(QPen(QColor(self.font_color_1), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+            self.translate_text.mergeCurrentCharFormat(self.format)
+            self.translate_text.append("团子一个人开发不易，这个软件真的花了很大很大的精力 _(:з」∠)_")
+            self.format.setTextOutline(QPen(QColor(self.font_color_2), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+            self.translate_text.mergeCurrentCharFormat(self.format)
+            self.translate_text.append("喜欢的话能不能点击上方的电池图标支持一下团子，真心感谢你❤")
+
+
+    # 按下屏蔽词键后做的事情
+    def clickFilter(self) :
+
+        # 如果处于自动模式下则暂停
+        if self.translate_mode :
+            self.stop_sign = True
+
+        self.object.filter_ui.show()
+
+
+    # 按下范围框选键
+    def clickRange(self):
+
+        # 如果处于自动模式下则暂停
+        if self.translate_mode :
+            self.stop_sign = True
+
+        screen_shot = ui.range.WScreenShot(self)
+        screen_shot.show()
+        self.show()
+
+
     # 退出程序
     def quit(self) :
 
         self.hide()
+        self.object.range_ui.close()
         self.unregisterHotKey()
 
         # 关闭引擎模块

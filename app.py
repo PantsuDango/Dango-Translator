@@ -7,21 +7,14 @@ import utils.config
 import utils.screen_rate
 import utils.check_font
 import utils.thread
+import utils.http
 
 import ui.login
 import ui.register
 import ui.translation
-
-
 import ui.filter
 import ui.range
 import ui.settin
-
-import utils
-import utils.check_font
-from utils import http
-import utils.screen_rate
-
 
 class DangoTranslator() :
 
@@ -57,40 +50,21 @@ class DangoTranslator() :
 
         # 翻译界面
         self.translation_ui = ui.translation.Translation(self)
-        # # 设置界面
-        # self.settin_ui = ui.settin.Settin(self.config, self.logger, self.translation_ui)
-        # # 屏蔽词界面
-        # self.filter_ui = ui.filter.Filter(self.translation_ui)
-        # 范围框界面
-        # self.range_ui = ui.range.Range(self.yaml["range"]['X1'],
-        #                                self.yaml["range"]['Y1'],
-        #                                self.yaml["range"]['X2'],
-        #                                self.yaml["range"]['Y2'],
-        #                                self.yaml["screenScaleRate"],
-        #                                self.translation_ui)
-
         self.login_ui.close()
         self.translation_ui.show()
-        print(111111111111)
 
+        # # 设置界面
+        # self.settin_ui = ui.settin.Settin(self.config, self.logger, self.translation_ui)
         # # 翻译界面设置页面按键信号
         # self.translation_ui.settin_button.clicked.connect(self.clickSettin)
-        #
-        # # 翻译界面按下退出键
-        # self.translation_ui.quit_button.clicked.connect(self.range_ui.close)
-        # self.translation_ui.quit_button.clicked.connect(self.translation_ui.quit)
-        #
-        # # 翻译界面屏蔽词按键信号
-        # self.translation_ui.filter_word_button.clicked.connect(self.clickFilter)
-        #
-        # # 翻译界面选择范围键信号
-        # self.translation_ui.range_button.clicked.connect(self.chooseRange)
-        #
         # # 翻译界面充电按钮信号
         # self.translation_ui.battery_button.clicked.connect(self.clickBattery)
-        #
-        # # 范围快捷键
-        # self.translation_ui.range_hotkey_sign.connect(self.chooseRange)
+
+        # 屏蔽词界面
+        self.filter_ui = ui.filter.Filter(self)
+
+        # 范围框界面
+        self.range_ui = ui.range.Range(self)
 
 
     # 按下充电键后做的事情
@@ -108,17 +82,6 @@ class DangoTranslator() :
         self.settin_ui.show()
 
 
-    # 按下屏蔽词键后做的事情
-    def clickFilter(self) :
-
-        # 如果处于自动模式下则暂停
-        if self.translation_ui.translate_mode :
-            self.translation_ui.stop_sign = True
-
-        self.filter_ui.refreshTable()
-        self.filter_ui.show()
-
-
     # 按下设置键后做的事情
     def clickSettin(self) :
 
@@ -131,18 +94,6 @@ class DangoTranslator() :
         self.translation_ui.close()
         self.range_ui.close()
         self.settin_ui.show()
-
-
-    # 进入范围框选
-    def chooseRange(self) :
-
-        # 如果处于自动模式下则暂停
-        if self.translation_ui.translate_mode :
-            self.translation_ui.stop_sign = True
-
-        self.WScreenShot = ui.range.WScreenShot(self.translation_ui, self.range_ui)
-        self.WScreenShot.show()
-        self.translation_ui.show()
 
 
     # 主函数

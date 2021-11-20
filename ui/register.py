@@ -56,7 +56,7 @@ class Register(QWidget) :
 
         # 设置字体
         font = QFont()
-        font.setFamily(self.font)
+        font.setFamily(self.font_type)
         font.setPointSize(self.font_size)
         self.setFont(font)
 
@@ -127,7 +127,7 @@ class Register(QWidget) :
         self.register_button.setStyleSheet("background: rgba(255, 255, 255, 0.5);"
                                            "color: %s;"
                                            "font: 15pt %s;"
-                                           %(self.color, self.font))
+                                           % (self.color, self.font_type))
 
         # 确定注册按钮
         self.modify_password_button = QPushButton(self)
@@ -137,7 +137,7 @@ class Register(QWidget) :
         self.modify_password_button.setStyleSheet("background: rgba(255, 255, 255, 0.5);"
                                            "color: %s;"
                                            "font: 15pt %s;"
-                                           %(self.color, self.font))
+                                                  % (self.color, self.font_type))
         self.modify_password_button.hide()
 
         self.setTabOrder(self.user_text, self.password_text)
@@ -156,7 +156,7 @@ class Register(QWidget) :
         # 输入框颜色
         self.color = "#FF79BC"
         # 界面字体
-        self.font = "华康方圆体W7"
+        self.font_type = "华康方圆体W7"
         # 界面字体大小
         self.font_size = 10
         # 验证码

@@ -194,12 +194,11 @@ def postSaveSettin(object) :
     # 离线OCR开关默认关闭
     object.config["offlineOCR"] = False
 
-    url = object.yaml["http://120.24.146.175:3000/DangoTranslate/SaveSettin"]
+    url = object.yaml["dict_info"]["dango_save_settin"]
     body = {
         "User": object.yaml["user"],
         "Data": json.dumps(object.config)
     }
-
     utils.http.post(url, body, object.logger)
 
 
