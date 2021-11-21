@@ -63,6 +63,7 @@ class DangoTranslator() :
         self.filter_ui = ui.filter.Filter(self)
         # 范围框界面
         self.range_ui = ui.range.Range(self)
+
         # 检查邮箱
         thread = utils.thread.createCheckBindEmailQThread(self)
         thread.signal.connect(self.register_ui.showBindEmailMessage)
@@ -76,7 +77,6 @@ class DangoTranslator() :
         if self.translation_ui.translate_mode:
             self.translation_ui.stop_sign = True
 
-        self.settin_ui.config = self.translation_ui.config
         self.translation_ui.unregisterHotKey()
         self.translation_ui.close()
         self.range_ui.close()
@@ -91,7 +91,6 @@ class DangoTranslator() :
         if self.translation_ui.translate_mode :
             self.translation_ui.stop_sign = True
 
-        self.settin_ui.config = self.translation_ui.config
         self.translation_ui.unregisterHotKey()
         self.translation_ui.close()
         self.range_ui.close()

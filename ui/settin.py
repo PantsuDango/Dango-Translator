@@ -119,8 +119,8 @@ class Settin(QMainWindow) :
         self.setCursor(cursor)
 
         # 设置字体
-        self.setStyleSheet("font: %spt '%s'; color: %s"
-                           %(self.font_size, self.font_type, self.color_1))
+        self.setStyleSheet("font: %spt '华康方圆体W7'; color: %s"
+                           %(self.font_size, self.color_1))
 
         # 顶部工具栏
         self.tab_widget = TabWidget(self)
@@ -1212,8 +1212,6 @@ class Settin(QMainWindow) :
         # 所使用的颜色
         self.color_1 = "#595959"  # 灰色
         self.color_2 = "#5B8FF9"  # 蓝色
-        # 界面字体
-        self.font_type = "华康方圆体W7"
         # 界面字体大小
         self.font_size = 10
         # 存被开启的翻译源
@@ -2024,22 +2022,13 @@ class Settin(QMainWindow) :
 
         # 保存设置
         self.saveConfig()
-
         # 注册新快捷键
-        self.registerHotKey()
-
+        utils.thread.createThread(self.registerHotKey)
         # 重置翻译引擎
         self.resetWebdriver()
-
         # 刷新百度OCR的AccessToken
         if self.baidu_ocr_use :
-            sign, access_token = translator.ocr.baidu.getAccessToken(self.object.config["OCR"]["Key"],
-                                                                     self.object.config["OCR"]["Secret"],
-                                                                     self.logger)
-            if sign :
-                self.object.config["AccessToken"] = access_token
-
-
+            translator.ocr.baidu.getAccessToken(self.object)
         # 设置上传云端
         utils.thread.createThread(utils.config.postSaveSettin, self.object)
 

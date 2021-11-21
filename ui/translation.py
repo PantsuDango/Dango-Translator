@@ -710,23 +710,28 @@ class Translation(QMainWindow) :
         self.show()
 
 
+    # 关闭selenuim的driver引擎
+    def killDriVer(self) :
+
+        os.popen("taskkill /im chromedriver.exe /F")
+        os.popen("taskkill /im geckodriver.exe /F")
+        os.popen("taskkill /im msedgedriver.exe /F")
+
+
     # 退出程序
     def quit(self) :
 
         self.hide()
         self.object.range_ui.close()
-        self.unregisterHotKey()
+        utils.thread.createThreadDaemonFalse(self.unregisterHotKey)
 
         # 关闭引擎模块
         utils.thread.createThreadDaemonFalse(self.sound.close)
         utils.thread.createThreadDaemonFalse(self.webdriver1.close)
         utils.thread.createThreadDaemonFalse(self.webdriver2.close)
-
         # 关闭selenuim的driver引擎
-        os.popen("taskkill /im chromedriver.exe /F")
-        os.popen("taskkill /im geckodriver.exe /F")
-        os.popen("taskkill /im msedgedriver.exe /F")
-
+        utils.thread.createThreadDaemonFalse(self.killDriVer)
         # 退出程序前保存设置
-        utils.config.postSaveSettin(self.object)
+        utils.thread.createThreadDaemonFalse(utils.config.postSaveSettin, self.object)
+
         self.close()

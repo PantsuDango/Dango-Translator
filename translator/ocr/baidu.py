@@ -1,13 +1,16 @@
+from traceback import format_exc
 import requests
-from base64 import b64encode
-import json
+import base64
 
-from utils.message import MessageBox
-from traceback import print_exc, format_exc
+import utils.message
+import utils.http
 
 
 # 获取访问百度OCR用的token
-def getAccessToken(client_id, client_secret, logger):
+def getAccessToken(object) :
+
+    client_id = object.config["OCR"]["Key"]
+    client_secret = object.config["OCR"]["Secret"]
 
     host = "https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=%s&client_secret=%s"%(client_id, client_secret)
     proxies = {"http": None, "https": None}
@@ -16,19 +19,19 @@ def getAccessToken(client_id, client_secret, logger):
         response = requests.get(host, proxies=proxies, timeout=10)
 
     except TypeError :
-        logger.error(format_exc())
-        MessageBox("百度OCR错误",
-                   "需要翻译器目录的路径设置为纯英文\n"
-                   "否则无法在非简中区的电脑系统下运行使用     ")
+        object.logger.error(format_exc())
+        utils.message.MessageBox("百度OCR错误",
+                                 "需要翻译器目录的路径设置为纯英文\n"
+                                 "否则无法在非简中区的电脑系统下运行使用     ")
 
     except Exception :
-        logger.error(format_exc())
-        MessageBox("百度OCR错误",
-                   "啊咧... 百度OCR连接失败惹 (つД`)\n"
-                   "你可能会无法使用百度OCR\n"
-                   "1. 可能开了代理或者加速器, 请尝试关闭它们\n"
-                   "2. 可能是校园网屏蔽或者是自身网络断开了\n"
-                   "3. 如都无法解决, 请更换使用团子离线或在线OCR     ")
+        object.logger.error(format_exc())
+        utils.message.MessageBox("百度OCR错误",
+                                 "啊咧... 百度OCR连接失败惹 (つД`)\n"
+                                 "你可能会无法使用百度OCR\n"
+                                 "1. 可能开了代理或者加速器, 请尝试关闭它们\n"
+                                 "2. 可能是校园网屏蔽或者是自身网络断开了\n"
+                                 "3. 如都无法解决, 请更换使用团子离线或在线OCR     ")
 
     else :
         try :
@@ -37,38 +40,36 @@ def getAccessToken(client_id, client_secret, logger):
 
             access_token = result_json.get("access_token", "")
             if access_token :
-                return True, access_token
+                object.config["AccessToken"] = access_token
 
             else :
                 error = response.json()["error"]
                 error_description = response.json()["error_description"]
 
                 if error_description == "unknown client id":
-                    MessageBox("百度OCR错误",
-                               "你可能会无法使用百度OCR\n"
-                               "你的百度OCR API Key填错啦 ヽ(#`Д´)ﾉ     ")
+                    utils.message.MessageBox("百度OCR错误",
+                                             "你可能会无法使用百度OCR\n"
+                                             "你的百度OCR API Key填错啦 ヽ(#`Д´)ﾉ     ")
 
                 elif error_description == "Client authentication failed":
-                    MessageBox("百度OCR错误",
-                               "你可能会无法使用百度OCR\n"
-                               "你的百度OCR Secret Key填错啦 ヽ(#`Д´)ﾉ     ")
+                    utils.message.MessageBox("百度OCR错误",
+                                             "你可能会无法使用百度OCR\n"
+                                             "你的百度OCR Secret Key填错啦 ヽ(#`Д´)ﾉ     ")
 
                 else:
-                    MessageBox("百度OCR错误",
-                               "啊咧...OCR连接失败惹... (つД`)\n"
-                               "你可能会无法使用百度OCR\n"
-                               "error：%s\n"
-                               "error_description：%s     "
-                               %(error, error_description))
+                    utils.message.MessageBox("百度OCR错误",
+                                             "啊咧...OCR连接失败惹... (つД`)\n"
+                                             "你可能会无法使用百度OCR\n"
+                                             "error：%s\n"
+                                             "error_description：%s     "
+                                             %(error, error_description))
 
         except Exception :
-            logger.error(format_exc())
-            MessageBox("百度OCR错误",
-                       "出现了出乎意料的问题..."
-                       "你可能会无法使用百度OCR\n"
-                       "%s"%(format_exc()))
-
-    return False, None
+            object.logger.error(format_exc())
+            utils.message.MessageBox("百度OCR错误",
+                                     "出现了出乎意料的问题..."
+                                     "你可能会无法使用百度OCR\n"
+                                     "%s"%(format_exc()))
 
 
 # 百度ocr
@@ -90,7 +91,7 @@ def baiduOCR(config, logger) :
             request_url = "https://aip.baidubce.com/rest/2.0/ocr/v1/general_basic"
 
         with open("./config/image.jpg", "rb") as file :
-            image = b64encode(file.read())
+            image = base64.b64encode(file.read())
         params = {"image": image, "language_type": language}
         headers = {"content-type": "application/x-www-form-urlencoded"}
         proxies = {"http": None, "https": None}
@@ -101,9 +102,9 @@ def baiduOCR(config, logger) :
 
         except TypeError:
             logger.error(format_exc())
-            MessageBox("百度OCR错误",
-                       "需要翻译器目录的路径设置为纯英文\n"
-                       "否则无法在非简中区的电脑系统下运行使用     ")
+            utils.message.MessageBox("百度OCR错误",
+                                     "需要翻译器目录的路径设置为纯英文\n"
+                                     "否则无法在非简中区的电脑系统下运行使用     ")
 
             sentence = "百度OCR错误: 需要翻译器目录的路径设置为纯英文, 否则无法在非简中区的电脑系统下运行使用"
 
