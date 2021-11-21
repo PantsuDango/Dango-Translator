@@ -2054,6 +2054,8 @@ class Settin(QMainWindow) :
 
         self.close()
         self.object.translation_ui.show()
+        if self.object.range_ui.show_sign == True :
+            self.object.range_ui.show()
 
         # 如果是自动模式下, 则解除暂停
         if self.object.translation_ui.translate_mode :

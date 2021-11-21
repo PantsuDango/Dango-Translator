@@ -95,6 +95,7 @@ class WScreenShot(QWidget) :
         # 显示范围框
         self.object.range_ui.setGeometry(X1, Y1, X2-X1, Y2-Y1)
         self.object.range_ui.label.setGeometry(0, 0, X2-X1, Y2-Y1)
+        self.object.range_ui.show_sign = True
         self.object.range_ui.show()
 
         # 如果是自动模式下, 则解除暂停
@@ -129,6 +130,7 @@ class Range(QMainWindow) :
         self.font_type = "华康方圆体W7"
         self.color = "#1E90FF"
         self.font_size = 12
+        self.show_sign = False
         self.ui()
 
 
@@ -140,7 +142,7 @@ class Range(QMainWindow) :
         Y2 = self.object.yaml["range"]["Y2"]
 
         # 窗口大小
-        self.setGeometry(X1, Y1, X2 - X1, Y2 - Y1)
+        self.setGeometry(X1, Y1, X2-X1, Y2-Y1)
 
         # 窗口无标题栏、窗口置顶、窗口透明
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint | Qt.Tool)
@@ -178,7 +180,7 @@ class Range(QMainWindow) :
         self.hide_button.setFont(self.font)
         self.hide_button.setText("隐藏")
         self.hide_button.setCursor(QCursor(Qt.PointingHandCursor))
-        self.hide_button.clicked.connect(self.close)
+        self.hide_button.clicked.connect(self.quit)
         self.hide_button.hide()
 
         # 右下角用于拉伸界面的控件
@@ -258,3 +260,9 @@ class Range(QMainWindow) :
         # 如果是自动模式下, 则解除暂停
         if self.object.translation_ui.translate_mode :
             self.object.translation_ui.stop_sign = False
+
+
+    def quit(self) :
+
+        self.show_sign = False
+        self.close()
