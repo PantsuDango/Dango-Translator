@@ -50,8 +50,7 @@ class Translation(QMainWindow) :
         self.logger = object.logger
         self.getInitConfig()
         self.ui()
-        # 翻译界面显示通知信息
-        utils.thread.createThread(self.getDefaultMessage)
+
         # 开启朗读模块
         self.sound = translator.sound.Sound(self.object)
         utils.thread.createThread(self.sound.openWebdriver)
@@ -110,6 +109,10 @@ class Translation(QMainWindow) :
 
         # 翻译框加入描边文字
         self.format = QTextCharFormat()
+        # 翻译界面显示通知信息
+        thread = utils.thread.createShowTranslateTextQThread(self.object)
+        thread.signal.connect(self.showTranslateText)
+        utils.thread.runQThread(thread)
 
         # 重叠提示消息框
         self.temp_text = QTextBrowser(self)
@@ -457,25 +460,28 @@ class Translation(QMainWindow) :
         self.textAreaChanged()
 
 
-    # 获取通知信息
-    def getInform(self) :
+    # 翻译框初始消息
+    def showTranslateText(self, result) :
 
-        # 版本广播信息请求地址
-        url = self.object.yaml["dict_info"]["dango_get_inform"]
-        body = {
-            "version": self.object.yaml["version"]
-        }
-        res = utils.http.post(url, body, self.logger)
-        result = res.get("Result", "")
-
-        if result != "" and result != "No" :
+        if result :
             for content in result.split(r"\n") :
                 self.format.setTextOutline(QPen(QColor(self.font_color_1), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
                 self.translate_text.mergeCurrentCharFormat(self.format)
                 self.translate_text.append(content)
-            return result
+        else :
+            self.format.setTextOutline(QPen(QColor(self.font_color_1), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+            self.translate_text.mergeCurrentCharFormat(self.format)
+            self.translate_text.append("欢迎你 ~ %s 么么哒 ~" % self.user)
+            self.format.setTextOutline(QPen(QColor(self.font_color_2), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+            self.translate_text.mergeCurrentCharFormat(self.format)
+            self.translate_text.append("b站关注 团子翻译器 查看动态可了解翻译器最新情况 ~")
+            self.format.setTextOutline(QPen(QColor(self.font_color_1), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+            self.translate_text.mergeCurrentCharFormat(self.format)
+            self.translate_text.append("团子一个人开发不易，这个软件真的花了很大很大的精力 _(:з」∠)_")
+            self.format.setTextOutline(QPen(QColor(self.font_color_2), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+            self.translate_text.mergeCurrentCharFormat(self.format)
+            self.translate_text.append("喜欢的话能不能点击上方的电池图标支持一下团子，真心感谢你❤")
 
-        return ""
 
 
     # 当翻译内容改变时界面自适应窗口大小
@@ -680,27 +686,6 @@ class Translation(QMainWindow) :
         # 提示
         if self.webdriver_type1 or self.webdriver_type2 :
             self.statusbar.showMessage("翻译模型启动中, 请等待完成后再操作...")
-
-
-    # 翻译框显示通知信息
-    def getDefaultMessage(self) :
-
-        # 获取版本通知
-        inform = self.getInform()
-        # 如果没有通知信息则显示默认信息
-        if not inform :
-            self.format.setTextOutline(QPen(QColor(self.font_color_1), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
-            self.translate_text.mergeCurrentCharFormat(self.format)
-            self.translate_text.append("欢迎你 ~ %s 么么哒 ~" % self.user)
-            self.format.setTextOutline(QPen(QColor(self.font_color_2), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
-            self.translate_text.mergeCurrentCharFormat(self.format)
-            self.translate_text.append("b站关注 团子翻译器 查看动态可了解翻译器最新情况 ~")
-            self.format.setTextOutline(QPen(QColor(self.font_color_1), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
-            self.translate_text.mergeCurrentCharFormat(self.format)
-            self.translate_text.append("团子一个人开发不易，这个软件真的花了很大很大的精力 _(:з」∠)_")
-            self.format.setTextOutline(QPen(QColor(self.font_color_2), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
-            self.translate_text.mergeCurrentCharFormat(self.format)
-            self.translate_text.append("喜欢的话能不能点击上方的电池图标支持一下团子，真心感谢你❤")
 
 
     # 按下屏蔽词键后做的事情

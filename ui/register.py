@@ -436,16 +436,15 @@ class Register(QWidget) :
                                      "%s     "%message)
 
 
-    # 检查邮箱
-    def checkBindEmail(self) :
+    # 显示检查邮箱失败信息
+    def showBindEmailMessage(self) :
 
-        if not utils.email.bindEmail(self.object) :
-            utils.message.checkEmailMessageBox("邮箱绑定检查",
-                                               "检测到您未绑定邮箱, 请先完成邮箱绑定     \n"
-                                               "邮箱绑定有以下好处:\n"
-                                               "1. 忘记密码时用于修改密码;\n"
-                                               "2. 购买在线OCR时接收购买凭证;",
-                                               self.object)
+        utils.message.checkEmailMessageBox("邮箱绑定检查",
+                                           "检测到您未绑定邮箱, 请先完成邮箱绑定     \n"
+                                           "邮箱绑定有以下好处:\n"
+                                           "1. 忘记密码时用于修改密码;\n"
+                                           "2. 购买在线OCR时接收购买凭证;",
+                                           self.object)
 
 
     # 按键信号解绑

@@ -228,3 +228,14 @@ def saveTransHisTory(text, translate_type) :
 
     with open("./config/翻译历史.txt", "a+", encoding="utf-8") as file :
         file.write(content)
+
+
+# 获取版本广播信息
+def getVersionMessage(object) :
+
+    url = object.yaml["dict_info"]["dango_get_inform"]
+    body = {
+        "version": object.yaml["version"]
+    }
+    res = utils.http.post(url, body, object.logger)
+    return res.get("Result", "")

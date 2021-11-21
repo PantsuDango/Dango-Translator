@@ -64,7 +64,9 @@ class DangoTranslator() :
         # 范围框界面
         self.range_ui = ui.range.Range(self)
         # 检查邮箱
-        self.register_ui.checkBindEmail()
+        thread = utils.thread.createCheckBindEmailQThread(self)
+        thread.signal.connect(self.register_ui.showBindEmailMessage)
+        utils.thread.runQThread(thread)
 
 
     # 按下充电键后做的事情
