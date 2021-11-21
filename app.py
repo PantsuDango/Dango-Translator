@@ -54,10 +54,10 @@ class DangoTranslator() :
 
         # 设置界面
         self.settin_ui = ui.settin.Settin(self)
-        # # 翻译界面设置页面按键信号
-        # self.translation_ui.settin_button.clicked.connect(self.clickSettin)
-        # # 翻译界面充电按钮信号
-        # self.translation_ui.battery_button.clicked.connect(self.clickBattery)
+        # 翻译界面设置页面按键信号
+        self.translation_ui.settin_button.clicked.connect(self.clickSettin)
+        # 翻译界面充电按钮信号
+        self.translation_ui.battery_button.clicked.connect(self.clickBattery)
 
         # 屏蔽词界面
         self.filter_ui = ui.filter.Filter(self)

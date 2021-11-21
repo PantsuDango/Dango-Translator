@@ -13,10 +13,10 @@ import utils.port
 import utils.test
 
 from ui import image
+import ui.hotkey
 import ui.switch
 import ui.desc
 import ui.key
-import ui.hotkey
 
 import translator.ocr.baidu
 
@@ -1362,7 +1362,7 @@ class Settin(QMainWindow) :
 
 
     # 改变在线OCR开关状态
-    def changeOnlineSwitch(self, checked):
+    def changeOnlineSwitch(self, checked) :
 
         if checked :
             if self.offline_ocr_use == True :
@@ -1375,7 +1375,7 @@ class Settin(QMainWindow) :
 
 
     # 改变百度OCR开关状态
-    def changeBaiduSwitch(self, checked):
+    def changeBaiduSwitch(self, checked) :
 
         if checked :
             if self.offline_ocr_use == True :
@@ -1388,7 +1388,7 @@ class Settin(QMainWindow) :
 
 
     # 改变公共有道翻译开关状态
-    def changeYoudaoSwitch(self, checked):
+    def changeYoudaoSwitch(self, checked) :
 
         if checked :
             self.youdao_use = True
@@ -1400,7 +1400,7 @@ class Settin(QMainWindow) :
 
 
     # 改变公共百度翻译开关状态
-    def changeBaiduWebSwitch(self, checked):
+    def changeBaiduWebSwitch(self, checked) :
 
         if checked :
             self.baidu_web_use = True
@@ -1412,7 +1412,7 @@ class Settin(QMainWindow) :
 
 
     # 改变公共腾讯翻译开关状态
-    def changeTencentWebSwitch(self, checked):
+    def changeTencentWebSwitch(self, checked) :
 
         if checked :
             self.tencent_web_use = True
@@ -1424,7 +1424,7 @@ class Settin(QMainWindow) :
 
 
     # 改变公共DeepL翻译开关状态
-    def changeDeepLSwitch(self, checked):
+    def changeDeepLSwitch(self, checked) :
 
         if checked :
             self.deepl_use = True
@@ -1436,7 +1436,7 @@ class Settin(QMainWindow) :
 
 
     # 改变公共Google翻译开关状态
-    def changeGoogleSwitch(self, checked):
+    def changeGoogleSwitch(self, checked) :
 
         if checked :
             self.google_use = True
@@ -1448,7 +1448,7 @@ class Settin(QMainWindow) :
 
 
     # 改变公共彩云翻译开关状态
-    def changeCaiyunWebSwitch(self, checked):
+    def changeCaiyunWebSwitch(self, checked) :
 
         if checked :
             self.caiyun_web_use = True
@@ -1460,7 +1460,7 @@ class Settin(QMainWindow) :
 
 
     # 改变私人腾讯翻译开关状态
-    def changeTencentSwitch(self, checked):
+    def changeTencentSwitch(self, checked) :
 
         if checked :
             self.tencent_use = True
@@ -1472,7 +1472,7 @@ class Settin(QMainWindow) :
 
 
     # 改变私人百度翻译开关状态
-    def changeBaiduTranslaterSwitch(self, checked):
+    def changeBaiduTranslaterSwitch(self, checked) :
 
         if checked :
             self.baidu_use = True
@@ -1484,7 +1484,7 @@ class Settin(QMainWindow) :
 
 
     # 改变私人彩云翻译开关状态
-    def changeCaiyunSwitch(self, checked):
+    def changeCaiyunSwitch(self, checked) :
 
         if checked :
             self.caiyun_use = True
@@ -1496,7 +1496,7 @@ class Settin(QMainWindow) :
 
 
     # 改变字体样式开关状态
-    def changeFontColorTypeSwitch(self, checked):
+    def changeFontColorTypeSwitch(self, checked) :
 
         if checked :
             self.font_color_type = True
@@ -1505,7 +1505,7 @@ class Settin(QMainWindow) :
 
 
     # 改变显示原文开关状态
-    def changeShowOriginalSwitch(self, checked):
+    def changeShowOriginalSwitch(self, checked) :
 
         if checked :
             self.show_original_use = True
@@ -1514,7 +1514,7 @@ class Settin(QMainWindow) :
 
 
     # 改变自动复制剪贴板开关状态
-    def changeAutoCopyOriginalSwitch(self, checked):
+    def changeAutoCopyOriginalSwitch(self, checked) :
 
         if checked :
             self.auto_clipboard_use = True
@@ -1523,7 +1523,7 @@ class Settin(QMainWindow) :
 
 
     # 改变自动复制剪贴板开关状态
-    def changeTextDirectionSwitch(self, checked):
+    def changeTextDirectionSwitch(self, checked) :
 
         if checked :
             self.text_direction_use = True
@@ -1532,7 +1532,7 @@ class Settin(QMainWindow) :
 
 
     # 改变翻译热键开关状态
-    def changeTranslateHotkeySwitch(self, checked):
+    def changeTranslateHotkeySwitch(self, checked) :
 
         if checked :
             self.translate_hotkey_use = True
@@ -1541,7 +1541,7 @@ class Settin(QMainWindow) :
 
 
     # 改变范围热键开关状态
-    def changeRangeHotkeySwitch(self, checked):
+    def changeRangeHotkeySwitch(self, checked) :
 
         if checked :
             self.range_hotkey_use = True
@@ -1619,177 +1619,177 @@ class Settin(QMainWindow) :
 
 
     # 翻译源字体颜色
-    def ChangeTranslateColor(self, type, color_str) :
+    def ChangeTranslateColor(self, translate_type, color_str) :
 
         color = QColorDialog.getColor(QColor(color_str), None, "设定所选翻译显示时的颜色")
         if not color.isValid() :
             return
 
-        if type == "youdao" :
+        if translate_type == "youdao" :
             self.youdao_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=color.name()))
             self.youdao_color = color.name()
-        elif type == "baidu" :
+        elif translate_type == "baidu" :
             self.baidu_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=color.name()))
             self.baidu_web_color = color.name()
-        elif type == "tencent" :
+        elif translate_type == "tencent" :
             self.tencent_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=color.name()))
             self.tencent_web_color = color.name()
-        elif type == "deepl" :
+        elif translate_type == "deepl" :
             self.deepl_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=color.name()))
             self.deepl_color = color.name()
-        elif type == "google" :
+        elif translate_type == "google" :
             self.google_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=color.name()))
             self.google_color = color.name()
-        elif type == "caiyun" :
+        elif translate_type == "caiyun" :
             self.caiyun_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=color.name()))
             self.caiyun_web_color = color.name()
-        elif type == "tencent_private" :
+        elif translate_type == "tencent_private" :
             self.tencent_private_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=color.name()))
             self.tencent_color = color.name()
-        elif type == "baidu_private" :
+        elif translate_type == "baidu_private" :
             self.baidu_private_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=color.name()))
             self.baidu_color = color.name()
-        elif type == "caiyun_private" :
+        elif translate_type == "caiyun_private" :
             self.caiyun_private_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=color.name()))
             self.caiyun_color = color.name()
 
 
     # 说明窗口
-    def showDesc(self, object) :
+    def showDesc(self, message_type) :
 
-        self.desc = ui.desc.Desc(self.object)
+        self.desc_ui = ui.desc.Desc(self.object)
 
         # OCR说明
-        if object == "OCR" :
-            self.desc.setWindowTitle("OCR说明")
-            self.desc.desc_text.append("\n首先区别OCR和翻译是两个模块。")
-            self.desc.desc_text.append("\nOCR即为文字识别技术, 用于提取图片内要翻译的文字.")
-            self.desc.desc_text.append("\n翻译器通过对所框选的范围进行截图, 然后利用OCR将截图内要翻译的文字识别出来, 再发送给翻译模块翻译。")
+        if message_type == "OCR" :
+            self.desc_ui.setWindowTitle("OCR说明")
+            self.desc_ui.desc_text.append("\n首先区别OCR和翻译是两个模块。")
+            self.desc_ui.desc_text.append("\nOCR即为文字识别技术, 用于提取图片内要翻译的文字.")
+            self.desc_ui.desc_text.append("\n翻译器通过对所框选的范围进行截图, 然后利用OCR将截图内要翻译的文字识别出来, 再发送给翻译模块翻译。")
 
         # 离线OCR说明
-        elif object == "offlineOCR" :
-            self.desc.setWindowTitle("离线OCR说明")
-            self.desc.desc_text.append("\n特性: \n依赖自身CPU性能, CPU性能越高，识别速度越快.")
-            self.desc.desc_text.append("识别精度一般.")
-            self.desc.desc_text.append("\n优点:\n1. 无额度限制, 完全免费, 可无限次使用;")
-            self.desc.desc_text.append("\n缺点:\n1. 对电脑配置较低的用户不友好, 可能会导致电脑很卡;")
-            self.desc.desc_text.append("2. 可能会因为环境配置问题导致安装失败, 不支持10年以前发行的CPU;")
-            self.desc.desc_text.append("\n详细使用方式见教程.")
+        elif message_type == "offlineOCR" :
+            self.desc_ui.setWindowTitle("离线OCR说明")
+            self.desc_ui.desc_text.append("\n特性: \n依赖自身CPU性能, CPU性能越高，识别速度越快.")
+            self.desc_ui.desc_text.append("识别精度一般.")
+            self.desc_ui.desc_text.append("\n优点:\n1. 无额度限制, 完全免费, 可无限次使用;")
+            self.desc_ui.desc_text.append("\n缺点:\n1. 对电脑配置较低的用户不友好, 可能会导致电脑很卡;")
+            self.desc_ui.desc_text.append("2. 可能会因为环境配置问题导致安装失败, 不支持10年以前发行的CPU;")
+            self.desc_ui.desc_text.append("\n详细使用方式见教程.")
 
         # 在线OCR说明
-        elif object == "onlineOCR":
-            self.desc.setWindowTitle("在线OCR说明")
-            self.desc.desc_text.append("\n特性: \n团子在大佬们的帮助下自行搭建的OCR在线服务.")
-            self.desc.desc_text.append("识别精度较好.")
-            self.desc.desc_text.append("\n优点:\n1. 不消耗电脑配置, 仅需联网;")
-            self.desc.desc_text.append("2. 性价比高, 服务期内无使用次数限制;")
-            self.desc.desc_text.append("\n缺点:\n1. 不免费, 需要氪点金金;")
-            self.desc.desc_text.append("\n详细使用方式见教程.")
+        elif message_type == "onlineOCR":
+            self.desc_ui.setWindowTitle("在线OCR说明")
+            self.desc_ui.desc_text.append("\n特性: \n团子在大佬们的帮助下自行搭建的OCR在线服务.")
+            self.desc_ui.desc_text.append("识别精度较好.")
+            self.desc_ui.desc_text.append("\n优点:\n1. 不消耗电脑配置, 仅需联网;")
+            self.desc_ui.desc_text.append("2. 性价比高, 服务期内无使用次数限制;")
+            self.desc_ui.desc_text.append("\n缺点:\n1. 不免费, 需要氪点金金;")
+            self.desc_ui.desc_text.append("\n详细使用方式见教程.")
 
         # 在线OCR说明
-        elif object == "baiduOCR":
-            self.desc.setWindowTitle("百度OCR说明")
-            self.desc.desc_text.append("\n特性: \n百度智能云的OCR服务.")
-            self.desc.desc_text.append("识别精度优秀.")
-            self.desc.desc_text.append("\n优点:\n1. 不消耗电脑配置, 仅需联网;")
-            self.desc.desc_text.append("\n缺点:\n1. 使用次数有限制;")
-            self.desc.desc_text.append("2. 不免费, 且价格较贵;")
-            self.desc.desc_text.append("\n详细使用方式见教程.")
+        elif message_type == "baiduOCR":
+            self.desc_ui.setWindowTitle("百度OCR说明")
+            self.desc_ui.desc_text.append("\n特性: \n百度智能云的OCR服务.")
+            self.desc_ui.desc_text.append("识别精度优秀.")
+            self.desc_ui.desc_text.append("\n优点:\n1. 不消耗电脑配置, 仅需联网;")
+            self.desc_ui.desc_text.append("\n缺点:\n1. 使用次数有限制;")
+            self.desc_ui.desc_text.append("2. 不免费, 且价格较贵;")
+            self.desc_ui.desc_text.append("\n详细使用方式见教程.")
 
         # 公共翻译说明
-        elif object == "publicTranslate" :
-            self.desc.setWindowTitle("公共翻译说明")
-            self.desc.desc_text.append("\n没有次数限制, 不需要注册, 可直接使用, 但不保证使用稳定性, 可能会抽风.")
-            self.desc.desc_text.append('\n使用需要电脑装有"最新版本的" Chorem(谷歌)浏览器、Firefox(火狐)浏览器、Edga(微软)浏览器 至少一款.')
-            self.desc.desc_text.append('\n翻译器原理上, 是通过后台启动相应的浏览器, 自动打开翻译网站去实现翻译.')
-            self.desc.desc_text.append("\n详细使用方式见教程.")
+        elif message_type == "publicTranslate" :
+            self.desc_ui.setWindowTitle("公共翻译说明")
+            self.desc_ui.desc_text.append("\n没有次数限制, 不需要注册, 可直接使用, 但不保证使用稳定性, 可能会抽风.")
+            self.desc_ui.desc_text.append('\n使用需要电脑装有"最新版本的" Chorem(谷歌)浏览器、Firefox(火狐)浏览器、Edga(微软)浏览器 至少一款.')
+            self.desc_ui.desc_text.append('\n翻译器原理上, 是通过后台启动相应的浏览器, 自动打开翻译网站去实现翻译.')
+            self.desc_ui.desc_text.append("\n详细使用方式见教程.")
 
         # 私人翻译说明
-        elif object == "privateTranslate" :
-            self.desc.setWindowTitle("私人翻译说明")
-            self.desc.desc_text.append("\n有次数限制, 使用前需要注册, 但使用稳定性, 基本上不会抽风.")
-            self.desc.desc_text.append("\n翻译器原理上, 是通过请求相应的云API接口去获取翻译结果")
-            self.desc.desc_text.append("\n详细使用方式见教程.")
+        elif message_type == "privateTranslate" :
+            self.desc_ui.setWindowTitle("私人翻译说明")
+            self.desc_ui.desc_text.append("\n有次数限制, 使用前需要注册, 但使用稳定性, 基本上不会抽风.")
+            self.desc_ui.desc_text.append("\n翻译器原理上, 是通过请求相应的云API接口去获取翻译结果")
+            self.desc_ui.desc_text.append("\n详细使用方式见教程.")
 
         # 翻译框透明度说明
-        elif object == "horizontalSlider" :
-            self.desc.setWindowTitle("翻译框透明度说明")
-            self.desc.desc_text.append("\n用于调节显示翻译结果的翻译框透明度.")
-            self.desc.desc_text.append("数值0为全透明")
-            self.desc.desc_text.append("数值100为完全不透明")
+        elif message_type == "horizontalSlider" :
+            self.desc_ui.setWindowTitle("翻译框透明度说明")
+            self.desc_ui.desc_text.append("\n用于调节显示翻译结果的翻译框透明度.")
+            self.desc_ui.desc_text.append("数值0为全透明")
+            self.desc_ui.desc_text.append("数值100为完全不透明")
 
         # 字体样式设定说明
-        elif object == "fontType" :
-            self.desc.setWindowTitle("字体样式设定说明")
-            self.desc.desc_text.append("描边字体为字体中间镂空白底, 描边带颜色:\n")
-            self.desc.desc_text.insertHtml('<img src={} width="{}" >'.format(HOLLOW_IMG_PATH, 195*self.rate))
-            self.desc.desc_text.append("\n实心字体为纯色字体:\n")
-            self.desc.desc_text.insertHtml('<img src="{}" width="{}" >'.format(SOLID_IMG_PATH, 195*self.rate))
-            self.desc.desc_text.append("\n顺便一提团子喜欢描边字体~")
+        elif message_type == "fontType" :
+            self.desc_ui.setWindowTitle("字体样式设定说明")
+            self.desc_ui.desc_text.append("描边字体为字体中间镂空白底, 描边带颜色:\n")
+            self.desc_ui.desc_text.insertHtml('<img src={} width="{}" >'.format(HOLLOW_IMG_PATH, 195 * self.rate))
+            self.desc_ui.desc_text.append("\n实心字体为纯色字体:\n")
+            self.desc_ui.desc_text.insertHtml('<img src="{}" width="{}" >'.format(SOLID_IMG_PATH, 195 * self.rate))
+            self.desc_ui.desc_text.append("\n顺便一提团子喜欢描边字体~")
 
         # 自动翻译设定说明
-        elif object == "autoSpeed" :
-            self.desc.setWindowTitle("自动翻译设定说明")
-            self.desc.desc_text.append("\n自动翻译模式下, 每隔该设定时间, 便会检测一次所框的范围内图像是否发生变化, 若发生变化则识别并刷新翻译")
+        elif message_type == "autoSpeed" :
+            self.desc_ui.setWindowTitle("自动翻译设定说明")
+            self.desc_ui.desc_text.append("\n自动翻译模式下, 每隔该设定时间, 便会检测一次所框的范围内图像是否发生变化, 若发生变化则识别并刷新翻译")
 
         # 显示原文说明
-        elif object == "showOriginal" :
-            self.desc.setWindowTitle("显示原文说明")
-            self.desc.desc_text.append("\n开启后, 会将OCR识别到的原文显示在翻译框.")
+        elif message_type == "showOriginal" :
+            self.desc_ui.setWindowTitle("显示原文说明")
+            self.desc_ui.desc_text.append("\n开启后, 会将OCR识别到的原文显示在翻译框.")
 
         # 文字方向说明
-        elif object == "textDirection":
-            self.desc.setWindowTitle("文字方向说明")
-            self.desc.desc_text.append("\n正常都是横向的呢, 竖向多用于漫画翻译的情况.")
+        elif message_type == "textDirection":
+            self.desc_ui.setWindowTitle("文字方向说明")
+            self.desc_ui.desc_text.append("\n正常都是横向的呢, 竖向多用于漫画翻译的情况.")
 
         # 图像相似度说明
-        elif object == "imageRefresh":
-            self.desc.setWindowTitle("图像相似度说明")
-            self.desc.desc_text.append("\n自动翻译模式下, 每隔设定的时间间隔, 会重新检测范围区域的图像. "
+        elif message_type == "imageRefresh":
+            self.desc_ui.setWindowTitle("图像相似度说明")
+            self.desc_ui.desc_text.append("\n自动翻译模式下, 每隔设定的时间间隔, 会重新检测范围区域的图像. "
                                        "只有当当前图像, 与前一次图像比较的相似度小于该设定的值时, 才会重新调取OCR识别该图像.")
-            self.desc.desc_text.append("\n如果觉得OCR频繁重复识别, 翻译框出现了'闪烁'的话, 可以调低此参数.")
-            self.desc.desc_text.append("\n如果看不懂请不要轻易修改此参数, 建议值为98.")
+            self.desc_ui.desc_text.append("\n如果觉得OCR频繁重复识别, 翻译框出现了'闪烁'的话, 可以调低此参数.")
+            self.desc_ui.desc_text.append("\n如果看不懂请不要轻易修改此参数, 建议值为98.")
 
         # 文字相似度说明
-        elif object == "textRefresh":
-            self.desc.setWindowTitle("文字相似度说明")
-            self.desc.desc_text.append("\n自动翻译模式下, 每隔设定的时间间隔, OCR识别结果刷新后. "
+        elif message_type == "textRefresh":
+            self.desc_ui.setWindowTitle("文字相似度说明")
+            self.desc_ui.desc_text.append("\n自动翻译模式下, 每隔设定的时间间隔, OCR识别结果刷新后. "
                                        "如果当前OCR识别出的原文, 与前一次识别的原文比较, 其相似度小于该设定的值时, "
                                        "才会重新调取翻译并刷新至翻译界面.")
-            self.desc.desc_text.append("\n如果觉得频繁重复翻译, 翻译框出现了'闪烁'的话, 可以调低此参数.")
-            self.desc.desc_text.append("\n如果看不懂请不要轻易修改此参数, 建议值为90.")
+            self.desc_ui.desc_text.append("\n如果觉得频繁重复翻译, 翻译框出现了'闪烁'的话, 可以调低此参数.")
+            self.desc_ui.desc_text.append("\n如果看不懂请不要轻易修改此参数, 建议值为90.")
 
         # QQ交流群
-        elif object == "qqGroup":
-            self.desc.setWindowTitle("加入交流群")
-            self.desc.qq_group_image.show()
+        elif message_type == "qqGroup":
+            self.desc_ui.setWindowTitle("加入交流群")
+            self.desc_ui.qq_group_image.show()
 
-        self.desc.show()
+        self.desc_ui.show()
 
 
     # 密钥窗口
-    def showKey(self, object) :
+    def showKey(self, key_type) :
 
         # 百度OCR
-        if object == "baiduOCR" :
+        if key_type == "baiduOCR" :
             self.key_ui.setWindowTitle("百度OCR - 密钥编辑")
             self.key_ui.baidu_ocr_key_textEdit.show()
             self.key_ui.baidu_ocr_secret_textEdit.show()
 
         # 私人腾讯翻译
-        elif object == "tencentTranslate" :
+        elif key_type == "tencentTranslate" :
             self.key_ui.setWindowTitle("私人腾讯翻译 - 密钥编辑")
             self.key_ui.tencent_private_key_textEdit.show()
             self.key_ui.tencent_private_secret_textEdit.show()
 
         # 私人腾讯翻译
-        elif object == "baiduTranslate" :
+        elif key_type == "baiduTranslate" :
             self.key_ui.setWindowTitle("私人百度翻译 - 密钥编辑")
             self.key_ui.baidu_private_key_textEdit.show()
             self.key_ui.baidu_private_secret_textEdit.show()
 
         # 私人彩云翻译
-        elif object == "caiyunTranslate" :
+        elif key_type == "caiyunTranslate" :
             self.key_ui.setWindowTitle("私人彩云翻译 - 密钥编辑")
             self.key_ui.caiyun_private_key_textEdit.show()
 
@@ -1813,21 +1813,21 @@ class Settin(QMainWindow) :
     def setHotKey(self, key_type) :
 
         # 快捷键界面
-        self.hotkey = ui.key.HotKey(self.object)
+        self.hotkey_ui = ui.hotkey.HotKey(self.object)
 
         if key_type == "translate" :
-            self.hotkey.setWindowTitle("设定翻译快捷键")
-            self.hotkey.comboBox_1.setCurrentText(self.object.config["translateHotkeyValue1"])
-            self.hotkey.comboBox_2.setCurrentText(self.object.config["translateHotkeyValue2"])
-            self.hotkey.sure_button.clicked.connect(lambda: self.hotkey.sure(key_type))
+            self.hotkey_ui.setWindowTitle("设定翻译快捷键")
+            self.hotkey_ui.comboBox_1.setCurrentText(self.object.config["translateHotkeyValue1"])
+            self.hotkey_ui.comboBox_2.setCurrentText(self.object.config["translateHotkeyValue2"])
+            self.hotkey_ui.sure_button.clicked.connect(lambda: self.hotkey_ui.sure(key_type))
 
         if key_type == "range" :
-            self.hotkey.setWindowTitle("设定范围快捷键")
-            self.hotkey.comboBox_1.setCurrentText(self.object.config["rangeHotkeyValue1"])
-            self.hotkey.comboBox_2.setCurrentText(self.object.config["rangeHotkeyValue2"])
-            self.hotkey.sure_button.clicked.connect(lambda: self.hotkey.sure(key_type))
+            self.hotkey_ui.setWindowTitle("设定范围快捷键")
+            self.hotkey_ui.comboBox_1.setCurrentText(self.object.config["rangeHotkeyValue1"])
+            self.hotkey_ui.comboBox_2.setCurrentText(self.object.config["rangeHotkeyValue2"])
+            self.hotkey_ui.sure_button.clicked.connect(lambda: self.hotkey_ui.sure(key_type))
 
-        self.hotkey.show()
+        self.hotkey_ui.show()
 
 
     # 校验翻译开关状态
@@ -2029,10 +2029,7 @@ class Settin(QMainWindow) :
         self.registerHotKey()
 
         # 重置翻译引擎
-        try :
-            self.resetWebdriver()
-        except Exception :
-            pass
+        self.resetWebdriver()
 
         # 刷新百度OCR的AccessToken
         if self.baidu_ocr_use :
