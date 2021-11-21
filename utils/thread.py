@@ -27,7 +27,7 @@ def runQThread(qthread) :
 
     def func() :
         qthread.start()
-        qthread.exec()
+        qthread.wait()
 
     thread = threading.Thread(target=func)
     thread.setDaemon(True)

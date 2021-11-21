@@ -314,7 +314,7 @@ class Register(QWidget) :
         thread = utils.email.SendEmail(url, user, email, self.code_key, self.logger)
         thread.signal.connect(self.showEmailMessage)
         thread.start()
-        thread.exec()
+        thread.wait()
 
 
     # 注册

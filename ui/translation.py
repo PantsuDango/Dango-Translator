@@ -543,10 +543,10 @@ class Translation(QMainWindow) :
         if self.auto_trans_exist :
             return
 
-        thread = utils.translater.Translater(self, self.logger)
+        thread = utils.translater.Translater(self.object)
         thread.clear_text_sign.connect(self.clearText)
         thread.start()
-        thread.exec()
+        thread.wait()
 
 
     # 收到翻译信息清屏

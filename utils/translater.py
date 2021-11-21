@@ -1,6 +1,5 @@
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import QApplication
-
 from skimage.metrics import structural_similarity
 from cv2 import imread, cvtColor, COLOR_BGR2GRAY
 from difflib import SequenceMatcher
@@ -21,13 +20,12 @@ class TranslaterProccess(QThread) :
 
     display_signal = pyqtSignal(str, str)
 
-    def __init__(self, window, original, trans_type, logger) :
+    def __init__(self, object, trans_type) :
 
         super(TranslaterProccess, self).__init__()
-        self.window = window
-        self.original = original
+        self.object = object
         self.trans_type = trans_type
-        self.logger = logger
+        self.logger = object.logger
 
 
     def run(self) :
@@ -37,36 +35,36 @@ class TranslaterProccess(QThread) :
 
         # 公共翻译一
         if self.trans_type == "webdriver_1" :
-            result = self.window.webdriver1.translater(self.original)
-            print("公共%s: %s" % (self.window.webdriver1.web_type, result))
+            result = self.object.translation_ui.webdriver1.translater(self.object.translation_ui.original)
+            print("公共%s: %s"%(self.object.translation_ui.webdriver1.web_type, result))
 
         # 公共翻译二
         elif self.trans_type == "webdriver_2" :
-            result = self.window.webdriver2.translater(self.original)
-            print("公共%s: %s" % (self.window.webdriver2.web_type, result))
+            result = self.object.translation_ui.webdriver2.translater(self.object.translation_ui.original)
+            print("公共%s: %s" % (self.object.translation_ui.webdriver2.web_type, result))
 
         # 私人百度
         elif self.trans_type == "baidu_private" :
-            secret_id = self.window.config["baiduAPI"]["Key"]
-            secret_key = self.window.config["baiduAPI"]["Secret"]
-            result = api.baidu(self.original, secret_id, secret_key, self.logger)
+            secret_id = self.object.config["baiduAPI"]["Key"]
+            secret_key = self.object.config["baiduAPI"]["Secret"]
+            result = api.baidu(self.object.translation_ui.original, secret_id, secret_key, self.logger)
             print("私人百度: ", result)
 
         # 私人腾讯
         elif self.trans_type == "tencent_private" :
-            secret_id = self.window.config["tencentAPI"]["Key"]
-            secret_key = self.window.config["tencentAPI"]["Secret"]
-            result = api.tencent(self.original, secret_id, secret_key, self.logger)
+            secret_id = self.object.config["tencentAPI"]["Key"]
+            secret_key = self.object.config["tencentAPI"]["Secret"]
+            result = api.tencent(self.object.translation_ui.original, secret_id, secret_key, self.logger)
             print("私人腾讯: ", result)
 
         # 私人彩云
         elif self.trans_type == "caiyun_private" :
-            secret_key = self.window.config["caiyunAPI"]
-            result = api.caiyun(self.original, secret_key, self.logger)
+            secret_key = self.object.config["caiyunAPI"]
+            result = api.caiyun(self.object.translation_ui.original, secret_key, self.logger)
             print("私人彩云: ", result)
 
         elif self.trans_type == "original" :
-            result = self.original
+            result = self.object.translation_ui.original
 
         if result :
             print("time: %s"%(time.time()-start))
@@ -79,20 +77,20 @@ class Translater(QThread) :
     create_trans_sign = pyqtSignal(str)
     clear_text_sign = pyqtSignal(bool)
 
-    def __init__(self, window, logger):
+    def __init__(self, object) :
 
         super(Translater, self).__init__()
-        self.window = window
-        self.logger = logger
+        self.object = object
+        self.logger = object.logger
         self.create_trans_sign.connect(self.creatTranslaterThread)
 
     # 截图
     def imageCut(self):
 
-        x1 = self.window.config["range"]["X1"]
-        y1 = self.window.config["range"]["Y1"]
-        x2 = self.window.config["range"]["X2"]
-        y2 = self.window.config["range"]["Y2"]
+        x1 = self.object.yaml["range"]["X1"]
+        y1 = self.object.yaml["range"]["Y1"]
+        x2 = self.object.yaml["range"]["X2"]
+        y2 = self.object.yaml["range"]["Y2"]
 
         screen = QApplication.primaryScreen()
         pix = screen.grabWindow(QApplication.desktop().winId(), x1, y1, x2-x1, y2-y1)
@@ -123,29 +121,29 @@ class Translater(QThread) :
     # 创建翻译线程
     def creatTranslaterThread(self, trans_type) :
 
-        self.window.thread_state += 1
-        thread = TranslaterProccess(self.window, self.window.original, trans_type, self.logger)
-        thread.display_signal.connect(self.window.display_text)
+        self.object.translation_ui.thread_state += 1
+        thread = TranslaterProccess(self.object, trans_type)
+        thread.display_signal.connect(self.object.translation_ui.display_text)
         thread.start()
-        thread.exec()
+        thread.wait()
 
 
     # 翻译主模块
     def translate(self) :
 
         # 如果还未选取范围就操作翻译
-        if self.window.config["range"] == {"X1": 0, "Y1": 0, "X2": 0, "Y2": 0} :
+        if self.object.yaml["range"] == {"X1": 0, "Y1": 0, "X2": 0, "Y2": 0} :
             self.clear_text_sign.emit(True)
-            self.window.original = "还未选取翻译范围, 请先使用范围键框选要翻译的屏幕区域"
+            self.object.translation_ui.original = "还未选取翻译范围, 请先使用范围键框选要翻译的屏幕区域"
             self.create_trans_sign.emit("original")
             # 关闭翻译界面自动开关
-            self.window.switch_button.mousePressEvent(1)
-            self.window.switch_button.updateValue()
+            self.object.translation_ui.switch_button.mousePressEvent(1)
+            self.object.translation_ui.switch_button.updateValue()
             return
 
         try:
             # 首次执行或手动模式下, 直接跳过图片相似度检测
-            if not self.window.original or not self.window.translate_mode :
+            if not self.object.translation_ui.original or not self.object.translation_ui.translate_mode :
                 self.imageCut()
             else :
                 # 判断两张图片的相似度
@@ -155,7 +153,7 @@ class Translater(QThread) :
                 image_score = self.compareImage(imageA, imageB)
 
                 # 在自动模式下, 如果如果相似度过高则不检测
-                if (image_score > self.window.config["imageSimilarity"]):
+                if (image_score > self.object.config["imageSimilarity"]):
                     return
         except Exception :
             self.logger.error(format_exc())
