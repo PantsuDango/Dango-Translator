@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import *
 from system_hotkey import SystemHotkey
 import qtawesome
 import os
+import time
 import pyperclip
 
 import utils.config
@@ -545,13 +546,10 @@ class Translation(QMainWindow) :
         if self.auto_trans_exist :
             return
 
-        import time
-        start = time.time()
         thread = utils.translater.Translater(self.object)
         thread.clear_text_sign.connect(self.clearText)
         thread.start()
         thread.wait()
-        print("线程结束: {}".format(time.time()-start))
 
 
     # 收到翻译信息清屏
@@ -621,6 +619,9 @@ class Translation(QMainWindow) :
         self.thread_state -= 1
         if self.thread_state < 0 :
             self.thread_state = 0
+
+        if self.thread_state == 0 :
+            self.statusbar.showMessage("翻译结束, 耗时: {:.2f} s".format(time.time()-self.start_time))
 
 
     # 检测范围区域和翻译区域是否有重叠
