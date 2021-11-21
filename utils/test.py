@@ -1,38 +1,43 @@
-import requests
+from PyQt5.QtWidgets import *
 import time
-import json
-from traceback import print_exc
+import os
+
+import translator.ocr.dango
+import utils.http
+import utils.thread
+import ui.desc
 
 
-TEST_IMAGE_PATH = "C:/Users/Dango/Desktop/翻译器/4.0/config/other/image.jpg"
+TEST_IMAGE_PATH = os.path.join(os.getcwd(), "config", "other", "image.jpg")
+NEW_TEST_IMAGE_PATH = os.path.join(os.getcwd(), "config", "other", "new_image.jpg")
 
 
 # 测试离线OCR
-def testOfflineOCR() :
+def testOfflineOCR(object) :
+
+    # 测试信息显示窗
+    object.settin_ui.desc_ui = ui.desc.Desc(object)
+    object.settin_ui.desc_ui.setWindowTitle("离线OCR测试")
+    object.settin_ui.desc_ui.desc_text.append("\n开始测试, 共测试5次...")
+    object.settin_ui.desc_ui.show()
+    total_time = 0
 
     url = "http://127.0.0.1:6666/ocr/api"
-    data = {
-        'ImagePath': TEST_IMAGE_PATH,
-        'Language': "JAP"
+    body = {
+        "ImagePath": NEW_TEST_IMAGE_PATH,
+        "Language": "JAP"
     }
-    proxies = {"http": None, "https": None}
-    timeCount = 0
 
-    for num in range(11) :
-        try :
-            start = time.time()
-            res = requests.post(url, data=json.dumps(data), proxies=proxies, timeout=10)
-            res.encoding = "utf-8"
+    for num in range(1, 6) :
+        start = time.time()
+        translator.ocr.dango.imageBorder(TEST_IMAGE_PATH, NEW_TEST_IMAGE_PATH, "a", 20, color=(255, 255, 255))
+        res = utils.http.post(url, body, object.logger)
+        end = time.time()
+        total_time += end-start
+        if res.get("Code", -1) == 0 :
+            object.settin_ui.desc_ui.desc_text.append("\n第{}次, 成功, 耗时{:.2f}s".format(num, (end - start)))
+        else:
+            object.settin_ui.desc_ui.desc_text.append("\n第{}次, 失败".format(num))
+        QApplication.processEvents()
 
-            end = time.time()
-            if num != 0 :
-                timeCount += end-start
-            print("time: {}\n".format(end-start))
-
-        except Exception :
-            print_exc()
-            print("\n测试失败")
-            break
-
-        if num == 10 :
-            print("avg time: {}".format(timeCount/10))
+    object.settin_ui.desc_ui.desc_text.append("\n测试完成, 平均耗时{:.2f}s".format(total_time/5))

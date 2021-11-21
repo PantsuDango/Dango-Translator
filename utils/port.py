@@ -4,7 +4,7 @@ from traceback import format_exc
 
 
 # 检查端口是否被占用
-def detectPort(port) :
+def detectPort(port, logger) :
 
     cmd = ("netstat", "-a", "-n")
     try :
@@ -12,11 +12,11 @@ def detectPort(port) :
 
         for line in p.stdout :
             if re.findall("0\.0\.0\.0:%d"%port, str(line)) :
-                return True, None
+                return True
 
         p.kill()
 
     except Exception :
-        return False, format_exc()
+        logger.error(format_exc())
 
-    return False, None
+    return False

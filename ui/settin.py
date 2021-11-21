@@ -256,7 +256,7 @@ class Settin(QMainWindow) :
         button.clicked.connect(lambda: self.showDesc("offlineOCR"))
 
         # 离线OCR状态开关
-        self.offline_ocr_switch = ui.switch.OfflineSwitch(self.tab_1, startX=(65-20)*self.rate)
+        self.offline_ocr_switch = ui.switch.OfflineSwitch(self.tab_1, startX=(65-20)*self.rate, logger=self.logger)
         self.customSetGeometry(self.offline_ocr_switch, 20, 60, 65, 20)
         self.offline_ocr_switch.checkedChanged.connect(self.changeOfflineSwitch)
         self.offline_ocr_switch.setCursor(QCursor(Qt.PointingHandCursor))
@@ -1565,44 +1565,43 @@ class Settin(QMainWindow) :
     # 运行离线OCR
     def runOfflineOCR(self) :
 
-        sign, message = utils.port.detectPort(6666)
-        if message :
-            print(message)
-        elif sign :
-            utils.message.MessageBox("这是来自团子的警告~",
-                                     "离线OCR已经在运行中了\n"
-                                     "请不要重复运行哦ヽ(･ω･´ﾒ)     ")
-            return
-
-        os.startfile(OCR_CMD_PATH)
+        # 检查端口是否被占用
+        if utils.port.detectPort(6666, self.logger) :
+            utils.message.MessageBox("运行失败",
+                                     "离线OCR已启动, 请不要重复运行!     ")
+        else :
+            try :
+                # 启动离线OCR
+                os.startfile(OCR_CMD_PATH)
+            except Exception :
+                self.logger.error(format_exc())
+                utils.message.MessageBox("运行失败",
+                                         "离线OCR运行失败, 原因:\n%s     "%format_exc())
 
 
     # 测试离线OCR
     def testOfflineOCR(self) :
 
-        sign, message = utils.port.detectPort(6666)
-        if message:
-            print(message)
-        elif not sign :
-            utils.message.MessageBox("测试离线OCR失败", "离线OCR还没运行成功，不可以进行测试哦\n"
-                                     "请先启动离线OCR，并保证其运行正常\n"
-                                     "使用期间可以缩小黑窗，但不可以退出哦(〃'▽'〃)     ")
-            return
-
-        utils.test.testOfflineOCR()
+        # 检查端口是否被占用
+        if not utils.port.detectPort(6666, self.logger) :
+            utils.message.MessageBox("测试失败",
+                                     "离线OCR还没运行成功，不可以进行测试     \n"
+                                     "请先启动离线OCR, 并保证其运行正常")
+        else :
+            utils.test.testOfflineOCR(self.object)
 
 
     # 打开离线OCR教程
     def openOfflineOCRTutorial(self) :
 
         try :
-            url = self.object.yaml["tutorials_offline_ocr"]
+            url = self.object.yaml["dict_info"]["tutorials_offline_ocr"]
             webbrowser.open(url, new=0, autoraise=True)
         except Exception :
             self.logger.error(format_exc())
 
 
-    # 打开团子在线OCR购
+    # 打开团子在线OCR购买
     def openDangoBuyPage(self):
 
         try :
