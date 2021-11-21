@@ -2,7 +2,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from utils import detectPort
+from utils.port import detectPort
 from utils.message import MessageBox
 
 

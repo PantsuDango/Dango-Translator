@@ -3,7 +3,8 @@
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from utils.message import MessageBox
+
+import utils.message
 
 LOGO_PATH = "./config/icon/logo.ico"
 PIXMAP_PATH = "./config/icon/pixmap.png"
@@ -11,13 +12,12 @@ PIXMAP_PATH = "./config/icon/pixmap.png"
 
 class HotKey(QWidget):
 
-    def __init__(self, config):
+    def __init__(self, object):
 
         super(HotKey, self).__init__()
 
-        self.config = config
+        self.object = object
         self.getInitConfig()
-
         self.ui()
 
     def ui(self):
@@ -29,9 +29,9 @@ class HotKey(QWidget):
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowCloseButtonHint)
 
         # 窗口图标
-        self.icon = QIcon()
-        self.icon.addPixmap(QPixmap(LOGO_PATH), QIcon.Normal, QIcon.On)
-        self.setWindowIcon(self.icon)
+        icon = QIcon()
+        icon.addPixmap(QPixmap(LOGO_PATH), QIcon.Normal, QIcon.On)
+        self.setWindowIcon(icon)
 
         # 鼠标样式
         pixmap = QPixmap(PIXMAP_PATH)
@@ -104,7 +104,7 @@ class HotKey(QWidget):
     def getInitConfig(self):
 
         # 界面缩放比例
-        self.rate = self.config["screenScaleRate"]
+        self.rate = self.object.yaml["screen_scale_rate"]
         # 界面尺寸
         self.window_width = int(300 * self.rate)
         self.window_height = int(200 * self.rate)
@@ -122,22 +122,23 @@ class HotKey(QWidget):
 
 
     # 按下确定键
-    def sure(self, object, key_type) :
+    def sure(self, key_type) :
 
         if self.comboBox_1.currentText() == self.comboBox_2.currentText() :
-            MessageBox("这是来自团子的警告~", "键位一和键位二不可重复ヽ(･ω･´ﾒ)     ")
+            utils.message.MessageBox("这是来自团子的警告~",
+                                     "键位一和键位二不可重复ヽ(･ω･´ﾒ)     ")
             return
 
         content = self.comboBox_1.currentText() + "+" + self.comboBox_2.currentText()
 
         if key_type == "translate" :
-            object.translate_hotkey_button.setText(content)
-            object.config["translateHotkeyValue1"] = self.comboBox_1.currentText()
-            object.config["translateHotkeyValue2"] = self.comboBox_2.currentText()
+            self.object.settin_ui.translate_hotkey_button.setText(content)
+            self.object.config["translateHotkeyValue1"] = self.comboBox_1.currentText()
+            self.object.config["translateHotkeyValue2"] = self.comboBox_2.currentText()
 
         elif key_type == "range" :
-            object.range_hotkey_button.setText(content)
-            object.config["rangeHotkeyValue1"] = self.comboBox_1.currentText()
-            object.config["rangeHotkeyValue2"] = self.comboBox_2.currentText()
+            self.object.settin_ui.range_hotkey_button.setText(content)
+            self.object.config["rangeHotkeyValue1"] = self.comboBox_1.currentText()
+            self.object.config["rangeHotkeyValue2"] = self.comboBox_2.currentText()
 
         self.close()

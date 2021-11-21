@@ -52,8 +52,8 @@ class DangoTranslator() :
         self.login_ui.close()
         self.translation_ui.show()
 
-        # # 设置界面
-        # self.settin_ui = ui.settin.Settin(self.config, self.logger, self.translation_ui)
+        # 设置界面
+        self.settin_ui = ui.settin.Settin(self)
         # # 翻译界面设置页面按键信号
         # self.translation_ui.settin_button.clicked.connect(self.clickSettin)
         # # 翻译界面充电按钮信号
@@ -78,7 +78,7 @@ class DangoTranslator() :
         self.translation_ui.unregisterHotKey()
         self.translation_ui.close()
         self.range_ui.close()
-        self.settin_ui.tabWidget.setCurrentIndex(4)
+        self.settin_ui.tab_widget.setCurrentIndex(4)
         self.settin_ui.show()
 
 

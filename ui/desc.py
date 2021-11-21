@@ -8,15 +8,16 @@ from PyQt5.QtWidgets import *
 LOGO_PATH = "./config/icon/logo.ico"
 PIXMAP_PATH = "./config/icon/pixmap.png"
 QQ_GROUP_IMAGE_PATH = "./config/other/交流群.png"
+BG_IMAGE_PATH = "./config/background/settin-desc.jpg"
 
 
 class Desc(QWidget) :
 
-    def __init__(self, config) :
+    def __init__(self, object) :
 
         super(Desc, self).__init__()
 
-        self.config = config
+        self.object = object
         self.getInitConfig()
 
         self.ui()
@@ -48,12 +49,12 @@ class Desc(QWidget) :
         self.setCursor(cursor)
 
         # 设置字体
-        self.setStyleSheet("font: 9pt '华康方圆体W7';")
+        self.setStyleSheet("font: %spt '%s';"%(self.font_size, self.font_type))
 
         # 背景图
         image_label = QLabel(self)
         image_label.setGeometry(QRect(0, 0, self.window_width, self.window_height))
-        image_label.setStyleSheet("border-image: url(./config/background/settin-desc.jpg);")
+        image_label.setStyleSheet("border-image: url(%s);"%BG_IMAGE_PATH)
 
         # 说明框
         self.desc_text = QTextBrowser(self)
@@ -71,17 +72,21 @@ class Desc(QWidget) :
                          int(210 * self.rate),
                          Qt.KeepAspectRatio,
                          Qt.SmoothTransformation)
-        self.qq_group_image = QLabel(self)
-        self.customSetGeometry(self.qq_group_image, 0, 0, 200, 250)
-        self.qq_group_image.setPixmap(pix)
-        self.qq_group_image.hide()
+        qq_group_image = QLabel(self)
+        self.customSetGeometry(qq_group_image, 0, 0, 200, 250)
+        qq_group_image .setPixmap(pix)
+        qq_group_image.hide()
 
 
     # 初始化配置
     def getInitConfig(self):
 
         # 界面缩放比例
-        self.rate = self.config["screenScaleRate"]
+        self.rate = self.object.yaml["screen_scale_rate"]
+        # 界面字体
+        self.font_type = "华康方圆体W7"
+        # 界面字体大小
+        self.font_size = 9
         # 界面尺寸
         self.window_width = int(200 * self.rate)
         self.window_height = int(250 * self.rate)

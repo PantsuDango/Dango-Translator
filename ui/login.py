@@ -52,7 +52,7 @@ class Login(QWidget) :
 
         # 设置字体
         font = QFont()
-        font.setFamily(self.font)
+        font.setFamily(self.font_type)
         font.setPointSize(self.font_size)
         self.setFont(font)
 
@@ -76,7 +76,7 @@ class Login(QWidget) :
         self.customSetGeometry(label, 15, 340, 200, 15)
         label.setStyleSheet("color: %s;"
                             "background: transparent;"
-                            "font: 10pt %s;"%(self.color, self.font))
+                            "font: 10pt %s;" % (self.color, self.font_type))
         label.setText("封面图 pixiv id: 80124193")
 
         # 矩形框
@@ -99,7 +99,7 @@ class Login(QWidget) :
         label.setStyleSheet("color: %s;"
                             "background: transparent;"
                             "font: 20pt %s;"
-                            "font-weight:bold;"%(self.color, self.font))
+                            "font-weight:bold;" % (self.color, self.font_type))
 
         # 最小化按钮
         button = QPushButton(qtawesome.icon("fa.minus", color=self.color), "", self)
@@ -146,7 +146,7 @@ class Login(QWidget) :
         self.login_button.setStyleSheet("background: transparent;"
                                         "color: %s;"
                                         "font: 15pt %s;"
-                                        %(self.color, self.font))
+                                        % (self.color, self.font_type))
 
         # 注册按钮
         self.register_button = QPushButton(self)
@@ -156,7 +156,7 @@ class Login(QWidget) :
         self.register_button.setStyleSheet("background: transparent;"
                                            "color: %s;"
                                            "font: 15pt %s;"
-                                           %(self.color, self.font))
+                                           % (self.color, self.font_type))
 
         # 忘记密码按钮
         self.forget_password_button = QPushButton(self)
@@ -166,17 +166,17 @@ class Login(QWidget) :
         self.forget_password_button.setStyleSheet("background: transparent;"
                                                   "color: %s;"
                                                   "font: 8pt %s;"
-                                                  %(self.color, self.font))
+                                                  % (self.color, self.font_type))
 
         # 版本号
         label = QLabel(self)
         self.customSetGeometry(label, 20, 540, 400, 15)
-        label.setText("版本号: Ver 4.0    更新时间: 2021-11-01    By: 胖次团子")
+        label.setText("版本号: Ver %s    更新时间: 2021-12-01    By: 胖次团子"%self.object.yaml["version"])
         label.setStyleSheet("color: %s;"
                             "background: transparent;"
                             "font-weight:bold;"
                             "font: 10pt %s;"
-                            %(self.color, self.font))
+                            %(self.color, self.font_type))
 
         self.setTabOrder(self.user_text, self.password_text)
 
@@ -187,7 +187,7 @@ class Login(QWidget) :
         # 界面缩放比例
         self.rate = self.object.yaml["screen_scale_rate"]
         # 界面字体
-        self.font = "华康方圆体W7"
+        self.font_type = "华康方圆体W7"
         # 界面字体大小
         self.font_size = 13
         # 界面颜色

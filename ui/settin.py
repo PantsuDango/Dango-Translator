@@ -1,27 +1,24 @@
-# -*- coding: utf-8 -*-
-
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-
-import utils.config
-from ui.switch import OfflineSwitch, SwitchOCR, SwitchFontType, ShowSwitch, SwitchDirection
-from ui.desc import Desc
-from ui.key import Key
-from ui.hotkey import HotKey
-import utils
-from utils import detectPort, testOfflineOCR, postConfigURL
-from utils.message import MessageBox
-
-from translator.ocr.baidu import getAccessToken
-from translator.all import resetWeb
-from ui import image
-
-import os
+from traceback import format_exc
 import qtawesome
 import webbrowser
-import threading
-from traceback import format_exc
+import os
+
+import utils.thread
+import utils.config
+import utils.message
+import utils.port
+import utils.test
+
+from ui import image
+import ui.switch
+import ui.desc
+import ui.key
+import ui.hotkey
+
+import translator.ocr.baidu
 
 
 OCR_CMD_PATH = "E:/DangoTranslate-Ver3.6.2/DangoOCR-Ver1.2/startOCR.cmd"
@@ -34,6 +31,7 @@ TRANSLATE_ICON_PATH = "./config/icon/translate.png"
 GOOD_ICON_PATH = "./config/icon/good.png"
 HOLLOW_IMG_PATH = "./config/other/描边.png"
 SOLID_IMG_PATH = "./config/other/实心.png"
+BG_IMAGE_PATH = "./config/background/settin.jpg"
 
 
 # 重构QTabWidget使其竖直选项卡文字水平
@@ -46,12 +44,12 @@ class TabBar(QTabBar):
         return s
 
 
-    def paintEvent(self, event):
+    def paintEvent(self, event) :
 
         painter = QStylePainter(self)
         opt = QStyleOptionTab()
 
-        for i in range(self.count()):
+        for i in range(self.count()) :
             self.initStyleOption(opt, i)
             painter.drawControl(QStyle.CE_TabBarTabShape, opt)
             painter.save()
@@ -71,7 +69,7 @@ class TabBar(QTabBar):
 
 
 # 重构QTabWidget使其竖直选项卡文字水平
-class TabWidget(QTabWidget):
+class TabWidget(QTabWidget) :
 
     def __init__(self, *args, **kwargs):
 
@@ -79,20 +77,19 @@ class TabWidget(QTabWidget):
         self.setTabBar(TabBar(self))
 
 
-class Settin(QMainWindow):
+class Settin(QMainWindow) :
 
-    def __init__(self, config, logger, window):
+    def __init__(self, object):
 
         super(Settin, self).__init__()
 
-        self.config = config
-        self.logger = logger
-        self.translation_ui = window
-
+        self.object = object
+        self.logger = object.logger
         self.getInitConfig()
         self.ui()
+
         # 初始化密钥界面
-        self.key_ui = Key(self.config, self)
+        self.key_ui = ui.key.Key(self.object)
 
 
     def ui(self):
@@ -105,7 +102,7 @@ class Settin(QMainWindow):
         self.setWindowFlags(Qt.WindowCloseButtonHint)
 
         # 窗口标题
-        self.setWindowTitle("团子翻译器 Ver4.0 - 设置")
+        self.setWindowTitle("团子翻译器 Ver%s - 设置"%self.object.yaml["version"])
 
         # 窗口图标
         icon = QIcon()
@@ -122,17 +119,18 @@ class Settin(QMainWindow):
         self.setCursor(cursor)
 
         # 设置字体
-        self.setStyleSheet("font: 10pt '华康方圆体W7'; color: %s" % self.color_1)
+        self.setStyleSheet("font: %spt '%s'; color: %s"
+                           %(self.font_size, self.font_type, self.color_1))
 
         # 顶部工具栏
-        self.tabWidget = TabWidget(self)
-        self.tabWidget.setGeometry(QRect(0, -1, self.window_width+5, self.window_height+5))
-        self.tabWidget.setTabPosition(QTabWidget.West)
+        self.tab_widget = TabWidget(self)
+        self.tab_widget.setGeometry(QRect(0, -1, self.window_width+5, self.window_height+5))
+        self.tab_widget.setTabPosition(QTabWidget.West)
         # 工具栏样式
-        self.tabWidget.setStyleSheet("QTabBar:tab { min-width: %dpx;"
+        self.tab_widget.setStyleSheet("QTabBar:tab { min-width: %dpx;"
                                                    "background: rgba(255, 255, 255, 1); }"
                                      "QTabBar:tab:selected { background: rgba(62, 62, 62, 0.01); }"
-                                     "QTabWidget::pane { border-image: url(./config/background/settin.jpg); }"
+                                     "QTabWidget::pane { border-image: url(%s); }"
                                      "QPushButton { background: %s;"
                                                    "border-radius: %spx;"
                                                    "color: rgb(255, 255, 255); }"
@@ -165,8 +163,8 @@ class Settin(QMainWindow):
                                      "QSpinBox { background: rgba(255, 255, 255, 0.3); }"
                                      "QFontComboBox { background: rgba(255, 255, 255, 0.3); }"
                                      "QDoubleSpinBox { background: rgba(255, 255, 255, 0.3); }"
-                                     %(80*self.rate, self.color_2, 6.66*self.rate, self.color_2, self.color_2,
-                                       8.66*self.rate, 4*self.rate, 13.33*self.rate, 13.33*self.rate,
+                                      % (80*self.rate, BG_IMAGE_PATH, self.color_2, 6.66*self.rate, self.color_2,
+                                       self.color_2, 8.66*self.rate, 4*self.rate, 13.33*self.rate, 13.33*self.rate,
                                        33.33*self.rate, 33.33*self.rate, -13.33*self.rate, -13.33*self.rate,
                                        -13.33*self.rate, -13.33*self.rate, 8.66*self.rate, 4*self.rate,
                                        10*self.rate, self.color_2
@@ -192,8 +190,8 @@ class Settin(QMainWindow):
         # 选项卡界面
         self.tab_1 = QWidget()
         self.customSetGeometry(self.tab_1, 0, 0, self.window_width, self.window_height)
-        self.tabWidget.addTab(self.tab_1, "")
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_1), "OCR设定")
+        self.tab_widget.addTab(self.tab_1, "")
+        self.tab_widget.setTabText(self.tab_widget.indexOf(self.tab_1), "OCR设定")
 
         # 分割线
         label = QLabel(self.tab_1)
@@ -212,7 +210,7 @@ class Settin(QMainWindow):
                                Qt.KeepAspectRatio,
                                Qt.SmoothTransformation)
         icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
-        self.tabWidget.setTabIcon(self.tabWidget.indexOf(self.tab_1), icon)
+        self.tab_widget.setTabIcon(self.tab_widget.indexOf(self.tab_1), icon)
 
         # 此Label用于雾化工具栏1的背景图
         label = QLabel(self.tab_1)
@@ -223,7 +221,7 @@ class Settin(QMainWindow):
         button = QPushButton(self.tab_1)
         self.customSetGeometry(button, 480, 25, 65, 20)
         button.setStyleSheet("color: %s;"
-                             "background: rgba(255, 255, 255, 0);"%self.color_2)
+                             "background: transparent;"%self.color_2)
         button.setText("什么是OCR")
         button.setCursor(QCursor(Qt.PointingHandCursor))
         button.clicked.connect(lambda: self.showDesc("OCR"))
@@ -232,7 +230,7 @@ class Settin(QMainWindow):
         button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_1)
         self.customSetIconSize(button, 20, 20)
         self.customSetGeometry(button, 545, 25, 20, 20)
-        button.setStyleSheet("background: rgba(255, 255, 255, 0);")
+        button.setStyleSheet("background: transparent;")
         button.setCursor(QCursor(Qt.PointingHandCursor))
         button.clicked.connect(lambda: self.showDesc("OCR"))
 
@@ -244,7 +242,7 @@ class Settin(QMainWindow):
         # 离线OCR说明按钮
         button = QPushButton(self.tab_1)
         self.customSetGeometry(button, 80, 25, 25, 20)
-        button.setStyleSheet("color: %s; font-size: 9pt; background: rgba(255, 255, 255, 0);"%self.color_2)
+        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;"%self.color_2)
         button.setText("说明")
         button.setCursor(QCursor(Qt.PointingHandCursor))
         button.clicked.connect(lambda: self.showDesc("offlineOCR"))
@@ -253,12 +251,12 @@ class Settin(QMainWindow):
         button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_1)
         self.customSetIconSize(button, 20, 20)
         self.customSetGeometry(button, 105, 25, 20, 20)
-        button.setStyleSheet("background: rgba(255, 255, 255, 0);")
+        button.setStyleSheet("background: transparent;")
         button.setCursor(QCursor(Qt.PointingHandCursor))
         button.clicked.connect(lambda: self.showDesc("offlineOCR"))
 
         # 离线OCR状态开关
-        self.offline_ocr_switch = OfflineSwitch(self.tab_1, startX=(65-20)*self.rate)
+        self.offline_ocr_switch = ui.switch.OfflineSwitch(self.tab_1, startX=(65-20)*self.rate)
         self.customSetGeometry(self.offline_ocr_switch, 20, 60, 65, 20)
         self.offline_ocr_switch.checkedChanged.connect(self.changeOfflineSwitch)
         self.offline_ocr_switch.setCursor(QCursor(Qt.PointingHandCursor))
@@ -292,7 +290,7 @@ class Settin(QMainWindow):
         # 在线OCR说明按钮
         button = QPushButton(self.tab_1)
         self.customSetGeometry(button, 80, 120, 25, 20)
-        button.setStyleSheet("color: %s; font-size: 9pt; background: rgba(255, 255, 255, 0);"%self.color_2)
+        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;"%self.color_2)
         button.setText("说明")
         button.setCursor(QCursor(Qt.PointingHandCursor))
         button.clicked.connect(lambda: self.showDesc("onlineOCR"))
@@ -301,12 +299,12 @@ class Settin(QMainWindow):
         button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_1)
         self.customSetIconSize(button, 20, 20)
         self.customSetGeometry(button, 105, 120, 20, 20)
-        button.setStyleSheet("background: rgba(255, 255, 255, 0);")
+        button.setStyleSheet("background: transparent;")
         button.setCursor(QCursor(Qt.PointingHandCursor))
         button.clicked.connect(lambda: self.showDesc("onlineOCR"))
 
         # 在线OCR状态开关
-        self.online_ocr_switch = SwitchOCR(self.tab_1, self.online_ocr_use, startX=(65-20)*self.rate)
+        self.online_ocr_switch = ui.switch.SwitchOCR(self.tab_1, self.online_ocr_use, startX=(65-20)*self.rate)
         self.customSetGeometry(self.online_ocr_switch, 20, 155, 65, 20)
         self.online_ocr_switch.checkedChanged.connect(self.changeOnlineSwitch)
         self.online_ocr_switch.setCursor(QCursor(Qt.PointingHandCursor))
@@ -338,7 +336,7 @@ class Settin(QMainWindow):
         # 百度OCR说明标签
         button = QPushButton(self.tab_1)
         self.customSetGeometry(button, 80, 215, 25, 20)
-        button.setStyleSheet("color: %s; font-size: 9pt; background: rgba(255, 255, 255, 0);"%self.color_2)
+        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;"%self.color_2)
         button.setText("说明")
         button.setCursor(QCursor(Qt.PointingHandCursor))
         button.clicked.connect(lambda: self.showDesc("baiduOCR"))
@@ -347,12 +345,12 @@ class Settin(QMainWindow):
         button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_1)
         self.customSetIconSize(button, 20, 20)
         self.customSetGeometry(button, 105, 215, 20, 20)
-        button.setStyleSheet("background: rgba(255, 255, 255, 0);")
+        button.setStyleSheet("background: transparent;")
         button.setCursor(QCursor(Qt.PointingHandCursor))
         button.clicked.connect(lambda: self.showDesc("baiduOCR"))
 
         # 百度OCR状态开关
-        self.baidu_ocr_switch = SwitchOCR(self.tab_1, self.baidu_ocr_use, startX=(65-20)*self.rate)
+        self.baidu_ocr_switch = ui.switch.SwitchOCR(self.tab_1, self.baidu_ocr_use, startX=(65-20)*self.rate)
         self.customSetGeometry(self.baidu_ocr_switch, 20, 250, 65, 20)
         self.baidu_ocr_switch.checkedChanged.connect(self.changeBaiduSwitch)
         self.baidu_ocr_switch.setCursor(QCursor(Qt.PointingHandCursor))
@@ -391,9 +389,9 @@ class Settin(QMainWindow):
         self.language_comboBox.setItemText(1, "英语（English）")
         self.language_comboBox.setItemText(2, "韩语（Korean）")
         self.language_comboBox.setStyleSheet("background: rgba(255, 255, 255, 1);")
-        if self.config["language"] == "ENG":
+        if self.object.config["language"] == "ENG":
             self.language_comboBox.setCurrentIndex(1)
-        elif self.config["language"] == "KOR":
+        elif self.object.config["language"] == "KOR":
             self.language_comboBox.setCurrentIndex(2)
         else:
             self.language_comboBox.setCurrentIndex(0)
@@ -404,8 +402,8 @@ class Settin(QMainWindow):
 
         # 选项卡界面
         self.tab_2 = QWidget()
-        self.tabWidget.addTab(self.tab_2, "")
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), " 翻译设定")
+        self.tab_widget.addTab(self.tab_2, "")
+        self.tab_widget.setTabText(self.tab_widget.indexOf(self.tab_2), " 翻译设定")
 
         # 分割线
         label = QLabel(self.tab_2)
@@ -422,7 +420,7 @@ class Settin(QMainWindow):
                                Qt.KeepAspectRatio,
                                Qt.SmoothTransformation)
         icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
-        self.tabWidget.setTabIcon(self.tabWidget.indexOf(self.tab_2), icon)
+        self.tab_widget.setTabIcon(self.tab_widget.indexOf(self.tab_2), icon)
 
         # 此Label用于雾化工具栏2的背景图
         imageLabel = QLabel(self.tab_2)
@@ -438,7 +436,7 @@ class Settin(QMainWindow):
         # 公共翻译说明标签
         button = QPushButton(self.tab_2)
         self.customSetGeometry(button, 90, 25, 25, 20)
-        button.setStyleSheet("color: %s; font-size: 9pt; background: rgba(255, 255, 255, 0);"%self.color_2)
+        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;"%self.color_2)
         button.setText("说明")
         button.setCursor(QCursor(Qt.PointingHandCursor))
         button.clicked.connect(lambda: self.showDesc("publicTranslate"))
@@ -447,7 +445,7 @@ class Settin(QMainWindow):
         button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_2)
         self.customSetIconSize(button, 20, 20)
         self.customSetGeometry(button, 115, 25, 20, 20)
-        button.setStyleSheet("background: rgba(255, 255, 255, 0);")
+        button.setStyleSheet("background: transparent;")
         button.setCursor(QCursor(Qt.PointingHandCursor))
         button.clicked.connect(lambda: self.showDesc("publicTranslate"))
 
@@ -463,7 +461,7 @@ class Settin(QMainWindow):
         label.setText("有道:")
 
         # 有道翻译开关
-        self.youdao_switch = SwitchOCR(self.tab_2, sign=self.youdao_use, startX=(65-20)*self.rate)
+        self.youdao_switch = ui.switch.SwitchOCR(self.tab_2, sign=self.youdao_use, startX=(65-20)*self.rate)
         self.customSetGeometry(self.youdao_switch, 65, 70, 65, 20)
         self.youdao_switch.checkedChanged.connect(self.changeYoudaoSwitch)
         self.youdao_switch.setCursor(QCursor(Qt.PointingHandCursor))
@@ -472,7 +470,7 @@ class Settin(QMainWindow):
         self.youdao_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.youdao_color), "", self.tab_2)
         self.customSetIconSize(self.youdao_color_button, 20, 20)
         self.customSetGeometry(self.youdao_color_button, 140, 70, 20, 20)
-        self.youdao_color_button.setStyleSheet("background: rgba(255, 255, 255, 0);")
+        self.youdao_color_button.setStyleSheet("background: transparent;")
         self.youdao_color_button.setCursor(QCursor(Qt.PointingHandCursor))
         self.youdao_color_button.clicked.connect(lambda: self.ChangeTranslateColor("youdao", self.youdao_color))
 
@@ -482,7 +480,7 @@ class Settin(QMainWindow):
         label.setText("百度:")
 
         # 百度翻译开关
-        self.baidu_switch = SwitchOCR(self.tab_2, sign=self.baidu_web_use, startX=(65-20)*self.rate)
+        self.baidu_switch = ui.switch.SwitchOCR(self.tab_2, sign=self.baidu_web_use, startX=(65-20)*self.rate)
         self.customSetGeometry(self.baidu_switch, 245, 70, 65, 20)
         self.baidu_switch.checkedChanged.connect(self.changeBaiduWebSwitch)
         self.baidu_switch.setCursor(QCursor(Qt.PointingHandCursor))
@@ -491,7 +489,7 @@ class Settin(QMainWindow):
         self.baidu_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.baidu_web_color), "", self.tab_2)
         self.customSetIconSize(self.baidu_color_button, 20, 20)
         self.customSetGeometry(self.baidu_color_button, 320, 70, 20, 20)
-        self.baidu_color_button.setStyleSheet("background: rgba(255, 255, 255, 0);")
+        self.baidu_color_button.setStyleSheet("background: transparent;")
         self.baidu_color_button.setCursor(QCursor(Qt.PointingHandCursor))
         self.baidu_color_button.clicked.connect(lambda: self.ChangeTranslateColor("baidu", self.baidu_web_color))
 
@@ -501,7 +499,7 @@ class Settin(QMainWindow):
         label.setText("腾讯:")
 
         # 腾讯翻译开关
-        self.tencent_switch = SwitchOCR(self.tab_2, sign=self.tencent_web_use, startX=(65-20)*self.rate)
+        self.tencent_switch = ui.switch.SwitchOCR(self.tab_2, sign=self.tencent_web_use, startX=(65-20)*self.rate)
         self.customSetGeometry(self.tencent_switch, 425, 70, 65, 20)
         self.tencent_switch.checkedChanged.connect(self.changeTencentWebSwitch)
         self.tencent_switch.setCursor(QCursor(Qt.PointingHandCursor))
@@ -510,7 +508,7 @@ class Settin(QMainWindow):
         self.tencent_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.tencent_web_color), "", self.tab_2)
         self.customSetIconSize(self.tencent_color_button, 20, 20)
         self.customSetGeometry(self.tencent_color_button, 500, 70, 20, 20)
-        self.tencent_color_button.setStyleSheet("background: rgba(255, 255, 255, 0);")
+        self.tencent_color_button.setStyleSheet("background: transparent;")
         self.tencent_color_button.setCursor(QCursor(Qt.PointingHandCursor))
         self.tencent_color_button.clicked.connect(lambda: self.ChangeTranslateColor("tencent", self.tencent_web_color))
 
@@ -520,7 +518,7 @@ class Settin(QMainWindow):
         label.setText("DeepL:")
 
         # DeepL翻译开关
-        self.deepl_switch = SwitchOCR(self.tab_2, sign=self.deepl_use, startX=(65-20)*self.rate)
+        self.deepl_switch = ui.switch.SwitchOCR(self.tab_2, sign=self.deepl_use, startX=(65-20)*self.rate)
         self.customSetGeometry(self.deepl_switch, 65, 120, 65, 20)
         self.deepl_switch.checkedChanged.connect(self.changeDeepLSwitch)
         self.deepl_switch.setCursor(QCursor(Qt.PointingHandCursor))
@@ -529,7 +527,7 @@ class Settin(QMainWindow):
         self.deepl_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.deepl_color), "", self.tab_2)
         self.customSetIconSize(self.deepl_color_button, 20, 20)
         self.customSetGeometry(self.deepl_color_button, 140, 120, 20, 20)
-        self.deepl_color_button.setStyleSheet("background: rgba(255, 255, 255, 0);")
+        self.deepl_color_button.setStyleSheet("background: transparent;")
         self.deepl_color_button.setCursor(QCursor(Qt.PointingHandCursor))
         self.deepl_color_button.clicked.connect(lambda: self.ChangeTranslateColor("deepl", self.deepl_color))
 
@@ -539,7 +537,7 @@ class Settin(QMainWindow):
         label.setText("谷歌:")
 
         # 谷歌翻译开关
-        self.google_switch = SwitchOCR(self.tab_2, sign=self.google_use, startX=(65-20)*self.rate)
+        self.google_switch = ui.switch.SwitchOCR(self.tab_2, sign=self.google_use, startX=(65-20)*self.rate)
         self.customSetGeometry(self.google_switch, 245, 120, 65, 20)
         self.google_switch.checkedChanged.connect(self.changeGoogleSwitch)
         self.google_switch.setCursor(QCursor(Qt.PointingHandCursor))
@@ -548,7 +546,7 @@ class Settin(QMainWindow):
         self.google_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.google_color), "", self.tab_2)
         self.customSetIconSize(self.google_color_button, 20, 20)
         self.customSetGeometry(self.google_color_button, 320, 120, 20, 20)
-        self.google_color_button.setStyleSheet("background: rgba(255, 255, 255, 0);")
+        self.google_color_button.setStyleSheet("background: transparent;")
         self.google_color_button.setCursor(QCursor(Qt.PointingHandCursor))
         self.google_color_button.clicked.connect(lambda: self.ChangeTranslateColor("google", self.google_color))
 
@@ -558,7 +556,7 @@ class Settin(QMainWindow):
         label.setText("彩云:")
 
         # 彩云翻译开关
-        self.caiyun_switch = SwitchOCR(self.tab_2, sign=self.caiyun_web_use, startX=(65-20)*self.rate)
+        self.caiyun_switch = ui.switch.SwitchOCR(self.tab_2, sign=self.caiyun_web_use, startX=(65-20)*self.rate)
         self.customSetGeometry(self.caiyun_switch, 425, 120, 65, 20)
         self.caiyun_switch.checkedChanged.connect(self.changeCaiyunWebSwitch)
         self.caiyun_switch.setCursor(QCursor(Qt.PointingHandCursor))
@@ -567,7 +565,7 @@ class Settin(QMainWindow):
         self.caiyun_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.caiyun_web_color), "", self.tab_2)
         self.customSetIconSize(self.caiyun_color_button, 20, 20)
         self.customSetGeometry(self.caiyun_color_button, 500, 120, 20, 20)
-        self.caiyun_color_button.setStyleSheet("background: rgba(255, 255, 255, 0);")
+        self.caiyun_color_button.setStyleSheet("background: transparent;")
         self.caiyun_color_button.setCursor(QCursor(Qt.PointingHandCursor))
         self.caiyun_color_button.clicked.connect(lambda: self.ChangeTranslateColor("caiyun", self.caiyun_web_color))
 
@@ -579,7 +577,7 @@ class Settin(QMainWindow):
         # 私人翻译说明标签
         button = QPushButton(self.tab_2)
         self.customSetGeometry(button, 90, 185, 25, 20)
-        button.setStyleSheet("color: %s; font-size: 9pt; background: rgba(255, 255, 255, 0);"%self.color_2)
+        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;"%self.color_2)
         button.setText("说明")
         button.setCursor(QCursor(Qt.PointingHandCursor))
         button.clicked.connect(lambda: self.showDesc("privateTranslate"))
@@ -588,7 +586,7 @@ class Settin(QMainWindow):
         button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_2)
         self.customSetIconSize(button, 20, 20)
         self.customSetGeometry(button, 115, 185, 20, 20)
-        button.setStyleSheet("background: rgba(255, 255, 255, 0);")
+        button.setStyleSheet("background: transparent;")
         button.setCursor(QCursor(Qt.PointingHandCursor))
         button.clicked.connect(lambda: self.showDesc("privateTranslate"))
 
@@ -598,7 +596,7 @@ class Settin(QMainWindow):
         label.setText("腾讯:")
 
         # 私人腾讯翻译开关
-        self.tencent_private_switch = SwitchOCR(self.tab_2, sign=self.tencent_use, startX=(65-20)*self.rate)
+        self.tencent_private_switch = ui.switch.SwitchOCR(self.tab_2, sign=self.tencent_use, startX=(65-20)*self.rate)
         self.customSetGeometry(self.tencent_private_switch, 65, 230, 65, 20)
         self.tencent_private_switch.checkedChanged.connect(self.changeTencentSwitch)
         self.tencent_private_switch.setCursor(QCursor(Qt.PointingHandCursor))
@@ -607,7 +605,7 @@ class Settin(QMainWindow):
         self.tencent_private_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.tencent_color), "", self.tab_2)
         self.customSetIconSize(self.tencent_private_color_button, 20, 20)
         self.customSetGeometry(self.tencent_private_color_button, 140, 230, 20, 20)
-        self.tencent_private_color_button.setStyleSheet("background: rgba(255, 255, 255, 0);")
+        self.tencent_private_color_button.setStyleSheet("background: transparent;")
         self.tencent_private_color_button.setCursor(QCursor(Qt.PointingHandCursor))
         self.tencent_private_color_button.clicked.connect(lambda: self.ChangeTranslateColor("tencent_private", self.tencent_use))
 
@@ -636,7 +634,7 @@ class Settin(QMainWindow):
         label.setText("百度:")
 
         # 私人百度翻译开关
-        self.baidu_private_switch = SwitchOCR(self.tab_2, sign=self.baidu_use, startX=(65-20)*self.rate)
+        self.baidu_private_switch = ui.switch.SwitchOCR(self.tab_2, sign=self.baidu_use, startX=(65-20)*self.rate)
         self.customSetGeometry(self.baidu_private_switch, 65, 280, 65, 20)
         self.baidu_private_switch.checkedChanged.connect(self.changeBaiduTranslaterSwitch)
         self.baidu_private_switch.setCursor(QCursor(Qt.PointingHandCursor))
@@ -645,7 +643,7 @@ class Settin(QMainWindow):
         self.baidu_private_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.baidu_color), "", self.tab_2)
         self.customSetIconSize(self.baidu_private_color_button, 20, 20)
         self.customSetGeometry(self.baidu_private_color_button, 140, 280, 20, 20)
-        self.baidu_private_color_button.setStyleSheet("background: rgba(255, 255, 255, 0);")
+        self.baidu_private_color_button.setStyleSheet("background: transparent;")
         self.baidu_private_color_button.setCursor(QCursor(Qt.PointingHandCursor))
         self.baidu_private_color_button.clicked.connect(lambda: self.ChangeTranslateColor("baidu_private", self.baidu_color))
 
@@ -674,7 +672,7 @@ class Settin(QMainWindow):
         label.setText("彩云:")
 
         # 私人彩云翻译开关
-        self.caiyun_private_switch = SwitchOCR(self.tab_2, sign=self.caiyun_use, startX=(65-20)*self.rate)
+        self.caiyun_private_switch = ui.switch.SwitchOCR(self.tab_2, sign=self.caiyun_use, startX=(65-20)*self.rate)
         self.customSetGeometry(self.caiyun_private_switch, 65, 330, 65, 20)
         self.caiyun_private_switch.checkedChanged.connect(self.changeCaiyunSwitch)
         self.caiyun_private_switch.setCursor(QCursor(Qt.PointingHandCursor))
@@ -683,7 +681,7 @@ class Settin(QMainWindow):
         self.caiyun_private_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.caiyun_color), "", self.tab_2)
         self.customSetIconSize(self.caiyun_private_color_button, 20, 20)
         self.customSetGeometry(self.caiyun_private_color_button, 140, 330, 20, 20)
-        self.caiyun_private_color_button.setStyleSheet("background: rgba(255, 255, 255, 0);")
+        self.caiyun_private_color_button.setStyleSheet("background: transparent;")
         self.caiyun_private_color_button.setCursor(QCursor(Qt.PointingHandCursor))
         self.caiyun_private_color_button.clicked.connect(lambda: self.ChangeTranslateColor("caiyun_private", self.caiyun_color))
 
@@ -712,8 +710,8 @@ class Settin(QMainWindow):
 
         # 选项卡界面
         self.tab_3 = QWidget()
-        self.tabWidget.addTab(self.tab_3, "")
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), " 其他设定")
+        self.tab_widget.addTab(self.tab_3, "")
+        self.tab_widget.setTabText(self.tab_widget.indexOf(self.tab_3), " 其他设定")
 
         # 分割线
         label = QLabel(self.tab_3)
@@ -730,7 +728,7 @@ class Settin(QMainWindow):
                                Qt.KeepAspectRatio,
                                Qt.SmoothTransformation)
         icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
-        self.tabWidget.setTabIcon(self.tabWidget.indexOf(self.tab_3), icon)
+        self.tab_widget.setTabIcon(self.tab_widget.indexOf(self.tab_3), icon)
 
         # 此Label用于雾化工具栏1的背景图
         imageLabel = QLabel(self.tab_3)
@@ -760,7 +758,7 @@ class Settin(QMainWindow):
         # 翻译框透明度说明标签
         button = QPushButton(self.tab_3)
         self.customSetGeometry(button, 490, 20, 25, 20)
-        button.setStyleSheet("color: %s; font-size: 9pt; background: rgba(255, 255, 255, 0);" % self.color_2)
+        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;" % self.color_2)
         button.setText("说明")
         button.setCursor(QCursor(Qt.PointingHandCursor))
         button.clicked.connect(lambda: self.showDesc("horizontalSlider"))
@@ -769,7 +767,7 @@ class Settin(QMainWindow):
         button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_3)
         self.customSetIconSize(button, 20, 20)
         self.customSetGeometry(button, 515, 20, 20, 20)
-        button.setStyleSheet("background: rgba(255, 255, 255, 0);")
+        button.setStyleSheet("background: transparent;")
         button.setCursor(QCursor(Qt.PointingHandCursor))
         button.clicked.connect(lambda: self.showDesc("horizontalSlider"))
 
@@ -803,7 +801,7 @@ class Settin(QMainWindow):
         label.setText("字体样式:")
 
         # 字体样式设定开关
-        self.font_type_switch = SwitchFontType(self.tab_3, sign=self.font_color_type, startX=(65-20)*self.rate)
+        self.font_type_switch = ui.switch.SwitchFontType(self.tab_3, sign=self.font_color_type, startX=(65-20)*self.rate)
         self.customSetGeometry(self.font_type_switch, 95, 120, 65, 20)
         self.font_type_switch.checkedChanged.connect(self.changeFontColorTypeSwitch)
         self.font_type_switch.setCursor(QCursor(Qt.PointingHandCursor))
@@ -811,7 +809,7 @@ class Settin(QMainWindow):
         # 字体样式设定说明标签
         button = QPushButton(self.tab_3)
         self.customSetGeometry(button, 175, 120, 25, 20)
-        button.setStyleSheet("color: %s; font-size: 9pt; background: rgba(255, 255, 255, 0);" % self.color_2)
+        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;" % self.color_2)
         button.setText("说明")
         button.setCursor(QCursor(Qt.PointingHandCursor))
         button.clicked.connect(lambda: self.showDesc("fontType"))
@@ -820,7 +818,7 @@ class Settin(QMainWindow):
         button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_3)
         self.customSetIconSize(button, 20, 20)
         self.customSetGeometry(button, 200, 120, 20, 20)
-        button.setStyleSheet("background: rgba(255, 255, 255, 0);")
+        button.setStyleSheet("background: transparent;")
         button.setCursor(QCursor(Qt.PointingHandCursor))
         button.clicked.connect(lambda: self.showDesc("fontType"))
 
@@ -841,7 +839,7 @@ class Settin(QMainWindow):
         # 自动模式速率设定说明标签
         button = QPushButton(self.tab_3)
         self.customSetGeometry(button, 490, 120, 25, 20)
-        button.setStyleSheet("color: %s; font-size: 9pt; background: rgba(255, 255, 255, 0);" % self.color_2)
+        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;" % self.color_2)
         button.setText("说明")
         button.setCursor(QCursor(Qt.PointingHandCursor))
         button.clicked.connect(lambda: self.showDesc("autoSpeed"))
@@ -850,7 +848,7 @@ class Settin(QMainWindow):
         button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_3)
         self.customSetIconSize(button, 20, 20)
         self.customSetGeometry(button, 515, 120, 20, 20)
-        button.setStyleSheet("background: rgba(255, 255, 255, 0);")
+        button.setStyleSheet("background: transparent;")
         button.setCursor(QCursor(Qt.PointingHandCursor))
         button.clicked.connect(lambda: self.showDesc("autoSpeed"))
 
@@ -860,7 +858,7 @@ class Settin(QMainWindow):
         label.setText("显示原文:")
 
         # 显示原文标签开关
-        self.show_original_switch = ShowSwitch(self.tab_3, sign=self.show_original_use, startX=(65-20)*self.rate)
+        self.show_original_switch = ui.switch.ShowSwitch(self.tab_3, sign=self.show_original_use, startX=(65-20)*self.rate)
         self.customSetGeometry(self.show_original_switch, 95, 170, 65, 20)
         self.show_original_switch.checkedChanged.connect(self.changeShowOriginalSwitch)
         self.show_original_switch.setCursor(QCursor(Qt.PointingHandCursor))
@@ -868,7 +866,7 @@ class Settin(QMainWindow):
         # 显示原文说明标签
         button = QPushButton(self.tab_3)
         self.customSetGeometry(button, 175, 170, 25, 20)
-        button.setStyleSheet("color: %s; font-size: 9pt; background: rgba(255, 255, 255, 0);" % self.color_2)
+        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;" % self.color_2)
         button.setText("说明")
         button.setCursor(QCursor(Qt.PointingHandCursor))
         button.clicked.connect(lambda: self.showDesc("showOriginal"))
@@ -877,7 +875,7 @@ class Settin(QMainWindow):
         button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_3)
         self.customSetIconSize(button, 20, 20)
         self.customSetGeometry(button, 200, 170, 20, 20)
-        button.setStyleSheet("background: rgba(255, 255, 255, 0);")
+        button.setStyleSheet("background: transparent;")
         button.setCursor(QCursor(Qt.PointingHandCursor))
         button.clicked.connect(lambda: self.showDesc("showOriginal"))
 
@@ -887,7 +885,7 @@ class Settin(QMainWindow):
         label.setText("原文自动复制到剪贴板:")
 
         # 原文自动复制到剪贴板开关
-        self.auto_copy_original_switch = SwitchOCR(self.tab_3, sign=self.auto_clipboard_use, startX=(65-20)*self.rate)
+        self.auto_copy_original_switch = ui.switch.SwitchOCR(self.tab_3, sign=self.auto_clipboard_use, startX=(65-20)*self.rate)
         self.customSetGeometry(self.auto_copy_original_switch, 430, 170, 65, 20)
         self.auto_copy_original_switch.checkedChanged.connect(self.changeAutoCopyOriginalSwitch)
         self.auto_copy_original_switch.setCursor(QCursor(Qt.PointingHandCursor))
@@ -898,7 +896,7 @@ class Settin(QMainWindow):
         label.setText("文字方向:")
 
         # 文字方向开关
-        self.text_direction_switch = SwitchDirection(self.tab_3, sign=self.text_direction_use, startX=(65-20)*self.rate)
+        self.text_direction_switch = ui.switch.SwitchDirection(self.tab_3, sign=self.text_direction_use, startX=(65-20)*self.rate)
         self.customSetGeometry(self.text_direction_switch, 95, 220, 65, 20)
         self.text_direction_switch.checkedChanged.connect(self.changeTextDirectionSwitch)
         self.text_direction_switch.setCursor(QCursor(Qt.PointingHandCursor))
@@ -906,7 +904,7 @@ class Settin(QMainWindow):
         # 文字方向说明标签
         button = QPushButton(self.tab_3)
         self.customSetGeometry(button, 175, 220, 25, 20)
-        button.setStyleSheet("color: %s; font-size: 9pt; background: rgba(255, 255, 255, 0);" % self.color_2)
+        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;" % self.color_2)
         button.setText("说明")
         button.setCursor(QCursor(Qt.PointingHandCursor))
         button.clicked.connect(lambda: self.showDesc("textDirection"))
@@ -915,7 +913,7 @@ class Settin(QMainWindow):
         button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_3)
         self.customSetIconSize(button, 20, 20)
         self.customSetGeometry(button, 200, 220, 20, 20)
-        button.setStyleSheet("background: rgba(255, 255, 255, 0);")
+        button.setStyleSheet("background: transparent;")
         button.setCursor(QCursor(Qt.PointingHandCursor))
         button.clicked.connect(lambda: self.showDesc("textDirection"))
 
@@ -925,7 +923,7 @@ class Settin(QMainWindow):
         label.setText("翻译热键:")
 
         # 翻译快捷键开关
-        self.translate_hotkey_switch = SwitchOCR(self.tab_3, sign=self.translate_hotkey_use, startX=(65-20)*self.rate)
+        self.translate_hotkey_switch = ui.switch.SwitchOCR(self.tab_3, sign=self.translate_hotkey_use, startX=(65-20)*self.rate)
         self.customSetGeometry(self.translate_hotkey_switch, 95, 270, 65, 20)
         self.translate_hotkey_switch.checkedChanged.connect(self.changeTranslateHotkeySwitch)
         self.translate_hotkey_switch.setCursor(QCursor(Qt.PointingHandCursor))
@@ -934,7 +932,7 @@ class Settin(QMainWindow):
         self.translate_hotkey_button = QPushButton(self.tab_3)
         self.customSetGeometry(self.translate_hotkey_button, 175, 270, 60, 20)
         self.translate_hotkey_button.setCursor(QCursor(Qt.PointingHandCursor))
-        self.translate_hotkey_button.setText(self.config["translateHotkeyValue1"]+"+"+self.config["translateHotkeyValue2"])
+        self.translate_hotkey_button.setText(self.object.config["translateHotkeyValue1"]+"+"+self.object.config["translateHotkeyValue2"])
         self.translate_hotkey_button.clicked.connect(lambda: self.setHotKey("translate"))
 
         # 范围快捷键标签
@@ -943,7 +941,7 @@ class Settin(QMainWindow):
         label.setText("范围热键:")
 
         # 范围快捷键开关
-        self.range_hotkey_switch = SwitchOCR(self.tab_3, sign=self.range_hotkey_use, startX=(65-20)*self.rate)
+        self.range_hotkey_switch = ui.switch.SwitchOCR(self.tab_3, sign=self.range_hotkey_use, startX=(65-20)*self.rate)
         self.customSetGeometry(self.range_hotkey_switch, 350, 270, 65, 20)
         self.range_hotkey_switch.checkedChanged.connect(self.changeRangeHotkeySwitch)
         self.range_hotkey_switch.setCursor(QCursor(Qt.PointingHandCursor))
@@ -952,7 +950,7 @@ class Settin(QMainWindow):
         self.range_hotkey_button = QPushButton(self.tab_3)
         self.customSetGeometry(self.range_hotkey_button, 430, 270, 60, 20)
         self.range_hotkey_button.setCursor(QCursor(Qt.PointingHandCursor))
-        self.range_hotkey_button.setText(self.config["rangeHotkeyValue1"]+"+"+self.config["rangeHotkeyValue2"])
+        self.range_hotkey_button.setText(self.object.config["rangeHotkeyValue1"]+"+"+self.object.config["rangeHotkeyValue2"])
         self.range_hotkey_button.clicked.connect(lambda: self.setHotKey("range"))
 
         # 图像相似度标签
@@ -972,7 +970,7 @@ class Settin(QMainWindow):
         # 图像相似度说明标签
         button = QPushButton(self.tab_3)
         self.customSetGeometry(button, 190, 320, 25, 20)
-        button.setStyleSheet("color: %s; font-size: 9pt; background: rgba(255, 255, 255, 0);" % self.color_2)
+        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;" % self.color_2)
         button.setText("说明")
         button.setCursor(QCursor(Qt.PointingHandCursor))
         button.clicked.connect(lambda: self.showDesc("imageRefresh"))
@@ -981,7 +979,7 @@ class Settin(QMainWindow):
         button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_3)
         self.customSetIconSize(button, 20, 20)
         self.customSetGeometry(button, 215, 320, 20, 20)
-        button.setStyleSheet("background: rgba(255, 255, 255, 0);")
+        button.setStyleSheet("background: transparent;")
         button.setCursor(QCursor(Qt.PointingHandCursor))
         button.clicked.connect(lambda: self.showDesc("imageRefresh"))
 
@@ -1002,7 +1000,7 @@ class Settin(QMainWindow):
         # 文字相似度说明标签
         button = QPushButton(self.tab_3)
         self.customSetGeometry(button, 445, 320, 25, 20)
-        button.setStyleSheet("color: %s; font-size: 9pt; background: rgba(255, 255, 255, 0);" % self.color_2)
+        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;" % self.color_2)
         button.setText("说明")
         button.setCursor(QCursor(Qt.PointingHandCursor))
         button.clicked.connect(lambda: self.showDesc("textRefresh"))
@@ -1011,7 +1009,7 @@ class Settin(QMainWindow):
         button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_3)
         self.customSetIconSize(button, 20, 20)
         self.customSetGeometry(button, 470, 320, 20, 20)
-        button.setStyleSheet("background: rgba(255, 255, 255, 0);")
+        button.setStyleSheet("background: transparent;")
         button.setCursor(QCursor(Qt.PointingHandCursor))
         button.clicked.connect(lambda: self.showDesc("textRefresh"))
 
@@ -1021,8 +1019,8 @@ class Settin(QMainWindow):
 
         # 选项卡界面
         self.tab_4 = QWidget()
-        self.tabWidget.addTab(self.tab_4, "")
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_4), "关于   ")
+        self.tab_widget.addTab(self.tab_4, "")
+        self.tab_widget.setTabText(self.tab_widget.indexOf(self.tab_4), "关于   ")
 
         # 分割线
         label = QLabel(self.tab_4)
@@ -1039,7 +1037,7 @@ class Settin(QMainWindow):
                                Qt.KeepAspectRatio,
                                Qt.SmoothTransformation)
         icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
-        self.tabWidget.setTabIcon(self.tabWidget.indexOf(self.tab_4), icon)
+        self.tab_widget.setTabIcon(self.tab_widget.indexOf(self.tab_4), icon)
 
         # 此Label用于雾化工具栏1的背景图
         imageLabel = QLabel(self.tab_4)
@@ -1145,8 +1143,8 @@ class Settin(QMainWindow):
 
         # 选项卡界面
         self.tab_5 = QWidget()
-        self.tabWidget.addTab(self.tab_5, "")
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_5), " 支持作者")
+        self.tab_widget.addTab(self.tab_5, "")
+        self.tab_widget.setTabText(self.tab_widget.indexOf(self.tab_5), " 支持作者")
 
         # 分割线
         label = QLabel(self.tab_5)
@@ -1163,7 +1161,7 @@ class Settin(QMainWindow):
                                Qt.KeepAspectRatio,
                                Qt.SmoothTransformation)
         icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
-        self.tabWidget.setTabIcon(self.tabWidget.indexOf(self.tab_5), icon)
+        self.tab_widget.setTabIcon(self.tab_widget.indexOf(self.tab_5), icon)
 
         # 此Label用于雾化工具栏1的背景图
         imageLabel = QLabel(self.tab_5)
@@ -1174,11 +1172,11 @@ class Settin(QMainWindow):
         label = QLabel(self.tab_5)
         self.customSetGeometry(label, 30, 20, 400, 145)
         label.setText("<html><head/><body><p>你好呀, 这里是胖次团子 ❤\
-                       </p><p>不知不觉软件已经更新到Ver4.0了, 这是团子最自豪的版本!\
+                       </p><p>不知不觉软件已经更新到Ver%s了, 这是团子最自豪的版本!\
                        </p><p>然后感谢你也成为团子用户的一员 ~\
                        </p><p>软件是免费的, 希望你没有被第三方渠道坑到 ~\
                        </p><p>欢迎你的投喂 ~ 团子会非常开心的! \
-                       </p><p>这会是团子不断更新优化的动力 ~</p></body></html>")
+                       </p><p>这会是团子不断更新优化的动力 ~</p></body></html>"%self.object.yaml["version"])
 
         # 放置微信收款图片
         label = QLabel(self.tab_5)
@@ -1207,101 +1205,105 @@ class Settin(QMainWindow):
     def getInitConfig(self):
 
         # 界面缩放比例
-        self.rate = self.config["screenScaleRate"]
+        self.rate = self.object.yaml["screen_scale_rate"]
         # 界面尺寸
         self.window_width = int(700*self.rate)
         self.window_height = int(400*self.rate)
         # 所使用的颜色
         self.color_1 = "#595959"  # 灰色
         self.color_2 = "#5B8FF9"  # 蓝色
+        # 界面字体
+        self.font_type = "华康方圆体W7"
+        # 界面字体大小
+        self.font_size = 10
         # 存被开启的翻译源
         self.translate_list = []
 
         # OCR各开关
         self.offline_ocr_use = False
-        self.online_ocr_use = self.config["onlineOCR"]
-        self.baidu_ocr_use = self.config["baiduOCR"]
+        self.online_ocr_use = self.object.config["onlineOCR"]
+        self.baidu_ocr_use = self.object.config["baiduOCR"]
 
         # 公共有道翻译开关
-        self.youdao_use = eval(self.config["youdaoUse"])
+        self.youdao_use = eval(self.object.config["youdaoUse"])
         if self.youdao_use :
             self.translate_list.append("youdao")
         # 公共百度翻译开关
-        self.baidu_web_use = eval(self.config["baiduwebUse"])
+        self.baidu_web_use = eval(self.object.config["baiduwebUse"])
         if self.baidu_web_use :
             self.translate_list.append("baidu")
         # 公共腾讯翻译开关
-        self.tencent_web_use = eval(self.config["tencentwebUse"])
+        self.tencent_web_use = eval(self.object.config["tencentwebUse"])
         if self.tencent_web_use :
             self.translate_list.append("tencent")
         # 公共DeepL翻译开关
-        self.deepl_use = eval(self.config["deeplUse"])
+        self.deepl_use = eval(self.object.config["deeplUse"])
         if self.deepl_use :
             self.translate_list.append("deepl")
         # 公共谷歌翻译开关
-        self.google_use = eval(self.config["googleUse"])
+        self.google_use = eval(self.object.config["googleUse"])
         if self.google_use :
             self.translate_list.append("google")
         # 公共彩云翻译开关
-        self.caiyun_web_use = eval(self.config["caiyunUse"])
+        self.caiyun_web_use = eval(self.object.config["caiyunUse"])
         if self.caiyun_web_use :
             self.translate_list.append("caiyun")
         # 私人腾讯翻译开关
-        self.tencent_use = eval(self.config["tencentUse"])
+        self.tencent_use = eval(self.object.config["tencentUse"])
         if self.tencent_use :
             self.translate_list.append("tencent_private")
         # 私人百度翻译开关
-        self.baidu_use = eval(self.config["baiduUse"])
+        self.baidu_use = eval(self.object.config["baiduUse"])
         if self.baidu_use :
             self.translate_list.append("baidu_private")
         # 私人彩云翻译开关
-        self.caiyun_use = eval(self.config["caiyunPrivateUse"])
+        self.caiyun_use = eval(self.object.config["caiyunPrivateUse"])
         if self.caiyun_use :
             self.translate_list.append("caiyun_private")
 
         # 字体颜色 公共有道
-        self.youdao_color = self.config["fontColor"]["youdao"]
+        self.youdao_color = self.object.config["fontColor"]["youdao"]
         # 字体颜色 公共百度
-        self.baidu_web_color = self.config["fontColor"]["baiduweb"]
+        self.baidu_web_color = self.object.config["fontColor"]["baiduweb"]
         # 字体颜色 公共腾讯
-        self.tencent_web_color = self.config["fontColor"]["tencentweb"]
+        self.tencent_web_color = self.object.config["fontColor"]["tencentweb"]
         # 字体颜色 公共DeepL
-        self.deepl_color = self.config["fontColor"]["deepl"]
+        self.deepl_color = self.object.config["fontColor"]["deepl"]
         # 字体颜色 公共谷歌
-        self.google_color = self.config["fontColor"]["google"]
+        self.google_color = self.object.config["fontColor"]["google"]
         # 字体颜色 公共彩云
-        self.caiyun_web_color = self.config["fontColor"]["caiyun"]
+        self.caiyun_web_color = self.object.config["fontColor"]["caiyun"]
         # 字体颜色 私人腾讯
-        self.tencent_color = self.config["fontColor"]["tencent"]
+        self.tencent_color = self.object.config["fontColor"]["tencent"]
         # 字体颜色 私人百度
-        self.baidu_color = self.config["fontColor"]["baidu"]
+        self.baidu_color = self.object.config["fontColor"]["baidu"]
         # 字体颜色 私人彩云
-        self.caiyun_color = self.config["fontColor"]["caiyunPrivate"]
+        self.caiyun_color = self.object.config["fontColor"]["caiyunPrivate"]
 
         # 翻译界面透明度
-        self.horizontal = self.config["horizontal"]
+        self.horizontal = self.object.config["horizontal"]
         # 翻译字体大小
-        self.fontSize = self.config["fontSize"]
+        self.fontSize = self.object.config["fontSize"]
         # 翻译字体类型
-        self.font_type = self.config["fontType"]
+        self.font_type = self.object.config["fontType"]
         # 字体样式开关
-        self.font_color_type = eval(self.config["showColorType"])
+        self.font_color_type = eval(self.object.config["showColorType"])
         # 自动翻译间隔设定
-        self.translate_speed = self.config["translateSpeed"]
+        self.translate_speed = self.object.config["translateSpeed"]
         # 显示原文开关
-        self.show_original_use = eval(self.config["showOriginal"])
+        self.show_original_use = eval(self.object.config["showOriginal"])
         # 原文自动复制到剪贴板开关
-        self.auto_clipboard_use = eval(self.config["showClipboard"])
+        self.auto_clipboard_use = eval(self.object.config["showClipboard"])
         # 文字方向
-        self.text_direction_use = eval(self.config["showTranslateRow"])
+        self.text_direction_use = eval(self.object.config["showTranslateRow"])
         # 翻译快捷键开关
-        self.translate_hotkey_use = eval(self.config["showHotKey1"])
+        self.translate_hotkey_use = eval(self.object.config["showHotKey1"])
         # 范围快捷键开关
-        self.range_hotkey_use = eval(self.config["showHotKey2"])
+        self.range_hotkey_use = eval(self.object.config["showHotKey2"])
         # 自动翻译图片刷新相似度
-        self.image_refresh_score = self.config["imageSimilarity"]
+        self.image_refresh_score = self.object.config["imageSimilarity"]
         # 自动翻译文字刷新相似度
-        self.text_refresh_score = self.config["textSimilarity"]
+        self.text_refresh_score = self.object.config["textSimilarity"]
 
         # 团子翻译器开源地址
         self.dango_translator_url = "https://github.com/PantsuDango/Dango-Translator"
@@ -1565,12 +1567,13 @@ class Settin(QMainWindow):
     # 运行离线OCR
     def runOfflineOCR(self) :
 
-        sign, message = detectPort(6666)
+        sign, message = utils.port.detectPort(6666)
         if message :
             print(message)
         elif sign :
-            MessageBox("这是来自团子的警告~", "离线OCR已经在运行中了\n"
-                                             "请不要重复运行哦ヽ(･ω･´ﾒ)     ")
+            utils.message.MessageBox("这是来自团子的警告~",
+                                     "离线OCR已经在运行中了\n"
+                                     "请不要重复运行哦ヽ(･ω･´ﾒ)     ")
             return
 
         os.startfile(OCR_CMD_PATH)
@@ -1579,36 +1582,35 @@ class Settin(QMainWindow):
     # 测试离线OCR
     def testOfflineOCR(self) :
 
-        sign, message = detectPort(6666)
+        sign, message = utils.port.detectPort(6666)
         if message:
             print(message)
         elif not sign :
-            MessageBox("测试离线OCR失败", "离线OCR还没运行成功，不可以进行测试哦\n"
-                                         "请先启动离线OCR，并保证其运行正常\n"
-                                         "使用期间可以缩小黑窗，但不可以退出哦(〃'▽'〃)     ")
+            utils.message.MessageBox("测试离线OCR失败", "离线OCR还没运行成功，不可以进行测试哦\n"
+                                     "请先启动离线OCR，并保证其运行正常\n"
+                                     "使用期间可以缩小黑窗，但不可以退出哦(〃'▽'〃)     ")
             return
 
-        testOfflineOCR()
+        utils.test.testOfflineOCR()
 
 
     # 打开离线OCR教程
     def openOfflineOCRTutorial(self) :
 
-        config_json, errorMsg = postConfigURL()
-        if errorMsg :
-            print(errorMsg)
-        else :
-            url = config_json.get("ocr_register", {}).get("offline_ocr", "https://docs.ayano.top/#/basic/ocr?id=%e7%a6%bb%e7%ba%bfocr%e8%af%b4%e6%98%8e")
+        try :
+            url = self.object.yaml["tutorials_offline_ocr"]
             webbrowser.open(url, new=0, autoraise=True)
+        except Exception :
+            self.logger.error(format_exc())
 
 
-    # 打开团子在线OCR购买页面
+    # 打开团子在线OCR购
     def openDangoBuyPage(self):
 
         try :
-            ocr_login_html = self.config["dictInfo"]["ocr_login_html"]
-            token = self.config["DangoToken"]
-            ocr_buy_html_base64 = self.config["dictInfo"]["ocr_buy_html_base64"]
+            ocr_login_html = self.object.yaml["dict_info"]["ocr_login_html"]
+            token = self.object.config["DangoToken"]
+            ocr_buy_html_base64 = self.object.yaml["dict_info"]["ocr_buy_html_base64"]
 
             url = "%s?token=%s&jump=%s"%(ocr_login_html, token, ocr_buy_html_base64)
             webbrowser.open(url, new=0, autoraise=True)
@@ -1655,7 +1657,7 @@ class Settin(QMainWindow):
     # 说明窗口
     def showDesc(self, object) :
 
-        self.desc = Desc(self.config)
+        self.desc = ui.desc.Desc(self.object)
 
         # OCR说明
         if object == "OCR" :
@@ -1811,19 +1813,19 @@ class Settin(QMainWindow):
     def setHotKey(self, key_type) :
 
         # 快捷键界面
-        self.hotkey = HotKey(self.config)
+        self.hotkey = ui.key.HotKey(self.object)
 
         if key_type == "translate" :
             self.hotkey.setWindowTitle("设定翻译快捷键")
-            self.hotkey.comboBox_1.setCurrentText(self.config["translateHotkeyValue1"])
-            self.hotkey.comboBox_2.setCurrentText(self.config["translateHotkeyValue2"])
-            self.hotkey.sure_button.clicked.connect(lambda: self.hotkey.sure(self, key_type))
+            self.hotkey.comboBox_1.setCurrentText(self.object.config["translateHotkeyValue1"])
+            self.hotkey.comboBox_2.setCurrentText(self.object.config["translateHotkeyValue2"])
+            self.hotkey.sure_button.clicked.connect(lambda: self.hotkey.sure(key_type))
 
         if key_type == "range" :
             self.hotkey.setWindowTitle("设定范围快捷键")
-            self.hotkey.comboBox_1.setCurrentText(self.config["rangeHotkeyValue1"])
-            self.hotkey.comboBox_2.setCurrentText(self.config["rangeHotkeyValue2"])
-            self.hotkey.sure_button.clicked.connect(lambda: self.hotkey.sure(self, key_type))
+            self.hotkey.comboBox_1.setCurrentText(self.object.config["rangeHotkeyValue1"])
+            self.hotkey.comboBox_2.setCurrentText(self.object.config["rangeHotkeyValue2"])
+            self.hotkey.sure_button.clicked.connect(lambda: self.hotkey.sure(key_type))
 
         self.hotkey.show()
 
@@ -1881,122 +1883,116 @@ class Settin(QMainWindow):
         # 重置开关
         tmp_sign_1 = False
         tmp_sign_2 = False
-        self.translation_ui.webdriver1.open_sign = False
-        self.translation_ui.webdriver2.open_sign = False
+        self.object.translation_ui.webdriver1.open_sign = False
+        self.object.translation_ui.webdriver2.open_sign = False
 
         # 刷新翻译
         translater_list = ["youdaoUse", "baiduwebUse", "tencentwebUse", "deeplUse", "googleUse", "caiyunUse"]
         for val in translater_list :
-            if self.config[val] == "False" :
+            if self.object.config[val] == "False" :
                 continue
 
             if not tmp_sign_2 :
                 tmp_sign_2 = True
-                self.translation_ui.webdriver1.open_sign = True
+                self.object.translation_ui.webdriver1.open_sign = True
             else :
-                self.translation_ui.webdriver2.open_sign = True
+                self.object.translation_ui.webdriver2.open_sign = True
 
             # 避免重复开启
             web_type = val.replace("Use", "").replace("web", "")
-            if web_type == self.translation_ui.webdriver_type1 or web_type == self.translation_ui.webdriver_type2 :
+            if web_type == self.object.translation_ui.webdriver_type1 or web_type == self.object.translation_ui.webdriver_type2 :
                 continue
 
             if not tmp_sign_1 :
                 # 刷新翻译引擎1
                 tmp_sign_1 = True
-                self.translation_ui.webdriver_type1 = web_type
-                webdriver_thread = threading.Thread(target=resetWeb,
-                                                    args=(self.translation_ui.webdriver1, web_type))
-                webdriver_thread.setDaemon(True)
-                webdriver_thread.start()
+                self.object.translation_ui.webdriver_type1 = web_type
+                utils.thread.createThread(self.object.translation_ui.webdriver1.openWeb, web_type)
 
             else :
                 # 刷新翻译引擎2
                 self.translation_ui.webdriver_type2 = web_type
-                webdriver_thread = threading.Thread(target=resetWeb,
-                                                    args=(self.translation_ui.webdriver2, web_type))
-                webdriver_thread.setDaemon(True)
-                webdriver_thread.start()
+                utils.thread.createThread(self.object.translation_ui.webdriver2.openWeb, web_type)
 
 
     # 退出前保存设置
     def saveConfig(self) :
 
         # OCR开关
-        self.config["offlineOCR"] = self.offline_ocr_use
-        self.config["onlineOCR"] = self.online_ocr_use
-        self.config["baiduOCR"] = self.baidu_ocr_use
+        self.object.config["offlineOCR"] = self.offline_ocr_use
+        self.object.config["onlineOCR"] = self.online_ocr_use
+        self.object.config["baiduOCR"] = self.baidu_ocr_use
 
         # 翻译语种
         if self.language_comboBox.currentIndex() == 1 :
-            self.config["language"] = "ENG"
+            self.object.config["language"] = "ENG"
         elif self.language_comboBox.currentIndex() == 2 :
-            self.config["language"] = "KOR"
+            self.object.config["language"] = "KOR"
         else:
-            self.config["language"] = "JAP"
+            self.object.config["language"] = "JAP"
 
         # 公共有道翻译开关
-        self.config["youdaoUse"] = str(self.youdao_use)
+        self.object.config["youdaoUse"] = str(self.youdao_use)
         # 公共百度翻译开关
-        self.config["baiduwebUse"] = str(self.baidu_web_use)
+        self.object.config["baiduwebUse"] = str(self.baidu_web_use)
         # 公共腾讯翻译开关
-        self.config["tencentwebUse"] = str(self.tencent_web_use)
+        self.object.config["tencentwebUse"] = str(self.tencent_web_use)
         # 公共DeepL翻译开关
-        self.config["deeplUse"] = str(self.deepl_use)
+        self.object.config["deeplUse"] = str(self.deepl_use)
         # 公共谷歌翻译开关
-        self.config["googleUse"] = str(self.google_use)
+        self.object.config["googleUse"] = str(self.google_use)
         # 公共彩云翻译开关
-        self.config["caiyunUse"] = str(self.caiyun_web_use)
+        self.object.config["caiyunUse"] = str(self.caiyun_web_use)
         # 私人腾讯翻译开关
-        self.config["tencentUse"] = str(self.tencent_use)
+        self.object.config["tencentUse"] = str(self.tencent_use)
         # 私人百度翻译开关
-        self.config["baiduUse"] = str(self.baidu_use)
+        self.object.config["baiduUse"] = str(self.baidu_use)
         # 私人彩云翻译开关
-        self.config["caiyunPrivateUse"] = str(self.caiyun_use)
+        self.object.config["caiyunPrivateUse"] = str(self.caiyun_use)
 
         # 字体颜色 公共有道
-        self.config["fontColor"]["youdao"] = self.youdao_color
+        self.object.config["fontColor"]["youdao"] = self.youdao_color
         # 字体颜色 公共百度
-        self.config["fontColor"]["baiduweb"] = self.baidu_web_color
+        self.object.config["fontColor"]["baiduweb"] = self.baidu_web_color
         # 字体颜色 公共腾讯
-        self.config["fontColor"]["tencentweb"] = self.tencent_web_color
+        self.object.config["fontColor"]["tencentweb"] = self.tencent_web_color
         # 字体颜色 公共DeepL
-        self.config["fontColor"]["deepl"] = self.deepl_color
+        self.object.config["fontColor"]["deepl"] = self.deepl_color
         # 字体颜色 公共谷歌
-        self.config["fontColor"]["google"] = self.google_color
+        self.object.config["fontColor"]["google"] = self.google_color
         # 字体颜色 公共彩云
-        self.config["fontColor"]["caiyun"] = self.caiyun_web_color
+        self.object.config["fontColor"]["caiyun"] = self.caiyun_web_color
         # 字体颜色 私人腾讯
-        self.config["fontColor"]["tencent"] = self.tencent_color
+        self.object.config["fontColor"]["tencent"] = self.tencent_color
         # 字体颜色 私人百度
-        self.config["fontColor"]["baidu"] = self.baidu_color
+        self.object.config["fontColor"]["baidu"] = self.baidu_color
         # 字体颜色 私人彩云
-        self.config["fontColor"]["caiyunPrivate"] = self.caiyun_color
+        self.object.config["fontColor"]["caiyunPrivate"] = self.caiyun_color
 
         # 翻译框透明度
-        self.config["horizontal"] = self.horizontal
+        self.object.config["horizontal"] = self.horizontal
         # 翻译字体大小
-        self.config["fontSize"] = self.fontSize_spinBox.value()
+        self.object.config["fontSize"] = self.fontSize_spinBox.value()
         # 翻译字体类型
-        self.config["fontType"] = self.font_type
+        self.object.config["fontType"] = self.font_type
         # 字体样式开关
-        self.config["showColorType"] = str(self.font_color_type)
+        self.object.config["showColorType"] = str(self.font_color_type)
         # 自动翻译间隔
-        self.config["translateSpeed"] = self.auto_speed_spinBox.value()
+        self.object.config["translateSpeed"] = self.auto_speed_spinBox.value()
         # 显示原文开关
-        self.config["showOriginal"] = str(self.show_original_use)
+        self.object.config["showOriginal"] = str(self.show_original_use)
         # 原文自动复制到剪贴板开关
-        self.config["showClipboard"] = str(self.auto_clipboard_use)
+        self.object.config["showClipboard"] = str(self.auto_clipboard_use)
         # 文字方向
-        self.config["showTranslateRow"] = str(self.text_direction_use)
+        self.object.config["showTranslateRow"] = str(self.text_direction_use)
         # 翻译快捷键开关
-        self.config["showHotKey1"] = str(self.translate_hotkey_use)
+        self.object.config["showHotKey1"] = str(self.translate_hotkey_use)
         # 范围快捷键开关
-        self.config["showHotKey2"] = str(self.range_hotkey_use)
+        self.object.config["showHotKey2"] = str(self.range_hotkey_use)
         # 自动翻译图片刷新相似度
-        self.config["imageSimilarity"] = self.image_refresh_spinBox.value()
+        self.object.config["imageSimilarity"] = self.image_refresh_spinBox.value()
         # 自动翻译文字刷新相似度
-        self.config["textSimilarity"] = self.text_refresh_spinBox.value()
+        self.object.config["textSimilarity"] = self.text_refresh_spinBox.value()
 
 
     # 注册新快捷键
@@ -2006,27 +2002,27 @@ class Settin(QMainWindow):
             "ctrl": "control",
             "win": "super"
         }
-        self.translation_ui.translate_hotkey_value1 = hotkey_map.get(self.config["translateHotkeyValue1"], self.config["translateHotkeyValue1"])
-        self.translation_ui.translate_hotkey_value2 = hotkey_map.get(self.config["translateHotkeyValue2"], self.config["translateHotkeyValue2"])
-        self.translation_ui.range_hotkey_value1 = hotkey_map.get(self.config["rangeHotkeyValue1"], self.config["rangeHotkeyValue1"])
-        self.translation_ui.range_hotkey_value2 = hotkey_map.get(self.config["rangeHotkeyValue2"], self.config["rangeHotkeyValue2"])
+        self.object.translation_ui.translate_hotkey_value1 = hotkey_map.get(self.object.config["translateHotkeyValue1"], self.object.config["translateHotkeyValue1"])
+        self.object.translation_ui.translate_hotkey_value2 = hotkey_map.get(self.object.config["translateHotkeyValue2"], self.object.config["translateHotkeyValue2"])
+        self.object.translation_ui.range_hotkey_value1 = hotkey_map.get(self.object.config["rangeHotkeyValue1"], self.object.config["rangeHotkeyValue1"])
+        self.object.translation_ui.range_hotkey_value2 = hotkey_map.get(self.object.config["rangeHotkeyValue2"], self.object.config["rangeHotkeyValue2"])
 
         # 注册新翻译快捷键
         if self.translate_hotkey_use :
-            self.translation_ui.translate_hotkey.register((self.translation_ui.translate_hotkey_value1,
-                                                           self.translation_ui.translate_hotkey_value2),
-                                                          callback=lambda x: self.translation_ui.translate_hotkey_sign.emit(True))
+            self.object.translation_ui.translate_hotkey.register((self.object.translation_ui.translate_hotkey_value1,
+                                                                  self.object.translation_ui.translate_hotkey_value2),
+                                                                  callback=lambda x: self.object.translation_ui.translate_hotkey_sign.emit(True))
         # 注册新范围快捷键
         if self.range_hotkey_use :
-            self.translation_ui.range_hotkey.register((self.translation_ui.range_hotkey_value1,
-                                                       self.translation_ui.range_hotkey_value2),
-                                                      callback=lambda x: self.translation_ui.range_hotkey_sign.emit(True))
+            self.object.translation_ui.range_hotkey.register((self.object.translation_ui.range_hotkey_value1,
+                                                              self.object.translation_ui.range_hotkey_value2),
+                                                              callback=lambda x: self.object.translation_ui.range_hotkey_sign.emit(True))
 
 
     # 窗口关闭处理
     def closeEvent(self, event) :
 
-        # 保存设置至本地文件
+        # 保存设置
         self.saveConfig()
 
         # 注册新快捷键
@@ -2040,40 +2036,39 @@ class Settin(QMainWindow):
 
         # 刷新百度OCR的AccessToken
         if self.baidu_ocr_use :
-            sign, access_token = getAccessToken(self.config["OCR"]["Key"], self.config["OCR"]["Secret"], self.logger)
+            sign, access_token = translator.ocr.baidu.getAccessToken(self.object.config["OCR"]["Key"],
+                                                                     self.object.config["OCR"]["Secret"],
+                                                                     self.logger)
             if sign :
-                self.config["AccessToken"] = access_token
+                self.object.config["AccessToken"] = access_token
 
-
-        # 设置页面配置更新至主模块
-        self.translation_ui.config = self.config
 
         # 设置上传云端
-        utils.config.postSaveSettin(self.config, self.logger)
+        utils.thread.createThread(utils.config.postSaveSettin, self.object)
 
         # 重置翻译界面
-        self.translation_ui.translate_text.setStyleSheet("border-width:0;\
-                                                         border-style:outset;\
-                                                         border-top:0px solid #e8f3f9;\
-                                                         color:white;\
-                                                         font-weight: bold;\
-                                                         background-color:rgba(62, 62, 62, %s)"
-                                                         % (self.horizontal))
-        self.translation_ui.temp_text.setStyleSheet("border-width:0;\
-                                                    border-style:outset;\
-                                                    border-top:0px solid #e8f3f9;\
-                                                    color:white;\
-                                                    font-weight: bold;\
-                                                    background-color:rgba(62, 62, 62, %s)"
-                                                    % (self.horizontal))
+        self.object.translation_ui.translate_text.setStyleSheet("border-width:0;\
+                                                                border-style:outset;\
+                                                                border-top:0px solid #e8f3f9;\
+                                                                color:white;\
+                                                                font-weight: bold;\
+                                                                background-color:rgba(62, 62, 62, %s)"
+                                                                %(self.horizontal))
+        self.object.translation_ui.temp_text.setStyleSheet("border-width:0;\
+                                                            border-style:outset;\
+                                                            border-top:0px solid #e8f3f9;\
+                                                            color:white;\
+                                                            font-weight: bold;\
+                                                            background-color:rgba(62, 62, 62, %s)"
+                                                            %(self.horizontal))
         # 重置状态栏界面
-        self.translation_ui.statusbar.setStyleSheet("font: 10pt '华康方圆体W7';"
-                                                    "color: white;"
-                                                    "background-color: rgba(62, 62, 62, 0.1)")
+        self.object.translation_ui.statusbar.setStyleSheet("font: 10pt '华康方圆体W7';"
+                                                           "color: white;"
+                                                           "background-color: rgba(62, 62, 62, 0.1)")
 
         self.close()
-        self.translation_ui.show()
+        self.object.translation_ui.show()
 
         # 如果是自动模式下, 则解除暂停
-        if self.translation_ui.translate_mode:
-            self.translation_ui.stop_sign = False
+        if self.object.translation_ui.translate_mode :
+            self.object.translation_ui.stop_sign = False

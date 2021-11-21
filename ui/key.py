@@ -11,14 +11,12 @@ PIXMAP_PATH = "./config/icon/pixmap.png"
 
 class Key(QWidget) :
 
-    def __init__(self, config, window) :
+    def __init__(self, object) :
 
         super(Key, self).__init__()
 
-        self.config = config
-        self.window = window
+        self.object = object
         self.getInitConfig()
-
         self.ui()
 
 
@@ -34,9 +32,9 @@ class Key(QWidget) :
         self.setWindowTitle("说明")
 
         # 窗口图标
-        self.icon = QIcon()
-        self.icon.addPixmap(QPixmap(LOGO_PATH), QIcon.Normal, QIcon.On)
-        self.setWindowIcon(self.icon)
+        icon = QIcon()
+        icon.addPixmap(QPixmap(LOGO_PATH), QIcon.Normal, QIcon.On)
+        self.setWindowIcon(icon)
 
         # 鼠标样式
         pixmap = QPixmap(PIXMAP_PATH)
@@ -64,7 +62,7 @@ class Key(QWidget) :
         self.baidu_ocr_key_textEdit.setPlaceholderText("百度OCR API Key")
         self.baidu_ocr_key_textEdit.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.baidu_ocr_key_textEdit.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.baidu_ocr_key_textEdit.setText(self.config["OCR"]["Key"])
+        self.baidu_ocr_key_textEdit.setText(self.object.config["OCR"]["Key"])
         self.baidu_ocr_key_textEdit.hide()
 
         # 百度OCR Secret Key 输入框
@@ -73,7 +71,7 @@ class Key(QWidget) :
         self.baidu_ocr_secret_textEdit.setPlaceholderText("百度OCR Secret Key")
         self.baidu_ocr_secret_textEdit.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.baidu_ocr_secret_textEdit.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.baidu_ocr_secret_textEdit.setText(self.config["OCR"]["Secret"])
+        self.baidu_ocr_secret_textEdit.setText(self.object.config["OCR"]["Secret"])
         self.baidu_ocr_secret_textEdit.hide()
 
         # 私人腾讯 SecretId 输入框
@@ -82,7 +80,7 @@ class Key(QWidget) :
         self.tencent_private_key_textEdit.setPlaceholderText("私人腾讯 SecretId")
         self.tencent_private_key_textEdit.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.tencent_private_key_textEdit.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.tencent_private_key_textEdit.setText(self.config["tencentAPI"]["Key"])
+        self.tencent_private_key_textEdit.setText(self.object.config["tencentAPI"]["Key"])
         self.tencent_private_key_textEdit.hide()
 
         # 私人腾讯 SecretKey 输入框
@@ -91,7 +89,7 @@ class Key(QWidget) :
         self.tencent_private_secret_textEdit.setPlaceholderText("私人腾讯 SecretKey")
         self.tencent_private_secret_textEdit.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.tencent_private_secret_textEdit.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.tencent_private_secret_textEdit.setText(self.config["tencentAPI"]["Secret"])
+        self.tencent_private_secret_textEdit.setText(self.object.config["tencentAPI"]["Secret"])
         self.tencent_private_secret_textEdit.hide()
 
         # 私人百度 APP ID 输入框
@@ -100,7 +98,7 @@ class Key(QWidget) :
         self.baidu_private_key_textEdit.setPlaceholderText("私人百度 APP ID")
         self.baidu_private_key_textEdit.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.baidu_private_key_textEdit.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.baidu_private_key_textEdit.setText(self.config["baiduAPI"]["Key"])
+        self.baidu_private_key_textEdit.setText(self.object.config["baiduAPI"]["Key"])
         self.baidu_private_key_textEdit.hide()
 
         # 私人百度 密钥 输入框
@@ -109,7 +107,7 @@ class Key(QWidget) :
         self.baidu_private_secret_textEdit.setPlaceholderText("私人百度 密钥")
         self.baidu_private_secret_textEdit.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.baidu_private_secret_textEdit.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.baidu_private_secret_textEdit.setText(self.config["baiduAPI"]["Secret"])
+        self.baidu_private_secret_textEdit.setText(self.object.config["baiduAPI"]["Secret"])
         self.baidu_private_secret_textEdit.hide()
 
         # 私人彩云 APP ID 输入框
@@ -118,7 +116,7 @@ class Key(QWidget) :
         self.caiyun_private_key_textEdit.setPlaceholderText("私人彩云 令牌")
         self.caiyun_private_key_textEdit.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.caiyun_private_key_textEdit.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.caiyun_private_key_textEdit.setText(self.config["caiyunAPI"])
+        self.caiyun_private_key_textEdit.setText(self.object.config["caiyunAPI"])
         self.caiyun_private_key_textEdit.hide()
 
 
@@ -126,7 +124,7 @@ class Key(QWidget) :
     def getInitConfig(self) :
 
         # 界面缩放比例
-        self.rate = self.config["screenScaleRate"]
+        self.rate = self.object.yaml["screen_scale_rate"]
         # 界面尺寸
         self.window_width = int(370 * self.rate)
         self.window_height = int(95 * self.rate)
@@ -150,13 +148,13 @@ class Key(QWidget) :
     # 窗口关闭处理
     def closeEvent(self, event) :
 
-        self.window.config["OCR"]["Key"] = self.filterNullWord(self.baidu_ocr_key_textEdit)
-        self.window.config["OCR"]["Secret"] = self.filterNullWord(self.baidu_ocr_secret_textEdit)
-        self.window.config["tencentAPI"]["Key"] = self.filterNullWord(self.tencent_private_key_textEdit)
-        self.window.config["tencentAPI"]["Secret"] = self.filterNullWord(self.tencent_private_secret_textEdit)
-        self.window.config["baiduAPI"]["Key"] = self.filterNullWord(self.baidu_private_key_textEdit)
-        self.window.config["baiduAPI"]["Secret"] = self.filterNullWord(self.baidu_private_secret_textEdit)
-        self.window.config["caiyunAPI"] = self.filterNullWord(self.caiyun_private_key_textEdit)
+        self.object.config["OCR"]["Key"] = self.filterNullWord(self.baidu_ocr_key_textEdit)
+        self.object.config["OCR"]["Secret"] = self.filterNullWord(self.baidu_ocr_secret_textEdit)
+        self.object.config["tencentAPI"]["Key"] = self.filterNullWord(self.tencent_private_key_textEdit)
+        self.object.config["tencentAPI"]["Secret"] = self.filterNullWord(self.tencent_private_secret_textEdit)
+        self.object.config["baiduAPI"]["Key"] = self.filterNullWord(self.baidu_private_key_textEdit)
+        self.object.config["baiduAPI"]["Secret"] = self.filterNullWord(self.baidu_private_secret_textEdit)
+        self.object.config["caiyunAPI"] = self.filterNullWord(self.caiyun_private_key_textEdit)
 
         self.baidu_ocr_key_textEdit.hide()
         self.baidu_ocr_secret_textEdit.hide()

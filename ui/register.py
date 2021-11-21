@@ -310,7 +310,7 @@ class Register(QWidget) :
 
         # 发送邮件
         self.code_key = str(random.randint(1001, 9999))
-        url = self.object.yaml["dict_info"]["send_key_email"]
+        url = self.object.yaml["dict_info"]["dango_send_email"]
         thread = utils.email.SendEmail(url, user, email, self.code_key, self.logger)
         thread.signal.connect(self.showEmailMessage)
         thread.start()

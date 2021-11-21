@@ -4,12 +4,6 @@ from traceback import format_exc
 import time
 
 
-# 刷新翻译页面
-def resetWeb(obj, web_type) :
-
-    obj.openWeb(web_type)
-
-
 # 翻译模块
 class Webdriver(QObject) :
 
