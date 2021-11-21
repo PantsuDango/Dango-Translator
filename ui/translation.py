@@ -286,6 +286,8 @@ class Translation(QMainWindow) :
         self.rate = self.object.yaml["screen_scale_rate"]
         # 界面透明度
         self.horizontal = self.object.config["horizontal"]
+        if self.horizontal == 0 :
+            self.horizontal = 0.01
         # 当前登录的用户
         self.user = self.object.yaml["user"]
         # 界面锁
@@ -543,10 +545,13 @@ class Translation(QMainWindow) :
         if self.auto_trans_exist :
             return
 
+        import time
+        start = time.time()
         thread = utils.translater.Translater(self.object)
         thread.clear_text_sign.connect(self.clearText)
         thread.start()
         thread.wait()
+        print("线程结束: {}".format(time.time()-start))
 
 
     # 收到翻译信息清屏
@@ -647,6 +652,36 @@ class Translation(QMainWindow) :
             self.translate_text.show()
 
 
+    # 加载翻译引擎1
+    def openWebdriver1(self) :
+
+        # 翻译模块1
+        self.webdriver1 = translator.all.Webdriver(self.object)
+        # 连接消息提示框
+        self.webdriver1.message_sign.connect(self.showStatusbar)
+        # 加载翻译引擎
+        self.webdriver1.openWebdriver()
+        # 开启翻译页面
+        if self.webdriver_type1 :
+            self.statusbar.showMessage("翻译模型启动中, 请等待完成后再操作...")
+            utils.thread.createThread(self.webdriver1.openWeb, self.webdriver_type1)
+
+
+    # 加载翻译引擎2
+    def openWebdriver2(self) :
+
+        # 翻译模块2
+        self.webdriver2 = translator.all.Webdriver(self.object)
+        # 连接消息提示框
+        self.webdriver2.message_sign.connect(self.showStatusbar)
+        # 加载翻译引擎
+        self.webdriver2.openWebdriver()
+        # 开启翻译页面
+        if self.webdriver_type2 :
+            self.statusbar.showMessage("翻译模型启动中, 请等待完成后再操作...")
+            utils.thread.createThread(self.webdriver2.openWeb, self.webdriver_type2)
+
+
     # 开启翻译模块
     def createWebdriverThread(self) :
 
@@ -664,28 +699,8 @@ class Translation(QMainWindow) :
                 # 翻译模块二的翻译源类型
                 self.webdriver_type2 = val.replace("Use", "").replace("web", "")
 
-        # 翻译模块1
-        self.webdriver1 = translator.all.Webdriver(self.object)
-        # 连接消息提示框
-        self.webdriver1.message_sign.connect(self.showStatusbar)
-        # 加载翻译引擎
-        utils.thread.createThread(self.webdriver1.openWebdriver)
-        # 开启翻译页面
-        if self.webdriver_type1 :
-            utils.thread.createThread(self.webdriver1.openWeb, self.webdriver_type1)
-
-        # 翻译模块2
-        self.webdriver2 = translator.all.Webdriver(self.object)
-        # 连接消息提示框
-        self.webdriver2.message_sign.connect(self.showStatusbar)
-        # 加载翻译引擎
-        utils.thread.createThread(self.webdriver2.openWebdriver)
-        # 开启翻译页面
-        if self.webdriver_type2 :
-            utils.thread.createThread(self.webdriver2.openWeb, self.webdriver_type2)
-        # 提示
-        if self.webdriver_type1 or self.webdriver_type2 :
-            self.statusbar.showMessage("翻译模型启动中, 请等待完成后再操作...")
+        utils.thread.createThread(self.openWebdriver1)
+        utils.thread.createThread(self.openWebdriver2)
 
 
     # 按下屏蔽词键后做的事情

@@ -132,13 +132,14 @@ class Translater(QThread) :
     def translate(self) :
 
         # 如果还未选取范围就操作翻译
-        if self.object.yaml["range"] == {"X1": 0, "Y1": 0, "X2": 0, "Y2": 0} :
+        if self.object.yaml["range"]["X2"] == 0 :
             self.clear_text_sign.emit(True)
             self.object.translation_ui.original = "还未选取翻译范围, 请先使用范围键框选要翻译的屏幕区域"
-            self.create_trans_sign.emit("original")
+            utils.thread.createThread(self.creatTranslaterThread, "original")
             # 关闭翻译界面自动开关
-            self.object.translation_ui.switch_button.mousePressEvent(1)
-            self.object.translation_ui.switch_button.updateValue()
+            if self.object.translation_ui.translate_mode == True :
+                self.object.translation_ui.switch_button.mousePressEvent(1)
+                self.object.translation_ui.switch_button.updateValue()
             return
 
         try:

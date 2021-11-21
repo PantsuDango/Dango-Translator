@@ -18,6 +18,7 @@ import ui.filter
 import ui.range
 import ui.settin
 
+
 class DangoTranslator() :
 
     # 配置初始化

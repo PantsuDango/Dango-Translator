@@ -1909,7 +1909,7 @@ class Settin(QMainWindow) :
 
             else :
                 # 刷新翻译引擎2
-                self.translation_ui.webdriver_type2 = web_type
+                self.object.translation_ui.webdriver_type2 = web_type
                 utils.thread.createThread(self.object.translation_ui.webdriver2.openWeb, web_type)
 
 
@@ -1968,9 +1968,9 @@ class Settin(QMainWindow) :
         self.object.config["fontColor"]["caiyunPrivate"] = self.caiyun_color
 
         # 翻译框透明度
+        self.object.config["horizontal"] = self.horizontal
         if self.horizontal == 0 :
             self.horizontal = 0.01
-        self.object.config["horizontal"] = self.horizontal
         # 翻译字体大小
         self.object.config["fontSize"] = self.fontSize_spinBox.value()
         # 翻译字体类型

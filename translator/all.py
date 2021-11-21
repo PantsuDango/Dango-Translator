@@ -91,8 +91,8 @@ class Webdriver(QObject) :
                     return
 
         self.browser_sign = 1
-        self.message_sign.emit("翻译模块启动完成~")
-        print("翻译引擎启动")
+        if not self.object.translation_ui.webdriver_type2 or not self.object.translation_ui.webdriver_type2 :
+            self.message_sign.emit("翻译模块启动完成~")
 
 
     # 打开翻译页面
@@ -313,10 +313,12 @@ class Webdriver(QObject) :
             except Exception:
                 pass
 
-            # 清空翻译框
-            self.browser.find_element_by_xpath('//*[@id="dl_translator"]/div[3]/div[4]/div[1]/div[2]/div[2]/textarea').clear()
+            try :
+                self.browser.find_element_by_xpath('//*[@id="dl_translator"]/div[3]/div[3]/div[1]/button/span').click()
+            except Exception :
+                pass
             # 输入要翻译的文本
-            self.browser.find_element_by_xpath('//*[@id="dl_translator"]/div[3]/div[4]/div[1]/div[2]/div[2]/textarea').send_keys(content)
+            self.browser.find_element_by_xpath('//*[@id="dl_translator"]/div[3]/div[3]/div[1]/div[2]/div[2]/textarea').send_keys(content)
 
             start = time.time()
             while True :
