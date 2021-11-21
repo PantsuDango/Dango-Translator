@@ -7,6 +7,7 @@ import utils.http
 
 
 YAML_PATH = "./config/config.yaml"
+HISTORY_FILE_PATH = "../翻译历史.txt"
 
 
 # 打开本地配置文件
@@ -202,6 +203,13 @@ def postSaveSettin(object) :
     utils.http.post(url, body, object.logger)
 
 
+# 保存识别到的原文
+def saveOriginalHisTory(original) :
+
+    with open(HISTORY_FILE_PATH, "a+", encoding="utf-8") as file :
+        file.write("\n\n[原文]\n%s"%original)
+
+
 # 保存翻译历史
 def saveTransHisTory(text, translate_type) :
 
@@ -226,7 +234,7 @@ def saveTransHisTory(text, translate_type) :
     else:
         return
 
-    with open("./config/翻译历史.txt", "a+", encoding="utf-8") as file :
+    with open(HISTORY_FILE_PATH, "a+", encoding="utf-8") as file :
         file.write(content)
 
 

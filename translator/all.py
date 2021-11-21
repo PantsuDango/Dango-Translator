@@ -146,7 +146,10 @@ class Webdriver(QObject) :
                     return "公共有道: 我超时啦!"
 
         except Exception :
-            self.browser.refresh()
+            try:
+                self.browser.refresh()
+            except Exception:
+                pass
             self.logger.error(format_exc())
             return "公共有道: 我抽风啦!"
 
@@ -184,7 +187,10 @@ class Webdriver(QObject) :
                     return "公共百度: 我超时啦!"
 
         except Exception :
-            self.browser.refresh()
+            try:
+                self.browser.refresh()
+            except Exception:
+                pass
             self.logger.error(format_exc())
             return "公共百度: 我抽风啦!"
 
@@ -222,7 +228,10 @@ class Webdriver(QObject) :
                     return "公共腾讯: 我超时啦!"
 
         except Exception :
-            self.browser.refresh()
+            try:
+                self.browser.refresh()
+            except Exception:
+                pass
             self.logger.error(format_exc())
             return "公共腾讯: 我抽风啦!"
 
@@ -261,7 +270,10 @@ class Webdriver(QObject) :
                     return "公共彩云: 我超时啦!"
 
         except Exception :
-            self.browser.refresh()
+            try:
+                self.browser.refresh()
+            except Exception:
+                pass
             self.logger.error(format_exc())
             return "公共彩云: 我抽风啦!"
 
@@ -299,7 +311,10 @@ class Webdriver(QObject) :
                     return "公共谷歌: 我超时啦!"
 
         except Exception :
-            self.browser.refresh()
+            try:
+                self.browser.refresh()
+            except Exception:
+                pass
             self.logger.error(format_exc())
             return "公共谷歌: 我抽风啦!"
 
@@ -343,7 +358,10 @@ class Webdriver(QObject) :
                     return "公共DeepL: 我超时啦!"
 
         except Exception :
-            self.browser.refresh()
+            try:
+                self.browser.refresh()
+            except Exception:
+                pass
             self.logger.error(format_exc())
             return "公共DeepL: 我抽风啦!"
 
@@ -378,8 +396,11 @@ class Webdriver(QObject) :
                     self.browser.refresh()
                     return "公共小牛: 我超时啦!"
 
-        except Exception:
-            self.browser.refresh()
+        except Exception :
+            try :
+                self.browser.refresh()
+            except Exception :
+                pass
             self.logger.error(format_exc())
             return "公共小牛: 我抽风啦!"
 

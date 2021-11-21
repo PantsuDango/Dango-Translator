@@ -8,6 +8,7 @@ import time
 import pyperclip
 
 import utils.thread
+import utils.config
 
 import translator.ocr.baidu
 import translator.ocr.dango
@@ -222,19 +223,11 @@ class Translater(QThread) :
         if nothing_sign :
             # 更新原文
             self.object.translation_ui.original = original
-
-            # 隐藏状态栏信息
-            # if self.object.translation_ui.statusbar_sign :
-            #     self.object.translation_ui.statusbar.clearMessage()
-            #     self.object.translation_ui.statusbar_sign = False
-
             # 是否复制到剪贴板
             if self.object.config["showClipboard"] == "True" :
                 pyperclip.copy(original)
-
-            # 保存识别到的原文
-            with open("./config/翻译历史.txt", "a+", encoding="utf-8") as file :
-                file.write("\n\n[原文]\n%s"%original)
+            # 保存原文
+            utils.config.saveOriginalHisTory(original)
 
 
     def run(self) :
