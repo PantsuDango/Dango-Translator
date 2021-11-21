@@ -1968,6 +1968,8 @@ class Settin(QMainWindow) :
         self.object.config["fontColor"]["caiyunPrivate"] = self.caiyun_color
 
         # 翻译框透明度
+        if self.horizontal == 0 :
+            self.horizontal = 0.01
         self.object.config["horizontal"] = self.horizontal
         # 翻译字体大小
         self.object.config["fontSize"] = self.fontSize_spinBox.value()

@@ -154,6 +154,8 @@ def configConvert(object) :
     ################### 其他设定 ###################
     # 翻译界面透明度
     object.config["horizontal"] = object.config.get("horizontal", 30)
+    if object.config["horizontal"] == 0 :
+        object.config["horizontal"] = 0.01
     # 字体大小
     object.config["fontSize"] = object.config.get("fontSize", 15)
     # 字体

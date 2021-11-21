@@ -7,9 +7,11 @@ from traceback import format_exc
 import time
 import pyperclip
 
-from translator.ocr.baidu import baiduOCR
-from translator.ocr.dango import dangoOCR
-from translator import api
+import utils.thread
+
+import translator.ocr.baidu
+import translator.ocr.dango
+import translator.api
 
 
 IMAGE_PATH = ".\config\image.jpg"
@@ -47,20 +49,20 @@ class TranslaterProccess(QThread) :
         elif self.trans_type == "baidu_private" :
             secret_id = self.object.config["baiduAPI"]["Key"]
             secret_key = self.object.config["baiduAPI"]["Secret"]
-            result = api.baidu(self.object.translation_ui.original, secret_id, secret_key, self.logger)
+            result = translator.api.baidu(self.object.translation_ui.original, secret_id, secret_key, self.logger)
             print("私人百度: ", result)
 
         # 私人腾讯
         elif self.trans_type == "tencent_private" :
             secret_id = self.object.config["tencentAPI"]["Key"]
             secret_key = self.object.config["tencentAPI"]["Secret"]
-            result = api.tencent(self.object.translation_ui.original, secret_id, secret_key, self.logger)
+            result = translator.api.tencent(self.object.translation_ui.original, secret_id, secret_key, self.logger)
             print("私人腾讯: ", result)
 
         # 私人彩云
         elif self.trans_type == "caiyun_private" :
             secret_key = self.object.config["caiyunAPI"]
-            result = api.caiyun(self.object.translation_ui.original, secret_key, self.logger)
+            result = translator.api.caiyun(self.object.translation_ui.original, secret_key, self.logger)
             print("私人彩云: ", result)
 
         elif self.trans_type == "original" :
@@ -74,7 +76,6 @@ class TranslaterProccess(QThread) :
 # 翻译处理模块
 class Translater(QThread) :
 
-    create_trans_sign = pyqtSignal(str)
     clear_text_sign = pyqtSignal(bool)
 
     def __init__(self, object) :
@@ -82,7 +83,6 @@ class Translater(QThread) :
         super(Translater, self).__init__()
         self.object = object
         self.logger = object.logger
-        self.create_trans_sign.connect(self.creatTranslaterThread)
 
     # 截图
     def imageCut(self):
@@ -159,16 +159,16 @@ class Translater(QThread) :
             self.logger.error(format_exc())
 
         # 百度OCR
-        if self.window.config["baiduOCR"] :
+        if self.object.config["baiduOCR"] :
             start = time.time()
-            ocr_sign, original = baiduOCR(self.window.config, self.logger)
+            ocr_sign, original = translator.ocr.baidu.baiduOCR(self.object.config, self.logger)
             print("百度OCR: ", original)
             print("time: %s"%(time.time()-start))
 
         # 团子OCR
-        elif self.window.config["onlineOCR"] :
+        elif self.object.config["onlineOCR"] :
             start = time.time()
-            ocr_sign, original = dangoOCR(self.window.config, self.logger)
+            ocr_sign, original = translator.ocr.dango.dangoOCR(self.object.config, self.logger)
             print("团子OCR: ", original)
             print("time: %s" % (time.time()-start))
 
@@ -179,18 +179,18 @@ class Translater(QThread) :
         # 如果出错就显示原文
         if not ocr_sign :
             self.clear_text_sign.emit(True)
-            self.window.original = original
-            self.create_trans_sign.emit("original")
+            self.object.translation_ui.original = original
+            utils.thread.createThread(self.creatTranslaterThread, "original")
             return
 
         # 如果检测不到文字或者文字和上一次一样则跳过
-        if not original or original == self.window.original :
+        if not original or original == self.object.translation_ui.original :
             return
 
         # 在自动模式下, 如果如果文本相似度过高则不翻译
-        if self.window.translate_mode :
-            text_score = self.getEqualRate(original, self.window.original)
-            if text_score > self.window.config["textSimilarity"] :
+        if self.object.translation_ui.translate_mode :
+            text_score = self.getEqualRate(original, self.object.translation_ui.original)
+            if text_score > self.object.config["textSimilarity"] :
                 return
 
         # 发送清屏信号
@@ -199,44 +199,44 @@ class Translater(QThread) :
         nothing_sign = False
 
         # 公共翻译一
-        if self.window.webdriver1.open_sign :
-            self.create_trans_sign.emit("webdriver_1")
+        if self.object.translation_ui.webdriver1.open_sign :
+            utils.thread.createThread(self.creatTranslaterThread, "webdriver_1")
             nothing_sign = True
 
         # 公共翻译二
-        if self.window.webdriver2.open_sign :
-            self.create_trans_sign.emit("webdriver_2")
+        if self.object.translation_ui.webdriver2.open_sign :
+            utils.thread.createThread(self.creatTranslaterThread, "webdriver_2")
             nothing_sign = True
 
         # 私人百度
-        if self.window.config["baiduUse"] == "True" :
-            self.create_trans_sign.emit("baidu_private")
+        if self.object.config["baiduUse"] == "True" :
+            utils.thread.createThread(self.creatTranslaterThread, "baidu_private")
             nothing_sign = True
 
         # 私人百度
-        if self.window.config["tencentUse"] == "True" :
-            self.create_trans_sign.emit("tencent_private")
+        if self.object.config["tencentUse"] == "True" :
+            utils.thread.createThread(self.creatTranslaterThread, "tencent_private")
             nothing_sign = True
 
         # 私人彩云
-        if self.window.config["caiyunPrivateUse"] == "True" :
-            self.create_trans_sign.emit("caiyun_private")
+        if self.object.config["caiyunPrivateUse"] == "True" :
+            utils.thread.createThread(self.creatTranslaterThread, "caiyun_private")
             nothing_sign = True
 
         # 显示原文
-        if self.window.config["showOriginal"] == "True" or not nothing_sign :
-            self.create_trans_sign.emit("original")
+        if self.object.config["showOriginal"] == "True" or not nothing_sign :
+            utils.thread.createThread(self.creatTranslaterThread, "original")
 
         # 翻译成功
         if nothing_sign :
             # 更新原文
-            self.window.original = original
+            self.object.translation_ui.original = original
             # 隐藏状态栏信息
-            if self.window.statusbar_sign:
-                self.window.statusbar.clearMessage()
-                self.window.statusbar_sign = False
+            if self.object.translation_ui.statusbar_sign :
+                self.object.translation_ui.statusbar.clearMessage()
+                self.object.translation_ui.statusbar_sign = False
             # 是否复制到剪贴板
-            if self.window.config["showClipboard"] == "True" :
+            if self.object.config["showClipboard"] == "True" :
                 pyperclip.copy(original)
             # 保存识别到的原文
             with open("./config/翻译历史.txt", "a+", encoding="utf-8") as file :
@@ -246,9 +246,9 @@ class Translater(QThread) :
     def run(self) :
 
         # 手动翻译
-        if not self.window.translate_mode :
+        if not self.object.translation_ui.translate_mode :
             # 如果上一次翻译未结束则直接跳过
-            if self.window.thread_state > 0:
+            if self.object.translation_ui.thread_state > 0 :
                 return
             try:
                 self.translate()
@@ -257,21 +257,21 @@ class Translater(QThread) :
 
         else :
             # 自动翻译
-            self.window.auto_trans_exist = True
+            self.object.translation_ui.auto_trans_exist = True
             while True :
                 # 如果自动翻译被停止则退出循环
-                if not self.window.translate_mode :
+                if not self.object.translation_ui.translate_mode :
                     print("自动翻译退出")
-                    self.window.auto_trans_exist = False
+                    self.object.translation_ui.auto_trans_exist = False
                     break
 
                 # 自动翻译暂停
-                if self.window.stop_sign :
+                if self.object.translation_ui.stop_sign :
                     print("自动翻译暂停")
                     time.sleep(0.1)
                     continue
                 # 如果上一次翻译未结束则直接跳过
-                if self.window.thread_state > 0:
+                if self.object.translation_ui.thread_state > 0:
                     continue
 
                 try :
@@ -279,4 +279,4 @@ class Translater(QThread) :
                 except Exception :
                     self.logger.error(format_exc())
 
-                time.sleep(self.window.config["translateSpeed"]-0.4)
+                time.sleep(self.object.config["translateSpeed"]-0.4)
