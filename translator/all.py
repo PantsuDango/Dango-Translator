@@ -51,7 +51,7 @@ class Webdriver(QObject) :
             option = webdriver.ChromeOptions()
             option.add_argument("--headless")
             self.browser = webdriver.Chrome(executable_path="./config/tools/chromedriver.exe",
-                                            service_log_path="./logs/geckodriver.log",
+                                            service_log_path="../logs/geckodriver.log",
                                             options=option)
         except Exception:
             self.logger.error(format_exc())
@@ -61,7 +61,7 @@ class Webdriver(QObject) :
                 option = webdriver.FirefoxOptions()
                 option.add_argument("--headless")
                 self.browser = webdriver.Firefox(executable_path="./config/tools/geckodriver.exe",
-                                                 service_log_path="./logs/geckodriver.log",
+                                                 service_log_path="../logs/geckodriver.log",
                                                  options=option)
             except Exception:
                 self.logger.error(format_exc())
@@ -81,7 +81,7 @@ class Webdriver(QObject) :
                             ]}
                     }
                     self.browser = webdriver.Edge(executable_path="./config/tools/msedgedriver.exe",
-                                                  service_log_path="./logs/geckodriver.log",
+                                                  service_log_path="../logs/geckodriver.log",
                                                   capabilities=EDGE)
                 except Exception :
                     self.browser_sign = 2
@@ -98,13 +98,13 @@ class Webdriver(QObject) :
     # 打开翻译页面
     def openWeb(self, web_type) :
 
+        self.web_type = web_type
         self.message_sign.emit("%s翻译引擎启动中, 请等待完成后再操作..."%self.translater_map[web_type])
         print("%s翻译引擎启动中, 请等待完成后再操作..."%self.translater_map[web_type])
 
         try :
             self.browser.get(self.url_map[web_type])
             self.browser.maximize_window()
-            self.web_type = web_type
             self.open_sign = True
             self.message_sign.emit("%s翻译引擎启动完成~"%self.translater_map[web_type])
             print("%s翻译引擎启动完成~"%self.translater_map[web_type])

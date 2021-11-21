@@ -37,11 +37,17 @@ class TranslaterProccess(QThread) :
 
         # 公共翻译一
         if self.trans_type == "webdriver_1" :
-            result = self.object.translation_ui.webdriver1.translater(self.object.translation_ui.original)
+            if self.object.translation_ui.webdriver1.open_sign :
+                result = self.object.translation_ui.webdriver1.translater(self.object.translation_ui.original)
+            else :
+                result = "%s翻译: 我抽风啦"%self.object.translation_ui.webdriver1.translater_map[self.object.translation_ui.webdriver1.web_type]
 
         # 公共翻译二
         elif self.trans_type == "webdriver_2" :
-            result = self.object.translation_ui.webdriver2.translater(self.object.translation_ui.original)
+            if self.object.translation_ui.webdriver1.open_sign :
+                result = self.object.translation_ui.webdriver2.translater(self.object.translation_ui.original)
+            else :
+                result = "%s翻译: 我抽风啦"%self.object.translation_ui.webdriver2.translater_map[self.object.translation_ui.webdriver2.web_type]
 
         # 私人百度
         elif self.trans_type == "baidu_private" :
@@ -63,8 +69,7 @@ class TranslaterProccess(QThread) :
         elif self.trans_type == "original" :
             result = self.object.translation_ui.original
 
-        if result :
-            self.display_signal.emit(result, self.trans_type)
+        self.display_signal.emit(result, self.trans_type)
 
 
 # 翻译处理模块
@@ -234,11 +239,13 @@ class Translater(QThread) :
 
         # 手动翻译
         if not self.object.translation_ui.translate_mode :
-            #
+            # 记录翻译开始时间
             self.object.translation_ui.start_time = time.time()
+
             # 如果上一次翻译未结束则直接跳过
             if self.object.translation_ui.thread_state > 0 :
                 return
+
             try:
                 self.translate()
             except Exception:
@@ -247,8 +254,11 @@ class Translater(QThread) :
         else :
             # 自动翻译
             self.object.translation_ui.auto_trans_exist = True
+
             while True :
+                # 记录翻译开始时间
                 self.object.translation_ui.start_time = time.time()
+
                 # 如果自动翻译被停止则退出循环
                 if not self.object.translation_ui.translate_mode :
                     self.object.translation_ui.auto_trans_exist = False
@@ -258,6 +268,7 @@ class Translater(QThread) :
                 if self.object.translation_ui.stop_sign :
                     time.sleep(0.1)
                     continue
+
                 # 如果上一次翻译未结束则直接跳过
                 if self.object.translation_ui.thread_state > 0:
                     continue
