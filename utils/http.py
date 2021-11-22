@@ -39,3 +39,15 @@ def loginDangoOCR(object) :
         object.config["DangoToken"] = res.get("Token", "")
     else :
         object.logger.error(res.get("ErrorMsg", ""))
+
+
+# 下载文件
+def downloadFile(url, save_path, logger) :
+
+    try :
+        res = requests.get(url, stream=True)
+        content = res.content
+        with open(save_path, "wb") as file :
+            file.write(content)
+    except Exception :
+        logger.error(format_exc())

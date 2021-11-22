@@ -34,6 +34,8 @@ class DangoTranslator() :
         self.yaml["dict_info"] = utils.config.getDictInfo(self.yaml["dict_info_url"], self.logger)
         # 屏幕分辨率
         self.yaml["screen_scale_rate"] = utils.screen_rate.getScreenRate(self.logger)
+        # 初始化图片资源
+        utils.thread.createThread(self.InitLoadImage)
 
 
     # 登录
@@ -96,6 +98,14 @@ class DangoTranslator() :
         self.translation_ui.close()
         self.range_ui.close()
         self.settin_ui.show()
+
+
+    # 初始化图片资源
+    def InitLoadImage(self) :
+
+        # 加载QQ群图片
+        qq_group_url = self.yaml["dict_info"]["dango_qq_group"]
+        utils.http.downloadFile(qq_group_url, "./config/other/交流群.png", self.logger)
 
 
     # 主函数

@@ -31,6 +31,7 @@ GOOD_ICON_PATH = "./config/icon/good.png"
 HOLLOW_IMG_PATH = "./config/other/描边.png"
 SOLID_IMG_PATH = "./config/other/实心.png"
 BG_IMAGE_PATH = "./config/background/settin.jpg"
+QQ_GROUP_PATH = "./config/other/交流群.png"
 
 
 # 重构QTabWidget使其竖直选项卡文字水平
@@ -1718,9 +1719,9 @@ class Settin(QMainWindow) :
         elif message_type == "fontType" :
             self.desc_ui.setWindowTitle("字体样式设定说明")
             self.desc_ui.desc_text.append("描边字体为字体中间镂空白底, 描边带颜色:\n")
-            self.desc_ui.desc_text.insertHtml('<img src={} width="{}" >'.format(HOLLOW_IMG_PATH, 195 * self.rate))
+            self.desc_ui.desc_text.insertHtml('<img src={} width="{}" >'.format(HOLLOW_IMG_PATH, 195*self.rate))
             self.desc_ui.desc_text.append("\n实心字体为纯色字体:\n")
-            self.desc_ui.desc_text.insertHtml('<img src="{}" width="{}" >'.format(SOLID_IMG_PATH, 195 * self.rate))
+            self.desc_ui.desc_text.insertHtml('<img src="{}" width="{}" >'.format(SOLID_IMG_PATH, 195*self.rate))
             self.desc_ui.desc_text.append("\n顺便一提团子喜欢描边字体~")
 
         # 自动翻译设定说明
@@ -1758,7 +1759,7 @@ class Settin(QMainWindow) :
         # QQ交流群
         elif message_type == "qqGroup":
             self.desc_ui.setWindowTitle("加入交流群")
-            self.desc_ui.qq_group_image.show()
+            self.desc_ui.desc_text.insertHtml('<img src={} width="{}" >'.format(QQ_GROUP_PATH, 195*self.rate))
 
         self.desc_ui.show()
 
