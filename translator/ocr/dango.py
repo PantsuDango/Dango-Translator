@@ -4,10 +4,12 @@ import base64
 from traceback import format_exc
 from PIL import Image
 import urllib3
+import os
 
+import utils.http
 
 IMAGE_PATH = "./config/image.jpg"
-NEW_IMAGE_PATH = "./config/new_image.jpg"
+new_image_path = "./config/new_image.jpg"
 
 
 # 图片四周加白边
@@ -53,9 +55,9 @@ def dangoOCR(config, logger) :
     # 忽略接口警告
     urllib3.disable_warnings()
     # 图片四周加白边
-    imageBorder(IMAGE_PATH, NEW_IMAGE_PATH, "a", 20, color=(255, 255, 255))
+    imageBorder(IMAGE_PATH, new_image_path, "a", 20, color=(255, 255, 255))
 
-    with open(NEW_IMAGE_PATH, "rb" ) as file :
+    with open(new_image_path, "rb") as file :
         image = file.read()
     imageBase64 = base64.b64encode(image).decode("utf-8")
 
@@ -90,3 +92,36 @@ def dangoOCR(config, logger) :
         logger.error(format_exc())
         print(res.text)
         return False, "团子OCR错误: 请求服务出错, 具体请查看错误日志"
+
+
+# 离线OCR
+def offlineOCR(object) :
+
+    image_path = os.path.join(os.getcwd(), "config", "image.jpg")
+    new_image_path = os.path.join(os.getcwd(), "config", "new_image.jpg")
+    language = object.config["language"]
+    url = "http://127.0.0.1:6666/ocr/api"
+    body = {
+        "ImagePath": new_image_path,
+        "Language": language
+    }
+
+    # 四周加白边
+    try :
+        imageBorder(image_path, new_image_path, "a", 20, color=(255, 255, 255))
+    except Exception :
+        body["ImagePath"] = image_path
+    res = utils.http.post(url, body, object.logger)
+    code = res.get("Code", -1)
+    message = res.get("Message", "")
+    if code == -1 :
+        return False, "离线OCR错误: %s"%message
+    else :
+        sentence = ""
+        for tmp in res.get("Data", []) :
+            if language == "ENG" :
+                sentence += tmp["Words"] + " "
+            else :
+                sentence += tmp["Words"]
+
+        return True, sentence

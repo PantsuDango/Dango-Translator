@@ -30,7 +30,10 @@ def testOfflineOCR(object) :
 
     for num in range(1, 6) :
         start = time.time()
-        translator.ocr.dango.imageBorder(TEST_IMAGE_PATH, NEW_TEST_IMAGE_PATH, "a", 20, color=(255, 255, 255))
+        try :
+            translator.ocr.dango.imageBorder(TEST_IMAGE_PATH, NEW_TEST_IMAGE_PATH, "a", 20, color=(255, 255, 255))
+        except Exception :
+            body["ImagePath"] = TEST_IMAGE_PATH
         res = utils.http.post(url, body, object.logger)
         end = time.time()
         total_time += end-start

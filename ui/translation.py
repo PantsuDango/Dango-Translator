@@ -555,6 +555,9 @@ class Translation(QMainWindow) :
     # 收到翻译信息清屏
     def clearText(self) :
 
+        # 记录翻译开始时间
+        self.object.translation_ui.start_time = time.time()
+
         # 翻译界面清屏
         self.translate_text.clear()
 
@@ -621,7 +624,11 @@ class Translation(QMainWindow) :
             self.thread_state = 0
 
         if self.thread_state == 0 :
-            self.statusbar.showMessage("翻译结束, 耗时: {:.2f} s".format(time.time()-self.start_time))
+            try :
+                self.statusbar.showMessage("翻译结束, 耗时: {:.2f} s".format(time.time()-self.start_time+self.ocr_time))
+            except Exception :
+                self.statusbar.showMessage("翻译结束, 耗时: {:.2f} s".format(time.time()-self.start_time))
+            self.ocr_time = 0
 
 
     # 检测范围区域和翻译区域是否有重叠

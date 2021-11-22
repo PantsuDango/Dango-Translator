@@ -21,7 +21,6 @@ import ui.key
 import translator.ocr.baidu
 
 
-OCR_CMD_PATH = "E:/DangoTranslate-Ver3.6.2/DangoOCR-Ver1.2/startOCR.cmd"
 LOGO_ICON_PATH = "./config/icon/logo.ico"
 PIXMAP_ICON_PATH = "./config/icon/pixmap.png"
 OCR_ICON_PATH = "./config/icon/ocr.png"
@@ -1572,7 +1571,7 @@ class Settin(QMainWindow) :
         else :
             try :
                 # 启动离线OCR
-                os.startfile(OCR_CMD_PATH)
+                os.startfile(self.object.yaml["ocr_cmd_path"])
             except Exception :
                 self.logger.error(format_exc())
                 utils.message.MessageBox("运行失败",
@@ -2053,7 +2052,7 @@ class Settin(QMainWindow) :
                                                            "color: white;"
                                                            "background-color: rgba(62, 62, 62, 0.1)")
 
-        self.close()
+        self.hide()
         self.object.translation_ui.show()
         if self.object.range_ui.show_sign == True :
             self.object.range_ui.show()

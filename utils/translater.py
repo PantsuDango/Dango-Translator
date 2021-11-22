@@ -161,6 +161,9 @@ class Translater(QThread) :
         except Exception :
             self.logger.error(format_exc())
 
+        # OCR开始时间
+        ocr_start_time = time.time()
+
         # 百度OCR
         if self.object.config["baiduOCR"] :
             ocr_sign, original = translator.ocr.baidu.baiduOCR(self.object.config, self.logger)
@@ -169,9 +172,15 @@ class Translater(QThread) :
         elif self.object.config["onlineOCR"] :
             ocr_sign, original = translator.ocr.dango.dangoOCR(self.object.config, self.logger)
 
+        elif self.object.config["offlineOCR"] :
+            ocr_sign, original = translator.ocr.dango.offlineOCR(self.object)
+
         else :
-            original = ""
+            original = "OCR错误: 未开启任何OCR, 请在设置-OCR设定中打开OCR开关"
             ocr_sign = False
+
+        # 记录OCR耗时
+        self.object.translation_ui.ocr_time = time.time()-ocr_start_time
 
         # 如果出错就显示原文
         if not ocr_sign :
@@ -239,14 +248,12 @@ class Translater(QThread) :
 
         # 手动翻译
         if not self.object.translation_ui.translate_mode :
-            # 记录翻译开始时间
-            self.object.translation_ui.start_time = time.time()
 
             # 如果上一次翻译未结束则直接跳过
             if self.object.translation_ui.thread_state > 0 :
                 return
 
-            try:
+            try :
                 self.translate()
             except Exception:
                 self.logger.error(format_exc())
@@ -256,8 +263,6 @@ class Translater(QThread) :
             self.object.translation_ui.auto_trans_exist = True
 
             while True :
-                # 记录翻译开始时间
-                self.object.translation_ui.start_time = time.time()
 
                 # 如果自动翻译被停止则退出循环
                 if not self.object.translation_ui.translate_mode :

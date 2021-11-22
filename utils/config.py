@@ -1,6 +1,6 @@
-import requests
 import yaml
 import json
+import time
 from traceback import format_exc
 
 import utils.http
@@ -22,6 +22,7 @@ def openConfig(logger) :
             "user": "",
             "password": "",
             "dict_info_url": "http://120.24.146.175:3000/DangoTranslate/ShowDict",
+            "ocr_cmd_path": "./config/tools/startOCR.cmd",
         }
 
     return config
@@ -73,7 +74,7 @@ def configConvert(object) :
 
     ################### OCR设定 ###################
     # 离线OCR开关
-    object.config["offlineOCR"] = object.config.get("offlineOCR", False)
+    object.config["offlineOCR"] = False
     # 在线OCR开关
     object.config["onlineOCR"] = object.config.get("onlineOCR", False)
     # 百度OCR开关
@@ -192,9 +193,6 @@ def configConvert(object) :
 # 保存配置至服务器
 def postSaveSettin(object) :
 
-    # 离线OCR开关默认关闭
-    object.config["offlineOCR"] = False
-
     url = object.yaml["dict_info"]["dango_save_settin"]
     body = {
         "User": object.yaml["user"],
@@ -206,31 +204,34 @@ def postSaveSettin(object) :
 # 保存识别到的原文
 def saveOriginalHisTory(original) :
 
+    date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
     with open(HISTORY_FILE_PATH, "a+", encoding="utf-8") as file :
-        file.write("\n\n[原文]\n%s"%original)
+        file.write("\n\n%s[原文]\n%s"%(date, original))
 
 
 # 保存翻译历史
 def saveTransHisTory(text, translate_type) :
 
     if translate_type == "youdao" :
-        content = "\n[公共有道]\n%s"%text
+        content = "[公共有道]\n%s"%text
     elif translate_type == "caiyun" :
-        content = "\n[公共彩云]\n%s"%text
+        content = "[公共彩云]\n%s"%text
     elif translate_type == "deepl" :
-        content = "\n[公共DeepL]\n%s"%text
+        content = "[公共DeepL]\n%s"%text
     elif translate_type == "baidu" :
-        content = "\n[公共百度]\n%s"%text
+        content = "[公共百度]\n%s"%text
     elif translate_type == "tencent" :
-        content = "\n[公共腾讯]\n%s"%text
+        content = "[公共腾讯]\n%s"%text
     elif translate_type == "google" :
-        content = "\n[公共谷歌]\n%s"%text
+        content = "[公共谷歌]\n%s"%text
     elif translate_type == "baidu_private" :
-        content = "\n[私人百度]\n%s"%text
+        content = "[私人百度]\n%s"%text
     elif translate_type == "tencent_private" :
-        content = "\n[私人腾讯]\n%s"%text
+        content = "[私人腾讯]\n%s"%text
     elif translate_type == "caiyun_private" :
-        content = "\n[私人彩云]\n%s"%text
+        content = "[私人彩云]\n%s"%text
+    elif translate_type == "xiaoniu" :
+        content = "[公共小牛]\n%s"%text
     else:
         return
 
