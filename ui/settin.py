@@ -1767,7 +1767,7 @@ class Settin(QMainWindow) :
         # QQ交流群
         elif message_type == "qqGroup":
             self.desc_ui.setWindowTitle("加入交流群")
-            self.desc_ui.desc_text.insertHtml('<img src={} width="{}" >'.format(QQ_GROUP_PATH, 245*self.rate))
+            self.desc_ui.desc_text.insertHtml('<img src="{}" width="{}" height="{}">'.format(QQ_GROUP_PATH, 245*self.rate, 295*self.rate))
 
         self.desc_ui.show()
 
