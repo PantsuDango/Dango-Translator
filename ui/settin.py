@@ -756,6 +756,7 @@ class Settin(QMainWindow) :
         self.horizontal_slider.setCursor(QCursor(Qt.PointingHandCursor))
         self.horizontal_slider.setValue(self.horizontal)
         self.horizontal_slider.valueChanged.connect(self.changeHorizontal)
+        self.horizontal_slider.installEventFilter(self)
 
         # 翻译框透明度数值标签
         self.horizontal_slider_label = QLabel(self.tab_3)
@@ -1805,6 +1806,40 @@ class Settin(QMainWindow) :
 
         self.horizontal = self.horizontal_slider.value()
         self.horizontal_slider_label.setText("{}%".format(self.horizontal))
+        if self.horizontal == 0 :
+            self.horizontal = 1
+        # 重置翻译界面
+        self.object.translation_ui.translate_text.setStyleSheet("border-width:0;\
+                                                                 border-style:outset;\
+                                                                 border-top:0px solid #e8f3f9;\
+                                                                 color:white;\
+                                                                 font-weight: bold;\
+                                                                 background-color:rgba(62, 62, 62, %s)"
+                                                                %(self.horizontal/100))
+        self.object.translation_ui.temp_text.setStyleSheet("border-width:0;\
+                                                            border-style:outset;\
+                                                            border-top:0px solid #e8f3f9;\
+                                                            color:white;\
+                                                            font-weight: bold;\
+                                                            background-color:rgba(62, 62, 62, %s)"
+                                                           %(self.horizontal/100))
+        # 重置状态栏界面
+        self.object.translation_ui.statusbar.setStyleSheet("font: 10pt '华康方圆体W7';"
+                                                           "color: white;"
+                                                           "background-color: rgba(62, 62, 62, 0.1)")
+
+
+    # 翻译框透明度调整时同屏显示透明框
+    def eventFilter(self, object, event):
+
+        if object == self.horizontal_slider :
+            if event.type() == QEvent.Enter :
+                self.object.translation_ui.show()
+
+            if event.type() == QEvent.Leave :
+                self.object.translation_ui.hide()
+
+            return QWidget.eventFilter(self, object, event)
 
 
     # 设定字体样式
@@ -1976,7 +2011,7 @@ class Settin(QMainWindow) :
         # 翻译框透明度
         self.object.config["horizontal"] = self.horizontal
         if self.horizontal == 0 :
-            self.horizontal = 0.01
+            self.horizontal = 1
         # 翻译字体大小
         self.object.config["fontSize"] = self.fontSize_spinBox.value()
         # 翻译字体类型
@@ -2040,25 +2075,25 @@ class Settin(QMainWindow) :
         # 设置上传云端
         utils.thread.createThread(utils.config.postSaveSettin, self.object)
 
-        # 重置翻译界面
-        self.object.translation_ui.translate_text.setStyleSheet("border-width:0;\
-                                                                border-style:outset;\
-                                                                border-top:0px solid #e8f3f9;\
-                                                                color:white;\
-                                                                font-weight: bold;\
-                                                                background-color:rgba(62, 62, 62, %s)"
-                                                                %(self.horizontal))
-        self.object.translation_ui.temp_text.setStyleSheet("border-width:0;\
-                                                            border-style:outset;\
-                                                            border-top:0px solid #e8f3f9;\
-                                                            color:white;\
-                                                            font-weight: bold;\
-                                                            background-color:rgba(62, 62, 62, %s)"
-                                                            %(self.horizontal))
-        # 重置状态栏界面
-        self.object.translation_ui.statusbar.setStyleSheet("font: 10pt '华康方圆体W7';"
-                                                           "color: white;"
-                                                           "background-color: rgba(62, 62, 62, 0.1)")
+        # # 重置翻译界面
+        # self.object.translation_ui.translate_text.setStyleSheet("border-width:0;\
+        #                                                         border-style:outset;\
+        #                                                         border-top:0px solid #e8f3f9;\
+        #                                                         color:white;\
+        #                                                         font-weight: bold;\
+        #                                                         background-color:rgba(62, 62, 62, %s)"
+        #                                                         %(self.horizontal))
+        # self.object.translation_ui.temp_text.setStyleSheet("border-width:0;\
+        #                                                     border-style:outset;\
+        #                                                     border-top:0px solid #e8f3f9;\
+        #                                                     color:white;\
+        #                                                     font-weight: bold;\
+        #                                                     background-color:rgba(62, 62, 62, %s)"
+        #                                                     %(self.horizontal))
+        # # 重置状态栏界面
+        # self.object.translation_ui.statusbar.setStyleSheet("font: 10pt '华康方圆体W7';"
+        #                                                    "color: white;"
+        #                                                    "background-color: rgba(62, 62, 62, 0.1)")
 
         self.hide()
         self.object.translation_ui.show()

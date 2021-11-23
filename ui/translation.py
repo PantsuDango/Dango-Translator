@@ -106,7 +106,7 @@ class Translation(QMainWindow) :
                                            color: white;\
                                            font-weight: bold;\
                                            background-color: rgba(62, 62, 62, %s)"
-                                           %(self.horizontal))
+                                           %(self.horizontal/100))
 
         # 翻译框加入描边文字
         self.format = QTextCharFormat()
@@ -127,7 +127,7 @@ class Translation(QMainWindow) :
                                      color: white;\
                                      font-weight: bold;\
                                      background-color: rgba(62, 62, 62, %s)"
-                                     %(self.horizontal))
+                                     %(self.horizontal/100))
         self.format.setTextOutline(QPen(QColor(self.font_color_1), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
         self.temp_text.mergeCurrentCharFormat(self.format)
         self.temp_text.append("翻译框和范围区域重叠, 请挪开翻译框!!!")
@@ -288,7 +288,7 @@ class Translation(QMainWindow) :
         # 界面透明度
         self.horizontal = self.object.config["horizontal"]
         if self.horizontal == 0 :
-            self.horizontal = 0.01
+            self.horizontal = 1
         # 当前登录的用户
         self.user = self.object.yaml["user"]
         # 界面锁
@@ -518,7 +518,7 @@ class Translation(QMainWindow) :
             self.lock_sign = False
 
             if self.horizontal == 0 :
-                self.horizontal = 0.01
+                self.horizontal = 1
 
         self.translate_text.setStyleSheet("border-width:0;\
                                           border-style:outset;\
@@ -526,7 +526,7 @@ class Translation(QMainWindow) :
                                           color:white;\
                                           font-weight: bold;\
                                           background-color:rgba(62, 62, 62, %s)"
-                                          %(self.horizontal))
+                                          %(self.horizontal/100))
 
 
     # 改变翻译模式
