@@ -86,10 +86,10 @@ class Desc(QWidget) :
         # 界面字体
         self.font_type = "华康方圆体W7"
         # 界面字体大小
-        self.font_size = 9
+        self.font_size = 10
         # 界面尺寸
-        self.window_width = int(200 * self.rate)
-        self.window_height = int(250 * self.rate)
+        self.window_width = int(250 * self.rate)
+        self.window_height = int(300 * self.rate)
 
 
     # 根据分辨率定义控件位置尺寸
