@@ -1750,19 +1750,19 @@ class Settin(QMainWindow) :
         # 图像相似度说明
         elif message_type == "imageRefresh":
             self.desc_ui.setWindowTitle("图像相似度说明")
+            self.setTextColor(self.desc_ui.desc_text, "#FF0000", "如果看不懂请不要轻易修改此参数, 建议值为98.")
             self.desc_ui.desc_text.append("\n自动翻译模式下, 每隔设定的时间间隔, 会重新检测范围区域的图像. "
-                                       "只有当当前图像, 与前一次图像比较的相似度小于该设定的值时, 才会重新调取OCR识别该图像.")
+                                          "只有当当前图像, 与前一次图像比较的相似度小于该设定的值时, 才会重新调取OCR识别该图像.")
             self.desc_ui.desc_text.append("\n如果觉得OCR频繁重复识别, 翻译框出现了'闪烁'的话, 可以调低此参数.")
-            self.desc_ui.desc_text.append("\n如果看不懂请不要轻易修改此参数, 建议值为98.")
 
         # 文字相似度说明
         elif message_type == "textRefresh":
             self.desc_ui.setWindowTitle("文字相似度说明")
+            self.setTextColor(self.desc_ui.desc_text, "#FF0000", "如果看不懂请不要轻易修改此参数, 建议值为90.")
             self.desc_ui.desc_text.append("\n自动翻译模式下, 每隔设定的时间间隔, OCR识别结果刷新后. "
-                                       "如果当前OCR识别出的原文, 与前一次识别的原文比较, 其相似度小于该设定的值时, "
-                                       "才会重新调取翻译并刷新至翻译界面.")
+                                          "如果当前OCR识别出的原文, 与前一次识别的原文比较, 其相似度小于该设定的值时, "
+                                          "才会重新调取翻译并刷新至翻译界面.")
             self.desc_ui.desc_text.append("\n如果觉得频繁重复翻译, 翻译框出现了'闪烁'的话, 可以调低此参数.")
-            self.desc_ui.desc_text.append("\n如果看不懂请不要轻易修改此参数, 建议值为90.")
 
         # QQ交流群
         elif message_type == "qqGroup":
@@ -1770,6 +1770,14 @@ class Settin(QMainWindow) :
             self.desc_ui.desc_text.insertHtml('<img src={} width="{}" >'.format(QQ_GROUP_PATH, 245*self.rate))
 
         self.desc_ui.show()
+
+
+    # 设置QText插入文字的颜色
+    def setTextColor(self, object, color, text) :
+
+        object.setTextColor(QColor(color))
+        object.append(text)
+        object.setTextColor(QColor(self.color_2))
 
 
     # 密钥窗口
@@ -2074,26 +2082,6 @@ class Settin(QMainWindow) :
             translator.ocr.baidu.getAccessToken(self.object)
         # 设置上传云端
         utils.thread.createThread(utils.config.postSaveSettin, self.object)
-
-        # # 重置翻译界面
-        # self.object.translation_ui.translate_text.setStyleSheet("border-width:0;\
-        #                                                         border-style:outset;\
-        #                                                         border-top:0px solid #e8f3f9;\
-        #                                                         color:white;\
-        #                                                         font-weight: bold;\
-        #                                                         background-color:rgba(62, 62, 62, %s)"
-        #                                                         %(self.horizontal))
-        # self.object.translation_ui.temp_text.setStyleSheet("border-width:0;\
-        #                                                     border-style:outset;\
-        #                                                     border-top:0px solid #e8f3f9;\
-        #                                                     color:white;\
-        #                                                     font-weight: bold;\
-        #                                                     background-color:rgba(62, 62, 62, %s)"
-        #                                                     %(self.horizontal))
-        # # 重置状态栏界面
-        # self.object.translation_ui.statusbar.setStyleSheet("font: 10pt '华康方圆体W7';"
-        #                                                    "color: white;"
-        #                                                    "background-color: rgba(62, 62, 62, 0.1)")
 
         self.hide()
         self.object.translation_ui.show()
