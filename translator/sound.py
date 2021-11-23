@@ -59,7 +59,6 @@ class Sound() :
 
         self.browser.get(self.url)
         self.browser.maximize_window()
-        print("音乐模块开启")
 
 
     # 播放音乐

@@ -445,7 +445,6 @@ class Settin(QMainWindow) :
         button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_2)
         self.customSetIconSize(button, 20, 20)
         self.customSetGeometry(button, 115, 25, 20, 20)
-        button.setStyleSheet("background: transparent;")
         button.setCursor(QCursor(Qt.PointingHandCursor))
         button.clicked.connect(lambda: self.showDesc("publicTranslate"))
 
@@ -455,12 +454,20 @@ class Settin(QMainWindow) :
         button.setText("教程")
         button.setCursor(QCursor(Qt.PointingHandCursor))
 
+        # 公共翻译备注
+        label = QLabel(self.tab_2)
+        self.customSetGeometry(label, 245, 25, 300, 20)
+        label.setText("可直接使用, 但不稳定可能会抽风")
+        label.setCursor(QCursor(Qt.PointingHandCursor))
+        label.setStyleSheet("color: %s"%self.color_2)
+
         # 有道翻译标签
         label = QLabel(self.tab_2)
         self.customSetGeometry(label, 20, 70, 35, 20)
         label.setText("有道:")
 
         # 有道翻译开关
+        button.setStyleSheet("background: transparent;")
         self.youdao_switch = ui.switch.SwitchOCR(self.tab_2, sign=self.youdao_use, startX=(65-20)*self.rate)
         self.customSetGeometry(self.youdao_switch, 65, 70, 65, 20)
         self.youdao_switch.checkedChanged.connect(self.changeYoudaoSwitch)
@@ -589,6 +596,13 @@ class Settin(QMainWindow) :
         button.setStyleSheet("background: transparent;")
         button.setCursor(QCursor(Qt.PointingHandCursor))
         button.clicked.connect(lambda: self.showDesc("privateTranslate"))
+
+        # 私人翻译备注
+        label = QLabel(self.tab_2)
+        self.customSetGeometry(label, 155, 185, 300, 20)
+        label.setText("需注册, 但稳定效果好, 建议使用")
+        label.setCursor(QCursor(Qt.PointingHandCursor))
+        label.setStyleSheet("color: %s" % self.color_2)
 
         # 私人腾讯翻译标签
         label = QLabel(self.tab_2)
