@@ -99,7 +99,7 @@ class Register(QWidget) :
         self.customSetGeometry(self.eye_button, 305, 50, 30, 30)
         self.eye_button.setStyleSheet("background: transparent;")
         self.eye_button.setCursor(QCursor(Qt.PointingHandCursor))
-        self.eye_button.installEventFilter(self)
+        self.eye_button.clicked.connect(self.clickEyeButton)
 
         # 邮箱输入框
         self.email_text = QLineEdit(self)
@@ -169,19 +169,15 @@ class Register(QWidget) :
                                  int(h * self.rate)))
 
 
-    # 鼠标移动到眼睛上时对密码的处理
-    def eventFilter(self, object, event) :
+    # 点击眼睛
+    def clickEyeButton(self):
 
-        if object == self.eye_button :
-            if event.type() == QEvent.Enter :
-                self.eye_button.setIcon(qtawesome.icon('fa.eye', color=self.color))
-                self.password_text.setEchoMode(QLineEdit.Normal)
-
-            if event.type() == QEvent.Leave :
-                self.eye_button.setIcon(qtawesome.icon('fa.eye-slash', color=self.color))
-                self.password_text.setEchoMode(QLineEdit.Password)
-
-            return QWidget.eventFilter(self, object, event)
+        if self.password_text.echoMode() == QLineEdit.Password:
+            self.eye_button.setIcon(qtawesome.icon('fa.eye', color=self.color))
+            self.password_text.setEchoMode(QLineEdit.Normal)
+        else:
+            self.eye_button.setIcon(qtawesome.icon('fa.eye-slash', color=self.color))
+            self.password_text.setEchoMode(QLineEdit.Password)
 
 
     # 登录界面点击注册
