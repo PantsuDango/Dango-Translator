@@ -179,7 +179,7 @@ class Settin(QMainWindow) :
 
         # 离线OCR标签
         label = QLabel(self)
-        self.customSetGeometry(label, 530, 380, 200, 15)
+        self.customSetGeometry(label, 630, 380, 200, 15)
         label.setText("背景图 pixiv id: 92140553")
         label.setStyleSheet("font-size: 9pt; color: %s"%self.color_2)
 
@@ -219,7 +219,7 @@ class Settin(QMainWindow) :
 
         # OCR说明
         button = QPushButton(self.tab_1)
-        self.customSetGeometry(button, 480, 25, 65, 20)
+        self.customSetGeometry(button, 400, 25, 65, 20)
         button.setStyleSheet("color: %s;"
                              "background: transparent;"%self.color_2)
         button.setText("什么是OCR")
@@ -229,7 +229,7 @@ class Settin(QMainWindow) :
         # OCR说明?号
         button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_1)
         self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 545, 25, 20, 20)
+        self.customSetGeometry(button, 465, 25, 20, 20)
         button.setStyleSheet("background: transparent;")
         button.setCursor(QCursor(Qt.PointingHandCursor))
         button.clicked.connect(lambda: self.showDesc("OCR"))
@@ -448,17 +448,11 @@ class Settin(QMainWindow) :
         button.setCursor(QCursor(Qt.PointingHandCursor))
         button.clicked.connect(lambda: self.showDesc("publicTranslate"))
 
-        # 公共翻译教程按钮
-        button = QPushButton(self.tab_2)
-        self.customSetGeometry(button, 160, 25, 60, 20)
-        button.setText("教程")
-        button.setCursor(QCursor(Qt.PointingHandCursor))
 
         # 公共翻译备注
         label = QLabel(self.tab_2)
-        self.customSetGeometry(label, 245, 25, 300, 20)
+        self.customSetGeometry(label, 155, 25, 300, 20)
         label.setText("可直接使用, 但不稳定可能会抽风")
-        label.setCursor(QCursor(Qt.PointingHandCursor))
         label.setStyleSheet("color: %s"%self.color_2)
 
         # 有道翻译标签
@@ -601,7 +595,6 @@ class Settin(QMainWindow) :
         label = QLabel(self.tab_2)
         self.customSetGeometry(label, 155, 185, 300, 20)
         label.setText("需注册, 但稳定效果好, 建议使用")
-        label.setCursor(QCursor(Qt.PointingHandCursor))
         label.setStyleSheet("color: %s" % self.color_2)
 
         # 私人腾讯翻译标签
@@ -1221,7 +1214,7 @@ class Settin(QMainWindow) :
         # 界面缩放比例
         self.rate = self.object.yaml["screen_scale_rate"]
         # 界面尺寸
-        self.window_width = int(700*self.rate)
+        self.window_width = int(800*self.rate)
         self.window_height = int(400*self.rate)
         # 所使用的颜色
         self.color_1 = "#595959"  # 灰色
