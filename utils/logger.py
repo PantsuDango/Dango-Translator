@@ -14,7 +14,7 @@ def setLog() :
     logPath = "./logs/" + log_file_name
 
     try :
-        os.makedirs(os.path.join(os.getcwd(), "../logs"))
+        os.makedirs(os.path.join(os.getcwd(), "./logs"))
     except FileExistsError :
         pass
 

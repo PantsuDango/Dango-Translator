@@ -32,6 +32,11 @@ HOLLOW_IMG_PATH = "./config/other/描边.png"
 SOLID_IMG_PATH = "./config/other/实心.png"
 BG_IMAGE_PATH = "./config/background/settin.jpg"
 QQ_GROUP_PATH = "./config/other/交流群.png"
+GITHUB_ICON_PATH = "./config/icon/github.png"
+TUTORIAL_ICON_PATH = "./config/icon/tutorial.png"
+BILIBILI_ICON_PATH = "./config/icon/bilibili.png"
+GROUP_PATH = "./config/icon/group.png"
+BILIBILI_VIDEO_PATH = "./config/icon/video.png"
 
 
 # 重构QTabWidget使其竖直选项卡文字水平
@@ -1054,63 +1059,108 @@ class Settin(QMainWindow) :
 
         # 项目地址标签
         label = QLabel(self.tab_4)
-        self.customSetGeometry(label, 110, 25, 300, 20)
+        self.customSetGeometry(label, 130, 25, 300, 20)
         label.setText("本软件已在github开源 (欢迎来点小星星)")
 
         # 项目地址按钮
         button = QPushButton(self.tab_4)
-        self.customSetGeometry(button, 20, 25, 70, 20)
-        button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.customSetGeometry(button, 20, 25, 90, 20)
         button.setText("项目地址")
-        button.clicked.connect(lambda: webbrowser.open(self.dango_translator_url))
+        button.clicked.connect(self.openGithubproject)
+
+        # 项目地址图标
+        github_icon = QIcon()
+        pixmap = QPixmap(GITHUB_ICON_PATH)
+        pixmap = pixmap.scaled(int(20 * self.rate),
+                               int(20 * self.rate),
+                               Qt.KeepAspectRatio,
+                               Qt.SmoothTransformation)
+        github_icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
+        button.setIcon(github_icon)
 
         # 在线教程标签
         label = QLabel(self.tab_4)
-        self.customSetGeometry(label, 110, 75, 300, 20)
+        self.customSetGeometry(label, 130, 75, 300, 20)
         label.setText("软件完整使用教程 (要好好阅读哦)")
 
         # 在线教程按钮
         button = QPushButton(self.tab_4)
-        self.customSetGeometry(button, 20, 75, 70, 20)
-        button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.customSetGeometry(button, 20, 75, 90, 20)
         button.setText("在线文档")
-        button.clicked.connect(lambda: webbrowser.open(self.tutorial_url))
+        button.clicked.connect(self.openTutorial)
 
-        # 添加作者标签
+        # 在线教程图标
+        icon = QIcon()
+        pixmap = QPixmap(TUTORIAL_ICON_PATH)
+        pixmap = pixmap.scaled(int(20 * self.rate),
+                               int(20 * self.rate),
+                               Qt.KeepAspectRatio,
+                               Qt.SmoothTransformation)
+        icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
+        button.setIcon(icon)
+
+        # 教程视频标签
         label = QLabel(self.tab_4)
-        self.customSetGeometry(label, 110, 125, 300, 20)
-        label.setText("联系作者 (QQ好友申请)")
+        self.customSetGeometry(label, 130, 125, 300, 20)
+        label.setText("软件b站教程视频 (不想看文档就看这个吧)")
 
-        # 添加作者按钮
+        # 教程视频按钮
         button = QPushButton(self.tab_4)
-        self.customSetGeometry(button, 20, 125, 70, 20)
-        button.setCursor(QCursor(Qt.PointingHandCursor))
-        button.setText("胖次团子")
-        button.clicked.connect(lambda: webbrowser.open(self.add_author_url))
+        self.customSetGeometry(button, 20, 125, 90, 20)
+        button.setText("教程视频")
+        button.clicked.connect(self.openBilibiliVideo)
+
+        # b站教程视频图标
+        icon = QIcon()
+        pixmap = QPixmap(BILIBILI_VIDEO_PATH)
+        pixmap = pixmap.scaled(int(20 * self.rate),
+                               int(20 * self.rate),
+                               Qt.KeepAspectRatio,
+                               Qt.SmoothTransformation)
+        icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
+        button.setIcon(icon)
+
+        # 关注作者标签
+        label = QLabel(self.tab_4)
+        self.customSetGeometry(label, 130, 175, 300, 20)
+        label.setText("发布公告的地方 (不关注团子吗)")
+
+        # 关注作者按钮
+        button = QPushButton(self.tab_4)
+        self.customSetGeometry(button, 20, 175, 90, 20)
+        button.setText("关注团子")
+        button.clicked.connect(self.oepnBilibili)
+
+        # QQ图标
+        icon = QIcon()
+        pixmap = QPixmap(BILIBILI_ICON_PATH)
+        pixmap = pixmap.scaled(int(20 * self.rate),
+                               int(20 * self.rate),
+                               Qt.KeepAspectRatio,
+                               Qt.SmoothTransformation)
+        icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
+        button.setIcon(icon)
 
         # 添加交流群标签
         label = QLabel(self.tab_4)
-        self.customSetGeometry(label, 110, 175, 300, 20)
+        self.customSetGeometry(label, 130, 225, 300, 20)
         label.setText("加入交流群 (QQ群申请)")
 
         # 添加交流群按钮
         button = QPushButton(self.tab_4)
-        self.customSetGeometry(button, 20, 175, 70, 20)
-        button.setCursor(QCursor(Qt.PointingHandCursor))
-        button.setText("交流群")
+        self.customSetGeometry(button, 20, 225, 90, 20)
+        button.setText("群聊交流")
         button.clicked.connect(lambda: self.showDesc("qqGroup"))
 
-        # 更新日志标签
-        label = QLabel(self.tab_4)
-        self.customSetGeometry(label, 110, 225, 300, 20)
-        label.setText("查看本软件更新日志")
-
-        # 更新日志按钮
-        button = QPushButton(self.tab_4)
-        self.customSetGeometry(button, 20, 226, 70, 20)
-        button.setCursor(QCursor(Qt.PointingHandCursor))
-        button.setText("更新日志")
-        button.clicked.connect(lambda: webbrowser.open(self.update_log))
+        # QQ群图标
+        icon = QIcon()
+        pixmap = QPixmap(GROUP_PATH)
+        pixmap = pixmap.scaled(int(20 * self.rate),
+                               int(20 * self.rate),
+                               Qt.KeepAspectRatio,
+                               Qt.SmoothTransformation)
+        icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
+        button.setIcon(icon)
 
         # 特别鸣谢标签
         label = QLabel(self.tab_4)
@@ -1119,31 +1169,31 @@ class Settin(QMainWindow) :
 
         # PaddleOCR主页按钮
         button = QPushButton(self.tab_4)
-        self.customSetGeometry(button, 20, 320, 70, 20)
-        button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.customSetGeometry(button, 20, 320, 90, 20)
         button.setText("PaddleOCR‭")
-        button.clicked.connect(lambda: webbrowser.open(self.PaddleOCR_github_url))
+        button.clicked.connect(self.openPaddleOCR)
+        button.setIcon(github_icon)
 
         # GT-Zhang主页按钮
         button = QPushButton(self.tab_4)
-        self.customSetGeometry(button, 130, 320, 70, 20)
-        button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.customSetGeometry(button, 130, 320, 90, 20)
         button.setText("GT-Zhang")
-        button.clicked.connect(lambda: webbrowser.open(self.gt_github_url))
+        button.clicked.connect(self.openGT)
+        button.setIcon(github_icon)
 
         # C4a15Wh主页按钮
         button = QPushButton(self.tab_4)
-        self.customSetGeometry(button, 240, 320, 70, 20)
-        button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.customSetGeometry(button, 240, 320, 90, 20)
         button.setText("C4a15Wh")
-        button.clicked.connect(lambda: webbrowser.open(self.c44_github_url))
+        button.clicked.connect(self.openC44)
+        button.setIcon(github_icon)
 
-        # C4a15Wh主页按钮
+        # cypas‭主页按钮
         button = QPushButton(self.tab_4)
-        self.customSetGeometry(button, 350, 320, 70, 20)
-        button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.customSetGeometry(button, 350, 320, 90, 20)
         button.setText("Cypas‭")
-        button.clicked.connect(lambda: webbrowser.open(self.cy_github_url))
+        button.clicked.connect(self.openCy)
+        button.setIcon(github_icon)
 
 
     # 支持作者标签页
@@ -1313,8 +1363,8 @@ class Settin(QMainWindow) :
 
         # 团子翻译器开源地址
         self.dango_translator_url = "https://github.com/PantsuDango/Dango-Translator"
-        # 添加作者QQ好友链接
-        self.add_author_url = "tencent://AddContact/?fromId=45&fromSubId=1&subcmd=all&uin=394883561&website=www.oicqzone.com"
+        # 团子b站个人主页
+        self.dango_bilibili_url = "https://space.bilibili.com/227927/dynamic"
         # 在线教程地址
         self.tutorial_url = "https://docs.ayano.top"
         # GT-Zhang个人主页
@@ -1326,7 +1376,7 @@ class Settin(QMainWindow) :
         # PaddleOCR项目主页
         self.PaddleOCR_github_url = "https://github.com/PaddlePaddle/PaddleOCR"
         # 更新日志
-        self.update_log = "https://github.com/PantsuDango/Dango-Translator/blob/master/docx/%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97.md"
+        self.bilibili_video_url = self.object.yaml["dict_info"]["bilibili_video"]
 
 
     # 根据分辨率定义控件位置尺寸
@@ -1606,6 +1656,78 @@ class Settin(QMainWindow) :
             url = self.object.yaml["dict_info"]["tutorials_offline_ocr"]
             webbrowser.open(url, new=0, autoraise=True)
         except Exception :
+            self.logger.error(format_exc())
+
+
+    # 打开guihub项目地址
+    def openGithubproject(self):
+
+        try:
+            webbrowser.open(self.dango_translator_url, new=0, autoraise=True)
+        except Exception:
+            self.logger.error(format_exc())
+
+
+    # 打开在线教程地址
+    def openTutorial(self):
+
+        try:
+            webbrowser.open(self.tutorial_url, new=0, autoraise=True)
+        except Exception:
+            self.logger.error(format_exc())
+
+
+    # 打开添加作者地址
+    def oepnBilibili(self):
+
+        try:
+            webbrowser.open(self.dango_bilibili_url, new=0, autoraise=True)
+        except Exception:
+            self.logger.error(format_exc())
+
+
+    # 打开更新日志地址
+    def openBilibiliVideo(self):
+
+        try:
+            webbrowser.open(self.bilibili_video_url, new=0, autoraise=True)
+        except Exception:
+            self.logger.error(format_exc())
+
+
+    # 打开PaddleOCR项目地址
+    def openPaddleOCR(self):
+
+        try:
+            webbrowser.open(self.PaddleOCR_github_url, new=0, autoraise=True)
+        except Exception:
+            self.logger.error(format_exc())
+
+
+    # 打开Gt-Zhang项目地址
+    def openGT(self):
+
+        try:
+            webbrowser.open(self.gt_github_url, new=0, autoraise=True)
+        except Exception:
+            self.logger.error(format_exc())
+
+
+    # 打开c44项目地址
+    def openC44(self):
+
+        try:
+            webbrowser.open(self.c44_github_url, new=0, autoraise=True)
+        except Exception:
+            self.logger.error(format_exc())
+
+
+    # 打开Cy项目地址
+    def openCy(self):
+
+        try:
+            webbrowser.open(self.cy_github_url, new=0, autoraise=True)
+        except Exception:
             self.logger.error(format_exc())
 
 
