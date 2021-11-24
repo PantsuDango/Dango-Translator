@@ -7,7 +7,7 @@ import utils.http
 
 
 YAML_PATH = "./config/config.yaml"
-HISTORY_FILE_PATH = "../翻译历史.txt"
+HISTORY_FILE_PATH = "./翻译历史.txt"
 
 
 # 打开本地配置文件

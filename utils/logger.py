@@ -11,7 +11,7 @@ def setLog() :
 
     date = time.strftime("%Y-%m-%d", time.localtime(time.time()))
     log_file_name = date + ".log"
-    logPath = "../logs/" + log_file_name
+    logPath = "./logs/" + log_file_name
 
     try :
         os.makedirs(os.path.join(os.getcwd(), "../logs"))
