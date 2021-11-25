@@ -2,6 +2,7 @@ from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMessageBox, QPushButton
 import sys
+import os
 
 import utils.check_font
 
@@ -74,6 +75,16 @@ def checkEmailMessageBox(title, text, object) :
     message_box.exec_()
 
 
+# 打开自动更新程序
+def updateVersion() :
+
+    try :
+        os.startfile("自动更新程序.exe")
+    except Exception :
+        pass
+    sys.exit()
+
+
 # 错误提示窗口-更新版本用
 def checkVersionMessageBox(title, text) :
 
@@ -89,7 +100,7 @@ def checkVersionMessageBox(title, text) :
     message_box.setText(text)
 
     check_version_button = QPushButton("好滴")
-    check_version_button.clicked.connect(lambda: sys.exit())
+    check_version_button.clicked.connect(updateVersion)
 
     message_box.addButton(check_version_button, QMessageBox.YesRole)
     message_box.addButton(QPushButton("忽略"), QMessageBox.NoRole)
