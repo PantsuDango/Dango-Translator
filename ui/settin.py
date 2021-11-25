@@ -37,6 +37,7 @@ TUTORIAL_ICON_PATH = "./config/icon/tutorial.png"
 BILIBILI_ICON_PATH = "./config/icon/bilibili.png"
 GROUP_PATH = "./config/icon/group.png"
 BILIBILI_VIDEO_PATH = "./config/icon/video.png"
+BLOG_PATH = "./config/icon/blog.png"
 
 
 # 重构QTabWidget使其竖直选项卡文字水平
@@ -1181,19 +1182,28 @@ class Settin(QMainWindow) :
         button.clicked.connect(self.openGT)
         button.setIcon(github_icon)
 
+        # QQ群图标
+        icon = QIcon()
+        pixmap = QPixmap(BLOG_PATH)
+        pixmap = pixmap.scaled(int(20 * self.rate),
+                               int(20 * self.rate),
+                               Qt.KeepAspectRatio,
+                               Qt.SmoothTransformation)
+        icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
+
         # C4a15Wh主页按钮
         button = QPushButton(self.tab_4)
         self.customSetGeometry(button, 240, 320, 90, 20)
         button.setText("C4a15Wh")
         button.clicked.connect(self.openC44)
-        button.setIcon(github_icon)
+        button.setIcon(icon)
 
         # cypas‭主页按钮
         button = QPushButton(self.tab_4)
         self.customSetGeometry(button, 350, 320, 90, 20)
         button.setText("Cypas‭")
         button.clicked.connect(self.openCy)
-        button.setIcon(github_icon)
+        button.setIcon(icon)
 
 
     # 支持作者标签页
