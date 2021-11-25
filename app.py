@@ -108,6 +108,21 @@ class DangoTranslator() :
         utils.http.downloadFile(qq_group_url, "./config/other/交流群.png", self.logger)
 
 
+    # 检查是否是最新版本
+    def showCheckVersionMessage(self) :
+
+        message = self.yaml["dict_info"]["update_version_message"]
+        text = ""
+        text_list = message.split(r"\n")
+        for index, val in enumerate(text_list) :
+            if index+1 == len(text_list) :
+                text += val
+            else :
+                text += val + "\n"
+        utils.message.checkVersionMessageBox("检查版本更新",
+                                             "%s     "%text)
+
+
     # 主函数
     def main(self) :
 
@@ -117,6 +132,11 @@ class DangoTranslator() :
 
         # 检查字体
         utils.check_font.checkFont(self.logger)
+
+        # 检查版本更新线程
+        thread = utils.thread.createCheckVersionQThread(self)
+        thread.signal.connect(self.showCheckVersionMessage)
+        utils.thread.runQThread(thread)
 
         # 登录界面
         self.login_ui = ui.login.Login(self)

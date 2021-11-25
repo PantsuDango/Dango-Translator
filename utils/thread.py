@@ -71,3 +71,20 @@ class createShowTranslateTextQThread(QThread) :
             self.signal.emit(result)
         else :
             self.signal.emit("")
+
+
+# 检查版本线程
+class createCheckVersionQThread(QThread) :
+
+    signal = pyqtSignal(bool)
+
+    def __init__(self, object):
+
+        super(createCheckVersionQThread, self).__init__()
+        self.object = object
+
+
+    def run(self) :
+
+        if self.object.yaml["version"] != self.object.yaml["dict_info"]["latest_version"] :
+            self.signal.emit(False)
