@@ -104,7 +104,7 @@ def tencent(sentence, secret_id, secret_key, logger):
 
         req = models.TextTranslateRequest()
         sentence = sentence.replace('"', "'")
-        params = '''{"SourceText":"%s","Source":"auto","Target":"zh","ProjectId":0}''' % (sentence)
+        params = '''{"SourceText":"%s","Source":"auto","Target":"zh","ProjectId":0}'''%(sentence)
         params = params.replace('\r', '\\r').replace('\n', '\\n')
         req.from_json_string(params)
 

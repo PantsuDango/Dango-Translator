@@ -634,6 +634,7 @@ class Settin(QMainWindow) :
         self.customSetGeometry(button, 260, 230, 60, 20)
         button.setText("测试")
         button.setCursor(QCursor(Qt.PointingHandCursor))
+        button.clicked.connect(lambda: utils.test.testTencent(self.object))
 
         # 私人腾讯翻译教程按钮
         button = QPushButton(self.tab_2)
