@@ -1546,13 +1546,16 @@ class Settin(QMainWindow) :
             self.auto_clipboard_use = False
 
 
-    # 改变自动复制剪贴板开关状态
+    # 改变文字方向开关状态
     def changeTextDirectionSwitch(self, checked) :
 
         if checked :
             self.text_direction_use = True
         else:
             self.text_direction_use = False
+
+        utils.message.MessageBox("这是来自团子的提示",
+                                 "目前仅有百度OCR支持了竖向的文字识别\n团子的离线和在线OCR还均未支持, 会尽快更新上!       ")
 
 
     # 改变翻译热键开关状态
