@@ -328,4 +328,4 @@ class Login(QWidget) :
 
         # 如果按下回车键
         if event.key() == 16777220 :
-            self.object.login()
+            self.login()

@@ -166,10 +166,11 @@ class OfflineSwitch(QWidget):
 
     checkedChanged = pyqtSignal(bool)
 
-    def __init__(self, parent=None, sign=False, startX=45):
+    def __init__(self, parent=None, sign=False, startX=45, object=None):
 
         super(QWidget, self).__init__(parent)
 
+        self.object = object
         self.checked = sign
         self.bgColorOff = QColor("#f0f0f0")
 
@@ -226,7 +227,7 @@ class OfflineSwitch(QWidget):
     def mousePressEvent(self, event) :
 
         # 通过检查端口占用校验离线OCR是否运行成功
-        sign = detectPort(6666)
+        sign = detectPort(self.object.yaml["port"])
         if not self.checked and not sign :
             MessageBox("离线OCR使用失败", "请先启动离线OCR, 并保证其运行正常, 再打开此开关      \n"
                                          "使用期间可以缩小黑窗, 但不可以关闭它")

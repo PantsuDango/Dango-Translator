@@ -22,7 +22,7 @@ def openConfig(logger) :
             "user": "",
             "password": "",
             "dict_info_url": "http://120.24.146.175:3000/DangoTranslate/ShowDict",
-            "ocr_cmd_path": "./config/tools/startOCR.cmd",
+            "ocr_cmd_path": ".\ocr\startOCR.cmd",
             "port": 6666
         }
 
@@ -32,6 +32,8 @@ def openConfig(logger) :
 # 保存配置文件
 def saveConfig(config, logger) :
 
+    config = config.copy()
+    del config["dict_info"]
     try :
         with open(YAML_PATH, "w", encoding="utf-8") as file :
             yaml.dump(config, file)

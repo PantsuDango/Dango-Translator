@@ -72,7 +72,7 @@ def dangoOCR(object, test=False) :
     imageBase64 = base64.b64encode(image).decode("utf-8")
 
     token = object.config["DangoToken"]
-    url = object.yaml["dict_info"]["ocr_server"]
+    url = object.yaml["dict_info"]["ocr"]
     language = object.config["language"]
 
     body = {
