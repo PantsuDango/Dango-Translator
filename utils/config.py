@@ -21,7 +21,7 @@ def openConfig(logger) :
         config = {
             "user": "",
             "password": "",
-            "dict_info_url": "http://120.24.146.175:3000/DangoTranslate/ShowDict",
+            "dict_info_url": "https://trans.dango.cloud/DangoTranslate/ShowDict",
             "ocr_cmd_path": ".\ocr\startOCR.cmd",
             "port": 6666
         }
