@@ -68,6 +68,43 @@ def testTencent(object) :
     object.settin_ui.desc_ui.desc_text.append("\n测试结束!")
 
 
+# 测试私人百度翻译
+def testBaidu(object) :
+
+    # 测试信息显示窗
+    object.settin_ui.desc_ui = ui.desc.Desc(object)
+    object.settin_ui.desc_ui.setWindowTitle("私人百度翻译测试")
+    object.settin_ui.desc_ui.desc_text.append("\n开始测试...")
+    object.settin_ui.desc_ui.show()
+
+    original = "もし、今の状況が自分らしくないことの連続で、好きになれないなら、どうすれば、変えられるかを真剣に考えてみよう。そしないと問題はちっとも解決しない。"
+    object.settin_ui.desc_ui.desc_text.append("\n原文: \n{}".format(original))
+    QApplication.processEvents()
+    secret_id = object.config["baiduAPI"]["Key"]
+    secret_key = object.config["baiduAPI"]["Secret"]
+    result = translator.api.baidu(original, secret_id, secret_key, object.logger)
+    object.settin_ui.desc_ui.desc_text.append("\n译文: \n{}".format(result))
+    object.settin_ui.desc_ui.desc_text.append("\n测试结束!")
+
+
+# 测试私人彩云翻译
+def testCaiyun(object) :
+
+    # 测试信息显示窗
+    object.settin_ui.desc_ui = ui.desc.Desc(object)
+    object.settin_ui.desc_ui.setWindowTitle("私人彩云翻译测试")
+    object.settin_ui.desc_ui.desc_text.append("\n开始测试...")
+    object.settin_ui.desc_ui.show()
+
+    original = "もし、今の状況が自分らしくないことの連続で、好きになれないなら、どうすれば、変えられるかを真剣に考えてみよう。そしないと問題はちっとも解決しない。"
+    object.settin_ui.desc_ui.desc_text.append("\n原文: \n{}".format(original))
+    QApplication.processEvents()
+    secret_key = object.config["caiyunAPI"]
+    result = translator.api.caiyun(original, secret_key, object.logger)
+    object.settin_ui.desc_ui.desc_text.append("\n译文: \n{}".format(result))
+    object.settin_ui.desc_ui.desc_text.append("\n测试结束!")
+
+
 # 测试在线OCR
 def testOnlineOCR(object) :
 

@@ -172,12 +172,12 @@ def configConvert(object) :
     object.config["showTranslateRow"] = object.config.get("showTranslateRow", "False")
     # 翻译快捷键
     object.config["translateHotkeyValue1"] = object.config.get("translateHotkeyValue1", "ctrl")
-    object.config["translateHotkeyValue2"] = object.config.get("translateHotkeyValue2", "z")
+    object.config["translateHotkeyValue2"] = object.config.get("translateHotkeyValue2", "d")
     # 翻译快捷键开关
     object.config["showHotKey1"] = object.config.get("showHotKey1", "False")
     # 范围快捷键
     object.config["rangeHotkeyValue1"] = object.config.get("rangeHotkeyValue1", "ctrl")
-    object.config["rangeHotkeyValue2"] = object.config.get("rangeHotkeyValue2", "x")
+    object.config["rangeHotkeyValue2"] = object.config.get("rangeHotkeyValue2", "f")
     # 范围快捷键开关
     object.config["showHotKey2"] = object.config.get("showHotKey2", "False")
     # 屏蔽词

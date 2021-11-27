@@ -632,11 +632,13 @@ class Settin(QMainWindow) :
         button = QPushButton(self.tab_2)
         self.customSetGeometry(button, 260, 280, 60, 20)
         button.setText("测试")
+        button.clicked.connect(lambda: utils.test.testBaidu(self.object))
 
         # 私人百度翻译教程按钮
         button = QPushButton(self.tab_2)
         self.customSetGeometry(button, 340, 280, 60, 20)
         button.setText("教程")
+        button.clicked.connect(self.openBaiduTutorial)
 
         # 私人彩云翻译标签
         label = QLabel(self.tab_2)
@@ -665,11 +667,13 @@ class Settin(QMainWindow) :
         button = QPushButton(self.tab_2)
         self.customSetGeometry(button, 260, 330, 60, 20)
         button.setText("测试")
+        button.clicked.connect(lambda: utils.test.testCaiyun(self.object))
 
         # 私人彩云翻译教程按钮
         button = QPushButton(self.tab_2)
         self.customSetGeometry(button, 340, 330, 60, 20)
         button.setText("教程")
+        button.clicked.connect(self.openCaiyunTutorial)
 
 
     # 其他设定标签页
@@ -1590,13 +1594,33 @@ class Settin(QMainWindow) :
             utils.test.testOfflineOCR(self.object)
 
 
-    # 打开离线OCR教程
+    # 打开私人腾讯翻译教程
     def openTencentTutorial(self):
 
         try :
             url = self.object.yaml["dict_info"]["tencent_tutorial"]
             webbrowser.open(url, new=0, autoraise=True)
         except Exception :
+            self.logger.error(format_exc())
+
+
+    # 打开私人百度翻译教程
+    def openBaiduTutorial(self):
+
+        try:
+            url = self.object.yaml["dict_info"]["baidu_tutorial"]
+            webbrowser.open(url, new=0, autoraise=True)
+        except Exception:
+            self.logger.error(format_exc())
+
+
+    # 打开私人彩云翻译教程
+    def openCaiyunTutorial(self):
+
+        try:
+            url = self.object.yaml["dict_info"]["caiyun_tutorial"]
+            webbrowser.open(url, new=0, autoraise=True)
+        except Exception:
             self.logger.error(format_exc())
 
 
