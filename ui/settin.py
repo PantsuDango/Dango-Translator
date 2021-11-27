@@ -39,6 +39,7 @@ GROUP_PATH = "./config/icon/group.png"
 BILIBILI_VIDEO_PATH = "./config/icon/video.png"
 BLOG_PATH = "./config/icon/blog.png"
 HOME_ICON_PATH = "./config/icon/home.png"
+SLIDER_ICON_PATH = "./config/icon/slider.png"
 
 
 # 重构QTabWidget使其竖直选项卡文字水平
@@ -162,7 +163,7 @@ class Settin(QMainWindow) :
                                                                   "margin-left: %spx;"
                                                                   "margin-bottom: %spx;"
                                                                   "margin-right: %spx;"
-                                                                  "border-image: url(./config/icon/logo.ico); }"
+                                                                  "border-image: url(./config/icon/slider.png); }"
                                      "QSlider::sub-page:horizontal { height: %spx;"
                                                                     "border-radius: %spx;"
                                                                     "margin-left: %spx;"
