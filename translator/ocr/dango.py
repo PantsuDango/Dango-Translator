@@ -6,7 +6,9 @@ import utils.http
 
 
 IMAGE_PATH = "./config/image.jpg"
-new_image_path = "./config/new_image.jpg"
+NEW_IMAGE_PATH = "./config/new_image.jpg"
+TEST_IMAGE_PATH = os.path.join(os.getcwd(), "config", "other", "image.jpg")
+NEW_TEST_IMAGE_PATH = os.path.join(os.getcwd(), "config", "other", "new_image.jpg")
 
 
 # 图片四周加白边
@@ -47,12 +49,25 @@ def imageBorder(src, dst, loc="a", width=3, color=(0, 0, 0)):
 
 
 # 团子在线OCR服务
-def dangoOCR(object) :
+def dangoOCR(object, test=False) :
 
-    # 图片四周加白边
-    imageBorder(IMAGE_PATH, new_image_path, "a", 20, color=(255, 255, 255))
+    if not test :
+        try :
+            # 四周加白边
+            imageBorder(IMAGE_PATH, NEW_IMAGE_PATH, "a", 10, color=(255, 255, 255))
+            path = NEW_IMAGE_PATH
+        except Exception:
+            path = IMAGE_PATH
+    else :
+        try :
+            # 四周加白边
+            imageBorder(TEST_IMAGE_PATH, NEW_TEST_IMAGE_PATH, "a", 10, color=(255, 255, 255))
+            path = NEW_TEST_IMAGE_PATH
+        except Exception:
+            path = TEST_IMAGE_PATH
 
-    with open(new_image_path, "rb") as file :
+
+    with open(path, "rb") as file :
         image = file.read()
     imageBase64 = base64.b64encode(image).decode("utf-8")
 
@@ -67,9 +82,9 @@ def dangoOCR(object) :
         "Token": token
     }
 
-    res = utils.http.post(url, body, object.logger, timeout=3)
+    res = utils.http.post(url, body, object.logger, timeout=2.5)
     if not res :
-        return False, "团子OCR错误: 错误未知, 具体请查询日志文件且联系团子"
+        return False, "团子OCR错误: 错误未知, 请尝试重试, 如果频繁出现此情况请联系团子"
 
     code = res.get("Code", -1)
     message = res.get("Message", "")
@@ -97,10 +112,13 @@ def offlineOCR(object) :
 
     # 四周加白边
     try :
-        imageBorder(image_path, new_image_path, "a", 20, color=(255, 255, 255))
+        imageBorder(image_path, new_image_path, "a", 10, color=(255, 255, 255))
     except Exception :
         body["ImagePath"] = image_path
     res = utils.http.post(url, body, object.logger)
+    if not res :
+        return False, "离线OCR错误: 错误未知, 请尝试重试, 如果频繁出现此情况请联系团子"
+
     code = res.get("Code", -1)
     message = res.get("Message", "")
     if code == -1 :

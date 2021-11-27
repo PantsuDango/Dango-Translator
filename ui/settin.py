@@ -314,11 +314,13 @@ class Settin(QMainWindow) :
         button = QPushButton(self.tab_1)
         self.customSetGeometry(button, 185, 155, 60, 20)
         button.setText("测试")
+        button.clicked.connect(lambda: utils.test.testOnlineOCR(self.object))
 
         # 在线OCR教程按钮
         button = QPushButton(self.tab_1)
         self.customSetGeometry(button, 265, 155, 60, 20)
         button.setText("教程")
+        button.clicked.connect(self.openOnlineOCRTutorials)
 
         # 百度OCR标签
         label = QLabel(self.tab_1)
@@ -344,21 +346,23 @@ class Settin(QMainWindow) :
         self.customSetGeometry(self.baidu_ocr_switch, 20, 250, 65, 20)
         self.baidu_ocr_switch.checkedChanged.connect(self.changeBaiduSwitch)
 
-        # 百度OCR测试按钮
+        # 百度OCR密钥按钮
         button = QPushButton(self.tab_1)
         self.customSetGeometry(button, 105, 250, 60, 20)
         button.setText("密钥")
         button.clicked.connect(lambda: self.showKey("baiduOCR"))
 
-        # 百度OCR教程按钮
+        # 百度OCR测试按钮
         button = QPushButton(self.tab_1)
         self.customSetGeometry(button, 185, 250, 60, 20)
         button.setText("测试")
+        button.clicked.connect(lambda: utils.test.testBaiduOCR(self.object))
 
-        # 私人百度翻译密钥按钮
+        # 百度OCR教程按钮
         button = QPushButton(self.tab_1)
         self.customSetGeometry(button, 265, 250, 60, 20)
         button.setText("教程")
+        button.clicked.connect(self.openBaiduOCRTutorials)
 
         # OCR识别语种标签
         label = QLabel(self.tab_1)
@@ -1589,10 +1593,10 @@ class Settin(QMainWindow) :
     # 打开离线OCR教程
     def openTencentTutorial(self):
 
-        try:
+        try :
             url = self.object.yaml["dict_info"]["tencent_tutorial"]
             webbrowser.open(url, new=0, autoraise=True)
-        except Exception:
+        except Exception :
             self.logger.error(format_exc())
 
 
@@ -1609,71 +1613,91 @@ class Settin(QMainWindow) :
     # 打开guihub项目地址
     def openGithubproject(self):
 
-        try:
+        try :
             webbrowser.open(self.dango_translator_url, new=0, autoraise=True)
-        except Exception:
+        except Exception :
             self.logger.error(format_exc())
 
 
     # 打开在线教程地址
     def openTutorial(self):
 
-        try:
+        try :
             webbrowser.open(self.tutorial_url, new=0, autoraise=True)
-        except Exception:
+        except Exception :
             self.logger.error(format_exc())
 
 
     # 打开添加作者地址
     def oepnBilibili(self):
 
-        try:
+        try :
             webbrowser.open(self.dango_bilibili_url, new=0, autoraise=True)
-        except Exception:
+        except Exception :
             self.logger.error(format_exc())
 
 
     # 打开更新日志地址
     def openBilibiliVideo(self):
 
-        try:
+        try :
             webbrowser.open(self.bilibili_video_url, new=0, autoraise=True)
-        except Exception:
+        except Exception :
             self.logger.error(format_exc())
 
 
     # 打开PaddleOCR项目地址
     def openPaddleOCR(self):
 
-        try:
+        try :
             webbrowser.open(self.PaddleOCR_github_url, new=0, autoraise=True)
-        except Exception:
+        except Exception :
             self.logger.error(format_exc())
 
 
     # 打开Gt-Zhang项目地址
     def openGT(self):
 
-        try:
+        try :
             webbrowser.open(self.gt_github_url, new=0, autoraise=True)
-        except Exception:
+        except Exception :
             self.logger.error(format_exc())
 
 
     # 打开c44项目地址
     def openC44(self):
 
-        try:
+        try :
             webbrowser.open(self.c44_github_url, new=0, autoraise=True)
-        except Exception:
+        except Exception :
             self.logger.error(format_exc())
 
 
     # 打开Cy项目地址
     def openCy(self):
 
-        try:
+        try :
             webbrowser.open(self.cy_github_url, new=0, autoraise=True)
+        except Exception :
+            self.logger.error(format_exc())
+
+
+    # 打开在线OCR教程地址
+    def openOnlineOCRTutorials(self) :
+
+        try :
+            url = self.object.yaml["dict_info"]["tutorials_online_ocr"]
+            webbrowser.open(url, new=0, autoraise=True)
+        except Exception:
+            self.logger.error(format_exc())
+
+
+    # 打开百度OCR教程地址
+    def openBaiduOCRTutorials(self):
+
+        try:
+            url = self.object.yaml["dict_info"]["tutorials_baidu_ocr"]
+            webbrowser.open(url, new=0, autoraise=True)
         except Exception:
             self.logger.error(format_exc())
 

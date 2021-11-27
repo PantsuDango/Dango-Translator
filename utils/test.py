@@ -3,6 +3,7 @@ import time
 import os
 
 import translator.ocr.dango
+import translator.ocr.baidu
 import translator.api
 import utils.http
 import utils.thread
@@ -64,4 +65,37 @@ def testTencent(object) :
     QApplication.processEvents()
     result = translator.api.tencent(original, secret_id, secret_key, object.logger)
     object.settin_ui.desc_ui.desc_text.append("\n译文: \n{}".format(result))
+    object.settin_ui.desc_ui.desc_text.append("\n测试结束!")
+
+
+# 测试在线OCR
+def testOnlineOCR(object) :
+
+    # 测试信息显示窗
+    object.settin_ui.desc_ui = ui.desc.Desc(object)
+    object.settin_ui.desc_ui.setWindowTitle("团子在线OCR测试")
+    object.settin_ui.desc_ui.desc_text.append("\n开始测试...")
+    object.settin_ui.desc_ui.desc_text.insertHtml('<img src={} width="{}" >'.format(TEST_IMAGE_PATH, 245 * object.settin_ui.rate))
+    object.settin_ui.desc_ui.show()
+    QApplication.processEvents()
+
+    ocr_sign, original = translator.ocr.dango.dangoOCR(object, test=True)
+    object.settin_ui.desc_ui.desc_text.append("\n识别结果: \n{}".format(original))
+    object.settin_ui.desc_ui.desc_text.append("\n测试结束!")
+
+
+# 测试百度OCR
+def testBaiduOCR(object) :
+
+    # 测试信息显示窗
+    object.settin_ui.desc_ui = ui.desc.Desc(object)
+    object.settin_ui.desc_ui.setWindowTitle("百度OCR测试")
+    object.settin_ui.desc_ui.desc_text.append("\n开始测试...")
+    object.settin_ui.desc_ui.desc_text.insertHtml('<img src={} width="{}" >'.format(TEST_IMAGE_PATH, 245 * object.settin_ui.rate))
+    object.settin_ui.desc_ui.show()
+    QApplication.processEvents()
+
+    translator.ocr.baidu.getAccessToken(object)
+    ocr_sign, original = translator.ocr.baidu.baiduOCR(object.config, object.logger, test=True)
+    object.settin_ui.desc_ui.desc_text.append("\n识别结果: \n{}".format(original))
     object.settin_ui.desc_ui.desc_text.append("\n测试结束!")

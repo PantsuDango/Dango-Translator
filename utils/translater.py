@@ -170,11 +170,10 @@ class Translater(QThread) :
         # 百度OCR
         if self.object.config["baiduOCR"] :
             ocr_sign, original = translator.ocr.baidu.baiduOCR(self.object.config, self.logger)
-
         # 团子OCR
         elif self.object.config["onlineOCR"] :
             ocr_sign, original = translator.ocr.dango.dangoOCR(self.object)
-
+        # 离线OCR
         elif self.object.config["offlineOCR"] :
             ocr_sign, original = translator.ocr.dango.offlineOCR(self.object)
 

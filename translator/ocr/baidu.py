@@ -73,7 +73,7 @@ def getAccessToken(object) :
 
 
 # 百度ocr
-def baiduOCR(config, logger) :
+def baiduOCR(config, logger, test=False) :
 
     language = config["language"]
     access_token = config["AccessToken"]
@@ -90,7 +90,11 @@ def baiduOCR(config, logger) :
             # 普通
             request_url = "https://aip.baidubce.com/rest/2.0/ocr/v1/general_basic"
 
-        with open("./config/image.jpg", "rb") as file :
+        if not test :
+            path = "./config/image.jpg"
+        else :
+            path = "./config/other/image.jpg"
+        with open(path, "rb") as file :
             image = base64.b64encode(file.read())
         params = {"image": image, "language_type": language}
         headers = {"content-type": "application/x-www-form-urlencoded"}
