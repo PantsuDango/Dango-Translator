@@ -522,6 +522,9 @@ class Translation(QMainWindow) :
         self.resize(width, newHeight + 30*self.rate)
         self.translate_text.setGeometry(0, 30*self.rate, width, newHeight)
 
+        # 判断是否和范围框碰撞
+        self.checkOverlap()
+
 
     # 锁定界面
     def lock(self) :
