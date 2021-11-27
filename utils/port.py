@@ -1,22 +1,15 @@
-import re
-import subprocess
-from traceback import format_exc
+import socket
 
 
-# 检查端口是否被占用
-def detectPort(port, logger) :
+def detectPort(port=6666) :
 
-    cmd = ("netstat", "-a", "-n")
-    try :
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-
-        for line in p.stdout :
-            if re.findall("0\.0\.0\.0:%d"%port, str(line)) :
-                return True
-
-        p.kill()
-
+    s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+    try:
+        s.connect(("127.0.0.1", port))
+        s.shutdown(2)
+        sign =  True
     except Exception :
-        logger.error(format_exc())
+        sign = False
+    s.close()
 
-    return False
+    return sign

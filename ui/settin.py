@@ -258,7 +258,7 @@ class Settin(QMainWindow) :
         button.clicked.connect(lambda: self.showDesc("offlineOCR"))
 
         # 离线OCR状态开关
-        self.offline_ocr_switch = ui.switch.OfflineSwitch(self.tab_1, startX=(65-20)*self.rate, logger=self.logger)
+        self.offline_ocr_switch = ui.switch.OfflineSwitch(self.tab_1, startX=(65-20)*self.rate)
         self.customSetGeometry(self.offline_ocr_switch, 20, 60, 65, 20)
         self.offline_ocr_switch.checkedChanged.connect(self.changeOfflineSwitch)
 
@@ -1561,7 +1561,7 @@ class Settin(QMainWindow) :
     def runOfflineOCR(self) :
 
         # 检查端口是否被占用
-        if utils.port.detectPort(6666, self.logger) :
+        if utils.port.detectPort(6666) :
             utils.message.MessageBox("运行失败",
                                      "离线OCR已启动, 请不要重复运行!     ")
         else :
@@ -1578,7 +1578,7 @@ class Settin(QMainWindow) :
     def testOfflineOCR(self) :
 
         # 检查端口是否被占用
-        if not utils.port.detectPort(6666, self.logger) :
+        if not utils.port.detectPort(6666) :
             utils.message.MessageBox("测试失败",
                                      "离线OCR还没运行成功，不可以进行测试     \n"
                                      "请先启动离线OCR, 并保证其运行正常")
