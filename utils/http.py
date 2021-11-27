@@ -11,7 +11,8 @@ def post(url, body, logger):
         "https": None
     }
     result = {}
-    try:
+    try :
+        print(json.dumps(body))
         response = requests.post(url, data=json.dumps(body), proxies=proxies, timeout=10)
         try :
             response.encoding = "utf-8"
@@ -35,9 +36,8 @@ def loginDangoOCR(object) :
     }
 
     res = post(url, body, object.logger)
-    if res.get("Code", -1) == 0 :
-        object.config["DangoToken"] = res.get("Token", "")
-    else :
+    object.config["DangoToken"] = res.get("Token", "")
+    if res.get("Code", -1) != 0 :
         object.logger.error(res.get("ErrorMsg", ""))
 
 
