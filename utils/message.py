@@ -106,3 +106,27 @@ def checkVersionMessageBox(title, text) :
     message_box.addButton(QPushButton("忽略"), QMessageBox.NoRole)
 
     message_box.exec_()
+
+
+
+# 错误提示窗口-关闭程序用
+def quitAppMessageBox(title, text, object) :
+
+    message_box = QMessageBox()
+    message_box.setTextInteractionFlags(Qt.TextSelectableByMouse)
+    message_box.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowMaximizeButtonHint | Qt.MSWindowsFixedSizeDialogHint)
+
+    icon = QtGui.QIcon()
+    icon.addPixmap(QtGui.QPixmap(LOGO_PATH), QtGui.QIcon.Normal, QtGui.QIcon.On)
+    message_box.setWindowIcon(icon)
+
+    message_box.setWindowTitle(title)
+    message_box.setText(text)
+
+    button1 = QPushButton("再见")
+    button1.clicked.connect(object.translation_ui.quit)
+    message_box.addButton(button1, QMessageBox.YesRole)
+
+    message_box.addButton(QPushButton("我点错了"), QMessageBox.NoRole)
+
+    message_box.exec_()

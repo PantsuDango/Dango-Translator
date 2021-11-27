@@ -13,6 +13,7 @@ import utils.thread
 import utils.translater
 import utils.http
 import utils.range
+import utils.message
 
 import translator.sound
 import translator.all
@@ -245,7 +246,7 @@ class Translation(QMainWindow) :
         self.quit_button.setToolTip("<b>退出程序 Quit</b>")
         self.quit_button.setStyleSheet("background: transparent;")
         self.quit_button.setCursor(QCursor(Qt.PointingHandCursor))
-        self.quit_button.clicked.connect(self.quit)
+        self.quit_button.clicked.connect(self.showAppquitMessageBox)
         self.quit_button.hide()
 
         # 右下角用于拉伸界面的控件
@@ -269,6 +270,13 @@ class Translation(QMainWindow) :
             self.range_hotkey.register((self.range_hotkey_value1, self.range_hotkey_value2),
                                        callback=lambda x: self.range_hotkey_sign.emit(True))
         self.range_hotkey_sign.connect(self.clickRange)
+
+
+        # 在系统托盘
+        self.system_tray_icon = QSystemTrayIcon(self)
+        self.system_tray_icon.setIcon(icon)
+        self.system_tray_icon.activated.connect(self.show)
+        self.system_tray_icon.show()
 
 
     # 窗口显示信号
@@ -750,9 +758,15 @@ class Translation(QMainWindow) :
     # 关闭selenuim的driver引擎
     def killDriVer(self) :
 
-        os.popen("taskkill /im chromedriver.exe /F")
-        os.popen("taskkill /im geckodriver.exe /F")
-        os.popen("taskkill /im msedgedriver.exe /F")
+        utils.thread.createThreadDaemonFalse(os.popen, "taskkill /im chromedriver.exe /F")
+        utils.thread.createThreadDaemonFalse(os.popen, "taskkill /im geckodriver.exe /F")
+        utils.thread.createThreadDaemonFalse(os.popen, "taskkill /im msedgedriver.exe /F")
+
+
+    # 退出提示框
+    def showAppquitMessageBox(self) :
+
+        utils.message.quitAppMessageBox("退出程序", "真的要关闭团子吗?QAQ      ", self.object)
 
 
     # 退出程序
@@ -767,7 +781,7 @@ class Translation(QMainWindow) :
         utils.thread.createThreadDaemonFalse(self.webdriver1.close)
         utils.thread.createThreadDaemonFalse(self.webdriver2.close)
         # 关闭selenuim的driver引擎
-        utils.thread.createThreadDaemonFalse(self.killDriVer)
+        self.killDriVer()
         # 退出程序前保存设置
         utils.thread.createThreadDaemonFalse(utils.config.postSaveSettin, self.object)
 

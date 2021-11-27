@@ -67,7 +67,7 @@ def dangoOCR(object) :
         "Token": token
     }
 
-    res = utils.http.post(url, body, object.logger, timeout=2)
+    res = utils.http.post(url, body, object.logger, timeout=3)
     if not res :
         return False, "团子OCR错误: 错误未知, 具体请查询日志文件且联系团子"
 
