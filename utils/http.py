@@ -4,7 +4,7 @@ from traceback import format_exc
 
 
 # 发送http请求
-def post(url, body, logger):
+def post(url, body, logger, timeout=10):
 
     proxies = {
         "http": None,
@@ -12,8 +12,7 @@ def post(url, body, logger):
     }
     result = {}
     try :
-        print(json.dumps(body))
-        response = requests.post(url, data=json.dumps(body), proxies=proxies, timeout=10)
+        response = requests.post(url, data=json.dumps(body), proxies=proxies, timeout=timeout)
         try :
             response.encoding = "utf-8"
             result = json.loads(response.text)

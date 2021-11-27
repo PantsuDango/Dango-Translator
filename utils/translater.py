@@ -121,7 +121,10 @@ class Translater(QThread) :
     def creatTranslaterThread(self, trans_type) :
 
         if self.object.translation_ui.thread_state == 0 :
+            # 发送清屏信号
+            self.clear_text_sign.emit(True)
             self.object.translation_ui.statusbar.showMessage("翻译中...")
+            QApplication.processEvents()
 
         self.object.translation_ui.thread_state += 1
         thread = TranslaterProccess(self.object, trans_type)
@@ -199,8 +202,8 @@ class Translater(QThread) :
             if text_score > self.object.config["textSimilarity"] :
                 return
 
-        # 发送清屏信号
-        self.clear_text_sign.emit(True)
+        # 更新原文
+        self.object.translation_ui.original = original
         # 判断是否未开任何翻译源
         nothing_sign = False
 
@@ -235,8 +238,6 @@ class Translater(QThread) :
 
         # 翻译成功
         if nothing_sign :
-            # 更新原文
-            self.object.translation_ui.original = original
             # 是否复制到剪贴板
             if self.object.config["showClipboard"] == "True" :
                 pyperclip.copy(original)

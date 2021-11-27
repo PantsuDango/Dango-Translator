@@ -67,14 +67,17 @@ def dangoOCR(object) :
         "Token": token
     }
 
-    res = utils.http.post(url, body, object.logger)
+    res = utils.http.post(url, body, object.logger, timeout=2)
+    if not res :
+        return False, "团子OCR错误: 错误未知, 具体请查询日志文件且联系团子"
+
     code = res.get("Code", -1)
     message = res.get("Message", "")
     if code == 0 :
         content = ""
-        for val in res["Result"] :
-            content += val["Words"]
-            return True, content
+        for val in res.get("Data", []) :
+            content += val.get("Words", "")
+        return True, content
     else :
         object.logger.error(message)
         return False, "团子OCR错误: %s"%message

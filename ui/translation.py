@@ -614,6 +614,7 @@ class Translation(QMainWindow) :
             self.translate_text.append(result)
         else:
             self.translate_text.append("<font color=%s>%s</font>"%(color, result))
+        QApplication.processEvents()
 
         # 保存译文
         utils.config.saveTransHisTory(result, trans_type)
