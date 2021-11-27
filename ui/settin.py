@@ -38,6 +38,7 @@ BILIBILI_ICON_PATH = "./config/icon/bilibili.png"
 GROUP_PATH = "./config/icon/group.png"
 BILIBILI_VIDEO_PATH = "./config/icon/video.png"
 BLOG_PATH = "./config/icon/blog.png"
+HOME_ICON_PATH = "./config/icon/home.png"
 
 
 # 重构QTabWidget使其竖直选项卡文字水平
@@ -993,14 +994,35 @@ class Settin(QMainWindow) :
         imageLabel.setGeometry(QRect(0, -1, self.window_width + 5, self.window_height + 5))
         imageLabel.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
 
+        # 官方网站标签
+        label = QLabel(self.tab_4)
+        self.customSetGeometry(label, 130, 20, 300, 20)
+        label.setText("团子翻译器的官网哦 (欢迎来玩)")
+
+        # 官方网站按钮
+        button = QPushButton(self.tab_4)
+        self.customSetGeometry(button, 20, 20, 90, 20)
+        button.setText("官方网站")
+        button.clicked.connect(self.openHomePage)
+
+        # 项目地址图标
+        icon = QIcon()
+        pixmap = QPixmap(HOME_ICON_PATH)
+        pixmap = pixmap.scaled(int(20 * self.rate),
+                               int(20 * self.rate),
+                               Qt.KeepAspectRatio,
+                               Qt.SmoothTransformation)
+        icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
+        button.setIcon(icon)
+
         # 项目地址标签
         label = QLabel(self.tab_4)
-        self.customSetGeometry(label, 130, 25, 300, 20)
+        self.customSetGeometry(label, 130, 65, 300, 20)
         label.setText("本软件已在github开源 (欢迎来点小星星)")
 
         # 项目地址按钮
         button = QPushButton(self.tab_4)
-        self.customSetGeometry(button, 20, 25, 90, 20)
+        self.customSetGeometry(button, 20, 65, 90, 20)
         button.setText("项目地址")
         button.clicked.connect(self.openGithubproject)
 
@@ -1016,12 +1038,12 @@ class Settin(QMainWindow) :
 
         # 在线教程标签
         label = QLabel(self.tab_4)
-        self.customSetGeometry(label, 130, 75, 300, 20)
+        self.customSetGeometry(label, 130, 110, 300, 20)
         label.setText("软件完整使用教程 (要好好阅读哦)")
 
         # 在线教程按钮
         button = QPushButton(self.tab_4)
-        self.customSetGeometry(button, 20, 75, 90, 20)
+        self.customSetGeometry(button, 20, 110, 90, 20)
         button.setText("在线文档")
         button.clicked.connect(self.openTutorial)
 
@@ -1037,12 +1059,12 @@ class Settin(QMainWindow) :
 
         # 教程视频标签
         label = QLabel(self.tab_4)
-        self.customSetGeometry(label, 130, 125, 300, 20)
+        self.customSetGeometry(label, 130, 150, 300, 20)
         label.setText("软件b站教程视频 (不想看文档就看这个吧)")
 
         # 教程视频按钮
         button = QPushButton(self.tab_4)
-        self.customSetGeometry(button, 20, 125, 90, 20)
+        self.customSetGeometry(button, 20, 150, 90, 20)
         button.setText("教程视频")
         button.clicked.connect(self.openBilibiliVideo)
 
@@ -1058,12 +1080,12 @@ class Settin(QMainWindow) :
 
         # 关注作者标签
         label = QLabel(self.tab_4)
-        self.customSetGeometry(label, 130, 175, 300, 20)
+        self.customSetGeometry(label, 130, 195, 300, 20)
         label.setText("发布公告的地方 (不关注团子吗)")
 
         # 关注作者按钮
         button = QPushButton(self.tab_4)
-        self.customSetGeometry(button, 20, 175, 90, 20)
+        self.customSetGeometry(button, 20, 195, 90, 20)
         button.setText("关注团子")
         button.clicked.connect(self.oepnBilibili)
 
@@ -1079,12 +1101,12 @@ class Settin(QMainWindow) :
 
         # 添加交流群标签
         label = QLabel(self.tab_4)
-        self.customSetGeometry(label, 130, 225, 300, 20)
+        self.customSetGeometry(label, 130, 240, 300, 20)
         label.setText("加入交流群 (QQ群申请)")
 
         # 添加交流群按钮
         button = QPushButton(self.tab_4)
-        self.customSetGeometry(button, 20, 225, 90, 20)
+        self.customSetGeometry(button, 20, 240, 90, 20)
         button.setText("群聊交流")
         button.clicked.connect(lambda: self.showDesc("qqGroup"))
 
@@ -1100,24 +1122,24 @@ class Settin(QMainWindow) :
 
         # 特别鸣谢标签
         label = QLabel(self.tab_4)
-        self.customSetGeometry(label, 20, 280, 300, 20)
+        self.customSetGeometry(label, 20, 290, 300, 20)
         label.setText("特别鸣谢 (本软件受到以下人员和项目的帮助)")
 
         # PaddleOCR主页按钮
         button = QPushButton(self.tab_4)
-        self.customSetGeometry(button, 20, 320, 90, 20)
+        self.customSetGeometry(button, 20, 330, 90, 20)
         button.setText("PaddleOCR‭")
         button.clicked.connect(self.openPaddleOCR)
         button.setIcon(github_icon)
 
         # GT-Zhang主页按钮
         button = QPushButton(self.tab_4)
-        self.customSetGeometry(button, 130, 320, 90, 20)
+        self.customSetGeometry(button, 130, 330, 90, 20)
         button.setText("GT-Zhang")
         button.clicked.connect(self.openGT)
         button.setIcon(github_icon)
 
-        # QQ群图标
+        # 博客图标
         icon = QIcon()
         pixmap = QPixmap(BLOG_PATH)
         pixmap = pixmap.scaled(int(20 * self.rate),
@@ -1128,14 +1150,14 @@ class Settin(QMainWindow) :
 
         # C4a15Wh主页按钮
         button = QPushButton(self.tab_4)
-        self.customSetGeometry(button, 240, 320, 90, 20)
+        self.customSetGeometry(button, 240, 330, 90, 20)
         button.setText("C4a15Wh")
         button.clicked.connect(self.openC44)
         button.setIcon(icon)
 
         # cypas‭主页按钮
         button = QPushButton(self.tab_4)
-        self.customSetGeometry(button, 350, 320, 90, 20)
+        self.customSetGeometry(button, 350, 330, 90, 20)
         button.setText("Cypas‭")
         button.clicked.connect(self.openCy)
         button.setIcon(icon)
@@ -1639,6 +1661,16 @@ class Settin(QMainWindow) :
 
         try :
             webbrowser.open(self.dango_translator_url, new=0, autoraise=True)
+        except Exception :
+            self.logger.error(format_exc())
+
+
+    # 打开软件首页
+    def openHomePage(self):
+
+        try :
+            url = self.object.yaml["dict_info"]["dange_home_page"]
+            webbrowser.open(url, new=0, autoraise=True)
         except Exception :
             self.logger.error(format_exc())
 

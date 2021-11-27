@@ -23,6 +23,7 @@ def openConfig(logger) :
             "password": "",
             "dict_info_url": "http://120.24.146.175:3000/DangoTranslate/ShowDict",
             "ocr_cmd_path": "./config/tools/startOCR.cmd",
+            "port": 6666
         }
 
     return config

@@ -99,6 +99,22 @@ class DangoTranslator() :
         qq_group_url = self.yaml["dict_info"]["dango_qq_group"]
         utils.http.downloadFile(qq_group_url, "./config/other/交流群.png", self.logger)
 
+        # 加载注册界面图片
+        qq_group_url = self.yaml["dict_info"]["register_image_url"]
+        utils.http.downloadFile(qq_group_url, "./config/other/register.gif", self.logger)
+
+        # 加载登录界面图片
+        login_image_url = self.yaml["dict_info"]["login_image_url"]
+        utils.http.downloadFile(login_image_url, "./config/background/login.png", self.logger)
+
+        # 加载设置界面图片
+        settin_image_url = self.yaml["dict_info"]["settin_image_url"]
+        utils.http.downloadFile(settin_image_url, "./config/background/settin.jpg", self.logger)
+
+        # 加载屏蔽词界面图片
+        settin_image_url = self.yaml["dict_info"]["settin_desc_image_url"]
+        utils.http.downloadFile(settin_image_url, "./config/background/settin-desc.jpg", self.logger)
+
 
     # 检查是否是最新版本
     def showCheckVersionMessage(self) :
