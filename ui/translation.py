@@ -271,6 +271,22 @@ class Translation(QMainWindow) :
         self.range_hotkey_sign.connect(self.clickRange)
 
 
+    # 窗口显示信号
+    def showEvent(self, e) :
+
+        # 如果处于自动模式下则暂停
+        if self.translate_mode :
+            self.stop_sign = False
+
+
+    # 窗口隐藏信号
+    def hideEvent(self, e) :
+
+        # 如果处于自动模式下则暂停
+        if self.translate_mode :
+            self.stop_sign = True
+
+
     # 初始化配置
     def getInitConfig(self):
 
@@ -715,10 +731,7 @@ class Translation(QMainWindow) :
     # 按下屏蔽词键后做的事情
     def clickFilter(self) :
 
-        # 如果处于自动模式下则暂停
-        if self.translate_mode :
-            self.stop_sign = True
-
+        self.hide()
         self.object.filter_ui.show()
 
 

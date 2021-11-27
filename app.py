@@ -76,10 +76,6 @@ class DangoTranslator() :
     # 按下充电键后做的事情
     def clickBattery(self) :
 
-        # 如果处于自动模式下则暂停
-        if self.translation_ui.translate_mode:
-            self.translation_ui.stop_sign = True
-
         self.translation_ui.unregisterHotKey()
         self.translation_ui.close()
         self.range_ui.close()
@@ -89,10 +85,6 @@ class DangoTranslator() :
 
     # 按下设置键后做的事情
     def clickSettin(self) :
-
-        # 如果处于自动模式下则暂停
-        if self.translation_ui.translate_mode :
-            self.translation_ui.stop_sign = True
 
         self.translation_ui.unregisterHotKey()
         self.translation_ui.close()
