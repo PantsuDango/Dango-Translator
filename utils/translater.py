@@ -191,8 +191,12 @@ class Translater(QThread) :
             utils.thread.createThread(self.creatTranslaterThread, "original")
             return
 
-        # 如果检测不到文字或者文字和上一次一样则跳过
-        if not original or original == self.object.translation_ui.original :
+        # 如果检测不到文字则跳过
+        if not original :
+            return
+
+        # 自动模式下文字和上一次一样则跳过
+        if self.object.translation_ui.translate_mode and original == self.object.translation_ui.original :
             return
 
         # 在自动模式下, 如果如果文本相似度过高则不翻译
