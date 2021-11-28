@@ -18,6 +18,7 @@ import utils.thread
 LOGO_PATH = "./config/icon/logo.ico"
 PIXMAP_PATH = "./config/icon/pixmap.png"
 BG_IMAGE_PATH = "./config/background/register.gif"
+PIXMAP2_PATH = "./config/icon/pixmap2.png"
 
 
 # 注册界面
@@ -53,6 +54,14 @@ class Register(QWidget) :
                                Qt.SmoothTransformation)
         cursor = QCursor(pixmap, 0, 0)
         self.setCursor(cursor)
+
+        # 鼠标选中状态图标
+        select_pixmap = QPixmap(PIXMAP2_PATH)
+        select_pixmap = select_pixmap.scaled(int(20 * self.rate),
+                                             int(20 * self.rate),
+                                             Qt.KeepAspectRatio,
+                                             Qt.SmoothTransformation)
+        select_pixmap = QCursor(select_pixmap, 0, 0)
 
         # 设置字体
         font = QFont()
@@ -98,7 +107,7 @@ class Register(QWidget) :
         self.customSetIconSize(self.eye_button, 25, 25)
         self.customSetGeometry(self.eye_button, 305, 50, 30, 30)
         self.eye_button.setStyleSheet("background: transparent;")
-        self.eye_button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.eye_button.setCursor(select_pixmap)
         self.eye_button.clicked.connect(self.clickEyeButton)
 
         # 邮箱输入框
@@ -114,7 +123,7 @@ class Register(QWidget) :
         # 获取验证码按钮
         self.send_email_button = QPushButton(self)
         self.customSetGeometry(self.send_email_button, 205, 125, 125, 25)
-        self.send_email_button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.send_email_button.setCursor(select_pixmap)
         self.send_email_button.setText("获取验证码")
         self.send_email_button.setStyleSheet("background: rgba(255, 255, 255, 0.5); color: %s"%(self.color))
         self.send_email_button.clicked.connect(self.sendEmail)
@@ -122,7 +131,7 @@ class Register(QWidget) :
         # 确定注册按钮
         self.sure_button = QPushButton(self)
         self.customSetGeometry(self.sure_button, 140, 175, 80, 35)
-        self.sure_button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.sure_button.setCursor(select_pixmap)
         self.sure_button.setText("确定")
         self.sure_button.setStyleSheet("background: rgba(255, 255, 255, 0.5);"
                                            "color: %s;"

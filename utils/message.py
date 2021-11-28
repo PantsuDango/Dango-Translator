@@ -1,4 +1,4 @@
-from PyQt5 import QtGui
+from PyQt5.QtGui import *
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMessageBox, QPushButton
 import sys
@@ -8,17 +8,28 @@ import utils.check_font
 
 
 LOGO_PATH = "./config/icon/logo.ico"
+PIXMAP_ICON_PATH = "./config/icon/pixmap.png"
+PIXMAP2_PATH = "./config/icon/pixmap2.png"
 
 
 # 错误提示窗口-通用
-def MessageBox(title, text):
+def MessageBox(title, text, rate=1):
 
     message_box = QMessageBox()
     message_box.setTextInteractionFlags(Qt.TextSelectableByMouse)
     message_box.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowMaximizeButtonHint | Qt.MSWindowsFixedSizeDialogHint)
 
-    icon = QtGui.QIcon()
-    icon.addPixmap(QtGui.QPixmap(LOGO_PATH), QtGui.QIcon.Normal, QtGui.QIcon.On)
+    # 鼠标样式
+    pixmap = QPixmap(PIXMAP_ICON_PATH)
+    pixmap = pixmap.scaled(int(20*rate),
+                           int(20*rate),
+                           Qt.KeepAspectRatio,
+                           Qt.SmoothTransformation)
+    cursor = QCursor(pixmap, 0, 0)
+    message_box.setCursor(cursor)
+
+    icon = QIcon()
+    icon.addPixmap(QPixmap(LOGO_PATH), QIcon.Normal, QIcon.On)
     message_box.setWindowIcon(icon)
 
     message_box.setWindowTitle(title)
@@ -30,14 +41,23 @@ def MessageBox(title, text):
 
 
 # 错误提示窗口-字体检查提示
-def checkFontMessageBox(title, text, logger):
+def checkFontMessageBox(title, text, logger, rate=1):
 
     message_box = QMessageBox()
     message_box.setTextInteractionFlags(Qt.TextSelectableByMouse)
     message_box.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowMaximizeButtonHint | Qt.MSWindowsFixedSizeDialogHint)
 
-    icon = QtGui.QIcon()
-    icon.addPixmap(QtGui.QPixmap(LOGO_PATH), QtGui.QIcon.Normal, QtGui.QIcon.On)
+    # 鼠标样式
+    pixmap = QPixmap(PIXMAP_ICON_PATH)
+    pixmap = pixmap.scaled(int(20*rate),
+                           int(20*rate),
+                           Qt.KeepAspectRatio,
+                           Qt.SmoothTransformation)
+    cursor = QCursor(pixmap, 0, 0)
+    message_box.setCursor(cursor)
+
+    icon = QIcon()
+    icon.addPixmap(QPixmap(LOGO_PATH), QIcon.Normal, QIcon.On)
     message_box.setWindowIcon(icon)
 
     message_box.setWindowTitle(title)
@@ -59,8 +79,17 @@ def checkEmailMessageBox(title, text, object) :
     message_box.setTextInteractionFlags(Qt.TextSelectableByMouse)
     message_box.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowMaximizeButtonHint | Qt.MSWindowsFixedSizeDialogHint)
 
-    icon = QtGui.QIcon()
-    icon.addPixmap(QtGui.QPixmap(LOGO_PATH), QtGui.QIcon.Normal, QtGui.QIcon.On)
+    # 鼠标样式
+    pixmap = QPixmap(PIXMAP_ICON_PATH)
+    pixmap = pixmap.scaled(int(20*object.yaml["screen_scale_rate"]),
+                           int(20*object.yaml["screen_scale_rate"]),
+                           Qt.KeepAspectRatio,
+                           Qt.SmoothTransformation)
+    cursor = QCursor(pixmap, 0, 0)
+    message_box.setCursor(cursor)
+
+    icon = QIcon()
+    icon.addPixmap(QPixmap(LOGO_PATH), QIcon.Normal, QIcon.On)
     message_box.setWindowIcon(icon)
 
     message_box.setWindowTitle(title)
@@ -86,14 +115,23 @@ def updateVersion() :
 
 
 # 错误提示窗口-更新版本用
-def checkVersionMessageBox(title, text) :
+def checkVersionMessageBox(title, text, rate=1) :
 
     message_box = QMessageBox()
     message_box.setTextInteractionFlags(Qt.TextSelectableByMouse)
     message_box.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowMaximizeButtonHint | Qt.MSWindowsFixedSizeDialogHint)
 
-    icon = QtGui.QIcon()
-    icon.addPixmap(QtGui.QPixmap(LOGO_PATH), QtGui.QIcon.Normal, QtGui.QIcon.On)
+    # 鼠标样式
+    pixmap = QPixmap(PIXMAP_ICON_PATH)
+    pixmap = pixmap.scaled(int(20*rate),
+                           int(20*rate),
+                           Qt.KeepAspectRatio,
+                           Qt.SmoothTransformation)
+    cursor = QCursor(pixmap, 0, 0)
+    message_box.setCursor(cursor)
+
+    icon = QIcon()
+    icon.addPixmap(QPixmap(LOGO_PATH), QIcon.Normal, QIcon.On)
     message_box.setWindowIcon(icon)
 
     message_box.setWindowTitle(title)
@@ -110,14 +148,23 @@ def checkVersionMessageBox(title, text) :
 
 
 # 错误提示窗口-关闭程序用
-def quitAppMessageBox(title, text, object) :
+def quitAppMessageBox(title, text, object, rate=1) :
 
     message_box = QMessageBox()
     message_box.setTextInteractionFlags(Qt.TextSelectableByMouse)
     message_box.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowMaximizeButtonHint | Qt.MSWindowsFixedSizeDialogHint)
 
-    icon = QtGui.QIcon()
-    icon.addPixmap(QtGui.QPixmap(LOGO_PATH), QtGui.QIcon.Normal, QtGui.QIcon.On)
+    # 鼠标样式
+    pixmap = QPixmap(PIXMAP_ICON_PATH)
+    pixmap = pixmap.scaled(int(20*rate),
+                           int(20*rate),
+                           Qt.KeepAspectRatio,
+                           Qt.SmoothTransformation)
+    cursor = QCursor(pixmap, 0, 0)
+    message_box.setCursor(cursor)
+
+    icon = QIcon()
+    icon.addPixmap(QPixmap(LOGO_PATH), QIcon.Normal, QIcon.On)
     message_box.setWindowIcon(icon)
 
     message_box.setWindowTitle(title)

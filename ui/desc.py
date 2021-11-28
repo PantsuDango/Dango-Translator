@@ -66,6 +66,7 @@ class Desc(QWidget) :
                                                     "border-top:0px solid #e8f3f9;"
                                                     "color: #5B8FF9;"
                                                     "background: rgba(255, 255, 255, 0.7); }")
+        self.desc_text.setCursor(cursor)
 
         pix = QPixmap(QQ_GROUP_IMAGE_PATH)
         pix = pix.scaled(int(200 * self.rate),

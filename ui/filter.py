@@ -8,6 +8,7 @@ import utils.thread
 LOGO_PATH = "./config/icon/logo.ico"
 PIXMAP_PATH = "./config/icon/pixmap.png"
 BG_IMAGE_PATH = "./config/background/login.png"
+PIXMAP2_PATH = "./config/icon/pixmap2.png"
 
 
 class Filter(QWidget) :
@@ -42,6 +43,14 @@ class Filter(QWidget) :
                                Qt.SmoothTransformation)
         cursor = QCursor(pixmap, 0, 0)
         self.setCursor(cursor)
+
+        # 鼠标选中状态图标
+        select_pixmap = QPixmap(PIXMAP2_PATH)
+        select_pixmap = select_pixmap.scaled(int(20 * self.rate),
+                                             int(20 * self.rate),
+                                             Qt.KeepAspectRatio,
+                                             Qt.SmoothTransformation)
+        select_pixmap = QCursor(select_pixmap, 0, 0)
 
         # 设置字体
         font = QFont()
@@ -87,6 +96,7 @@ class Filter(QWidget) :
         self.add_button.setStyleSheet("background: rgba(255, 255, 255, 0.4);")
         self.add_button.setText("添加")
         self.add_button.clicked.connect(self.addFilter)
+        self.add_button.setCursor(select_pixmap)
 
         # 添加屏蔽词
         self.delete_button = QPushButton(self)
@@ -94,6 +104,7 @@ class Filter(QWidget) :
         self.delete_button.setStyleSheet("background: rgba(255, 255, 255, 0.4);")
         self.delete_button.setText("删除")
         self.delete_button.clicked.connect(self.deleteFilter)
+        self.delete_button.setCursor(select_pixmap)
 
 
     # 初始化配置

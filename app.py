@@ -47,7 +47,7 @@ class DangoTranslator() :
                                  "发生了意料之外的错误, 导致无法连接服务器\n"
                                  "请查阅日志文件并联系团子处理\n"
                                  "日志文件地址:\n"
-                                 "%s"%os.path.join(os.getcwd(), "logs", log_file_name))
+                                 "%s"%os.path.join(os.getcwd(), "logs", log_file_name), self.yaml["screen_scale_rate"])
         sys.exit()
 
 
@@ -151,7 +151,7 @@ class DangoTranslator() :
             utils.message.MessageBox("此版本已停止服务",
                                      "目前您使用的是测试版本, 此版本已经停止更新      \n"
                                      "请下载正式版本使用, 下载地址:\n%s      "
-                                     %self.yaml["dict_info"]["update_version"])
+                                     %self.yaml["dict_info"]["update_version"], self.yaml["screen_scale_rate"])
             sys.exit()
 
     # 主函数

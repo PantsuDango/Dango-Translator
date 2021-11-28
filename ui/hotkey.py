@@ -8,6 +8,7 @@ import utils.message
 
 LOGO_PATH = "./config/icon/logo.ico"
 PIXMAP_PATH = "./config/icon/pixmap.png"
+PIXMAP2_PATH = "./config/icon/pixmap2.png"
 
 
 class HotKey(QWidget):
@@ -42,6 +43,14 @@ class HotKey(QWidget):
         cursor = QCursor(pixmap, 0, 0)
         self.setCursor(cursor)
 
+        # 鼠标选中状态图标
+        select_pixmap = QPixmap(PIXMAP2_PATH)
+        select_pixmap = select_pixmap.scaled(int(20 * self.rate),
+                                             int(20 * self.rate),
+                                             Qt.KeepAspectRatio,
+                                             Qt.SmoothTransformation)
+        select_pixmap = QCursor(select_pixmap, 0, 0)
+
         # 设置字体
         self.setStyleSheet("QWidget { font: 12pt '华康方圆体W7'; "
                                      "background: rgb(255, 255, 255); "
@@ -70,6 +79,7 @@ class HotKey(QWidget):
             self.comboBox_1.addItem("")
             self.comboBox_1.setItemText(index, val)
         self.comboBox_1.setStyleSheet("background: rgba(255, 255, 255, 1);")
+        self.comboBox_1.setCursor(select_pixmap)
 
         label = QLabel(self)
         self.customSetGeometry(label, 145, 80, 50, 20)
@@ -86,18 +96,19 @@ class HotKey(QWidget):
             self.comboBox_2.addItem("")
             self.comboBox_2.setItemText(index, val)
         self.comboBox_2.setStyleSheet("background: rgba(255, 255, 255, 1);")
+        self.comboBox_2.setCursor(select_pixmap)
 
         # 确定按钮
         self.sure_button = QPushButton(self)
         self.customSetGeometry(self.sure_button, 130, 160, 70, 25)
         self.sure_button.setText("确定")
-        self.sure_button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.sure_button.setCursor(select_pixmap)
 
         # 取消按钮
         button = QPushButton(self)
         self.customSetGeometry(button, 210, 160, 70, 25)
         button.setText("取消")
-        button.setCursor(QCursor(Qt.PointingHandCursor))
+        button.setCursor(select_pixmap)
         button.clicked.connect(self.close)
 
     # 初始化配置

@@ -24,6 +24,7 @@ import ui.range
 
 LOGO_PATH = "./config/icon/logo.ico"
 PIXMAP_PATH = "./config/icon/pixmap.png"
+PIXMAP2_PATH = "./config/icon/pixmap2.png"
 
 
 # 翻译界面
@@ -84,6 +85,14 @@ class Translation(QMainWindow) :
                                Qt.SmoothTransformation)
         cursor = QCursor(pixmap, 0, 0)
         self.setCursor(cursor)
+
+        # 鼠标选中状态图标
+        select_pixmap = QPixmap(PIXMAP2_PATH)
+        select_pixmap = select_pixmap.scaled(int(20 * self.rate),
+                                             int(20 * self.rate),
+                                             Qt.KeepAspectRatio,
+                                             Qt.SmoothTransformation)
+        select_pixmap = QCursor(select_pixmap, 0, 0)
 
         # 工具栏标签
         label = QLabel(self)
@@ -150,7 +159,7 @@ class Translation(QMainWindow) :
         self.start_button.setToolTip("<b>翻译键 Translate</b><br>点击后翻译（手动模式）")
         self.start_button.setStyleSheet("background: transparent;")
         self.start_button.clicked.connect(self.startTranslater)
-        self.start_button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.start_button.setCursor(select_pixmap)
         self.start_button.hide()
 
         # 设置按钮
@@ -159,7 +168,7 @@ class Translation(QMainWindow) :
         self.customSetGeometry(self.settin_button, 213, 5, 20, 20)
         self.settin_button.setToolTip("<b>设置键 Settin</b><br>翻译器的详细设置")
         self.settin_button.setStyleSheet("background: transparent;")
-        self.settin_button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.settin_button.setCursor(select_pixmap)
         self.settin_button.hide()
 
         # 范围按钮
@@ -168,7 +177,7 @@ class Translation(QMainWindow) :
         self.customSetGeometry(self.range_button, 253, 5, 20, 20)
         self.range_button.setToolTip("<b>范围 Range</b><br>框选要翻译的区域<br>需从左上到右下拖动")
         self.range_button.setStyleSheet("background: transparent;")
-        self.range_button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.range_button.setCursor(select_pixmap)
         self.range_button.clicked.connect(self.clickRange)
         self.range_button.hide()
 
@@ -178,7 +187,7 @@ class Translation(QMainWindow) :
         self.customSetGeometry(self.copy_button, 293, 5, 20, 20)
         self.copy_button.setToolTip("<b>复制 Copy</b><br>将当前识别到的文本<br>复制至剪贴板")
         self.copy_button.setStyleSheet("background: transparent;")
-        self.copy_button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.copy_button.setCursor(select_pixmap)
         self.copy_button.clicked.connect(lambda: pyperclip.copy(self.original))
         self.copy_button.hide()
 
@@ -188,7 +197,7 @@ class Translation(QMainWindow) :
         self.customSetGeometry(self.filter_word_button, 333, 5, 20, 20)
         self.filter_word_button.setToolTip("<b>屏蔽字符 Filter</b><br>将特定翻译错误的词<br>屏蔽不显示")
         self.filter_word_button.setStyleSheet("background: transparent;")
-        self.filter_word_button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.filter_word_button.setCursor(select_pixmap)
         self.filter_word_button.clicked.connect(self.clickFilter)
         self.filter_word_button.hide()
 
@@ -197,7 +206,7 @@ class Translation(QMainWindow) :
         self.customSetGeometry(self.switch_button, 373, 5, 50, 20)
         self.switch_button.setToolTip("<b>模式 Mode</b><br>手动翻译/自动翻译")
         self.switch_button.checkedChanged.connect(self.changeTranslateMode)
-        self.switch_button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.switch_button.setCursor(select_pixmap)
         self.switch_button.hide()
 
         # 朗读原文按钮
@@ -207,7 +216,7 @@ class Translation(QMainWindow) :
         self.play_voice_button.setToolTip("<b>朗读原文 Play Voice</b><br>朗读识别到的原文")
         self.play_voice_button.setStyleSheet("background: transparent;")
         self.play_voice_button.clicked.connect(lambda: utils.thread.createThread(self.sound.playSound, self.original, self.object.config["language"]))
-        self.play_voice_button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.play_voice_button.setCursor(select_pixmap)
         self.play_voice_button.hide()
 
         # 充电按钮
@@ -216,7 +225,7 @@ class Translation(QMainWindow) :
         self.customSetGeometry(self.battery_button, 483, 5, 24, 20)
         self.battery_button.setToolTip("<b>充电入口 Support author</b><br>我要给团子充电支持!")
         self.battery_button.setStyleSheet("background: transparent;")
-        self.battery_button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.battery_button.setCursor(select_pixmap)
         self.battery_button.hide()
 
         # 锁按钮
@@ -225,7 +234,7 @@ class Translation(QMainWindow) :
         self.customSetGeometry(self.lock_button, 527, 5, 20, 20)
         self.lock_button.setToolTip("<b>锁定翻译界面 Lock</b>")
         self.lock_button.setStyleSheet("background: transparent;")
-        self.lock_button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.lock_button.setCursor(select_pixmap)
         self.lock_button.clicked.connect(self.lock)
         self.lock_button.hide()
 
@@ -235,7 +244,7 @@ class Translation(QMainWindow) :
         self.customSetGeometry(self.minimize_button, 567, 5, 20, 20)
         self.minimize_button.setToolTip("<b>最小化 Minimize</b>")
         self.minimize_button.setStyleSheet("background: transparent;")
-        self.minimize_button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.minimize_button.setCursor(select_pixmap)
         self.minimize_button.clicked.connect(self.showMinimized)
         self.minimize_button.hide()
 
@@ -245,7 +254,7 @@ class Translation(QMainWindow) :
         self.customSetGeometry(self.quit_button, 607, 5, 20, 20)
         self.quit_button.setToolTip("<b>退出程序 Quit</b>")
         self.quit_button.setStyleSheet("background: transparent;")
-        self.quit_button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.quit_button.setCursor(select_pixmap)
         self.quit_button.clicked.connect(self.showAppquitMessageBox)
         self.quit_button.hide()
 

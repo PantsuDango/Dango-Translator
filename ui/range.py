@@ -5,6 +5,7 @@ import re
 
 
 PIXMAP_PATH = "./config/icon/pixmap.png"
+PIXMAP2_PATH = "./config/icon/pixmap2.png"
 
 
 # 选择范围
@@ -157,6 +158,14 @@ class Range(QMainWindow) :
         cursor = QCursor(pixmap, 0, 0)
         self.setCursor(cursor)
 
+        # 鼠标选中状态图标
+        select_pixmap = QPixmap(PIXMAP2_PATH)
+        select_pixmap = select_pixmap.scaled(int(20 * self.rate),
+                                             int(20 * self.rate),
+                                             Qt.KeepAspectRatio,
+                                             Qt.SmoothTransformation)
+        select_pixmap = QCursor(select_pixmap, 0, 0)
+
         self.label = QLabel(self)
         self.label.setGeometry(0, 0, X2 - X1, Y2 - Y1)
         self.label.setStyleSheet("border-width:1;\
@@ -179,7 +188,7 @@ class Range(QMainWindow) :
                                        "color: %s;"%self.color)
         self.hide_button.setFont(self.font)
         self.hide_button.setText("隐藏")
-        self.hide_button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.hide_button.setCursor(select_pixmap)
         self.hide_button.clicked.connect(self.quit)
         self.hide_button.hide()
 
