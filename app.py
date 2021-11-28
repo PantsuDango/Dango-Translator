@@ -131,12 +131,25 @@ class DangoTranslator() :
                                              "%s     "%text)
 
 
+    # 检查是否为测试版本
+    def checkIsTestVersion(self) :
+
+        if "Beta" in self.yaml["version"] and self.yaml["dict_info"]["test_version_switch"] != "1" :
+            utils.message.MessageBox("此版本已停止服务",
+                                     "目前您使用的是测试版本, 此版本已经停止更新      \n"
+                                     "请下载正式版本使用, 下载地址:\n%s      "
+                                     %self.yaml["dict_info"]["update_version"])
+            sys.exit()
+
     # 主函数
     def main(self) :
 
         # 自适应高分辨率
         QCoreApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
         app = QApplication(sys.argv)
+
+        # 检查是否为测试版本
+        self.checkIsTestVersion()
 
         # 检查字体
         utils.check_font.checkFont(self.logger)
