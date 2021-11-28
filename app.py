@@ -1,6 +1,8 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 import sys
+import os
+import time
 
 import utils.logger
 import utils.config
@@ -29,13 +31,24 @@ class DangoTranslator() :
         # 本地配置
         self.yaml = utils.config.openConfig(self.logger)
         # 版本号
-        self.yaml["version"] = "4.0-Beta"
+        self.yaml["version"] = "4.0.2-Beta"
         # 配置中心
         self.yaml["dict_info"] = utils.config.getDictInfo(self.yaml["dict_info_url"], self.logger)
         # 屏幕分辨率
         self.yaml["screen_scale_rate"] = utils.screen_rate.getScreenRate(self.logger)
-        # 初始化图片资源
-        utils.thread.createThread(self.InitLoadImage)
+
+
+    # 服务连接失败提示
+    def serverClientFailMessage(self) :
+
+        date = time.strftime("%Y-%m-%d", time.localtime(time.time()))
+        log_file_name = date + ".log"
+        utils.message.MessageBox("连接服务器失败",
+                                 "发生了意料之外的错误, 导致无法连接服务器\n"
+                                 "请查阅日志文件并联系团子处理\n"
+                                 "日志文件地址:\n"
+                                 "%s"%os.path.join(os.getcwd(), "logs", log_file_name))
+        sys.exit()
 
 
     # 登录
@@ -148,6 +161,9 @@ class DangoTranslator() :
         QCoreApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
         app = QApplication(sys.argv)
 
+        if not self.yaml["dict_info"] :
+            self.serverClientFailMessage()
+
         # 检查是否为测试版本
         self.checkIsTestVersion()
 
@@ -158,6 +174,9 @@ class DangoTranslator() :
         thread = utils.thread.createCheckVersionQThread(self)
         thread.signal.connect(self.showCheckVersionMessage)
         utils.thread.runQThread(thread)
+
+        # 初始化图片资源
+        utils.thread.createThread(self.InitLoadImage)
 
         # 登录界面
         self.login_ui = ui.login.Login(self)
