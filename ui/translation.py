@@ -633,7 +633,7 @@ class Translation(QMainWindow) :
             color = self.object.config["fontColor"]["caiyunPrivate"]
         # 原文
         elif trans_type == "original" :
-            color = self.object.config["fontColor"]["original"]
+            color = self.font_color_1
         else :
             return
 
