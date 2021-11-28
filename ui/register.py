@@ -19,6 +19,7 @@ LOGO_PATH = "./config/icon/logo.ico"
 PIXMAP_PATH = "./config/icon/pixmap.png"
 BG_IMAGE_PATH = "./config/background/register.gif"
 PIXMAP2_PATH = "./config/icon/pixmap2.png"
+EDIT_PATH = "./config/icon/edit.png"
 
 
 # 注册界面
@@ -63,6 +64,14 @@ class Register(QWidget) :
                                              Qt.SmoothTransformation)
         select_pixmap = QCursor(select_pixmap, 0, 0)
 
+        # 鼠标编辑状态图标
+        edit_pixmap = QPixmap(EDIT_PATH)
+        edit_pixmap = edit_pixmap.scaled(int(20*self.rate),
+                                         int(25*self.rate),
+                                         Qt.KeepAspectRatio,
+                                         Qt.SmoothTransformation)
+        edit_pixmap = QCursor(edit_pixmap, 0, 0)
+
         # 设置字体
         font = QFont()
         font.setFamily(self.font_type)
@@ -96,11 +105,13 @@ class Register(QWidget) :
         self.user_text = QLineEdit(self)
         self.customSetGeometry(self.user_text, 30, 10, 300, 30)
         self.user_text.setPlaceholderText("请输入账号:")
+        self.user_text.setCursor(edit_pixmap)
 
         # 密码输入框
         self.password_text = QLineEdit(self)
         self.customSetGeometry(self.password_text, 30, 50, 300, 30)
         self.password_text.setEchoMode(QLineEdit.Password)
+        self.password_text.setCursor(edit_pixmap)
 
         # 是否显示密码
         self.eye_button = QPushButton(qtawesome.icon("fa.eye-slash", color=self.color), "", self)
@@ -114,11 +125,13 @@ class Register(QWidget) :
         self.email_text = QLineEdit(self)
         self.customSetGeometry(self.email_text, 30, 90, 300, 30)
         self.email_text.setPlaceholderText("请输入绑定的邮箱:")
+        self.email_text.setCursor(edit_pixmap)
 
         # 验证码输入框
         self.code_key_text = QLineEdit(self)
         self.customSetGeometry(self.code_key_text, 30, 130, 300, 30)
         self.code_key_text.setPlaceholderText("请输入邮箱验证码:")
+        self.code_key_text.setCursor(edit_pixmap)
 
         # 获取验证码按钮
         self.send_email_button = QPushButton(self)

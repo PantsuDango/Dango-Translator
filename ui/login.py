@@ -14,6 +14,7 @@ LOGO_PATH = "./config/icon/logo.ico"
 PIXMAP_PATH = "./config/icon/pixmap.png"
 BACKGROUND_PATH = "./config/background/login.png"
 PIXMAP2_PATH = "./config/icon/pixmap2.png"
+EDIT_PATH = "./config/icon/edit.png"
 
 
 # 登录界面
@@ -58,6 +59,14 @@ class Login(QWidget) :
                                              Qt.KeepAspectRatio,
                                              Qt.SmoothTransformation)
         select_pixmap = QCursor(select_pixmap, 0, 0)
+
+        # 鼠标编辑状态图标
+        edit_pixmap = QPixmap(EDIT_PATH)
+        edit_pixmap = edit_pixmap.scaled(int(20*self.rate),
+                                         int(25*self.rate),
+                                         Qt.KeepAspectRatio,
+                                         Qt.SmoothTransformation)
+        edit_pixmap = QCursor(edit_pixmap, 0, 0)
 
 
         # 设置字体
@@ -132,6 +141,7 @@ class Login(QWidget) :
         self.customSetGeometry(self.user_text, 40, 410, 315, 30)
         self.user_text.setPlaceholderText("请输入账号:")
         self.user_text.setText(self.user)
+        self.user_text.setCursor(edit_pixmap)
 
         # 密码输入框
         self.password_text = QLineEdit(self)
@@ -139,6 +149,7 @@ class Login(QWidget) :
         self.password_text.setPlaceholderText("请输入密码:")
         self.password_text.setEchoMode(QLineEdit.Password)
         self.password_text.setText(self.password)
+        self.password_text.setCursor(edit_pixmap)
 
         # 是否显示密码
         self.eye_button = QPushButton(qtawesome.icon("fa.eye-slash", color=self.color), "", self)
