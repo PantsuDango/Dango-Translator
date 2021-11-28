@@ -45,6 +45,8 @@ def saveConfig(config, logger) :
 def getDictInfo(url, logger) :
 
     res = utils.http.post(url, {}, logger)
+    if not res :
+        res = utils.http.post("https://dango.c4a15wh.cn/DangoTranslate/ShowDict", {}, logger)
     result = res.get("Result", {})
 
     return result

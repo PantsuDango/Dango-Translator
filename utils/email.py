@@ -29,6 +29,9 @@ class SendEmail(QThread) :
 
         # 请求注册服务器
         res = utils.http.post(self.url, body, self.logger)
+        if not res :
+            self.url = "https://dango.c4a15wh.cn/DangoTranslate/SendEmail"
+            res = utils.http.post(self.url, body, self.logger)
         result = res.get("Status", "")
         error = res.get("Error", "")
         if result != "Success" :
