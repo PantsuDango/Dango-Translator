@@ -134,3 +134,7 @@
 
 #### 支持作者
 <img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.0/%E6%94%AF%E6%8C%81%E4%BD%9C%E8%80%85.png" width="100%" height="100%">
+
+
+## 开源协议
+本项目使用GNU LESSER GENERAL PUBLIC LICENSE(LGPL)开源协议
