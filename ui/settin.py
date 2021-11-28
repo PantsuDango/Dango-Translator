@@ -119,8 +119,8 @@ class Settin(QMainWindow) :
 
         # 鼠标样式
         pixmap = QPixmap(PIXMAP_ICON_PATH)
-        pixmap = pixmap.scaled(int(30*self.rate),
-                               int(34*self.rate),
+        pixmap = pixmap.scaled(int(20*self.rate),
+                               int(20*self.rate),
                                Qt.KeepAspectRatio,
                                Qt.SmoothTransformation)
         cursor = QCursor(pixmap, 0, 0)
