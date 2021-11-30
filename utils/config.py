@@ -7,7 +7,7 @@ import utils.http
 
 
 YAML_PATH = "./config/config.yaml"
-HISTORY_FILE_PATH = "./翻译历史.txt"
+HISTORY_FILE_PATH = "../翻译历史.txt"
 
 
 # 打开本地配置文件
@@ -220,25 +220,25 @@ def saveOriginalHisTory(original) :
 def saveTransHisTory(text, translate_type) :
 
     if translate_type == "youdao" :
-        content = "[公共有道]\n%s"%text
+        content = "[公共有道]\n%s\n"%text
     elif translate_type == "caiyun" :
-        content = "[公共彩云]\n%s"%text
+        content = "[公共彩云]\n%s\n"%text
     elif translate_type == "deepl" :
-        content = "[公共DeepL]\n%s"%text
+        content = "[公共DeepL]\n%s\n"%text
     elif translate_type == "baidu" :
-        content = "[公共百度]\n%s"%text
+        content = "[公共百度]\n%s\n"%text
     elif translate_type == "tencent" :
-        content = "[公共腾讯]\n%s"%text
+        content = "[公共腾讯]\n%s\n"%text
     elif translate_type == "google" :
-        content = "[公共谷歌]\n%s"%text
+        content = "[公共谷歌]\n%s\n"%text
     elif translate_type == "baidu_private" :
-        content = "[私人百度]\n%s"%text
+        content = "[私人百度]\n%s\n"%text
     elif translate_type == "tencent_private" :
-        content = "[私人腾讯]\n%s"%text
+        content = "[私人腾讯]\n%s\n"%text
     elif translate_type == "caiyun_private" :
-        content = "[私人彩云]\n%s"%text
+        content = "[私人彩云]\n%s\n"%text
     elif translate_type == "xiaoniu" :
-        content = "[公共小牛]\n%s"%text
+        content = "[公共小牛]\n%s\n"%text
     else:
         return
 

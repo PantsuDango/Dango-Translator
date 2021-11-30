@@ -21,7 +21,7 @@ class Sound() :
             option = webdriver.ChromeOptions()
             option.add_argument("--headless")
             self.browser = webdriver.Chrome(executable_path="./config/tools/chromedriver.exe",
-                                            service_log_path="./logs/geckodriver.log",
+                                            service_log_path="../logs/geckodriver.log",
                                             options=option)
         except Exception:
             self.logger.error(format_exc())
@@ -31,7 +31,7 @@ class Sound() :
                 option = webdriver.FirefoxOptions()
                 option.add_argument("--headless")
                 self.browser = webdriver.Firefox(executable_path="./config/tools/geckodriver.exe",
-                                                 service_log_path="./logs/geckodriver.log",
+                                                 service_log_path="../logs/geckodriver.log",
                                                  options=option)
             except Exception:
                 self.logger.error(format_exc())
@@ -51,7 +51,7 @@ class Sound() :
                             ]}
                     }
                     self.browser = webdriver.Edge(executable_path="./config/tools/msedgedriver.exe",
-                                                  service_log_path="./logs/geckodriver.log",
+                                                  service_log_path="../logs/geckodriver.log",
                                                   capabilities=EDGE)
                 except Exception:
                     self.logger.error(format_exc())
