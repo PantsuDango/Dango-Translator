@@ -82,7 +82,12 @@ def dangoOCR(object, test=False) :
         "Token": token
     }
 
-    res = utils.http.post(url, body, object.logger, timeout=2.5)
+    # 尝试请求三次
+    for num in range(3) :
+        res = utils.http.post(url, body, object.logger, timeout=2)
+        if res :
+            break
+    # 如果出错就直接结束
     if not res :
         return False, "团子OCR错误: 错误未知, 请尝试重试, 如果频繁出现此情况请联系团子"
 
