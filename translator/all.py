@@ -91,7 +91,10 @@ class Webdriver(QObject) :
                     return
 
         self.browser_sign = 1
-        if not self.object.translation_ui.webdriver_type2 or not self.object.translation_ui.webdriver_type2 :
+        self.message_sign.emit("翻译模块启动完成~")
+        if self.object.translation_ui.webdriver1.browser_sign == 1 \
+                and self.object.translation_ui.webdriver2.browser_sign == 1 \
+                and self.object.translation_ui.webdriver3.browser_sign == 1 :
             self.message_sign.emit("翻译模块启动完成~")
 
 
@@ -100,7 +103,6 @@ class Webdriver(QObject) :
 
         self.web_type = web_type
         self.message_sign.emit("%s翻译引擎启动中, 请等待完成后再操作..."%self.translater_map[web_type])
-        print("%s翻译引擎启动中, 请等待完成后再操作..."%self.translater_map[web_type])
 
         try :
             self.browser.get(self.url_map[web_type])
@@ -112,7 +114,6 @@ class Webdriver(QObject) :
         except Exception :
             self.logger.error(format_exc())
             self.message_sign.emit("%s翻译引擎启动失败..."%self.translater_map[web_type])
-            print("%s翻译引擎启动失败..."%self.translater_map[web_type])
 
 
     # 有道翻译
@@ -142,14 +143,9 @@ class Webdriver(QObject) :
                 # 判断超时
                 end = time.time()
                 if (end - start) > 10:
-                    self.browser.refresh()
                     return "公共有道: 我超时啦!"
 
         except Exception :
-            try:
-                self.browser.refresh()
-            except Exception:
-                pass
             self.logger.error(format_exc())
             return "公共有道: 我抽风啦!"
 
@@ -183,14 +179,9 @@ class Webdriver(QObject) :
                 # 判断超时
                 end = time.time()
                 if (end - start) > 10 :
-                    self.browser.refresh()
                     return "公共百度: 我超时啦!"
 
         except Exception :
-            try:
-                self.browser.refresh()
-            except Exception:
-                pass
             self.logger.error(format_exc())
             return "公共百度: 我抽风啦!"
 
@@ -224,14 +215,9 @@ class Webdriver(QObject) :
                 # 判断超时
                 end = time.time()
                 if (end - start) > 10 :
-                    self.browser.refresh()
                     return "公共腾讯: 我超时啦!"
 
         except Exception :
-            try:
-                self.browser.refresh()
-            except Exception:
-                pass
             self.logger.error(format_exc())
             return "公共腾讯: 我抽风啦!"
 
@@ -258,7 +244,7 @@ class Webdriver(QObject) :
                 try :
                     # 提取翻译信息
                     outputText = self.browser.find_element_by_id("target-textblock").get_attribute("textContent")
-                    if not outputText.isspace() and len(outputText.strip()) > 1 and "".join(outputText.split()) != self.content:
+                    if not outputText.isspace() and len(outputText.strip()) > 1 and "".join(outputText.split()) != self.content :
                         self.content = outputText.strip()
                         return self.content
                 except Exception :
@@ -266,14 +252,9 @@ class Webdriver(QObject) :
                 # 判断超时
                 end = time.time()
                 if (end - start) > 10 :
-                    self.browser.refresh()
                     return "公共彩云: 我超时啦!"
 
         except Exception :
-            try:
-                self.browser.refresh()
-            except Exception:
-                pass
             self.logger.error(format_exc())
             return "公共彩云: 我抽风啦!"
 
@@ -307,14 +288,9 @@ class Webdriver(QObject) :
                 # 判断超时
                 end = time.time()
                 if (end - start) > 10 :
-                    self.browser.refresh()
                     return "公共谷歌: 我超时啦!"
 
         except Exception :
-            try:
-                self.browser.refresh()
-            except Exception:
-                pass
             self.logger.error(format_exc())
             return "公共谷歌: 我抽风啦!"
 
@@ -354,14 +330,9 @@ class Webdriver(QObject) :
                 # 判断超时
                 end = time.time()
                 if (end - start) > 10 :
-                    self.browser.refresh()
                     return "公共DeepL: 我超时啦!"
 
         except Exception :
-            try:
-                self.browser.refresh()
-            except Exception:
-                pass
             self.logger.error(format_exc())
             return "公共DeepL: 我抽风啦!"
 
@@ -393,14 +364,9 @@ class Webdriver(QObject) :
                 # 判断超时
                 end = time.time()
                 if (end - start) > 10:
-                    self.browser.refresh()
                     return "公共小牛: 我超时啦!"
 
         except Exception :
-            try :
-                self.browser.refresh()
-            except Exception :
-                pass
             self.logger.error(format_exc())
             return "公共小牛: 我抽风啦!"
 

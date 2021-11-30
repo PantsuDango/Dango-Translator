@@ -44,10 +44,17 @@ class TranslaterProccess(QThread) :
 
         # 公共翻译二
         elif self.trans_type == "webdriver_2" :
-            if self.object.translation_ui.webdriver1.open_sign :
+            if self.object.translation_ui.webdriver2.open_sign :
                 result = self.object.translation_ui.webdriver2.translater(self.object.translation_ui.original)
             else :
                 result = "%s翻译: 我抽风啦"%self.object.translation_ui.webdriver2.translater_map[self.object.translation_ui.webdriver2.web_type]
+
+        # 公共翻译三
+        elif self.trans_type == "webdriver_3":
+            if self.object.translation_ui.webdriver3.open_sign :
+                result = self.object.translation_ui.webdriver3.translater(self.object.translation_ui.original)
+            else:
+                result = "%s翻译: 我抽风啦" % self.object.translation_ui.webdriver3.translater_map[self.object.translation_ui.webdriver3.web_type]
 
         # 私人百度
         elif self.trans_type == "baidu_private" :
@@ -218,6 +225,11 @@ class Translater(QThread) :
         # 公共翻译二
         if self.object.translation_ui.webdriver2.open_sign :
             utils.thread.createThread(self.creatTranslaterThread, "webdriver_2")
+            nothing_sign = True
+
+        # 公共翻译三
+        if self.object.translation_ui.webdriver3.open_sign:
+            utils.thread.createThread(self.creatTranslaterThread, "webdriver_3")
             nothing_sign = True
 
         # 私人百度

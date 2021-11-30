@@ -340,6 +340,8 @@ class Translation(QMainWindow) :
         self.webdriver_type1 = ""
         # 翻译线程2翻译类型
         self.webdriver_type2 = ""
+        # 翻译线程3翻译类型
+        self.webdriver_type3 = ""
         # 状态栏是否隐藏标志
         self.statusbar_sign = True
         # 各翻译源线程状态标志
@@ -622,6 +624,9 @@ class Translation(QMainWindow) :
         # 公共翻译二
         elif trans_type == "webdriver_2" :
             color = self.object.config["fontColor"][self.translater_yaml_map[self.webdriver2.web_type]]
+        # 公共翻译三
+        elif trans_type == "webdriver_3":
+            color = self.object.config["fontColor"][self.translater_yaml_map[self.webdriver3.web_type]]
         # 私人百度
         elif trans_type == "baidu_private" :
             color = self.object.config["fontColor"]["baidu"]
@@ -726,6 +731,20 @@ class Translation(QMainWindow) :
             self.statusbar.showMessage("翻译模型启动中, 请等待完成后再操作...")
             utils.thread.createThread(self.webdriver2.openWeb, self.webdriver_type2)
 
+    # 加载翻译引擎3
+    def openWebdriver3(self):
+
+        # 翻译模块2
+        self.webdriver3 = translator.all.Webdriver(self.object)
+        # 连接消息提示框
+        self.webdriver3.message_sign.connect(self.showStatusbar)
+        # 加载翻译引擎
+        self.webdriver3.openWebdriver()
+        # 开启翻译页面
+        if self.webdriver_type3 :
+            self.statusbar.showMessage("翻译模型启动中, 请等待完成后再操作...")
+            utils.thread.createThread(self.webdriver3.openWeb, self.webdriver_type3)
+
 
     # 开启翻译模块
     def createWebdriverThread(self) :
@@ -740,12 +759,15 @@ class Translation(QMainWindow) :
             if not self.webdriver_type1 :
                 # 翻译模块一的翻译源类型
                 self.webdriver_type1 = val.replace("Use", "").replace("web", "")
-            else:
+            elif not self.webdriver_type2 :
                 # 翻译模块二的翻译源类型
                 self.webdriver_type2 = val.replace("Use", "").replace("web", "")
+            else :
+                self.webdriver_type3 = val.replace("Use", "").replace("web", "")
 
         utils.thread.createThread(self.openWebdriver1)
         utils.thread.createThread(self.openWebdriver2)
+        utils.thread.createThread(self.openWebdriver3)
 
 
     # 按下屏蔽词键后做的事情

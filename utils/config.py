@@ -139,12 +139,12 @@ def configConvert(object) :
                 "caiyunUse", "tencentUse", "baiduUse", "caiyunPrivateUse"] :
         if object.config[val] == "True" :
             tmp.append(val)
-    if len(tmp) > 2 :
+    if len(tmp) > 3 :
         count = 0
         for val in tmp :
             object.config[val] = "False"
             count += 1
-            if len(tmp) - count <= 2 :
+            if len(tmp) - count <= 3 :
                 break
 
     # 私人腾讯翻译密钥

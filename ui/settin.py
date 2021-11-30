@@ -2140,7 +2140,7 @@ class Settin(QMainWindow) :
     # 校验翻译开关状态
     def checkTranslaterUse(self) :
 
-        if len(self.translate_list) <= 2 :
+        if len(self.translate_list) <= 3 :
             return
 
         for val in self.translate_list :
@@ -2180,7 +2180,7 @@ class Settin(QMainWindow) :
                 self.caiyun_private_switch.mousePressEvent(1)
                 self.caiyun_private_switch.updateValue()
 
-            if len(self.translate_list) <= 2 :
+            if len(self.translate_list) <= 3 :
                 break
 
 
@@ -2188,10 +2188,9 @@ class Settin(QMainWindow) :
     def resetWebdriver(self) :
 
         # 重置开关
-        tmp_sign_1 = False
-        tmp_sign_2 = False
         self.object.translation_ui.webdriver1.open_sign = False
         self.object.translation_ui.webdriver2.open_sign = False
+        self.object.translation_ui.webdriver3.open_sign = False
 
         # 刷新翻译
         translater_list = ["youdaoUse", "baiduwebUse", "tencentwebUse", "deeplUse", "googleUse", "caiyunUse"]
@@ -2199,27 +2198,34 @@ class Settin(QMainWindow) :
             if self.object.config[val] == "False" :
                 continue
 
-            if not tmp_sign_2 :
-                tmp_sign_2 = True
-                self.object.translation_ui.webdriver1.open_sign = True
-            else :
-                self.object.translation_ui.webdriver2.open_sign = True
-
             # 避免重复开启
             web_type = val.replace("Use", "").replace("web", "")
-            if web_type == self.object.translation_ui.webdriver_type1 or web_type == self.object.translation_ui.webdriver_type2 :
+            if web_type == self.object.translation_ui.webdriver_type1 :
+                self.object.translation_ui.webdriver1.open_sign = True
                 continue
 
-            if not tmp_sign_1 :
+            elif web_type == self.object.translation_ui.webdriver_type2 :
+                self.object.translation_ui.webdriver2.open_sign = True
+                continue
+
+            elif web_type == self.object.translation_ui.webdriver_type3 :
+                self.object.translation_ui.webdriver3.open_sign = True
+                continue
+
+            if not self.object.translation_ui.webdriver1.open_sign :
                 # 刷新翻译引擎1
-                tmp_sign_1 = True
                 self.object.translation_ui.webdriver_type1 = web_type
                 utils.thread.createThread(self.object.translation_ui.webdriver1.openWeb, web_type)
 
-            else :
+            elif not self.object.translation_ui.webdriver2.open_sign :
                 # 刷新翻译引擎2
                 self.object.translation_ui.webdriver_type2 = web_type
                 utils.thread.createThread(self.object.translation_ui.webdriver2.openWeb, web_type)
+
+            elif not self.object.translation_ui.webdriver3.open_sign :
+                # 刷新翻译引擎3
+                self.object.translation_ui.webdriver_type3 = web_type
+                utils.thread.createThread(self.object.translation_ui.webdriver3.openWeb, web_type)
 
 
     # 退出前保存设置
