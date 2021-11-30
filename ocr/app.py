@@ -97,7 +97,10 @@ def ocrProccess(imgPath, language) :
 
     resMapList = []
     for line in result :
-        print(line[1][0])
+        try:
+            print(line[1][0])
+        except Exception :
+            pass
         resMap = {
             "Coordinate": {
                 "UpperLeft": line[0][0],
