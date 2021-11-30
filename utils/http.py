@@ -4,13 +4,20 @@ from traceback import format_exc
 
 
 # 发送http请求
-def post(url, body, logger, timeout=10) :
+def post(url, body, logger, timeout=5) :
 
     proxies = {
         "http": None,
         "https": None
     }
     result = {}
+
+    try :
+        # 消除https警告
+        requests.packages.urllib3.disable_warnings()
+    except Exception :
+        pass
+
     try :
         with requests.post(url, data=json.dumps(body), proxies=proxies, verify=False, timeout=timeout) as response :
             try :
