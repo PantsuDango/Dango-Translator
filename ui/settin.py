@@ -281,6 +281,12 @@ class Settin(QMainWindow) :
         button.clicked.connect(lambda: self.showDesc("offlineOCR"))
         button.setCursor(self.question_pixmap)
 
+        # 离线OCR备注
+        label = QLabel(self.tab_1)
+        self.customSetGeometry(label, 145, 25, 300, 20)
+        label.setText("如果安装失败建议直接使用在线OCR")
+        label.setStyleSheet("color: %s" % self.color_2)
+
         # 离线OCR状态开关
         self.offline_ocr_switch = ui.switch.OfflineSwitch(self.tab_1, sign=self.offline_ocr_use, startX=(65-20)*self.rate, object=self.object)
         self.customSetGeometry(self.offline_ocr_switch, 20, 60, 65, 20)
@@ -329,6 +335,12 @@ class Settin(QMainWindow) :
         button.clicked.connect(lambda: self.showDesc("onlineOCR"))
         button.setCursor(self.question_pixmap)
 
+        # 在线OCR备注
+        label = QLabel(self.tab_1)
+        self.customSetGeometry(label, 145, 120, 300, 20)
+        label.setText("精度高, 无限调用次数, 建议使用")
+        label.setStyleSheet("color: %s" % self.color_2)
+
         # 在线OCR状态开关
         self.online_ocr_switch = ui.switch.SwitchOCR(self.tab_1, self.online_ocr_use, startX=(65-20)*self.rate)
         self.customSetGeometry(self.online_ocr_switch, 20, 155, 65, 20)
@@ -376,6 +388,12 @@ class Settin(QMainWindow) :
         button.setStyleSheet("background: transparent;")
         button.clicked.connect(lambda: self.showDesc("baiduOCR"))
         button.setCursor(self.question_pixmap)
+
+        # 百度OCR备注
+        label = QLabel(self.tab_1)
+        self.customSetGeometry(label, 145, 215, 300, 20)
+        label.setText("老用户专用, 精度虽高但价格昂贵")
+        label.setStyleSheet("color: %s" % self.color_2)
 
         # 百度OCR状态开关
         self.baidu_ocr_switch = ui.switch.SwitchOCR(self.tab_1, self.baidu_ocr_use, startX=(65-20)*self.rate)
@@ -477,12 +495,20 @@ class Settin(QMainWindow) :
         self.customSetGeometry(button, 115, 25, 20, 20)
         button.clicked.connect(lambda: self.showDesc("publicTranslate"))
         button.setCursor(self.question_pixmap)
+        button.setStyleSheet("background: transparent;")
 
         # 公共翻译备注
         label = QLabel(self.tab_2)
-        self.customSetGeometry(label, 155, 25, 300, 20)
+        self.customSetGeometry(label, 155, 25, 200, 20)
         label.setText("可直接使用, 但不稳定可能会抽风")
         label.setStyleSheet("color: %s"%self.color_2)
+
+        # 公共翻译教程按钮
+        button = QPushButton(self.tab_2)
+        self.customSetGeometry(button, 380, 25, 60, 20)
+        button.setText("教程")
+        button.clicked.connect(self.openPublicTransTutorial)
+        button.setCursor(self.select_pixmap)
 
         # 有道翻译标签
         label = QLabel(self.tab_2)
@@ -490,7 +516,6 @@ class Settin(QMainWindow) :
         label.setText("有道:")
 
         # 有道翻译开关
-        button.setStyleSheet("background: transparent;")
         self.youdao_switch = ui.switch.SwitchOCR(self.tab_2, sign=self.youdao_use, startX=(65-20)*self.rate)
         self.customSetGeometry(self.youdao_switch, 65, 70, 65, 20)
         self.youdao_switch.checkedChanged.connect(self.changeYoudaoSwitch)
@@ -1775,6 +1800,16 @@ class Settin(QMainWindow) :
             self.logger.error(format_exc())
 
 
+    # 打开公共翻译教程
+    def openPublicTransTutorial(self):
+
+        try:
+            url = self.object.yaml["dict_info"]["tutorial_public_trans"]
+            webbrowser.open(url, new=0, autoraise=True)
+        except Exception:
+            self.logger.error(format_exc())
+
+
     # 打开私人百度翻译教程
     def openBaiduTutorial(self):
 
@@ -1989,7 +2024,7 @@ class Settin(QMainWindow) :
             self.desc_ui.desc_text.append("\n缺点:\n1. 不免费, 需要氪点金金;")
             self.desc_ui.desc_text.append("\n详细使用方式见教程.")
 
-        # 在线OCR说明
+        # 百度OCR说明
         elif message_type == "baiduOCR":
             self.desc_ui.setWindowTitle("百度OCR说明")
             self.desc_ui.desc_text.append("\n特性: \n百度智能云的OCR服务.")

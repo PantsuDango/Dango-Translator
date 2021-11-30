@@ -33,11 +33,13 @@ class DangoTranslator() :
         # 本地配置
         self.yaml = utils.config.openConfig(self.logger)
         # 版本号
-        self.yaml["version"] = "4.0.1-Beta"
+        self.yaml["version"] = "4.0.2-Beta"
         # 配置中心
         self.yaml["dict_info"] = utils.config.getDictInfo(self.yaml["dict_info_url"], self.logger)
         # 屏幕分辨率
         self.yaml["screen_scale_rate"] = utils.screen_rate.getScreenRate(self.logger)
+        # 保存配置
+        utils.config.saveConfig(self.yaml, self.logger)
 
 
     # 服务连接失败提示

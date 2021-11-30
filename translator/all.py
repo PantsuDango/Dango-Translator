@@ -87,7 +87,7 @@ class Webdriver(QObject) :
                     self.browser_sign = 2
                     self.logger.error(format_exc())
                     self.close()
-                    self.message_sign.emit("翻译模块启动失败...")
+                    self.message_sign.emit("翻译模块启动失败, 无法使用公共翻译, 详见公共翻译教程说明")
                     return
 
         self.browser_sign = 1
@@ -113,7 +113,7 @@ class Webdriver(QObject) :
 
         except Exception :
             self.logger.error(format_exc())
-            self.message_sign.emit("%s翻译引擎启动失败..."%self.translater_map[web_type])
+            self.message_sign.emit("%s翻译引擎启动失败, 详见公共翻译教程说明"%self.translater_map[web_type])
 
 
     # 有道翻译
