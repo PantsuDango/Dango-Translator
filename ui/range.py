@@ -3,6 +3,8 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import re
 
+import utils.thread
+
 
 PIXMAP_PATH = "./config/icon/pixmap.png"
 PIXMAP2_PATH = "./config/icon/pixmap2.png"
@@ -114,7 +116,7 @@ class WScreenShot(QWidget) :
                 self.object.translation_ui.checkOverlap()
                 # 如果处于手动模式下则刷新一次翻译
                 if not self.object.translation_ui.translate_mode :
-                    self.object.translation_ui.startTranslater()
+                    utils.thread.createThread(self.object.translation_ui.startTranslater)
         except Exception :
             pass
 

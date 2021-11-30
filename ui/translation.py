@@ -158,7 +158,7 @@ class Translation(QMainWindow) :
         self.customSetGeometry(self.start_button, 173, 5, 20, 20)
         self.start_button.setToolTip("<b>翻译键 Translate</b><br>点击后翻译（手动模式）")
         self.start_button.setStyleSheet("background: transparent;")
-        self.start_button.clicked.connect(self.startTranslater)
+        self.start_button.clicked.connect(lambda: utils.thread.createThread(self.startTranslater))
         self.start_button.setCursor(select_pixmap)
         self.start_button.hide()
 
@@ -814,6 +814,7 @@ class Translation(QMainWindow) :
         utils.thread.createThreadDaemonFalse(self.sound.close)
         utils.thread.createThreadDaemonFalse(self.webdriver1.close)
         utils.thread.createThreadDaemonFalse(self.webdriver2.close)
+        utils.thread.createThreadDaemonFalse(self.webdriver3.close)
         # 关闭selenuim的driver引擎
         self.killDriVer()
         # 退出程序前保存设置
