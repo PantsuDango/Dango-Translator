@@ -120,7 +120,12 @@ def offlineOCR(object) :
         imageBorder(image_path, new_image_path, "a", 10, color=(255, 255, 255))
     except Exception :
         body["ImagePath"] = image_path
-    res = utils.http.post(url, body, object.logger)
+
+    # 尝试请求三次
+    for num in range(3):
+        res = utils.http.post(url, body, object.logger)
+        if res and res.get("Code", -1) != -1 :
+            break
     if not res :
         return False, "离线OCR错误: 错误未知, 请尝试重试, 如果频繁出现此情况请联系团子"
 
