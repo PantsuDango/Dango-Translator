@@ -79,7 +79,7 @@ def configConvert(object) :
 
     ################### OCR设定 ###################
     # 离线OCR开关
-    object.config["offlineOCR"] = False
+    object.config["offlineOCR"] = object.config.get("offlineOCR", False)
     # 在线OCR开关
     object.config["onlineOCR"] = object.config.get("onlineOCR", False)
     # 百度OCR开关

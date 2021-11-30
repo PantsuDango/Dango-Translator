@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
+from traceback import format_exc
 import sys
 import os
 import time
@@ -12,6 +13,7 @@ import utils.thread
 import utils.http
 import utils.email
 import utils.message
+import utils.port
 
 import ui.login
 import ui.register
@@ -85,6 +87,9 @@ class DangoTranslator() :
         thread.signal.connect(self.register_ui.showBindEmailMessage)
         utils.thread.runQThread(thread)
 
+        # 自动启动离线OCR
+        utils.thread.createThread(self.autoOpenOfflineOCR)
+
 
     # 按下充电键后做的事情
     def clickBattery(self) :
@@ -103,6 +108,19 @@ class DangoTranslator() :
         self.translation_ui.close()
         self.range_ui.close()
         self.settin_ui.show()
+
+
+    # 自动打开离线OCR
+    def autoOpenOfflineOCR(self) :
+
+        if not self.config["offlineOCR"] :
+            return
+        if not utils.port.detectPort(self.yaml["port"]) :
+            try :
+                # 启动离线OCR
+                os.startfile(self.yaml["ocr_cmd_path"])
+            except Exception :
+                self.logger.error(format_exc())
 
 
     # 初始化图片资源

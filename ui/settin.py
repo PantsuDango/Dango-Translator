@@ -282,7 +282,7 @@ class Settin(QMainWindow) :
         button.setCursor(self.question_pixmap)
 
         # 离线OCR状态开关
-        self.offline_ocr_switch = ui.switch.OfflineSwitch(self.tab_1, startX=(65-20)*self.rate, object=self.object)
+        self.offline_ocr_switch = ui.switch.OfflineSwitch(self.tab_1, sign=self.offline_ocr_use, startX=(65-20)*self.rate, object=self.object)
         self.customSetGeometry(self.offline_ocr_switch, 20, 60, 65, 20)
         self.offline_ocr_switch.checkedChanged.connect(self.changeOfflineSwitch)
         self.offline_ocr_switch.setCursor(self.select_pixmap)
@@ -1351,7 +1351,7 @@ class Settin(QMainWindow) :
         self.translate_list = []
 
         # OCR各开关
-        self.offline_ocr_use = False
+        self.offline_ocr_use = self.object.config["offlineOCR"]
         self.online_ocr_use = self.object.config["onlineOCR"]
         self.baidu_ocr_use = self.object.config["baiduOCR"]
 
