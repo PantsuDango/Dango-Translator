@@ -144,11 +144,16 @@ def offlineOCR(object) :
         return False, "离线OCR错误: %s"%message
     else :
         sentence = ""
-        print(res.get("Data", []))
         for index, tmp in enumerate(res.get("Data", [])) :
-            if language == "ENG" :
-                sentence += tmp["Words"] + " "
+            if index+1 != len(res.get("Data", [])) and object.config["BranchLineUse"] :
+                if language == "ENG" :
+                    sentence += (tmp["Words"] + " \n")
+                else :
+                    sentence += (tmp["Words"] + "\n")
             else :
-                sentence += tmp["Words"]
+                if language == "ENG" :
+                    sentence += (tmp["Words"] + " ")
+                else :
+                    sentence += tmp["Words"]
 
         return True, sentence
