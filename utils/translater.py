@@ -249,6 +249,8 @@ class Translater(QThread) :
 
         # 显示原文
         if self.object.config["showOriginal"] == "True" or not nothing_sign :
+            if not nothing_sign :
+                self.object.translation_ui.original += "\n\n未开启任何翻译源, 无法翻译, 请在设置-翻译源设定-打开要使用的翻译源"
             utils.thread.createThread(self.creatTranslaterThread, "original")
 
         # 翻译成功
