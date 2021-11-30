@@ -211,7 +211,7 @@ def saveOriginalHisTory(original) :
 
     date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
     with open(HISTORY_FILE_PATH, "a+", encoding="utf-8") as file :
-        file.write("\n\n%s[原文]\n%s"%(date, original))
+        file.write("\n\n[原文][%s]\n%s\n"%(date, original))
 
 
 # 保存翻译历史
