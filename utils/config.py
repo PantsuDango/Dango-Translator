@@ -175,6 +175,8 @@ def configConvert(object) :
     object.config["showClipboard"] = object.config.get("showClipboard", "False")
     # 文字方向
     object.config["showTranslateRow"] = object.config.get("showTranslateRow", "False")
+    # 文字换行
+    object.config["BranchLineUse"] = object.config.get("BranchLineUse", False)
     # 翻译快捷键
     object.config["translateHotkeyValue1"] = object.config.get("translateHotkeyValue1", "ctrl")
     object.config["translateHotkeyValue2"] = object.config.get("translateHotkeyValue2", "d")

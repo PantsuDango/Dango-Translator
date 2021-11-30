@@ -963,6 +963,33 @@ class Settin(QMainWindow) :
         button.clicked.connect(lambda: self.showDesc("textDirection"))
         button.setCursor(self.question_pixmap)
 
+        # 文字换行标签
+        label = QLabel(self.tab_3)
+        self.customSetGeometry(label, 275, 220, 80, 20)
+        label.setText("文字换行:")
+
+        # 文字换行开关
+        self.branch_line_switch = ui.switch.SwitchBranchLine(self.tab_3, sign=self.branch_line_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.branch_line_switch, 350, 220, 65, 20)
+        self.branch_line_switch.checkedChanged.connect(self.changeBranchLineSwitch)
+        self.branch_line_switch.setCursor(self.select_pixmap)
+
+        # 文字换行说明标签
+        button = QPushButton(self.tab_3)
+        self.customSetGeometry(button, 430, 220, 25, 20)
+        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;" % self.color_2)
+        button.setText("说明")
+        button.clicked.connect(lambda: self.showDesc("branchLine"))
+        button.setCursor(self.question_pixmap)
+
+        # 文字换行说明?号图标
+        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_3)
+        self.customSetIconSize(button, 20, 20)
+        self.customSetGeometry(button, 455, 220, 20, 20)
+        button.setStyleSheet("background: transparent;")
+        button.clicked.connect(lambda: self.showDesc("textDirection"))
+        button.setCursor(self.question_pixmap)
+
         # 翻译快捷键标签
         label = QLabel(self.tab_3)
         self.customSetGeometry(label, 20, 270, 80, 20)
@@ -1425,8 +1452,10 @@ class Settin(QMainWindow) :
         self.show_original_use = eval(self.object.config["showOriginal"])
         # 原文自动复制到剪贴板开关
         self.auto_clipboard_use = eval(self.object.config["showClipboard"])
-        # 文字方向
+        # 文字方向开关
         self.text_direction_use = eval(self.object.config["showTranslateRow"])
+        # 文字换行开关
+        self.branch_line_use = self.object.config["BranchLineUse"]
         # 翻译快捷键开关
         self.translate_hotkey_use = eval(self.object.config["showHotKey1"])
         # 范围快捷键开关
@@ -1651,6 +1680,15 @@ class Settin(QMainWindow) :
             self.auto_clipboard_use = True
         else:
             self.auto_clipboard_use = False
+
+
+    # 改变文字换行开关状态
+    def changeBranchLineSwitch(self, checked):
+
+        if checked :
+            self.branch_line_use = True
+        else:
+            self.branch_line_use = False
 
 
     # 改变文字方向开关状态
@@ -2029,6 +2067,12 @@ class Settin(QMainWindow) :
             self.desc_ui.setWindowTitle("加入交流群")
             self.desc_ui.desc_text.insertHtml('<img src="{}" width="{}" height="{}">'.format(QQ_GROUP_PATH, 245*self.rate, 295*self.rate))
 
+        # 文字换行
+        elif message_type == "branchLine" :
+            self.desc_ui.setWindowTitle("文字换行说明")
+            self.setTextColor(self.desc_ui.desc_text, "#FF0000", "如果看不懂请打开此开关.")
+            self.desc_ui.desc_text.append("\n会将识别到的原文换行后再翻译, 可能会出现断句错误情况")
+
         self.desc_ui.show()
 
 
@@ -2300,6 +2344,8 @@ class Settin(QMainWindow) :
         self.object.config["showClipboard"] = str(self.auto_clipboard_use)
         # 文字方向
         self.object.config["showTranslateRow"] = str(self.text_direction_use)
+        # 文字换行
+        self.object.config["BranchLineUse"] = self.branch_line_use
         # 翻译快捷键开关
         self.object.config["showHotKey1"] = str(self.translate_hotkey_use)
         # 范围快捷键开关

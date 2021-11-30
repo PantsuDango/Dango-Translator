@@ -148,7 +148,7 @@ def baiduOCR(config, logger, test=False) :
                     sentence = ""
 
                     # 竖排翻译模式
-                    if showTranslateRow == "True":
+                    if showTranslateRow == "True" :
                         if words :
                             for word in words[::-1] :
                                 sentence += word["words"] + ","
@@ -156,8 +156,18 @@ def baiduOCR(config, logger, test=False) :
 
                     # 普通翻译模式
                     else:
-                        for word in words:
-                            sentence += word["words"]
+                        for index, word in enumerate(words) :
+                            if config["BranchLineUse"] and (index+1 != len(words)) :
+                                if language == "ENG" :
+                                    sentence += word["words"] + " \n"
+                                else :
+                                    sentence += word["words"] + "\n"
+                            else :
+                                if language == "ENG" :
+                                    sentence += word["words"] + " "
+                                else :
+                                    sentence += word["words"]
+
                     return True, sentence
 
             else:

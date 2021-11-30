@@ -95,8 +95,17 @@ def dangoOCR(object, test=False) :
     message = res.get("Message", "")
     if code == 0 :
         content = ""
-        for val in res.get("Data", []) :
-            content += val.get("Words", "")
+        for index, val in enumerate(res.get("Data", [])) :
+            if (index+1 != len(res.get("Data", []))) and object.config["BranchLineUse"] :
+                if language == "ENG" :
+                    content += (val.get("Words", "") + " \n")
+                else :
+                    content += (val.get("Words", "") + "\n")
+            else :
+                if language == "ENG" :
+                    content += val.get("Words", "") + " "
+                else :
+                    content += val.get("Words", "")
         return True, content
     else :
         object.logger.error(message)
@@ -122,7 +131,7 @@ def offlineOCR(object) :
         body["ImagePath"] = image_path
 
     # 尝试请求三次
-    for num in range(3):
+    for num in range(3) :
         res = utils.http.post(url, body, object.logger)
         if res and res.get("Code", -1) != -1 :
             break
@@ -135,7 +144,8 @@ def offlineOCR(object) :
         return False, "离线OCR错误: %s"%message
     else :
         sentence = ""
-        for tmp in res.get("Data", []) :
+        print(res.get("Data", []))
+        for index, tmp in enumerate(res.get("Data", [])) :
             if language == "ENG" :
                 sentence += tmp["Words"] + " "
             else :
