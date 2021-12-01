@@ -75,7 +75,7 @@ def progressbar(url):
         content_size = int(response.headers["content-length"])
         if response.status_code == 200 :
             print("文件大小:{size:.2f} MB".format(size=content_size/chunk_size/1024))
-            with open("团子翻译器.exe", "wb") as file :
+            with open("temp.exe", "wb") as file :
                 for data in response.iter_content(chunk_size=chunk_size) :
                     file.write(data)
                     size +=len(data)
@@ -83,10 +83,10 @@ def progressbar(url):
         return None
     except Exception as err :
         try :
-            os.remove("团子翻译器.exe")
+            os.remove("temp.exe")
         except Exception :
             pass
-        return "下载失败: %s\n\n请尝试手动复制下载链接下载, 然后直接替换app目录内的'团子翻译器.exe'"%err
+        return "下载失败: %s\n\n请尝试手动复制下载链接下载, 然后将'temp.exe'文件名修改为'团子翻译器.exe', 再拿去替换app目录内的'团子翻译器.exe'即可"%err
 
 
 def main() :
@@ -114,7 +114,7 @@ def main() :
     # 替换版本文件
     print("\n>>> 替换新版本文件...")
     try :
-        shutil.move("团子翻译器.exe", "./app/团子翻译器.exe")
+        shutil.move("temp.exe", "./app/团子翻译器.exe")
         print("更新完成, 正在自动重启翻译器...")
         os.startfile("团子翻译器.exe")
         sys.exit()
