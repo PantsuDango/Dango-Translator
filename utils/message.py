@@ -108,6 +108,7 @@ def checkEmailMessageBox(title, text, object) :
 def updateVersion() :
 
     try :
+        os.chdir(os.path.abspath(".."))
         os.startfile("..\自动更新程序.exe")
     except Exception as err :
         MessageBox("自动更新失败", "打开自动更新程序失败:\n%s"%err)
