@@ -109,10 +109,8 @@ def updateVersion() :
 
     try :
         os.startfile("..\自动更新程序.exe")
-    except Exception :
-        import traceback
-        print(os.getcwd())
-        traceback.print_exc()
+    except Exception as err :
+        MessageBox("自动更新失败", "打开自动更新程序失败:\n%s"%err)
         pass
     sys.exit()
 
