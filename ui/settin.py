@@ -499,7 +499,7 @@ class Settin(QMainWindow) :
 
         # 公共翻译备注
         label = QLabel(self.tab_2)
-        self.customSetGeometry(label, 155, 25, 200, 20)
+        self.customSetGeometry(label, 155, 25, 300, 20)
         label.setText("可直接使用, 但不稳定可能会抽风")
         label.setStyleSheet("color: %s"%self.color_2)
 
@@ -1012,7 +1012,7 @@ class Settin(QMainWindow) :
         self.customSetIconSize(button, 20, 20)
         self.customSetGeometry(button, 455, 220, 20, 20)
         button.setStyleSheet("background: transparent;")
-        button.clicked.connect(lambda: self.showDesc("textDirection"))
+        button.clicked.connect(lambda: self.showDesc("branchLine"))
         button.setCursor(self.question_pixmap)
 
         # 翻译快捷键标签
