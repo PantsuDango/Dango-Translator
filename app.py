@@ -51,7 +51,7 @@ class DangoTranslator() :
                                  "发生了意料之外的错误, 导致无法连接服务器\n"
                                  "请查阅日志文件并联系团子处理\n"
                                  "日志文件地址:\n"
-                                 "%s"%os.path.join(os.getcwd(), "logs", log_file_name), self.yaml["screen_scale_rate"])
+                                 "%s"%os.path.join(os.path.abspath("../") , "logs", log_file_name), self.yaml["screen_scale_rate"])
         sys.exit()
 
 
