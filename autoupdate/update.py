@@ -116,7 +116,7 @@ def main() :
     try :
         shutil.move("团子翻译器.exe", "./app/团子翻译器.exe")
         print("更新完成, 正在自动重启翻译器...")
-        os.startfile("点我运行.exe")
+        os.startfile("团子翻译器.exe")
         sys.exit()
     except Exception as err :
         return print("替换新版本文件失败: %s"%err)
