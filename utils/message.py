@@ -108,8 +108,11 @@ def checkEmailMessageBox(title, text, object) :
 def updateVersion() :
 
     try :
-        os.startfile("../自动更新程序.exe")
+        os.startfile("..\自动更新程序.exe")
     except Exception :
+        import traceback
+        print(os.getcwd())
+        traceback.print_exc()
         pass
     sys.exit()
 
