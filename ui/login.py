@@ -192,7 +192,7 @@ class Login(QWidget) :
         # 版本号
         label = QLabel(self)
         self.customSetGeometry(label, 20, 540, 380, 15)
-        label.setText("版本号: %s  更新时间: 2021-12-02  By: 胖次团子"%self.object.yaml["version"])
+        label.setText("版本号: %s  更新时间: 2021-12-03  By: 胖次团子"%self.object.yaml["version"])
         label.setStyleSheet("color: %s;"
                             "background: transparent;"
                             "font-weight:bold;"
