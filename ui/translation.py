@@ -653,7 +653,8 @@ class Translation(QMainWindow) :
             self.format.setTextOutline(QPen(QColor(color), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
             self.translate_text.mergeCurrentCharFormat(self.format)
             self.translate_text.append(result)
-        else:
+        else :
+            result = result.replace("\n", "<br>")
             self.translate_text.append("<font color=%s>%s</font>"%(color, result))
         QApplication.processEvents()
 
