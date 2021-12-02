@@ -51,9 +51,9 @@ class Webdriver(QObject) :
             option = webdriver.ChromeOptions()
             option.add_argument("--headless")
             self.browser = webdriver.Chrome(executable_path="./config/tools/chromedriver.exe",
-                                            service_log_path="../logs/geckodriver.log",
+                                            service_log_path="nul",
                                             options=option)
-        except Exception:
+        except Exception :
             self.logger.error(format_exc())
 
             try:
@@ -61,7 +61,7 @@ class Webdriver(QObject) :
                 option = webdriver.FirefoxOptions()
                 option.add_argument("--headless")
                 self.browser = webdriver.Firefox(executable_path="./config/tools/geckodriver.exe",
-                                                 service_log_path="../logs/geckodriver.log",
+                                                 service_log_path="nul",
                                                  options=option)
             except Exception:
                 self.logger.error(format_exc())
@@ -81,7 +81,7 @@ class Webdriver(QObject) :
                             ]}
                     }
                     self.browser = webdriver.Edge(executable_path="./config/tools/msedgedriver.exe",
-                                                  service_log_path="../logs/geckodriver.log",
+                                                  service_log_path="nul",
                                                   capabilities=EDGE)
                 except Exception :
                     self.browser_sign = 2
