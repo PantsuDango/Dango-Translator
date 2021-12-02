@@ -49,7 +49,7 @@ class Webdriver(QObject) :
         try:
             # 使用谷歌浏览器
             option = webdriver.ChromeOptions()
-            option.add_argument("--headless")
+            #option.add_argument("--headless")
             self.browser = webdriver.Chrome(executable_path="./config/tools/chromedriver.exe",
                                             service_log_path="nul",
                                             options=option)
@@ -157,7 +157,7 @@ class Webdriver(QObject) :
         try:
             try:
                 self.browser.find_element_by_xpath(self.object.yaml["dict_info"]["youdao_xpath"]).click()
-            except Exception:
+            except Exception :
                 pass
 
             # 清空文本框
