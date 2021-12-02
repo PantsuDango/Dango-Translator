@@ -298,4 +298,7 @@ class Translater(QThread) :
                 except Exception :
                     self.logger.error(format_exc())
 
-                time.sleep(self.object.config["translateSpeed"]-0.4)
+                if self.object.config["onlineOCR"] :
+                    time.sleep(self.object.config["translateSpeed"]-0.6)
+                else :
+                    time.sleep(self.object.config["translateSpeed"]-0.4)

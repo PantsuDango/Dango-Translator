@@ -192,7 +192,7 @@ def caiyun(sentence, token, logger) :
     }
     proxies = {"http": None, "https": None}
     try:
-        response = requests.request("POST", url, data=json.dumps(payload), headers=headers, proxies=proxies, timeout=10)
+        response = requests.request("POST", url, data=json.dumps(payload), headers=headers, proxies=proxies, timeout=5)
         result = json.loads(response.text)['target'][0]
 
     except Exception:
