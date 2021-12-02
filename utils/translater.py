@@ -214,6 +214,11 @@ class Translater(QThread) :
 
         # 更新原文
         self.object.translation_ui.original = original
+        # 是否复制到剪贴板
+        if self.object.config["showClipboard"] == "True":
+            pyperclip.copy(original)
+        # 保存原文
+        utils.config.saveOriginalHisTory(original)
         # 判断是否未开任何翻译源
         nothing_sign = False
 
@@ -252,14 +257,6 @@ class Translater(QThread) :
             if not nothing_sign :
                 self.object.translation_ui.original += "\n\n未开启任何翻译源, 无法翻译, 请在设置-翻译源设定-打开要使用的翻译源"
             utils.thread.createThread(self.creatTranslaterThread, "original")
-
-        # 翻译成功
-        if nothing_sign :
-            # 是否复制到剪贴板
-            if self.object.config["showClipboard"] == "True" :
-                pyperclip.copy(original)
-            # 保存原文
-            utils.config.saveOriginalHisTory(original)
 
 
     def run(self) :
