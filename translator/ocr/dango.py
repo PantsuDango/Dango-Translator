@@ -84,7 +84,7 @@ def dangoOCR(object, test=False) :
 
     # 尝试请求三次
     for num in range(3) :
-        res = utils.http.post(url, body, object.logger, timeout=3)
+        res = utils.http.post(url, body, object.logger, timeout=2)
         if res :
             break
     # 如果出错就直接结束
