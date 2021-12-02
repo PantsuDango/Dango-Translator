@@ -130,7 +130,8 @@ class Translater(QThread) :
         if self.object.translation_ui.thread_state == 0 :
             # 发送清屏信号
             self.clear_text_sign.emit(True)
-            self.object.translation_ui.statusbar.showMessage("翻译中...")
+            if self.object.translation_ui.translate_mode :
+                self.object.translation_ui.statusbar.showMessage("翻译中...")
             QApplication.processEvents()
 
         self.object.translation_ui.thread_state += 1
@@ -269,6 +270,7 @@ class Translater(QThread) :
                 return
 
             try :
+                self.object.translation_ui.statusbar.showMessage("翻译中...")
                 self.translate()
             except Exception:
                 self.logger.error(format_exc())
@@ -299,6 +301,6 @@ class Translater(QThread) :
                     self.logger.error(format_exc())
 
                 if self.object.config["onlineOCR"] :
-                    time.sleep(self.object.config["translateSpeed"]-0.6)
+                    time.sleep(self.object.config["translateSpeed"]-0.2)
                 else :
                     time.sleep(self.object.config["translateSpeed"]-0.4)
