@@ -2267,6 +2267,9 @@ class Settin(QMainWindow) :
     def resetWebdriver(self) :
 
         # 重置开关
+        self.object.translation_ui.webdriver1.web_type = ""
+        self.object.translation_ui.webdriver2.web_type = ""
+        self.object.translation_ui.webdriver3.web_type = ""
         self.object.translation_ui.webdriver1.open_sign = False
         self.object.translation_ui.webdriver2.open_sign = False
         self.object.translation_ui.webdriver3.open_sign = False
@@ -2276,34 +2279,20 @@ class Settin(QMainWindow) :
         for val in translater_list :
             if self.object.config[val] == "False" :
                 continue
-
-            # 避免重复开启
             web_type = val.replace("Use", "").replace("web", "")
-            if web_type == self.object.translation_ui.webdriver_type1 :
-                self.object.translation_ui.webdriver1.open_sign = True
-                continue
-
-            elif web_type == self.object.translation_ui.webdriver_type2 :
-                self.object.translation_ui.webdriver2.open_sign = True
-                continue
-
-            elif web_type == self.object.translation_ui.webdriver_type3 :
-                self.object.translation_ui.webdriver3.open_sign = True
-                continue
-
-            if not self.object.translation_ui.webdriver1.open_sign :
-                # 刷新翻译引擎1
-                self.object.translation_ui.webdriver_type1 = web_type
+            # 刷新翻译引擎1
+            if not self.object.translation_ui.webdriver1.web_type :
+                self.object.translation_ui.webdriver1.web_type = web_type
                 utils.thread.createThread(self.object.translation_ui.webdriver1.openWeb, web_type)
 
-            elif not self.object.translation_ui.webdriver2.open_sign :
-                # 刷新翻译引擎2
-                self.object.translation_ui.webdriver_type2 = web_type
+            # 刷新翻译引擎2
+            elif not self.object.translation_ui.webdriver2.web_type :
+                self.object.translation_ui.webdriver2.web_type = web_type
                 utils.thread.createThread(self.object.translation_ui.webdriver2.openWeb, web_type)
 
-            elif not self.object.translation_ui.webdriver3.open_sign :
-                # 刷新翻译引擎3
-                self.object.translation_ui.webdriver_type3 = web_type
+            # 刷新翻译引擎3
+            elif not self.object.translation_ui.webdriver3.web_type :
+                self.object.translation_ui.webdriver3.web_type = web_type
                 utils.thread.createThread(self.object.translation_ui.webdriver3.openWeb, web_type)
 
 

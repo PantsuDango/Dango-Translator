@@ -91,7 +91,6 @@ class Webdriver(QObject) :
                     return
 
         self.browser_sign = 1
-        self.message_sign.emit("翻译模块启动完成~")
         if self.object.translation_ui.webdriver1.browser_sign == 1 \
                 and self.object.translation_ui.webdriver2.browser_sign == 1 \
                 and self.object.translation_ui.webdriver3.browser_sign == 1 :
@@ -102,18 +101,54 @@ class Webdriver(QObject) :
     def openWeb(self, web_type) :
 
         self.web_type = web_type
-        self.message_sign.emit("%s翻译引擎启动中, 请等待完成后再操作..."%self.translater_map[web_type])
+
+        # 判断当前准备启动的所有翻译源
+        web_type_list = [
+            self.object.translation_ui.webdriver1.web_type,
+            self.object.translation_ui.webdriver2.web_type,
+            self.object.translation_ui.webdriver3.web_type
+        ]
+        content = ""
+        for val in web_type_list :
+            if not val :
+                continue
+            content += "[公共%s]"%self.translater_map[val]
+        self.message_sign.emit("%s翻译启动中, 请等待完成后再操作..."%content)
 
         try :
             self.browser.get(self.url_map[web_type])
             self.browser.maximize_window()
             self.open_sign = True
-            self.message_sign.emit("%s翻译引擎启动完成~"%self.translater_map[web_type])
-            print("%s翻译引擎启动完成~"%self.translater_map[web_type])
 
         except Exception :
             self.logger.error(format_exc())
-            self.message_sign.emit("%s翻译引擎启动失败, 详见公共翻译教程说明"%self.translater_map[web_type])
+
+        open_sign_list = [
+            self.object.translation_ui.webdriver1.open_sign,
+            self.object.translation_ui.webdriver2.open_sign,
+            self.object.translation_ui.webdriver3.open_sign
+        ]
+        web_type_list = [
+            self.object.translation_ui.webdriver1.web_type,
+            self.object.translation_ui.webdriver2.web_type,
+            self.object.translation_ui.webdriver3.web_type
+        ]
+
+        success_content, fail_content = "", ""
+        for val1, val2 in zip(web_type_list, open_sign_list) :
+            if not val1 :
+                continue
+            if val2 :
+                success_content += "[公共%s]"%self.translater_map[val1]
+            else :
+                fail_content += "[公共%s]"%self.translater_map[val1]
+
+        if not success_content :
+            self.message_sign.emit("%s启动中..."%fail_content)
+        elif not fail_content :
+            self.message_sign.emit("%s翻译启动成功" %success_content)
+        else :
+            self.message_sign.emit("%s翻译启动成功, %s启动中..."%(success_content, fail_content))
 
 
     # 有道翻译

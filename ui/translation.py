@@ -264,7 +264,7 @@ class Translation(QMainWindow) :
         self.statusbar.setStyleSheet("font: 10pt %s;"
                                      "color: %s;"
                                      "background-color: rgba(62, 62, 62, 0.1)"
-                                     % (self.font_type, self.icon_color))
+                                     %(self.font_type, self.icon_color))
 
         # 注册翻译快捷键
         self.translate_hotkey = SystemHotkey()
@@ -279,13 +279,6 @@ class Translation(QMainWindow) :
             self.range_hotkey.register((self.range_hotkey_value1, self.range_hotkey_value2),
                                        callback=lambda x: self.range_hotkey_sign.emit(True))
         self.range_hotkey_sign.connect(self.clickRange)
-
-
-        # 在系统托盘
-        self.system_tray_icon = QSystemTrayIcon(self)
-        self.system_tray_icon.setIcon(icon)
-        self.system_tray_icon.activated.connect(self.show)
-        self.system_tray_icon.show()
 
 
     # 窗口显示信号
@@ -621,12 +614,15 @@ class Translation(QMainWindow) :
         # 公共翻译一
         if trans_type == "webdriver_1" :
             color = self.object.config["fontColor"][self.translater_yaml_map[self.webdriver1.web_type]]
+            trans_type = self.webdriver1.web_type
         # 公共翻译二
         elif trans_type == "webdriver_2" :
             color = self.object.config["fontColor"][self.translater_yaml_map[self.webdriver2.web_type]]
+            trans_type = self.webdriver2.web_type
         # 公共翻译三
         elif trans_type == "webdriver_3":
             color = self.object.config["fontColor"][self.translater_yaml_map[self.webdriver3.web_type]]
+            trans_type = self.webdriver3.web_type
         # 私人百度
         elif trans_type == "baidu_private" :
             color = self.object.config["fontColor"]["baidu"]
@@ -714,7 +710,6 @@ class Translation(QMainWindow) :
         self.webdriver1.openWebdriver()
         # 开启翻译页面
         if self.webdriver_type1 :
-            self.statusbar.showMessage("翻译模型启动中, 请等待完成后再操作...")
             utils.thread.createThread(self.webdriver1.openWeb, self.webdriver_type1)
 
 
@@ -729,13 +724,12 @@ class Translation(QMainWindow) :
         self.webdriver2.openWebdriver()
         # 开启翻译页面
         if self.webdriver_type2 :
-            self.statusbar.showMessage("翻译模型启动中, 请等待完成后再操作...")
             utils.thread.createThread(self.webdriver2.openWeb, self.webdriver_type2)
 
     # 加载翻译引擎3
     def openWebdriver3(self):
 
-        # 翻译模块2
+        # 翻译模块3
         self.webdriver3 = translator.all.Webdriver(self.object)
         # 连接消息提示框
         self.webdriver3.message_sign.connect(self.showStatusbar)
@@ -743,7 +737,6 @@ class Translation(QMainWindow) :
         self.webdriver3.openWebdriver()
         # 开启翻译页面
         if self.webdriver_type3 :
-            self.statusbar.showMessage("翻译模型启动中, 请等待完成后再操作...")
             utils.thread.createThread(self.webdriver3.openWeb, self.webdriver_type3)
 
 
