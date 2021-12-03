@@ -101,6 +101,7 @@ class Webdriver(QObject) :
     def openWeb(self, web_type) :
 
         self.web_type = web_type
+        self.content = ""
 
         # 判断当前准备启动的所有翻译源
         web_type_list = [
@@ -175,7 +176,6 @@ class Webdriver(QObject) :
         except Exception:
             pass
         language = self.object.config["language"]
-        start = time.time()
 
         # 有道
         if web_type == "youdao" :
@@ -200,6 +200,19 @@ class Webdriver(QObject) :
             self.browserClickTimeout('//*[@id="dl_translator"]/div[3]/div[3]/div[1]/div[2]/div[4]/div/div[1]/button[1]/div[1]')
             self.browserClickTimeout('//*[@id="dl_translator"]/div[3]/div[3]/div[3]/div[1]/div[2]/div[1]/button/div')
             self.browserClickTimeout('//*[@id="dl_translator"]/div[3]/div[3]/div[3]/div[3]/div[7]/div/div[3]/button[8]/div[1]')
+
+        # google
+        if web_type == "google" :
+            self.browserClickTimeout('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[1]/c-wiz/div[2]/button/div[2]')
+            self.browserClickTimeout('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[3]/c-wiz/div[1]/div/div[3]/div/div[1]/div/div[2]')
+            self.browserClickTimeout('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[1]/c-wiz/div[5]/button/div[2]')
+            self.browserClickTimeout('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[3]/c-wiz/div[2]/div/div[3]/div/div[2]/div[110]/div[2]')
+
+        if web_type == "caiyun" :
+            self.browserClickTimeout('//*[@id="app"]/div[2]/div[1]/div[2]/div/div[1]/div[1]/div/div/div[1]')
+            self.browserClickTimeout('//*[@id="app"]/div[2]/div[1]/div[2]/div/div[1]/div[1]/div/div[2]/div[1]')
+            self.browserClickTimeout('//*[@id="app"]/div[2]/div[1]/div[2]/div/div[1]/div[1]/div/div/div[3]')
+            self.browserClickTimeout('//*[@id="app"]/div[2]/div[1]/div[2]/div/div[1]/div[1]/div/div[2]/div[2]')
 
 
     # 有道翻译
@@ -298,10 +311,10 @@ class Webdriver(QObject) :
 
         try :
             # 清空翻译框
-            self.browser.find_element_by_xpath('//*[@id="textarea"]').clear()
+            self.browserClickTimeout('//*[@id="app"]/div[2]/div[1]/div[2]/div/div[2]/div/a')
             # 输入要翻译的文本
             self.browser.find_element_by_xpath('//*[@id="textarea"]').send_keys(content)
-            self.browser.find_element_by_xpath('//*[@id="app"]/div[2]/div[1]/div[2]/div/div[1]/div[2]/div[2]').click()
+            self.browserClickTimeout('//*[@id="app"]/div[2]/div[1]/div[2]/div/div[1]/div[2]/div[2]')
 
             start = time.time()
             while True :
@@ -309,9 +322,9 @@ class Webdriver(QObject) :
                 # 提取翻译信息
                 try :
                     # 提取翻译信息
-                    outputText = self.browser.find_element_by_id("target-textblock").get_attribute("textContent")
-                    if not outputText.isspace() and len(outputText.strip()) > 1 and "".join(outputText.split()) != self.content :
-                        self.content = outputText.strip()
+                    text = self.browser.find_element_by_xpath('//*[@id="texttarget"]/p/span').text
+                    if text != self.content :
+                        self.content = text
                         return self.content
                 except Exception :
                     pass
