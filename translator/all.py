@@ -49,7 +49,7 @@ class Webdriver(QObject) :
         try:
             # 使用谷歌浏览器
             option = webdriver.ChromeOptions()
-            option.add_argument("--headless")
+            #option.add_argument("--headless")
             self.browser = webdriver.Chrome(executable_path="./config/tools/chromedriver.exe",
                                             service_log_path="nul",
                                             options=option)
@@ -119,8 +119,10 @@ class Webdriver(QObject) :
             self.browser.get(self.url_map[web_type])
             self.browser.maximize_window()
             self.open_sign = True
-
+            self.transInit(web_type)
         except Exception :
+            import traceback
+            traceback.print_exc()
             self.logger.error(format_exc())
 
         open_sign_list = [
@@ -151,15 +153,59 @@ class Webdriver(QObject) :
             self.message_sign.emit("%s翻译启动成功, %s启动中..."%(success_content, fail_content))
 
 
+    # 点击动作延时
+    def browserClickTimeout(self, xpath, timeout=1) :
+
+        start = time.time()
+        while True :
+            try :
+                self.browser.find_element_by_xpath(xpath).click()
+                break
+            except Exception :
+                if time.time()-start > timeout :
+                    break
+
+
+    # 翻译页面初始化
+    def transInit(self, web_type) :
+
+        try :
+            # 去弹窗广告
+            self.browser.find_element_by_xpath(self.object.yaml["dict_info"]["%s_xpath"%web_type]).click()
+        except Exception:
+            pass
+        language = self.object.config["language"]
+        start = time.time()
+
+        # 有道
+        if web_type == "youdao" :
+            self.browserClickTimeout('//*[@id="langSelect"]')
+            if language == "JAP" :
+                self.browserClickTimeout('//*[@id="languageSelect"]/li[5]/a')
+            elif language == "ENG" :
+                self.browserClickTimeout('//*[@id="languageSelect"]/li[3]/a')
+            elif language == "KOR" :
+                self.browserClickTimeout('//*[@id="languageSelect"]/li[7]/a')
+
+        # 腾讯
+        if web_type == "tencent" :
+            self.browserClickTimeout('//*[@id="language-button-group-source"]/div[1]')
+            self.browserClickTimeout('//*[@id="language-button-group-source"]/div[2]/ul/li[1]/span')
+            self.browserClickTimeout('//*[@id="language-button-group-target"]/div[1]')
+            self.browserClickTimeout('//*[@id="language-button-group-target"]/div[2]/ul/li[1]/span')
+
+        # DeepL
+        if web_type == "deepl" :
+            self.browserClickTimeout('//*[@id="dl_translator"]/div[3]/div[3]/div[1]/div[1]/div/button/div')
+            self.browserClickTimeout('//*[@id="dl_translator"]/div[3]/div[3]/div[1]/div[2]/div[4]/div/div[1]/button[1]/div[1]')
+            self.browserClickTimeout('//*[@id="dl_translator"]/div[3]/div[3]/div[3]/div[1]/div[2]/div[1]/button/div')
+            self.browserClickTimeout('//*[@id="dl_translator"]/div[3]/div[3]/div[3]/div[3]/div[7]/div/div[3]/button[8]/div[1]')
+
+
     # 有道翻译
     def youdao(self, content) :
 
-        try:
-            try:
-                self.browser.find_element_by_xpath(self.object.yaml["dict_info"]["youdao_xpath"]).click()
-            except Exception :
-                pass
-
+        try :
             # 清空文本框
             self.browser.find_element_by_xpath('//*[@id="inputOriginal"]').clear()
             # 输入要翻译的文本
@@ -189,11 +235,6 @@ class Webdriver(QObject) :
     def baidu(self, content):
 
         try :
-            try :
-                self.browser.find_element_by_xpath(self.object.yaml["dict_info"]["baidu_xpath"]).click()
-            except Exception :
-                pass
-
             # 清空翻译框
             self.browser.find_element_by_xpath('//*[@id="baidu_translate_input"]').clear()
             # 输入要翻译的文本
@@ -225,11 +266,6 @@ class Webdriver(QObject) :
     def tencent(self, content) :
 
         try :
-            try :
-                self.browser.find_element_by_xpath(self.object.yaml["dict_info"]["tencent_xpath"]).click()
-            except Exception :
-                pass
-
             # 清空翻译框
             self.browser.find_element_by_xpath('/html/body/div[2]/div[2]/div[2]/div[1]/div[1]/textarea').clear()
             # 输入要翻译的文本
@@ -261,11 +297,6 @@ class Webdriver(QObject) :
     def caiyun(self, content) :
 
         try :
-            try:
-                self.browser.find_element_by_xpath(self.object.yaml["dict_info"]["caiyun_xpath"]).click()
-            except Exception:
-                pass
-
             # 清空翻译框
             self.browser.find_element_by_xpath('//*[@id="textarea"]').clear()
             # 输入要翻译的文本
