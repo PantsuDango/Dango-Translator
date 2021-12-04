@@ -188,30 +188,62 @@ class Webdriver(QObject) :
             elif language == "KOR" :
                 self.browserClickTimeout('//*[@id="languageSelect"]/li[7]/a')
 
+        # 百度
+        if web_type == "baidu" :
+            self.browserClickTimeout('//*[@id="main-outer"]/div/div/div[1]/div[1]/div[1]/a[1]/span/span')
+            if language == "JAP" :
+                self.browserClickTimeout('//*[@id="lang-panel-container"]/div/div[5]/div[1]/div[16]/div/span[1]')
+            elif language == "ENG" :
+                self.browserClickTimeout('//*[@id="lang-panel-container"]/div/div[5]/div[1]/div[21]/div/span[1]')
+            elif language == "KOR" :
+                self.browserClickTimeout('//*[@id="lang-panel-container"]/div/div[5]/div[1]/div[8]/div/span[1]')
+
+
         # 腾讯
         if web_type == "tencent" :
             self.browserClickTimeout('//*[@id="language-button-group-source"]/div[1]')
-            self.browserClickTimeout('//*[@id="language-button-group-source"]/div[2]/ul/li[1]/span')
+            if language == "JAP" :
+                self.browserClickTimeout('//*[@id="language-button-group-source"]/div[2]/ul/li[4]/span')
+            elif language == "ENG" :
+                self.browserClickTimeout('//*[@id="language-button-group-source"]/div[2]/ul/li[3]/span')
+            elif language == "KOR" :
+                self.browserClickTimeout('//*[@id="language-button-group-source"]/div[2]/ul/li[5]/span')
             self.browserClickTimeout('//*[@id="language-button-group-target"]/div[1]')
             self.browserClickTimeout('//*[@id="language-button-group-target"]/div[2]/ul/li[1]/span')
 
         # DeepL
         if web_type == "deepl" :
             self.browserClickTimeout('//*[@id="dl_translator"]/div[3]/div[3]/div[1]/div[1]/div/button/div')
-            self.browserClickTimeout('//*[@id="dl_translator"]/div[3]/div[3]/div[1]/div[2]/div[4]/div/div[1]/button[1]/div[1]')
+            if language == "JAP" :
+                self.browserClickTimeout('//*[@id="dl_translator"]/div[3]/div[3]/div[1]/div[2]/div[4]/div/div[2]/button[7]/div')
+            elif language == "ENG" :
+                self.browserClickTimeout('//*[@id="dl_translator"]/div[3]/div[3]/div[1]/div[2]/div[4]/div/div[3]/button[6]/div')
+            elif language == "KOR" :
+                self.browserClickTimeout('//*[@id="dl_translator"]/div[3]/div[3]/div[1]/div[2]/div[4]/div/div[1]/button[1]/div[1]')
             self.browserClickTimeout('//*[@id="dl_translator"]/div[3]/div[3]/div[3]/div[1]/div[2]/div[1]/button/div')
             self.browserClickTimeout('//*[@id="dl_translator"]/div[3]/div[3]/div[3]/div[3]/div[7]/div/div[3]/button[8]/div[1]')
 
         # google
         if web_type == "google" :
             self.browserClickTimeout('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[1]/c-wiz/div[2]/button/div[2]')
-            self.browserClickTimeout('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[3]/c-wiz/div[1]/div/div[3]/div/div[1]/div/div[2]')
+            if language == "JAP" :
+                self.browserClickTimeout('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[3]/c-wiz/div[1]/div/div[3]/div/div[3]/div[67]/div[2]')
+            elif language == "ENG" :
+                self.browserClickTimeout('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[3]/c-wiz/div[1]/div/div[3]/div/div[3]/div[106]/div[2]')
+            elif language == "KOR" :
+                self.browserClickTimeout('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[3]/c-wiz/div[1]/div/div[3]/div/div[3]/div[30]/div[2]')
             self.browserClickTimeout('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[1]/c-wiz/div[5]/button/div[2]')
             self.browserClickTimeout('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[3]/c-wiz/div[2]/div/div[3]/div/div[2]/div[110]/div[2]')
 
+        # 彩云
         if web_type == "caiyun" :
             self.browserClickTimeout('//*[@id="app"]/div[2]/div[1]/div[2]/div/div[1]/div[1]/div/div/div[1]')
-            self.browserClickTimeout('//*[@id="app"]/div[2]/div[1]/div[2]/div/div[1]/div[1]/div/div[2]/div[1]')
+            if language == "JAP" :
+                self.browserClickTimeout('//*[@id="app"]/div[2]/div[1]/div[2]/div/div[1]/div[1]/div/div[2]/div[4]')
+            elif language == "ENG" :
+                self.browserClickTimeout('//*[@id="app"]/div[2]/div[1]/div[2]/div/div[1]/div[1]/div/div[2]/div[3]')
+            elif language == "KOR" :
+                self.browserClickTimeout('//*[@id="app"]/div[2]/div[1]/div[2]/div/div[1]/div[1]/div/div[2]/div[1]')
             self.browserClickTimeout('//*[@id="app"]/div[2]/div[1]/div[2]/div/div[1]/div[1]/div/div/div[3]')
             self.browserClickTimeout('//*[@id="app"]/div[2]/div[1]/div[2]/div/div[1]/div[1]/div/div[2]/div[2]')
 
@@ -221,7 +253,8 @@ class Webdriver(QObject) :
 
         try :
             # 清空文本框
-            self.browser.find_element_by_xpath('//*[@id="inputOriginal"]').clear()
+            if self.content :
+                self.browserClickTimeout('//*[@id="inputDelete"]')
             # 输入要翻译的文本
             self.browser.find_element_by_xpath('//*[@id="inputOriginal"]').send_keys(content)
             self.browser.find_element_by_xpath('//*[@id="transMachine"]').click()
@@ -230,14 +263,13 @@ class Webdriver(QObject) :
             while True:
                 time.sleep(0.1)
                 # 提取翻译信息
-                outputText = self.browser.find_element_by_id("transTarget").get_attribute("textContent")
-                if not outputText.isspace() and len(outputText.strip()) > 1 and "".join(
-                        outputText.split()) != self.content:
-                    self.content = "".join(outputText.split())
+                text = self.browser.find_element_by_xpath('//*[@id="transTarget"]').text
+                if text :
+                    self.content = text
                     return self.content
                 # 判断超时
                 end = time.time()
-                if (end - start) > 10:
+                if (end - start) > 10 :
                     return "公共有道: 我超时啦!"
 
         except Exception :
@@ -250,7 +282,8 @@ class Webdriver(QObject) :
 
         try :
             # 清空翻译框
-            self.browser.find_element_by_xpath('//*[@id="baidu_translate_input"]').clear()
+            if self.content :
+                self.browserClickTimeout('//*[@id="main-outer"]/div/div/div[1]/div[2]/div[1]/div[1]/div/div[2]/a')
             # 输入要翻译的文本
             self.browser.find_element_by_xpath('//*[@id="baidu_translate_input"]').send_keys(content)
             self.browser.find_element_by_xpath('//*[@id="translate-button"]').click()
@@ -260,9 +293,9 @@ class Webdriver(QObject) :
                 time.sleep(0.1)
                 # 提取翻译信息
                 try :
-                    outputText = self.browser.find_element_by_xpath('//*[@id="main-outer"]/div/div/div[1]/div[2]/div[1]/div[2]/div/div/div[1]/p[2]').text
-                    if outputText and outputText != self.content:
-                        self.content = outputText
+                    text = self.browser.find_element_by_xpath('//*[@id="main-outer"]/div/div/div[1]/div[2]/div[1]/div[2]/div/div/div[1]/p[2]').text
+                    if text :
+                        self.content = text
                         return self.content
                 except Exception :
                     pass
@@ -281,7 +314,8 @@ class Webdriver(QObject) :
 
         try :
             # 清空翻译框
-            self.browser.find_element_by_xpath('/html/body/div[2]/div[2]/div[2]/div[1]/div[1]/textarea').clear()
+            if self.content :
+                self.browserClickTimeout('/html/body/div[2]/div[2]/div[2]/div[1]/div[2]')
             # 输入要翻译的文本
             self.browser.find_element_by_xpath('/html/body/div[2]/div[2]/div[2]/div[1]/div[1]/textarea').send_keys(content)
             self.browser.find_element_by_xpath('//*[@id="language-button-group-translate"]/div').click()
@@ -291,9 +325,9 @@ class Webdriver(QObject) :
                 time.sleep(0.1)
                 # 提取翻译信息
                 try :
-                    outputText = self.browser.find_element_by_xpath('/html/body/div[2]/div[2]/div[2]/div[2]/div[2]').text
-                    if outputText and "".join(outputText.split()) != self.content :
-                        self.content = "".join(outputText.split())
+                    text = self.browser.find_element_by_xpath('/html/body/div[2]/div[2]/div[2]/div[2]/div[2]').text
+                    if text :
+                        self.content = text.replace("\n", "")
                         return self.content
                 except Exception :
                     pass
@@ -312,7 +346,8 @@ class Webdriver(QObject) :
 
         try :
             # 清空翻译框
-            self.browserClickTimeout('//*[@id="app"]/div[2]/div[1]/div[2]/div/div[2]/div/a')
+            if self.content :
+                self.browserClickTimeout('//*[@id="app"]/div[2]/div[1]/div[2]/div/div[2]/div/a')
             # 输入要翻译的文本
             self.browser.find_element_by_xpath('//*[@id="textarea"]').send_keys(content)
             self.browserClickTimeout('//*[@id="app"]/div[2]/div[1]/div[2]/div/div[1]/div[2]/div[2]')
@@ -392,12 +427,12 @@ class Webdriver(QObject) :
                 # 提取翻译信息
                 try :
                     # 提取翻译信息
-                    outputText = self.browser.find_element_by_id("target-dummydiv").get_attribute("textContent")
-                    if not outputText.isspace() \
-                            and outputText.strip() \
-                            and "[...]" not in "".join(outputText.split()) \
-                            and (len(content) > 5 and len("".join(outputText.split())) > 3 ) :
-                        self.content = outputText.strip()
+                    text = self.browser.find_element_by_id("target-dummydiv").get_attribute("textContent")
+                    if not text.isspace() \
+                            and text.strip() \
+                            and "[...]" not in "".join(text.split()) \
+                            and (len(content) > 5 and len("".join(text.split())) > 3 ) :
+                        self.content = text.strip()
                         return self.content
                 except Exception :
                     pass
