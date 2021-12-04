@@ -1,0 +1,15 @@
+selenium==3.141.0
+Flask==1.1.1
+opencv_python==4.2.0.34
+win32gui==221.6
+QtAwesome==0.7.1
+scikit_image==0.15.0
+system_hotkey==1.0.3
+tencentcloud_sdk_python==3.0.170
+pyperclip==1.8.0
+requests==2.23.0
+paddleocr==2.3.0.2
+Pillow==8.4.0
+PyQt5==5.15.6
+PyYAML==6.0
+skimage==0.0
