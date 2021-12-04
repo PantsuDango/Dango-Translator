@@ -20,7 +20,7 @@ class Sound() :
         try:
             # 使用谷歌浏览器
             option = webdriver.ChromeOptions()
-            #option.add_argument("--headless")
+            option.add_argument("--headless")
             self.browser = webdriver.Chrome(executable_path="./config/tools/chromedriver.exe",
                                             service_log_path="nul",
                                             options=option)
