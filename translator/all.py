@@ -165,6 +165,7 @@ class Webdriver(QObject) :
             except Exception :
                 if time.time()-start > timeout :
                     break
+            time.sleep(0.1)
 
 
     # 翻译页面初始化
@@ -323,7 +324,7 @@ class Webdriver(QObject) :
                 try :
                     # 提取翻译信息
                     text = self.browser.find_element_by_xpath('//*[@id="texttarget"]/p/span').text
-                    if text != self.content :
+                    if text :
                         self.content = text
                         return self.content
                 except Exception :
@@ -342,13 +343,9 @@ class Webdriver(QObject) :
     def google(self, content) :
 
         try :
-            try:
-                self.browser.find_element_by_xpath(self.object.yaml["dict_info"]["google_xpath"]).click()
-            except Exception:
-                pass
-
             # 清空翻译框
-            self.browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[2]/div[2]/c-wiz[1]/span/span/div/textarea').clear()
+            if self.content :
+                self.browserClickTimeout('/html[1]/body[1]/c-wiz[1]/div[1]/div[2]/c-wiz[1]/div[2]/c-wiz[1]/div[1]/div[2]/div[2]/c-wiz[1]/div[1]/div[1]/div[1]/span[1]/button[1]/div[2]')
             # 输入要翻译的文本
             self.browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[2]/div[2]/c-wiz[1]/span/span/div/textarea').send_keys(content)
 
@@ -357,10 +354,15 @@ class Webdriver(QObject) :
                 time.sleep(0.1)
                 # 提取翻译信息
                 try :
-                    outputText = self.browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[2]/div[2]/c-wiz[2]/div[5]/div/div[1]').text
-                    # 原文相似度
-                    if outputText :
-                        self.content = "".join(outputText.split())
+                    try :
+                        # 可能出出现重试按钮
+                        self.browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[2]/div[2]/c-wiz[2]/div[4]/div[2]/button/span').click()
+                    except Exception :
+                        pass
+                    text = self.browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[2]/div[2]/c-wiz[2]/div[5]/div/div[1]').text
+                    if text :
+                        text = text.replace("\n", "")
+                        self.content = text
                         return self.content
                 except Exception :
                     pass
