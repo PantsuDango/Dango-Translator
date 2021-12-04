@@ -2266,6 +2266,9 @@ class Settin(QMainWindow) :
     # 重置翻译引擎
     def resetWebdriver(self) :
 
+        # 重置语音模块
+        utils.thread.createThread(self.object.translation_ui.sound.refreshWeb)
+
         # 重置开关
         self.object.translation_ui.webdriver1.web_type = ""
         self.object.translation_ui.webdriver2.web_type = ""

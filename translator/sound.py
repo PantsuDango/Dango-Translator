@@ -10,6 +10,7 @@ class Sound() :
 
         self.object = object
         self.logger = object.logger
+        self.content = ""
         self.url = "https://fanyi.qq.com/"
 
 
@@ -19,7 +20,7 @@ class Sound() :
         try:
             # 使用谷歌浏览器
             option = webdriver.ChromeOptions()
-            option.add_argument("--headless")
+            #option.add_argument("--headless")
             self.browser = webdriver.Chrome(executable_path="./config/tools/chromedriver.exe",
                                             service_log_path="nul",
                                             options=option)
@@ -57,33 +58,65 @@ class Sound() :
                     self.logger.error(format_exc())
                     self.close()
 
-        self.browser.get(self.url)
-        self.browser.maximize_window()
+        self.refreshWeb()
+
+
+    # 刷新页面
+    def refreshWeb(self) :
+
+        self.content = ""
+        try :
+            self.browser.get(self.url)
+            self.browser.maximize_window()
+            self.transInit()
+        except Exception :
+            self.logger.error(format_exc())
+            self.close()
+
+
+    # 点击动作延时
+    def browserClickTimeout(self, xpath, timeout=1):
+
+        start = time.time()
+        while True:
+            try:
+                self.browser.find_element_by_xpath(xpath).click()
+                break
+            except Exception:
+                if time.time() - start > timeout:
+                    break
+            time.sleep(0.1)
+
+
+    # 翻译页面初始化
+    def transInit(self) :
+
+        try:
+            self.browser.find_element_by_xpath(self.object.yaml["dict_info"]["tencent_xpath"]).click()
+        except Exception:
+            pass
+        language = self.object.config["language"]
+
+        self.browserClickTimeout('//*[@id="language-button-group-source"]/div[1]')
+        if language == "JAP":
+            self.browserClickTimeout('//*[@id="language-button-group-source"]/div[2]/ul/li[4]/span')
+        elif language == "ENG":
+            self.browserClickTimeout('//*[@id="language-button-group-source"]/div[2]/ul/li[3]/span')
+        elif language == "KOR":
+            self.browserClickTimeout('//*[@id="language-button-group-source"]/div[2]/ul/li[5]/span')
 
 
     # 播放音乐
-    def playSound(self, content, language) :
+    def playSound(self, content) :
 
         try :
-            try :
-                self.browser.find_element_by_xpath(self.object.yaml["dict_info"]["tencent_xpath"]).click()
-            except Exception :
-                pass
-
-            # 清空文本框
-            self.browser.find_element_by_xpath('/html/body/div[2]/div[2]/div[2]/div[1]/div[1]/textarea').clear()
-            # 输入要朗读的文本
-            self.browser.find_element_by_xpath('/html/body/div[2]/div[2]/div[2]/div[1]/div[1]/textarea').send_keys(content)
-            self.browser.find_element_by_xpath('//*[@id="language-button-group-source"]/div[1]/span').click()
-            # 选择朗读语种
-            if language == "JAP" :
-                self.browser.find_element_by_xpath('//*[@id="language-button-group-source"]/div[2]/ul/li[4]/span').click()
-            elif language == "ENG" :
-                self.browser.find_element_by_xpath('//*[@id="language-button-group-source"]/div[2]/ul/li[3]/span').click()
-            elif language == "KOR" :
-                self.browser.find_element_by_xpath('//*[@id="language-button-group-source"]/div[2]/ul/li[5]/span').click()
-            else :
-                return
+            if content != self.content :
+                # 清空文本框
+                self.browserClickTimeout('/html/body/div[2]/div[2]/div[2]/div[1]/div[2]')
+                # 输入要朗读的文本
+                self.browser.find_element_by_xpath('/html/body/div[2]/div[2]/div[2]/div[1]/div[1]/textarea').send_keys(content)
+                self.browser.find_element_by_xpath('//*[@id="language-button-group-translate"]/div').click()
+                self.content = content
 
             # 判断是否已经开始朗读
             while True :

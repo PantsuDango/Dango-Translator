@@ -215,7 +215,7 @@ class Translation(QMainWindow) :
         self.customSetGeometry(self.play_voice_button, 443, 5, 20, 20)
         self.play_voice_button.setToolTip("<b>朗读原文 Play Voice</b><br>朗读识别到的原文")
         self.play_voice_button.setStyleSheet("background: transparent;")
-        self.play_voice_button.clicked.connect(lambda: utils.thread.createThread(self.sound.playSound, self.original, self.object.config["language"]))
+        self.play_voice_button.clicked.connect(lambda: utils.thread.createThread(self.sound.playSound, self.original))
         self.play_voice_button.setCursor(select_pixmap)
         self.play_voice_button.hide()
 
