@@ -380,15 +380,9 @@ class Webdriver(QObject) :
     def deepl(self, content) :
 
         try :
-            try:
-                self.browser.find_element_by_xpath(self.object.yaml["dict_info"]["deepl_xpath"]).click()
-            except Exception:
-                pass
-
-            try :
-                self.browser.find_element_by_xpath('//*[@id="dl_translator"]/div[3]/div[3]/div[1]/button/span').click()
-            except Exception :
-                pass
+            # 清空翻译框
+            if self.content:
+                self.browserClickTimeout('//*[@id="dl_translator"]/div[3]/div[3]/div[1]/button/span')
             # 输入要翻译的文本
             self.browser.find_element_by_xpath('//*[@id="dl_translator"]/div[3]/div[3]/div[1]/div[2]/div[2]/textarea').send_keys(content)
 
@@ -401,7 +395,6 @@ class Webdriver(QObject) :
                     outputText = self.browser.find_element_by_id("target-dummydiv").get_attribute("textContent")
                     if not outputText.isspace() \
                             and outputText.strip() \
-                            and outputText.strip() != self.content \
                             and "[...]" not in "".join(outputText.split()) \
                             and (len(content) > 5 and len("".join(outputText.split())) > 3 ) :
                         self.content = outputText.strip()
