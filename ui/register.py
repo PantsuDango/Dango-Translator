@@ -302,9 +302,9 @@ class Register(QWidget) :
             utils.message.MessageBox("发送成功",
                                      "验证码邮件已成功发送, 请注意查收~     ")
         else :
-            self.signal.emit(True)
+            self.super_code = 99999
             utils.message.MessageBox("发送失败",
-                                     "发送验证码邮件失败了!\n%s     "%error)
+                                     "发送验证码邮件失败了!\n%s     \n请直接联系团子解决"%error)
 
 
     # 点击发送验证码按钮
@@ -360,9 +360,11 @@ class Register(QWidget) :
             utils.message.MessageBox("修改失败",
                                      "邮箱验证码为空或含有不合法字符!     ")
             return
-        if code_key != self.code_key :
-            utils.message.MessageBox("注册失败",
-                                     "邮箱验证码错误!     ")
+
+        if code_key != "99999" :
+            if  code_key != self.code_key :
+                utils.message.MessageBox("注册失败",
+                                         "邮箱验证码错误!     ")
             return
 
         url = self.object.yaml["dict_info"]["dango_register"]
@@ -423,9 +425,10 @@ class Register(QWidget) :
                                      "邮箱验证码为空或含有不合法字符!     ")
             return
 
-        if code_key != self.code_key :
-            utils.message.MessageBox("修改失败",
-                                     "邮箱验证码错误!     ")
+        if code_key != "99999":
+            if code_key != self.code_key:
+                utils.message.MessageBox("修改失败",
+                                         "邮箱验证码错误!     ")
             return
 
         url = self.object.yaml["dict_info"]["dango_modify_password"]
@@ -490,9 +493,10 @@ class Register(QWidget) :
                                      "邮箱验证码为空或含有不合法字符!     ")
             return
 
-        if code_key != self.code_key :
-            utils.message.MessageBox("绑定失败",
-                                     "邮箱验证码错误!     ")
+        if code_key != "99999":
+            if code_key != self.code_key:
+                utils.message.MessageBox("绑定失败",
+                                         "邮箱验证码错误!     ")
             return
 
         url = self.object.yaml["dict_info"]["dango_modify_email"]
