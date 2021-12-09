@@ -2152,6 +2152,7 @@ class Settin(QMainWindow) :
     def changeHorizontal(self) :
 
         self.horizontal = self.horizontal_slider.value()
+        self.object.translation_ui.horizontal = self.horizontal
         self.horizontal_slider_label.setText("{}%".format(self.horizontal))
         if self.horizontal == 0 :
             self.horizontal = 1
