@@ -90,7 +90,7 @@ class DangoTranslator() :
         thread.signal.connect(self.register_ui.showBindEmailMessage)
         utils.thread.runQThread(thread)
 
-        # 自动启动离线OCR
+        # 自动启动本地OCR
         utils.thread.createThread(self.autoOpenOfflineOCR)
 
 
@@ -113,14 +113,14 @@ class DangoTranslator() :
         self.settin_ui.show()
 
 
-    # 自动打开离线OCR
+    # 自动打开本地OCR
     def autoOpenOfflineOCR(self) :
 
         if not self.config["offlineOCR"] :
             return
         if not utils.port.detectPort(self.yaml["port"]) :
             try :
-                # 启动离线OCR
+                # 启动本地OCR
                 os.startfile(self.yaml["ocr_cmd_path"])
             except Exception :
                 self.logger.error(format_exc())

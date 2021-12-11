@@ -203,7 +203,7 @@ class Settin(QMainWindow) :
         self.setTabFour()
         self.setTabFive()
 
-        # 离线OCR标签
+        # 背景图pixiv标签
         label = QLabel(self)
         self.customSetGeometry(label, 630, 380, 200, 15)
         label.setText("背景图 pixiv id: 92140553")
@@ -260,12 +260,12 @@ class Settin(QMainWindow) :
         button.clicked.connect(lambda: self.showDesc("OCR"))
         button.setCursor(self.question_pixmap)
 
-        # 离线OCR标签
+        # 本地OCR标签
         label = QLabel(self.tab_1)
         self.customSetGeometry(label, 20, 25, 60, 20)
-        label.setText("离线OCR")
+        label.setText("本地OCR")
 
-        # 离线OCR说明按钮
+        # 本地OCR说明按钮
         button = QPushButton(self.tab_1)
         self.customSetGeometry(button, 80, 25, 25, 20)
         button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;"%self.color_2)
@@ -273,7 +273,7 @@ class Settin(QMainWindow) :
         button.clicked.connect(lambda: self.showDesc("offlineOCR"))
         button.setCursor(self.question_pixmap)
 
-        # 离线OCR说明?号图标
+        # 本地OCR说明?号图标
         button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_1)
         self.customSetIconSize(button, 20, 20)
         self.customSetGeometry(button, 105, 25, 20, 20)
@@ -281,33 +281,33 @@ class Settin(QMainWindow) :
         button.clicked.connect(lambda: self.showDesc("offlineOCR"))
         button.setCursor(self.question_pixmap)
 
-        # 离线OCR备注
+        # 本地OCR备注
         label = QLabel(self.tab_1)
         self.customSetGeometry(label, 145, 25, 300, 20)
         label.setText("如果安装失败建议直接使用在线OCR")
         label.setStyleSheet("color: %s" % self.color_2)
 
-        # 离线OCR状态开关
+        # 本地OCR状态开关
         self.offline_ocr_switch = ui.switch.OfflineSwitch(self.tab_1, sign=self.offline_ocr_use, startX=(65-20)*self.rate, object=self.object)
         self.customSetGeometry(self.offline_ocr_switch, 20, 60, 65, 20)
         self.offline_ocr_switch.checkedChanged.connect(self.changeOfflineSwitch)
         self.offline_ocr_switch.setCursor(self.select_pixmap)
 
-        # 离线OCR运行按钮
+        # 本地OCR运行按钮
         button = QPushButton(self.tab_1)
         self.customSetGeometry(button, 105, 60, 60, 20)
         button.setText("运行")
         button.clicked.connect(self.runOfflineOCR)
         button.setCursor(self.select_pixmap)
 
-        # 离线OCR测试按钮
+        # 本地OCR测试按钮
         button = QPushButton(self.tab_1)
         self.customSetGeometry(button, 185, 60, 60, 20)
         button.setText("测试")
         button.clicked.connect(self.testOfflineOCR)
         button.setCursor(self.select_pixmap)
 
-        # 离线OCR教程按钮
+        # 本地OCR教程按钮
         button = QPushButton(self.tab_1)
         self.customSetGeometry(button, 265, 60, 60, 20)
         button.setText("教程")
@@ -1533,7 +1533,7 @@ class Settin(QMainWindow) :
         object.setGraphicsEffect(shadow)
 
 
-    # 改变离线OCR开关状态
+    # 改变本地OCR开关状态
     def changeOfflineSwitch(self, checked) :
 
         if checked :
@@ -1725,7 +1725,7 @@ class Settin(QMainWindow) :
             self.text_direction_use = False
 
         utils.message.MessageBox("这是来自团子的提示",
-                                 "目前仅有百度OCR支持了竖向的文字识别\n团子的离线和在线OCR还均未支持, 会尽快更新上!       ")
+                                 "目前仅有百度OCR支持了竖向的文字识别\n团子的本地和在线OCR还均未支持, 会尽快更新上!       ")
 
 
     # 改变翻译热键开关状态
@@ -1761,31 +1761,31 @@ class Settin(QMainWindow) :
             self.baidu_ocr_switch.updateValue()
 
 
-    # 运行离线OCR
+    # 运行本地OCR
     def runOfflineOCR(self) :
 
         # 检查端口是否被占用
         if utils.port.detectPort(self.object.yaml["port"]) :
             utils.message.MessageBox("运行失败",
-                                     "离线OCR已启动, 请不要重复运行!     ")
+                                     "本地OCR已启动, 请不要重复运行!     ")
         else :
             try :
-                # 启动离线OCR
+                # 启动本地OCR
                 os.startfile(self.object.yaml["ocr_cmd_path"])
             except Exception :
                 self.logger.error(format_exc())
                 utils.message.MessageBox("运行失败",
-                                         "离线OCR运行失败, 原因:\n%s     "%format_exc())
+                                         "本地OCR运行失败, 原因:\n%s     "%format_exc())
 
 
-    # 测试离线OCR
+    # 测试本地OCR
     def testOfflineOCR(self) :
 
         # 检查端口是否被占用
         if not utils.port.detectPort(self.object.yaml["port"]) :
             utils.message.MessageBox("测试失败",
-                                     "离线OCR还没运行成功，不可以进行测试     \n"
-                                     "请先启动离线OCR, 并保证其运行正常")
+                                     "本地OCR还没运行成功，不可以进行测试     \n"
+                                     "请先启动本地OCR, 并保证其运行正常")
         else :
             utils.test.testOfflineOCR(self.object)
 
@@ -1830,7 +1830,7 @@ class Settin(QMainWindow) :
             self.logger.error(format_exc())
 
 
-    # 打开离线OCR教程
+    # 打开本地OCR教程
     def openOfflineOCRTutorial(self) :
 
         try :
@@ -2004,9 +2004,9 @@ class Settin(QMainWindow) :
             self.desc_ui.desc_text.append("\nOCR即为文字识别技术, 用于提取图片内要翻译的文字.")
             self.desc_ui.desc_text.append("\n翻译器通过对所框选的范围进行截图, 然后利用OCR将截图内要翻译的文字识别出来, 再发送给翻译模块翻译。")
 
-        # 离线OCR说明
+        # 本地OCR说明
         elif message_type == "offlineOCR" :
-            self.desc_ui.setWindowTitle("离线OCR说明")
+            self.desc_ui.setWindowTitle("本地OCR说明")
             self.desc_ui.desc_text.append("\n特性: \n依赖自身CPU性能, CPU性能越高，识别速度越快.")
             self.desc_ui.desc_text.append("识别精度一般.")
             self.desc_ui.desc_text.append("\n优点:\n1. 无额度限制, 完全免费, 可无限次使用;")

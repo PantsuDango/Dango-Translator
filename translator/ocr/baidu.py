@@ -31,7 +31,7 @@ def getAccessToken(object) :
                                  "你可能会无法使用百度OCR\n"
                                  "1. 可能开了代理或者加速器, 请尝试关闭它们\n"
                                  "2. 可能是校园网屏蔽或者是自身网络断开了\n"
-                                 "3. 如都无法解决, 请更换使用团子离线或在线OCR     ")
+                                 "3. 如都无法解决, 请更换使用团子本地或在线OCR     ")
 
     else :
         try :
@@ -133,7 +133,7 @@ def baiduOCR(config, logger, test=False) :
                         if showTranslateRow == "True":
                             sentence = "百度OCR错误：竖排翻译模式每日额度已用光, 请取消竖排翻译模式"
                         else:
-                            sentence = "百度OCR错误: 无额度, 可使用离线ocr"
+                            sentence = "百度OCR错误: 无额度, 可使用本地OCR或在线OCR"
 
                     elif error_code == 111 :
                         sentence = "百度OCR错误: 密钥过期了, 请进入设置页面后保存一次设置, 以重新生成密钥"
