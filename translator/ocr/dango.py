@@ -12,7 +12,7 @@ NEW_TEST_IMAGE_PATH = os.path.join(os.getcwd(), "config", "other", "new_image.jp
 
 
 # 图片四周加白边
-def imageBorder(src, dst, loc="a", width=3, color=(0, 0, 0)):
+def imageBorder(src, dst, loc="a", width=3, color=(0, 0, 0), type="on"):
 
     # 读取图片
     img_ori = Image.open(src)
@@ -45,7 +45,10 @@ def imageBorder(src, dst, loc="a", width=3, color=(0, 0, 0)):
         pass
 
     # 保存图片
-    img_new.save(dst, "webp", quality=1)
+    if type == "on" :
+        img_new.save(dst, "webp", quality=1)
+    else :
+        img_new.save(dst)
 
 
 # 团子在线OCR服务
@@ -127,7 +130,7 @@ def offlineOCR(object) :
 
     # 四周加白边
     try :
-        imageBorder(image_path, new_image_path, "a", 10, color=(255, 255, 255))
+        imageBorder(image_path, new_image_path, "a", 10, color=(255, 255, 255), type="off")
     except Exception :
         body["ImagePath"] = image_path
 
