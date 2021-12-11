@@ -116,7 +116,7 @@ def dangoOCR(object, test=False) :
         return False, "团子OCR错误: %s"%message
 
 
-# 离线OCR
+# 本地OCR
 def offlineOCR(object) :
 
     image_path = os.path.join(os.getcwd(), "config", "image.jpg")
@@ -140,12 +140,12 @@ def offlineOCR(object) :
         if res and res.get("Code", -1) == 0 :
             break
     if not res :
-        return False, "离线OCR错误: 错误未知, 请尝试重试, 如果频繁出现此情况请联系团子"
+        return False, "本地OCR错误: 错误未知, 请尝试重试, 如果频繁出现此情况请联系团子"
 
     code = res.get("Code", -1)
     message = res.get("Message", "")
     if code == -1 :
-        return False, "离线OCR错误: %s"%message
+        return False, "本地OCR错误: %s"%message
     else :
         sentence = ""
         for index, tmp in enumerate(res.get("Data", [])) :

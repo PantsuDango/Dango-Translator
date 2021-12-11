@@ -6,7 +6,7 @@ from traceback import format_exc
 OCR_SRC_FILE_PATH = "./ocr/resources/app.py"
 
 
-# 更新离线ocr源码文件
+# 更新本地ocr源码文件
 def updateOCRSrcFile(url, logger) :
 
     try:

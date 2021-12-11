@@ -14,12 +14,12 @@ TEST_IMAGE_PATH = os.path.join(os.getcwd(), "config", "other", "image.jpg")
 NEW_TEST_IMAGE_PATH = os.path.join(os.getcwd(), "config", "other", "new_image.jpg")
 
 
-# 测试离线OCR
+# 测试本地OCR
 def testOfflineOCR(object) :
 
     # 测试信息显示窗
     object.settin_ui.desc_ui = ui.desc.Desc(object)
-    object.settin_ui.desc_ui.setWindowTitle("离线OCR测试")
+    object.settin_ui.desc_ui.setWindowTitle("本地OCR测试")
     object.settin_ui.desc_ui.desc_text.append("\n开始测试, 共测试5次...")
     object.settin_ui.desc_ui.show()
     QApplication.processEvents()

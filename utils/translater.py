@@ -180,7 +180,7 @@ class Translater(QThread) :
         # 团子OCR
         elif self.object.config["onlineOCR"] :
             ocr_sign, original = translator.ocr.dango.dangoOCR(self.object)
-        # 离线OCR
+        # 本地OCR
         elif self.object.config["offlineOCR"] :
             ocr_sign, original = translator.ocr.dango.offlineOCR(self.object)
 
