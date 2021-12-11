@@ -684,7 +684,7 @@ class Translation(QMainWindow) :
         # 翻译框坐标
         rect = self.geometry()
         X1 = rect.left()
-        Y1 = rect.top()
+        Y1 = rect.top()+(self.height()-self.translate_text.height())
         X2 = rect.left() + rect.width()
         Y2 = rect.top() + rect.height()
 
