@@ -1,7 +1,7 @@
 import base64
 from PIL import Image
 import os
-
+import time
 import utils.http
 
 
@@ -45,12 +45,12 @@ def imageBorder(src, dst, loc="a", width=3, color=(0, 0, 0)):
         pass
 
     # 保存图片
-    img_new.save(dst)
+    img_new.save(dst, "webp", quality=1)
 
 
 # 团子在线OCR服务
 def dangoOCR(object, test=False) :
-
+    a = time.time()
     if not test :
         try :
             # 四周加白边
@@ -65,6 +65,7 @@ def dangoOCR(object, test=False) :
             path = NEW_TEST_IMAGE_PATH
         except Exception:
             path = TEST_IMAGE_PATH
+    print(time.time()-a)
 
 
     with open(path, "rb") as file :
