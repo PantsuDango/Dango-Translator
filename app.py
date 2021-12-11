@@ -14,6 +14,7 @@ import utils.http
 import utils.email
 import utils.message
 import utils.port
+import utils.update
 
 import ui.login
 import ui.register
@@ -125,8 +126,12 @@ class DangoTranslator() :
                 self.logger.error(format_exc())
 
 
-    # 初始化图片资源
+    # 初始化资源
     def InitLoadImage(self) :
+
+        # 更新ocr源码文件
+        ocr_src_file = self.yaml["dict_info"]["ocr_src_file"]
+        utils.update.updateOCRSrcFile(ocr_src_file, self.logger)
 
         # 加载QQ群图片
         qq_group_url = self.yaml["dict_info"]["dango_qq_group"]
