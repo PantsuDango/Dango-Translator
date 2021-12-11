@@ -1495,7 +1495,7 @@ class Settin(QMainWindow) :
         # 团子b站个人主页
         self.dango_bilibili_url = "https://space.bilibili.com/227927/dynamic"
         # 在线教程地址
-        self.tutorial_url = "https://docs.ayano.top"
+        self.tutorial_url = self.object.yaml["dict_info"]["tutorial_url"]
         # GT-Zhang个人主页
         self.gt_github_url = "https://github.com/GT-ZhangAcer"
         # C4a15Wh个人主页
