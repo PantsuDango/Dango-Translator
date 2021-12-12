@@ -43,6 +43,8 @@ BLOG_PATH = "./config/icon/blog.png"
 HOME_ICON_PATH = "./config/icon/home.png"
 SLIDER_ICON_PATH = "./config/icon/slider.png"
 FUNCTION_ICON_PATH = "./config/icon/function.png"
+OPEN_STATUSBAR_IMG_PATH = "./config/other/显示消息栏.png"
+CLOSE_STATUSBAR_IMG_PATH = "./config/other/屏蔽消息栏.png"
 
 
 # 重构QTabWidget使其竖直选项卡文字水平
@@ -932,12 +934,28 @@ class Settin(QMainWindow) :
         self.show_statusbar_switch.checkedChanged.connect(self.changeShowStatusbarSwitch)
         self.show_statusbar_switch.setCursor(self.select_pixmap)
 
+        # 显示消息栏说明标签
+        button = QPushButton(self.tab_3)
+        self.customSetGeometry(button, 175, 170, 25, 20)
+        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;" % self.color_2)
+        button.setText("说明")
+        button.clicked.connect(lambda: self.showDesc("showStatusbar"))
+        button.setCursor(self.question_pixmap)
+
+        # 显示消息栏说明?号图标
+        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_3)
+        self.customSetIconSize(button, 20, 20)
+        self.customSetGeometry(button, 200, 170, 20, 20)
+        button.setStyleSheet("background: transparent;")
+        button.clicked.connect(lambda: self.showDesc("showStatusbar"))
+        button.setCursor(self.question_pixmap)
+
         # 原文颜色标签
         label = QLabel(self.tab_3)
         self.customSetGeometry(label, 275, 170, 60, 20)
         label.setText("原文颜色:")
 
-        # 原文翻译颜色选择
+        # 原文颜色选择
         self.original_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.original_color), "", self.tab_3)
         self.customSetIconSize(self.original_color_button, 20, 20)
         self.customSetGeometry(self.original_color_button, 350, 170, 20, 20)
@@ -945,7 +963,7 @@ class Settin(QMainWindow) :
         self.original_color_button.clicked.connect(lambda: self.ChangeTranslateColor("original", self.original_color))
         self.original_color_button.setCursor(self.select_pixmap)
 
-        # 显示原文说明标签
+        # 原文颜色说明标签
         button = QPushButton(self.tab_3)
         self.customSetGeometry(button, 430, 170, 25, 20)
         button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;" % self.color_2)
@@ -953,7 +971,7 @@ class Settin(QMainWindow) :
         button.clicked.connect(lambda: self.showDesc("originalColor"))
         button.setCursor(self.question_pixmap)
 
-        # 显示原文说明?号图标
+        # 原文颜色说明?号图标
         button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_3)
         self.customSetIconSize(button, 20, 20)
         self.customSetGeometry(button, 455, 170, 20, 20)
@@ -1783,11 +1801,13 @@ class Settin(QMainWindow) :
             self.show_statusbar_use = True
             self.object.translation_ui.statusbar_sign = True
             self.object.translation_ui.statusbar.show()
+            self.object.translation_ui.temp_statusbar.hide()
             self.object.translation_ui.textAreaChanged()
         else:
             self.show_statusbar_use = False
             self.object.translation_ui.statusbar_sign = False
             self.object.translation_ui.statusbar.hide()
+            self.object.translation_ui.temp_statusbar.show()
             self.object.translation_ui.textAreaChanged()
 
 
@@ -2208,6 +2228,15 @@ class Settin(QMainWindow) :
         elif message_type == "originalColor" :
             self.desc_ui.setWindowTitle("原文颜色说明")
             self.desc_ui.desc_text.append("\n控制翻译界面显示的原文, 和一切错误说明, 通知信息的文字颜色")
+
+        # 显示消息栏说明
+        elif message_type == "showStatusbar" :
+            self.desc_ui.setWindowTitle("翻译时间说明")
+            self.desc_ui.desc_text.append("控制翻译界面底部消息栏是否显示\n")
+            self.desc_ui.desc_text.append("若显示\n")
+            self.desc_ui.desc_text.insertHtml('<img src={} width="{}" >'.format(OPEN_STATUSBAR_IMG_PATH, 245*self.rate))
+            self.desc_ui.desc_text.append("\n若屏蔽:\n")
+            self.desc_ui.desc_text.insertHtml('<img src="{}" width="{}" >'.format(CLOSE_STATUSBAR_IMG_PATH, 245*self.rate))
 
         self.desc_ui.show()
 
