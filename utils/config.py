@@ -113,6 +113,8 @@ def configConvert(object) :
     object.config["fontColor"]["baidu"] = object.config["fontColor"].get("baidu", "#5B8FF9")
     # 字体颜色 私人彩云
     object.config["fontColor"]["caiyunPrivate"] = object.config["fontColor"].get("caiyunPrivate", "#5B8FF9")
+    # 原文颜色
+    object.config["fontColor"]["original"] = object.config["fontColor"].get("original", "#5B8FF9")
 
     # 公共有道翻译开关
     object.config["youdaoUse"] = object.config.get("youdaoUse", "False")
