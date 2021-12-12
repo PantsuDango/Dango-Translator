@@ -429,7 +429,7 @@ class Register(QWidget) :
             if code_key != self.code_key:
                 utils.message.MessageBox("修改失败",
                                          "邮箱验证码错误!     ")
-            return
+                return
 
         url = self.object.yaml["dict_info"]["dango_modify_password"]
         body = {
