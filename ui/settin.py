@@ -921,6 +921,17 @@ class Settin(QMainWindow) :
         button.clicked.connect(lambda: self.showDesc("showOriginal"))
         button.setCursor(self.question_pixmap)
 
+        # 显示消息栏标签
+        label = QLabel(self.tab_3)
+        self.customSetGeometry(label, 20, 170, 60, 20)
+        label.setText("翻译时间:")
+
+        # 显示消息栏
+        self.show_statusbar_switch = ui.switch.ShowSwitch(self.tab_3, sign=self.show_statusbar_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.show_statusbar_switch, 95, 170, 65, 20)
+        self.show_statusbar_switch.checkedChanged.connect(self.changeShowStatusbarSwitch)
+        self.show_statusbar_switch.setCursor(self.select_pixmap)
+
 
     # 功能设定标签页
     def setTabFour(self) :
@@ -1540,6 +1551,8 @@ class Settin(QMainWindow) :
         self.PaddleOCR_github_url = "https://github.com/PaddlePaddle/PaddleOCR"
         # 更新日志
         self.bilibili_video_url = self.object.yaml["dict_info"]["bilibili_video"]
+        # 显示消息栏
+        self.show_statusbar_use = self.object.config["showStatusbarUse"]
 
 
     # 根据分辨率定义控件位置尺寸
@@ -1730,6 +1743,19 @@ class Settin(QMainWindow) :
             self.show_original_use = True
         else:
             self.show_original_use = False
+
+
+    # 改变显示消息栏开关状态
+    def changeShowStatusbarSwitch(self, checked):
+
+        if checked:
+            self.show_statusbar_use = True
+            self.object.translation_ui.statusbar_sign = True
+        else:
+            self.show_statusbar_use = False
+            self.object.translation_ui.statusbar_sign = False
+            self.object.translation_ui.statusbar.clearMessage()
+            self.object.translation_ui.textAreaChanged()
 
 
     # 改变自动复制剪贴板开关状态
@@ -2416,6 +2442,8 @@ class Settin(QMainWindow) :
         self.object.config["imageSimilarity"] = self.image_refresh_spinBox.value()
         # 自动翻译文字刷新相似度
         self.object.config["textSimilarity"] = self.text_refresh_spinBox.value()
+        # 显示消息栏
+        self.object.config["showStatusbarUse"] = self.show_statusbar_use
 
 
     # 注册新快捷键
