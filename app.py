@@ -129,6 +129,9 @@ class DangoTranslator() :
     # 初始化资源
     def InitLoadImage(self) :
 
+        # 更新icon文件
+        utils.update.updateIcon(self.yaml, self.logger)
+
         # 更新ocr源码文件
         ocr_src_file = self.yaml["dict_info"]["ocr_src_file"]
         utils.update.updateOCRSrcFile(ocr_src_file, self.logger)
