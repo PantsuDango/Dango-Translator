@@ -1,9 +1,11 @@
 import re
-import requests
+import os
 from traceback import format_exc
+import utils.http
 
 
 OCR_SRC_FILE_PATH = "./ocr/resources/app.py"
+FUNCTION_ICON_PATH = "./config/icon/function.png"
 
 
 # 更新本地ocr源码文件
@@ -15,10 +17,15 @@ def updateOCRSrcFile(url, logger) :
 
         regex = "paddleocr.paddleocr.BASE_DIR"
         if len(re.findall(regex, src)) > 0 :
-            res = requests.get(url, stream=True)
-            content = res.content
-            with open(OCR_SRC_FILE_PATH, "wb") as file :
-                file.write(content)
+            utils.http.downloadFile(url, OCR_SRC_FILE_PATH, logger)
 
     except Exception:
         logger.error(format_exc())
+
+
+# 一些新增图标的更新
+def updateIcon(yaml, logger) :
+
+    if not os.path.exists(FUNCTION_ICON_PATH) :
+        url = yaml["dict_info"]["function_icon_url"]
+        utils.http.downloadFile(url, FUNCTION_ICON_PATH, logger)
