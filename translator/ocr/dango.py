@@ -53,7 +53,7 @@ def imageBorder(src, dst, loc="a", width=3, color=(0, 0, 0), type="on"):
 
 # 团子在线OCR服务
 def dangoOCR(object, test=False) :
-    a = time.time()
+
     if not test :
         try :
             # 四周加白边
@@ -68,8 +68,6 @@ def dangoOCR(object, test=False) :
             path = NEW_TEST_IMAGE_PATH
         except Exception:
             path = TEST_IMAGE_PATH
-    print(time.time()-a)
-
 
     with open(path, "rb") as file :
         image = file.read()
