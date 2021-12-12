@@ -1751,10 +1751,12 @@ class Settin(QMainWindow) :
         if checked:
             self.show_statusbar_use = True
             self.object.translation_ui.statusbar_sign = True
+            self.object.translation_ui.statusbar.show()
+            self.object.translation_ui.textAreaChanged()
         else:
             self.show_statusbar_use = False
             self.object.translation_ui.statusbar_sign = False
-            self.object.translation_ui.statusbar.clearMessage()
+            self.object.translation_ui.statusbar.hide()
             self.object.translation_ui.textAreaChanged()
 
 
