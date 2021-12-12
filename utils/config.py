@@ -195,6 +195,8 @@ def configConvert(object) :
     object.config["textSimilarity"] = object.config.get("textSimilarity", 90)
     # 范围坐标
     object.yaml["range"] = {"X1": 0, "Y1": 0, "X2": 0, "Y2": 0}
+    # 显示消息栏
+    object.config["showStatusbarUse"] = object.config.get("showStatusbarUse", True)
 
 
 # 保存配置至服务器

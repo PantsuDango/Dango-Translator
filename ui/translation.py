@@ -336,7 +336,7 @@ class Translation(QMainWindow) :
         # 翻译线程3翻译类型
         self.webdriver_type3 = ""
         # 状态栏是否隐藏标志
-        self.statusbar_sign = True
+        self.statusbar_sign = self.object.config["showStatusbarUse"]
         # 各翻译源线程状态标志
         self.thread_state = 0
         # 自动翻译线程存在标志
@@ -421,10 +421,8 @@ class Translation(QMainWindow) :
     # 状态栏显示信号槽
     def showStatusbar(self, messgae) :
 
-        if not self.statusbar_sign :
-            self.statusbar_sign = True
-            self.textAreaChanged()
-        self.statusbar.showMessage(messgae)
+        if self.statusbar_sign :
+            self.statusbar.showMessage(messgae)
 
 
     # 鼠标进入控件事件
@@ -527,7 +525,10 @@ class Translation(QMainWindow) :
         self.translate_text.setGeometry(0, 30*self.rate, width, newHeight)
 
         # 判断是否和范围框碰撞
-        self.checkOverlap()
+        try :
+            self.checkOverlap()
+        except Exception :
+            pass
 
 
     # 锁定界面
@@ -672,9 +673,9 @@ class Translation(QMainWindow) :
 
         if self.thread_state == 0 :
             try :
-                self.statusbar.showMessage("翻译结束, 耗时: {:.2f} s".format(time.time()-self.start_time+self.ocr_time))
+                self.showStatusbar("翻译结束, 耗时: {:.2f} s".format(time.time()-self.start_time+self.ocr_time))
             except Exception :
-                self.statusbar.showMessage("翻译结束, 耗时: {:.2f} s".format(time.time()-self.start_time))
+                self.showStatusbar("翻译结束, 耗时: {:.2f} s".format(time.time()-self.start_time))
             self.ocr_time = 0
 
 
@@ -751,7 +752,7 @@ class Translation(QMainWindow) :
     # 开启翻译模块
     def createWebdriverThread(self) :
 
-        self.statusbar.showMessage("翻译模块启动中, 请等待完成后再操作...")
+        self.showStatusbar("翻译模块启动中, 请等待完成后再操作...")
 
         # 筛选翻译源类型
         translater_list = ["youdaoUse", "baiduwebUse", "tencentwebUse", "deeplUse", "googleUse", "caiyunUse"]
