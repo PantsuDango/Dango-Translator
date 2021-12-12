@@ -223,17 +223,17 @@ class Translater(QThread) :
         nothing_sign = False
 
         # 公共翻译一
-        if self.object.translation_ui.webdriver1.open_sign :
+        if self.object.translation_ui.webdriver1.web_type :
             utils.thread.createThread(self.creatTranslaterThread, "webdriver_1")
             nothing_sign = True
 
         # 公共翻译二
-        if self.object.translation_ui.webdriver2.open_sign :
+        if self.object.translation_ui.webdriver2.web_type :
             utils.thread.createThread(self.creatTranslaterThread, "webdriver_2")
             nothing_sign = True
 
         # 公共翻译三
-        if self.object.translation_ui.webdriver3.open_sign:
+        if self.object.translation_ui.webdriver3.web_type:
             utils.thread.createThread(self.creatTranslaterThread, "webdriver_3")
             nothing_sign = True
 
