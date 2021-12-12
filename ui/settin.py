@@ -932,6 +932,35 @@ class Settin(QMainWindow) :
         self.show_statusbar_switch.checkedChanged.connect(self.changeShowStatusbarSwitch)
         self.show_statusbar_switch.setCursor(self.select_pixmap)
 
+        # 原文颜色标签
+        label = QLabel(self.tab_3)
+        self.customSetGeometry(label, 275, 170, 60, 20)
+        label.setText("原文颜色:")
+
+        # 原文翻译颜色选择
+        self.original_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.original_color), "", self.tab_3)
+        self.customSetIconSize(self.original_color_button, 20, 20)
+        self.customSetGeometry(self.original_color_button, 350, 170, 20, 20)
+        self.original_color_button.setStyleSheet("background: transparent;")
+        self.original_color_button.clicked.connect(lambda: self.ChangeTranslateColor("original", self.original_color))
+        self.original_color_button.setCursor(self.select_pixmap)
+
+        # 显示原文说明标签
+        button = QPushButton(self.tab_3)
+        self.customSetGeometry(button, 430, 170, 25, 20)
+        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;" % self.color_2)
+        button.setText("说明")
+        button.clicked.connect(lambda: self.showDesc("originalColor"))
+        button.setCursor(self.question_pixmap)
+
+        # 显示原文说明?号图标
+        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_3)
+        self.customSetIconSize(button, 20, 20)
+        self.customSetGeometry(button, 455, 170, 20, 20)
+        button.setStyleSheet("background: transparent;")
+        button.clicked.connect(lambda: self.showDesc("originalColor"))
+        button.setCursor(self.question_pixmap)
+
 
     # 功能设定标签页
     def setTabFour(self) :
@@ -1507,6 +1536,8 @@ class Settin(QMainWindow) :
         self.baidu_color = self.object.config["fontColor"]["baidu"]
         # 字体颜色 私人彩云
         self.caiyun_color = self.object.config["fontColor"]["caiyunPrivate"]
+        # 原文颜色
+        self.original_color = self.object.config["fontColor"]["original"]
 
         # 翻译界面透明度
         self.horizontal = self.object.config["horizontal"]
@@ -2052,6 +2083,9 @@ class Settin(QMainWindow) :
         elif translate_type == "caiyun_private" :
             self.caiyun_private_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=color.name()))
             self.caiyun_color = color.name()
+        elif translate_type == "original" :
+            self.original_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=color.name()))
+            self.original_color = color.name()
 
 
     # 说明窗口
@@ -2169,6 +2203,11 @@ class Settin(QMainWindow) :
             self.desc_ui.setWindowTitle("文字换行说明")
             self.setTextColor(self.desc_ui.desc_text, "#FF0000", "如果看不懂请打开此开关.")
             self.desc_ui.desc_text.append("\n会将识别到的原文换行后再翻译, 可能会出现断句错误情况")
+
+        # 原文颜色
+        elif message_type == "originalColor" :
+            self.desc_ui.setWindowTitle("原文颜色说明")
+            self.desc_ui.desc_text.append("\n控制翻译界面显示的原文, 和一切错误说明, 通知信息的文字颜色")
 
         self.desc_ui.show()
 
@@ -2415,6 +2454,8 @@ class Settin(QMainWindow) :
         self.object.config["fontColor"]["baidu"] = self.baidu_color
         # 字体颜色 私人彩云
         self.object.config["fontColor"]["caiyunPrivate"] = self.caiyun_color
+        # 原文颜色
+        self.object.config["fontColor"]["original"] = self.original_color
 
         # 翻译框透明度
         self.object.config["horizontal"] = self.horizontal
