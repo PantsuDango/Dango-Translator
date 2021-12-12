@@ -265,6 +265,8 @@ class Translation(QMainWindow) :
                                      "color: %s;"
                                      "background-color: rgba(62, 62, 62, 0.1)"
                                      %(self.font_type, self.icon_color))
+        if not self.statusbar_sign :
+            self.statusbar.hide()
 
         # 注册翻译快捷键
         self.translate_hotkey = SystemHotkey()
@@ -418,20 +420,12 @@ class Translation(QMainWindow) :
             pass
 
 
-    # 状态栏显示信号槽
-    def showStatusbar(self, messgae) :
-
-        if self.statusbar_sign :
-            self.statusbar.showMessage(messgae)
-
-
     # 鼠标进入控件事件
     def enterEvent(self, QEvent) :
 
         if self.lock_sign == True :
             self.lock_button.show()
             self.lock_button.setStyleSheet("background-color:rgba(62, 62, 62, 0.1);")
-            self.statusbar.hide()
             return
 
         # 显示所有顶部工具栏控件
@@ -447,12 +441,14 @@ class Translation(QMainWindow) :
         self.lock_button.show()
         self.filter_word_button.show()
         self.setStyleSheet("QLabel#drag_label {background-color:rgba(62, 62, 62, 0.1)}")
+        if self.statusbar_sign :
+            self.statusbar.show()
 
 
     # 鼠标离开控件事件
     def leaveEvent(self, QEvent) :
 
-        if self.lock_sign == False :
+        if self.lock_sign == False and self.statusbar_sign :
             self.statusbar.show()
 
         width = round((self.width() - 454*self.rate) / 2)
@@ -673,9 +669,9 @@ class Translation(QMainWindow) :
 
         if self.thread_state == 0 :
             try :
-                self.showStatusbar("翻译结束, 耗时: {:.2f} s".format(time.time()-self.start_time+self.ocr_time))
+                self.statusbar.showMessage("翻译结束, 耗时: {:.2f} s".format(time.time()-self.start_time+self.ocr_time))
             except Exception :
-                self.showStatusbar("翻译结束, 耗时: {:.2f} s".format(time.time()-self.start_time))
+                self.statusbar.showMessage("翻译结束, 耗时: {:.2f} s".format(time.time()-self.start_time))
             self.ocr_time = 0
 
 
@@ -752,7 +748,7 @@ class Translation(QMainWindow) :
     # 开启翻译模块
     def createWebdriverThread(self) :
 
-        self.showStatusbar("翻译模块启动中, 请等待完成后再操作...")
+        self.statusbar.showMessage("翻译模块启动中, 请等待完成后再操作...")
 
         # 筛选翻译源类型
         translater_list = ["youdaoUse", "baiduwebUse", "tencentwebUse", "deeplUse", "googleUse", "caiyunUse"]
@@ -771,6 +767,12 @@ class Translation(QMainWindow) :
         utils.thread.createThread(self.openWebdriver1)
         utils.thread.createThread(self.openWebdriver2)
         utils.thread.createThread(self.openWebdriver3)
+
+
+    # 状态栏显示消息信号槽
+    def showStatusbar(self, message) :
+
+        self.statusbar.showMessage(message)
 
 
     # 按下屏蔽词键后做的事情

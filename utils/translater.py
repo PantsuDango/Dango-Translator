@@ -130,7 +130,7 @@ class Translater(QThread) :
         if self.object.translation_ui.thread_state == 0 :
             # 发送清屏信号
             self.clear_text_sign.emit(True)
-            self.object.translation_ui.showStatusbar("翻译中...")
+            self.object.translation_ui.statusbar.showMessage("翻译中...")
             QApplication.processEvents()
 
         self.object.translation_ui.thread_state += 1
