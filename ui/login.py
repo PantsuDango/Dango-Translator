@@ -96,7 +96,7 @@ class Login(QWidget) :
         label.setStyleSheet("color: %s;"
                             "background: transparent;"
                             "font: 10pt %s;" % (self.color, self.font_type))
-        label.setText("封面图 pixiv id: 80124193")
+        label.setText("封面图 pixiv id: %s"%self.object.yaml["dict_info"]["cover_pixiv_id"])
 
         # 矩形框
         label = QLabel(self)
@@ -192,7 +192,7 @@ class Login(QWidget) :
         # 版本号
         label = QLabel(self)
         self.customSetGeometry(label, 20, 540, 380, 15)
-        label.setText("版本号: %s  更新时间: 2021-12-12  By: 胖次团子"%self.object.yaml["version"])
+        label.setText("版本号: %s  更新时间: 2021-12-21  By: 胖次团子"%self.object.yaml["version"])
         label.setStyleSheet("color: %s;"
                             "background: transparent;"
                             "font-weight:bold;"
