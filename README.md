@@ -1,8 +1,8 @@
 # 团子翻译器 - 基于OCR的生肉翻译软件
 
 
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.0-ff69b4)](https://github.com/PantsuDango/Dango-Translator)
-[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2021--11--28-ff69b4)]()
+[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.0.5-ff69b4)](https://github.com/PantsuDango/Dango-Translator)
+[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2021--12--21-ff69b4)]()
 [![更新时间](https://img.shields.io/badge/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-win7--10-ff69b4)]()
 [![GitHubStars](https://img.shields.io/github/stars/PantsuDango/Dango-Translator)]()
 [![GitHubForks](https://img.shields.io/github/forks/PantsuDango/Dango-Translator)]()
@@ -15,7 +15,7 @@
 团子翻译器是一款生肉翻译软件，通过OCR识别屏幕特定范围内的文字，然后将识别到的文字调取各大厂的翻译，并输出翻译结果。
 
 + 搭载了离线OCR，项目地址：[DangoOCR](https://github.com/PantsuDango/DangoOCR) 
-+ 搭载了在线OCR，官网地址：[星团云OCR](https://cloud.stariver.org/auth/login.html)
++ 搭载了在线OCR，官网地址：[星河云OCR](https://cloud.stariver.org/auth/login.html)
 + 实现自动模式，循环识别区域内的文本并翻译
 + 配置了9种翻译源
 + 账号系统，能够自动云端保存配置
@@ -25,17 +25,15 @@
 ## 安装版下载
 
 - 群文件下载：[![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-6%E7%BE%A4-ff69b4)](https://github.com/PantsuDango/Dango-Translator/blob/dev/4.0/config/other/%E4%BA%A4%E6%B5%81%E7%BE%A4.png)  
-- 团子云盘下载：[下载地址](https://s.dango.cloud/s/QBYCX)
-- GitHub下载：[下载地址](https://github.com/PantsuDango/Dango-Translator/releases/download/Ver4.0/DangoTranslate-Ver4.0.zip)
-
+- 官网下载：[下载地址](https://translator.dango.cloud)
 
   
 ## 更新日志
 
 #### 翻译器相关 
 
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.0-ff69b4)]()
-[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2021--11--28-ff69b4)]()
+[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.0.5-ff69b4)]()
+[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2021--12--21-ff69b4)]()
 
 + 更新了全新的4.0版本，完全重构；
 + 优化了所有公共翻译的质量和速度，新加入了DeepL翻译源；
@@ -59,14 +57,10 @@
 
 + 更多更新日志：[查看]()
 
-
   
 ## 使用教程
 
-[翻译器教程](https://docs.ayano.top/#/)
-
-[离线OCR教程](https://docs.ayano.top/#/basic/ocr?id=%e7%a6%bb%e7%ba%bfocr%e8%af%b4%e6%98%8e)
-
+[翻译器教程](https://docs.ayano.top)
 
   
 ## 原理说明
