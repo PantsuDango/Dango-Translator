@@ -57,3 +57,14 @@ def downloadFile(url, save_path, logger) :
             file.write(content)
     except Exception :
         logger.error(format_exc())
+
+
+# 发送get请求
+def get(url, logger, timeout=5) :
+
+    try :
+        res = requests.get(url, stream=True, timeout=timeout)
+        return res.text
+    except Exception :
+        logger.error(format_exc())
+        return None
