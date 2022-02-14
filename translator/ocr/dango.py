@@ -2,6 +2,7 @@ import base64
 from PIL import Image
 import os
 import utils.http
+import utils.range
 
 
 IMAGE_PATH = "./config/image.jpg"
@@ -17,6 +18,7 @@ def imageBorder(src, dst, loc="a", width=3, color=(0, 0, 0)):
     img_ori = Image.open(src)
     w = img_ori.size[0]
     h = img_ori.size[1]
+    img_new = None
 
     # 添加边框
     if loc in ["a", "all"]:
@@ -40,11 +42,55 @@ def imageBorder(src, dst, loc="a", width=3, color=(0, 0, 0)):
         w += width
         img_new = Image.new("RGB", (w, h), color)
         img_new.paste(img_ori, (width, 0, w, h))
-    else:
-        pass
 
     # 保存图片
     img_new.save(dst)
+
+
+# 结果排序组包
+def resultSort(ocr_result, branchLineUse):
+    # 文字顺序由右至左排序
+    ocr_result.sort(key=lambda x: x["Coordinate"]["UpperRight"][0], reverse=True)
+    # ocr结果归类文本块
+    new_words_list = []
+    filter_words_list = []
+    for index, val in enumerate(ocr_result):
+        if val in filter_words_list:
+            continue
+        tmp_words_list = []
+        tmp_words_list.append(val)
+        # 以字宽作为碰撞阈值
+        word_width = val["Coordinate"]["UpperRight"][0] - val["Coordinate"]["UpperLeft"][0]
+        rr1 = utils.range.createRectangular(val, word_width)
+        utils.range.findRectangular(rr1, ocr_result, index, tmp_words_list)
+        new_words_list.append(tmp_words_list)
+        for val in tmp_words_list:
+            filter_words_list.append(val)
+
+    # 文字顺序由上至下排序
+    filter_words_list = []
+    new_ocr_result = []
+    ocr_result.sort(key=lambda x: x["Coordinate"]["UpperRight"][1], reverse=False)
+    for val in ocr_result:
+        if val in filter_words_list:
+            continue
+        for tmp in new_words_list:
+            if val in tmp:
+                filter_words_list += tmp
+                new_ocr_result.append(tmp)
+
+    # 整理文本块结果
+    text = ""
+    for val in new_ocr_result:
+        content = ""
+        for x in val:
+            content += x["Words"]
+        if val != new_ocr_result[-1] and branchLineUse :
+            text += content + "\n"
+        else :
+            text += content
+
+    return text
 
 
 # 团子在线OCR服务
@@ -72,6 +118,9 @@ def dangoOCR(object, test=False) :
     token = object.config["DangoToken"]
     url = object.yaml["dict_info"]["ocr_server"]
     language = object.config["language"]
+    showTranslateRow = object.config["showTranslateRow"]
+    if language == "JAP" and showTranslateRow == "True" :
+        language = "Vertical_JAP"
 
     body = {
         "ImageB64": imageBase64,
@@ -80,11 +129,8 @@ def dangoOCR(object, test=False) :
         "Token": token
     }
 
-    # 尝试请求两次
-    for num in range(2) :
-        res = utils.http.post(url, body, object.logger, timeout=3)
-        if res :
-            break
+    url = "http://g1.node.c4a15wh.cn:11451/OCR"
+    res = utils.http.post(url, body, object.logger)
     # 如果出错就直接结束
     if not res :
         return False, "团子OCR错误: 错误未知, 请尝试重试, 如果频繁出现此情况请联系团子"
@@ -92,19 +138,24 @@ def dangoOCR(object, test=False) :
     code = res.get("Code", -1)
     message = res.get("Message", "")
     if code == 0 :
-        content = ""
-        for index, val in enumerate(res.get("Data", [])) :
-            if (index+1 != len(res.get("Data", []))) and object.config["BranchLineUse"] :
-                if language == "ENG" :
-                    content += (val.get("Words", "") + " \n")
+        # 竖排识别
+        if language == "Vertical_JAP" :
+            content = resultSort(res.get("Data", []), object.config["BranchLineUse"])
+            return True, content
+        else :
+            content = ""
+            for index, val in enumerate(res.get("Data", [])) :
+                if (index+1 != len(res.get("Data", []))) and object.config["BranchLineUse"] :
+                    if language == "ENG" :
+                        content += (val.get("Words", "") + " \n")
+                    else :
+                        content += (val.get("Words", "") + "\n")
                 else :
-                    content += (val.get("Words", "") + "\n")
-            else :
-                if language == "ENG" :
-                    content += val.get("Words", "") + " "
-                else :
-                    content += val.get("Words", "")
-        return True, content
+                    if language == "ENG" :
+                        content += val.get("Words", "") + " "
+                    else :
+                        content += val.get("Words", "")
+            return True, content
     else :
         object.logger.error(message)
         return False, "团子OCR错误: %s"%message
@@ -128,11 +179,7 @@ def offlineOCR(object) :
     except Exception :
         body["ImagePath"] = image_path
 
-    # 尝试请求三次
-    for num in range(3) :
-        res = utils.http.post(url, body, object.logger)
-        if res and res.get("Code", -1) == 0 :
-            break
+    res = utils.http.post(url, body, object.logger)
     if not res :
         return False, "本地OCR错误: 错误未知, 请尝试重试, 如果频繁出现此情况请联系团子"
 
