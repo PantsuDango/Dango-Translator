@@ -129,7 +129,6 @@ def dangoOCR(object, test=False) :
         "Token": token
     }
 
-    url = "http://g1.node.c4a15wh.cn:11451/OCR"
     res = utils.http.post(url, body, object.logger)
     # 如果出错就直接结束
     if not res :

@@ -23,6 +23,8 @@ import ui.filter
 import ui.range
 import ui.settin
 
+import translator.update_chrome_driver
+
 
 class DangoTranslator() :
 
@@ -127,7 +129,10 @@ class DangoTranslator() :
 
 
     # 初始化资源
-    def InitLoadImage(self) :
+    def InitLoadFile(self) :
+
+        # 更新谷歌浏览器引擎文件
+        utils.thread.createThread(translator.update_chrome_driver.updateChromeDriver, self.logger)
 
         # 更新icon文件
         utils.update.updateIcon(self.yaml, self.logger)
@@ -204,7 +209,7 @@ class DangoTranslator() :
         utils.thread.runQThread(thread)
 
         # 初始化图片资源
-        utils.thread.createThread(self.InitLoadImage)
+        utils.thread.createThread(self.InitLoadFile)
 
         # 登录界面
         self.login_ui = ui.login.Login(self)
