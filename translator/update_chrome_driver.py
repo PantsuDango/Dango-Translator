@@ -1,10 +1,10 @@
 from selenium import webdriver
-import re
-import utils.http
 from difflib import SequenceMatcher
+from traceback import format_exc
+import re
 import zipfile
 import os
-from traceback import format_exc
+import utils.http
 
 CHROMEDRIVER_PATH = "./config/tools/chromedriver.exe"
 CHROMEDRIVER_DIR_PATH = "./config/tools"
@@ -22,9 +22,11 @@ def checkChromeVersion() :
     option = webdriver.ChromeOptions()
     option.add_argument("--headless")
     try:
-        webdriver.Chrome(executable_path=CHROMEDRIVER_PATH,
+        driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH,
                          service_log_path="nul",
-                         chrome_options=option)
+                         options=option)
+        driver.close()
+        driver.quit()
     except Exception as err :
         regex = re.findall("Current browser version is (.+?) with binary", str(err))
         if regex :

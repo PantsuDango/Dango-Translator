@@ -68,4 +68,3 @@ def get(url, logger, timeout=5) :
         return res.text
     except Exception :
         logger.error(format_exc())
-        return None
