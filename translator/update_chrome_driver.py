@@ -8,6 +8,7 @@ from traceback import format_exc
 
 CHROMEDRIVER_PATH = "./config/tools/chromedriver.exe"
 CHROMEDRIVER_DIR_PATH = "./config/tools"
+DRIVER_ZIP_NAME = "chromedriver_win32.zip"
 
 # 判断原文相似度
 def getEqualRate(str1, str2) :
@@ -33,6 +34,7 @@ def checkChromeVersion() :
 # 获取谷歌引擎文件下载信息
 def getChromeVersionInfo(chrome_version, logger) :
 
+    # 获取所有引擎版本
     url = "https://registry.npmmirror.com/-/binary/chromedriver/"
     res = utils.http.get(url, logger)
     if not res :
@@ -46,9 +48,11 @@ def getChromeVersionInfo(chrome_version, logger) :
     driver_version = ""
     max_score = 0
     for val in res :
+        # 正则过滤无关的内容
         regex = re.findall("\d{2}\.0\.\d{4}\.\d{1,3}", val["name"])
         if not regex :
             continue
+        # 文本对比找出最匹配的引擎版本
         score = getEqualRate(regex[0], chrome_version)
         if score > max_score :
             max_score = score
@@ -62,15 +66,18 @@ def getChromeVersionInfo(chrome_version, logger) :
 def downloadDriver(driver_version, logger) :
 
     url = "https://registry.npmmirror.com/-/binary/chromedriver/{}/chromedriver_win32.zip".format(driver_version)
-    utils.http.downloadFile(url, "chromedriver_win32.zip", logger)
+    if not utils.http.downloadFile(url, DRIVER_ZIP_NAME, logger) :
+        return
 
+    # 解压压缩包
     try :
-        zip_file = zipfile.ZipFile("chromedriver_win32.zip")
+        zip_file = zipfile.ZipFile(DRIVER_ZIP_NAME)
         zip_list = zip_file.namelist()
-        for f in zip_list:
+        for f in zip_list :
             zip_file.extract(f, CHROMEDRIVER_DIR_PATH)
         zip_file.close()
-        os.remove("chromedriver_win32.zip")
+        # 删除压缩包
+        os.remove(DRIVER_ZIP_NAME)
     except Exception :
         logger.error(format_exc())
 

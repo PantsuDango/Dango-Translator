@@ -55,6 +55,7 @@ def downloadFile(url, save_path, logger) :
         content = res.content
         with open(save_path, "wb") as file :
             file.write(content)
+        return True
     except Exception :
         logger.error(format_exc())
 
