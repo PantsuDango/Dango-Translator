@@ -24,6 +24,7 @@ import ui.range
 import ui.settin
 
 import translator.update_chrome_driver
+import translator.update_edge_driver
 
 
 class DangoTranslator() :
@@ -133,30 +134,26 @@ class DangoTranslator() :
 
         # 更新谷歌浏览器引擎文件
         utils.thread.createThread(translator.update_chrome_driver.updateChromeDriver, self.logger)
+        # 更新Edge浏览器引擎文件
+        utils.thread.createThread(translator.update_edge_driver.updateEdgeDriver, self.logger)
 
         # 更新icon文件
         utils.update.updateIcon(self.yaml, self.logger)
-
         # 更新ocr源码文件
         ocr_src_file = self.yaml["dict_info"]["ocr_src_file"]
         utils.update.updateOCRSrcFile(ocr_src_file, self.logger)
-
         # 加载QQ群图片
         qq_group_url = self.yaml["dict_info"]["dango_qq_group"]
         utils.http.downloadFile(qq_group_url, "./config/other/交流群.png", self.logger)
-
         # 加载注册界面图片
         qq_group_url = self.yaml["dict_info"]["register_image_url"]
         utils.http.downloadFile(qq_group_url, "./config/other/register.gif", self.logger)
-
         # 加载登录界面图片
         login_image_url = self.yaml["dict_info"]["login_image_url"]
         utils.http.downloadFile(login_image_url, "./config/background/login.png", self.logger)
-
         # 加载设置界面图片
         settin_image_url = self.yaml["dict_info"]["settin_image_url"]
         utils.http.downloadFile(settin_image_url, "./config/background/settin.jpg", self.logger)
-
         # 加载屏蔽词界面图片
         settin_image_url = self.yaml["dict_info"]["settin_desc_image_url"]
         utils.http.downloadFile(settin_image_url, "./config/background/settin-desc.jpg", self.logger)
