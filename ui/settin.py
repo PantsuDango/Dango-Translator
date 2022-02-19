@@ -1221,13 +1221,13 @@ class Settin(QMainWindow) :
         # 百度OCR高精度模式备注
         label = QLabel(self.tab_4)
         self.customSetGeometry(label, 275, 220, 150, 20)
-        label.setText("百度高精度:")
+        label.setText("百度OCR高精度:")
 
         # 百度OCR高精度模式开关
         self.baidu_ocr_high_precision_switch = ui.switch.SwitchOCR(self.tab_4,
                                                                    self.baidu_ocr_high_precision_use,
                                                                    startX=(65-20) * self.rate)
-        self.customSetGeometry(self.baidu_ocr_high_precision_switch, 365, 220, 65, 20)
+        self.customSetGeometry(self.baidu_ocr_high_precision_switch, 390, 220, 65, 20)
         self.baidu_ocr_high_precision_switch.checkedChanged.connect(self.changeBaiduOcrHighPrecisionSwitch)
         self.baidu_ocr_high_precision_switch.setCursor(self.select_pixmap)
 
