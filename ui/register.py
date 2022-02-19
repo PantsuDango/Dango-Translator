@@ -311,7 +311,8 @@ class Register(QWidget) :
     def sendEmail(self) :
 
         user = self.user_text.text()
-        email = self.email_text.text()
+        email = self.email_text.text().strip()
+        self.email_text.setText(email)
 
         if not user or re.findall("\s", user):
             utils.message.MessageBox("发送失败",
@@ -340,7 +341,8 @@ class Register(QWidget) :
 
         user = self.user_text.text()
         password = self.password_text.text()
-        email = self.email_text.text()
+        email = self.email_text.text().strip()
+        self.email_text.setText(email)
         code_key = self.code_key_text.text()
 
         # 校验注册参数合法性
@@ -401,7 +403,8 @@ class Register(QWidget) :
 
         user = self.user_text.text()
         password = self.password_text.text()
-        email = self.email_text.text()
+        email = self.email_text.text().strip()
+        self.email_text.setText(email)
         code_key = self.code_key_text.text()
 
         # 校验注册参数合法性
@@ -480,7 +483,8 @@ class Register(QWidget) :
     # 绑定邮箱确定键
     def bindEmail(self) :
 
-        email = self.email_text.text()
+        email = self.email_text.text().strip()
+        self.email_text.setText(email)
         code_key = self.code_key_text.text()
 
         if not self.checkEmailValidity(email) :
