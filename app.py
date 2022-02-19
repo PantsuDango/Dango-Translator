@@ -233,6 +233,10 @@ class DangoTranslator() :
         # 登录界面忘记密码按键
         self.login_ui.forget_password_button.clicked.connect(self.register_ui.clickForgetPassword)
 
+        # 自动登录
+        if self.yaml["auto_login"] :
+            self.login()
+
         app.exit(app.exec_())
 
 

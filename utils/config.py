@@ -16,6 +16,11 @@ def openConfig(logger) :
     try :
         with open(YAML_PATH, "r", encoding="utf-8") as file :
             config = yaml.load(file.read(), Loader=yaml.FullLoader)
+
+        # 2022.02.19 添加新参数
+        if "auto_login" not in config.keys() :
+            config["auto_login"] = False
+
     except Exception :
         logger.error(format_exc())
         config = {
@@ -23,7 +28,8 @@ def openConfig(logger) :
             "password": "",
             "dict_info_url": "https://trans.dango.cloud/DangoTranslate/ShowDict",
             "ocr_cmd_path": ".\ocr\startOCR.cmd",
-            "port": 6666
+            "port": 6666,
+            "auto_login": False
         }
 
     return config

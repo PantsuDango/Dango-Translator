@@ -1205,6 +1205,18 @@ class Settin(QMainWindow) :
         button.clicked.connect(lambda: self.showDesc("textRefresh"))
         button.setCursor(self.question_pixmap)
 
+        # 自动登录标签
+        label = QLabel(self.tab_4)
+        self.customSetGeometry(label, 20, 220, 80, 20)
+        label.setText("自动登录:")
+
+        # 自动登录开关
+        self.auto_login_switch = ui.switch.SwitchOCR(self.tab_4, sign=self.auto_login_use,
+                                                       startX=(65-20) * self.rate)
+        self.customSetGeometry(self.auto_login_switch, 95, 220, 65, 20)
+        self.auto_login_switch.checkedChanged.connect(self.changeAutoLoginSwitch)
+        self.auto_login_switch.setCursor(self.select_pixmap)
+
 
     # 关于标签页
     def setTabFive(self) :
@@ -1579,6 +1591,8 @@ class Settin(QMainWindow) :
         self.translate_hotkey_use = eval(self.object.config["showHotKey1"])
         # 范围快捷键开关
         self.range_hotkey_use = eval(self.object.config["showHotKey2"])
+        # 自动登录开关
+        self.auto_login_use = self.object.yaml["auto_login"]
         # 自动翻译图片刷新相似度
         self.image_refresh_score = self.object.config["imageSimilarity"]
         # 自动翻译文字刷新相似度
@@ -1856,6 +1870,14 @@ class Settin(QMainWindow) :
         else:
             self.range_hotkey_use = False
 
+
+    # 改变自动登录开关状态
+    def changeAutoLoginSwitch(self, checked) :
+
+        if checked :
+            self.auto_login_use = True
+        else:
+            self.auto_login_use = False
 
 
     # 重置开关状态
@@ -2512,6 +2534,8 @@ class Settin(QMainWindow) :
         self.object.config["imageSimilarity"] = self.image_refresh_spinBox.value()
         # 自动翻译文字刷新相似度
         self.object.config["textSimilarity"] = self.text_refresh_spinBox.value()
+        # 自动登录开关
+        self.object.yaml["auto_login"] = self.auto_login_use
         # 显示消息栏
         self.object.config["showStatusbarUse"] = self.show_statusbar_use
 
@@ -2545,6 +2569,8 @@ class Settin(QMainWindow) :
 
         # 保存设置
         self.saveConfig()
+        # 保存本地配置
+        utils.config.saveConfig(self.object.yaml, self.logger)
         # 注册新快捷键
         utils.thread.createThread(self.registerHotKey)
         # 重置翻译引擎
