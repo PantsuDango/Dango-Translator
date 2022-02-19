@@ -142,9 +142,12 @@ class Key(QWidget) :
                                  int(h * self.rate)))
 
 
+    # 过滤空字符
     def filterNullWord(self, obj) :
 
-        return obj.text().replace(' ', '').replace('\n', '').replace('\t', '')
+        text = obj.text().strip()
+        obj.setText(text)
+        return text
 
 
     # 窗口关闭处理
