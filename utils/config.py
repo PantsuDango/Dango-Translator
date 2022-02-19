@@ -95,6 +95,8 @@ def configConvert(object) :
     object.config["OCR"]["Secret"] = object.config["OCR"].get("Secret", "")
     object.config["OCR"]["Key"] = object.config["OCR"].get("Key", "")
     object.config["AccessToken"] = object.config.get("AccessToken", "")
+    # 百度OCR高精度开关
+    object.config["OCR"]["highPrecision"] = object.config["OCR"].get("highPrecision", False)
     # 翻译语种
     object.config["language"] = object.config.get("language", "JAP")
 

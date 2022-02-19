@@ -1211,11 +1211,25 @@ class Settin(QMainWindow) :
         label.setText("自动登录:")
 
         # 自动登录开关
-        self.auto_login_switch = ui.switch.SwitchOCR(self.tab_4, sign=self.auto_login_use,
-                                                       startX=(65-20) * self.rate)
+        self.auto_login_switch = ui.switch.SwitchOCR(self.tab_4,
+                                                     sign=self.auto_login_use,
+                                                     startX=(65-20) * self.rate)
         self.customSetGeometry(self.auto_login_switch, 95, 220, 65, 20)
         self.auto_login_switch.checkedChanged.connect(self.changeAutoLoginSwitch)
         self.auto_login_switch.setCursor(self.select_pixmap)
+
+        # 百度OCR高精度模式备注
+        label = QLabel(self.tab_4)
+        self.customSetGeometry(label, 275, 220, 150, 20)
+        label.setText("百度高精度:")
+
+        # 百度OCR高精度模式开关
+        self.baidu_ocr_high_precision_switch = ui.switch.SwitchOCR(self.tab_4,
+                                                                   self.baidu_ocr_high_precision_use,
+                                                                   startX=(65-20) * self.rate)
+        self.customSetGeometry(self.baidu_ocr_high_precision_switch, 365, 220, 65, 20)
+        self.baidu_ocr_high_precision_switch.checkedChanged.connect(self.changeBaiduOcrHighPrecisionSwitch)
+        self.baidu_ocr_high_precision_switch.setCursor(self.select_pixmap)
 
 
     # 关于标签页
@@ -1510,6 +1524,7 @@ class Settin(QMainWindow) :
         self.offline_ocr_use = self.object.config["offlineOCR"]
         self.online_ocr_use = self.object.config["onlineOCR"]
         self.baidu_ocr_use = self.object.config["baiduOCR"]
+        self.baidu_ocr_high_precision_use = self.object.config["OCR"]["highPrecision"]
 
         # 公共有道翻译开关
         self.youdao_use = eval(self.object.config["youdaoUse"])
@@ -1680,6 +1695,15 @@ class Settin(QMainWindow) :
             self.baidu_ocr_use = True
         else :
             self.baidu_ocr_use = False
+
+
+    # 改变百度OCR高精度开关状态
+    def changeBaiduOcrHighPrecisionSwitch(self, checked):
+
+        if checked :
+            self.baidu_ocr_high_precision_use = True
+        else:
+            self.baidu_ocr_high_precision_use = False
 
 
     # 改变公共有道翻译开关状态
@@ -2536,9 +2560,10 @@ class Settin(QMainWindow) :
         self.object.config["textSimilarity"] = self.text_refresh_spinBox.value()
         # 自动登录开关
         self.object.yaml["auto_login"] = self.auto_login_use
+        # 百度OCR高精度开关
+        self.object.config["OCR"]["highPrecision"] = self.baidu_ocr_high_precision_use
         # 显示消息栏
         self.object.config["showStatusbarUse"] = self.show_statusbar_use
-
 
     # 注册新快捷键
     def registerHotKey(self) :

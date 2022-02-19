@@ -78,12 +78,13 @@ def baiduOCR(config, logger, test=False) :
     language = config["language"]
     access_token = config["AccessToken"]
     showTranslateRow = config["showTranslateRow"]
+    highPrecision = config["OCR"]["highPrecision"]
 
     if not access_token :
         sentence = "百度OCR错误：还未注册OCR API，不可使用"
 
     else:
-        if showTranslateRow == "True" :
+        if showTranslateRow == "True" or highPrecision :
             # 高精度
             request_url = "https://aip.baidubce.com/rest/2.0/ocr/v1/accurate_basic"
         else :
