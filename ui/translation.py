@@ -14,6 +14,7 @@ import utils.translater
 import utils.http
 import utils.range
 import utils.message
+import utils.lock
 
 import translator.sound
 import translator.all
@@ -811,10 +812,13 @@ class Translation(QMainWindow) :
     # 退出程序
     def quit(self) :
 
+        # 界面关闭
         self.hide()
         self.object.range_ui.close()
+        # 删除进程锁
+        utils.lock.deleteLock()
+        # 注销快捷键
         utils.thread.createThreadDaemonFalse(self.unregisterHotKey)
-
         # 关闭引擎模块
         utils.thread.createThreadDaemonFalse(self.sound.close)
         utils.thread.createThreadDaemonFalse(self.webdriver1.close)

@@ -15,6 +15,7 @@ import utils.email
 import utils.message
 import utils.port
 import utils.update
+import utils.lock
 
 import ui.login
 import ui.register
@@ -56,6 +57,16 @@ class DangoTranslator() :
                                  "请查阅日志文件并联系团子处理\n"
                                  "日志文件地址:\n"
                                  "%s"%os.path.join(os.path.abspath("../") , "logs", log_file_name), self.yaml["screen_scale_rate"])
+        sys.exit()
+
+
+    # 唯一进程锁提示
+    def checkLockMessage(self):
+        utils.message.MessageBox("启动失败",
+                                 "团子翻译器已在运行中\n"
+                                 "请不要重复运行, 如你并没有重复运行\n"
+                                 "请尝试删除以下文件后重试:\n"
+                                 "%s"%utils.lock.LOCK_FILE_PATH)
         sys.exit()
 
 
@@ -191,20 +202,22 @@ class DangoTranslator() :
         QCoreApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
         app = QApplication(sys.argv)
 
+        # 唯一进程锁
+        if utils.lock.checkLock() :
+            self.checkLockMessage()
+        else :
+            utils.lock.createLock()
+        # 连接配置中心
         if not self.yaml["dict_info"] :
             self.serverClientFailMessage()
-
         # 检查是否为测试版本
         self.checkIsTestVersion()
-
         # 检查字体
         utils.check_font.checkFont(self.logger)
-
         # 检查版本更新线程
         thread = utils.thread.createCheckVersionQThread(self)
         thread.signal.connect(self.showCheckVersionMessage)
         utils.thread.runQThread(thread)
-
         # 初始化图片资源
         utils.thread.createThread(self.InitLoadFile)
 

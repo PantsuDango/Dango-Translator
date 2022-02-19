@@ -8,6 +8,7 @@ import re
 import utils.message
 import utils.http
 import utils.config
+import utils.lock
 
 
 LOGO_PATH = "./config/icon/logo.ico"
@@ -134,7 +135,7 @@ class Login(QWidget) :
         self.customSetGeometry(button, 370, 360, 20, 20)
         button.setStyleSheet("background: transparent;")
         button.setCursor(select_pixmap)
-        button.clicked.connect(QCoreApplication.instance().quit)
+        button.clicked.connect(self.quit)
 
         # 账号输入框
         self.user_text = QLineEdit(self)
@@ -350,3 +351,12 @@ class Login(QWidget) :
         # 如果按下回车键
         if event.key() == 16777220 :
             self.object.login()
+
+
+    # 退出程序
+    def quit(self) :
+
+        # 删除进程锁
+        utils.lock.deleteLock()
+        # 退出
+        QCoreApplication.instance().quit()
