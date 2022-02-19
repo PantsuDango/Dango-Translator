@@ -4,6 +4,7 @@ import tkinter.font
 from traceback import format_exc
 
 import utils.message
+import utils.lock
 
 
 FONT_PATH = os.path.join(os.getcwd(), "config", "other", "华康方圆体W7.TTC")
@@ -34,4 +35,6 @@ def openFontFile(logger) :
                                  "请手动打开安装，字体文件路径如下:\n"
                                  "%s     "%FONT_PATH)
 
+    # 删除进程锁
+    utils.lock.deleteLock()
     sys.exit()

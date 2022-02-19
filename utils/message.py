@@ -3,8 +3,10 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMessageBox, QPushButton
 import sys
 import os
+import time
 
 import utils.check_font
+import utils.lock
 
 
 LOGO_PATH = "./config/icon/logo.ico"
@@ -112,7 +114,9 @@ def updateVersion() :
         os.startfile("自动更新程序.exe")
     except Exception as err :
         MessageBox("自动更新失败", "打开自动更新程序失败:\n%s"%err)
-        pass
+
+    # 删除进程锁
+    utils.lock.deleteLock()
     sys.exit()
 
 
@@ -148,7 +152,6 @@ def checkVersionMessageBox(title, text, rate=1) :
     message_box.exec_()
 
 
-
 # 错误提示窗口-关闭程序用
 def quitAppMessageBox(title, text, object, rate=1) :
 
@@ -179,3 +182,57 @@ def quitAppMessageBox(title, text, object, rate=1) :
     message_box.addButton(QPushButton("我点错了"), QMessageBox.NoRole)
 
     message_box.exec_()
+
+
+# 服务连接失败提示
+def serverClientFailMessage(object) :
+
+    date = time.strftime("%Y-%m-%d", time.localtime(time.time()))
+    log_file_name = date + ".log"
+    utils.message.MessageBox("连接服务器失败",
+                             "发生了意料之外的错误, 导致无法连接服务器\n"
+                             "请查阅日志文件并联系团子处理\n"
+                             "日志文件地址:\n"
+                             "%s"%os.path.join(os.path.abspath("../") , "logs", log_file_name), object.yaml["screen_scale_rate"])
+    # 删除进程锁
+    utils.lock.deleteLock()
+    sys.exit()
+
+
+# 检查是否是最新版本
+def showCheckVersionMessage(object) :
+
+    message = object.yaml["dict_info"]["update_version_message"]
+    text = ""
+    text_list = message.split(r"\n")
+    for index, val in enumerate(text_list) :
+        if index+1 == len(text_list) :
+            text += val
+        else :
+            text += val + "\n"
+    checkVersionMessageBox("检查版本更新",
+                           "%s     "%text)
+
+
+# 唯一进程锁提示
+def checkLockMessage() :
+
+    MessageBox("启动失败",
+               "团子翻译器已在运行中\n"
+               "请不要重复运行, 如你并没有重复运行\n"
+               "请尝试删除以下文件后重试:\n"
+               "%s"%utils.lock.LOCK_FILE_PATH)
+    sys.exit()
+
+
+# 检查是否为测试版本
+def checkIsTestVersion(object) :
+
+    if "Beta" in object.yaml["version"] and object.yaml["dict_info"]["test_version_switch"] != "1" :
+        MessageBox("此版本已停止服务",
+                   "目前您使用的是测试版本, 此版本已经停止更新      \n"
+                   "请下载正式版本使用, 下载地址:\n%s      "
+                   %object.yaml["dict_info"]["update_version"], object.yaml["screen_scale_rate"])
+        # 删除进程锁
+        utils.lock.deleteLock()
+        sys.exit()

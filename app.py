@@ -3,7 +3,6 @@ from PyQt5.QtCore import *
 from traceback import format_exc
 import sys
 import os
-import time
 
 import utils.logger
 import utils.config
@@ -38,36 +37,13 @@ class DangoTranslator() :
         # 本地配置
         self.yaml = utils.config.openConfig(self.logger)
         # 版本号
-        self.yaml["version"] = "4.0.5"
+        self.yaml["version"] = "4.0.51"
         # 配置中心
         self.yaml["dict_info"] = utils.config.getDictInfo(self.yaml["dict_info_url"], self.logger)
         # 屏幕分辨率
         self.yaml["screen_scale_rate"] = utils.screen_rate.getScreenRate(self.logger)
         # 保存配置
         utils.config.saveConfig(self.yaml, self.logger)
-
-
-    # 服务连接失败提示
-    def serverClientFailMessage(self) :
-
-        date = time.strftime("%Y-%m-%d", time.localtime(time.time()))
-        log_file_name = date + ".log"
-        utils.message.MessageBox("连接服务器失败",
-                                 "发生了意料之外的错误, 导致无法连接服务器\n"
-                                 "请查阅日志文件并联系团子处理\n"
-                                 "日志文件地址:\n"
-                                 "%s"%os.path.join(os.path.abspath("../") , "logs", log_file_name), self.yaml["screen_scale_rate"])
-        sys.exit()
-
-
-    # 唯一进程锁提示
-    def checkLockMessage(self):
-        utils.message.MessageBox("启动失败",
-                                 "团子翻译器已在运行中\n"
-                                 "请不要重复运行, 如你并没有重复运行\n"
-                                 "请尝试删除以下文件后重试:\n"
-                                 "%s"%utils.lock.LOCK_FILE_PATH)
-        sys.exit()
 
 
     # 登录
@@ -170,31 +146,6 @@ class DangoTranslator() :
         utils.http.downloadFile(settin_image_url, "./config/background/settin-desc.jpg", self.logger)
 
 
-    # 检查是否是最新版本
-    def showCheckVersionMessage(self) :
-
-        message = self.yaml["dict_info"]["update_version_message"]
-        text = ""
-        text_list = message.split(r"\n")
-        for index, val in enumerate(text_list) :
-            if index+1 == len(text_list) :
-                text += val
-            else :
-                text += val + "\n"
-        utils.message.checkVersionMessageBox("检查版本更新",
-                                             "%s     "%text)
-
-
-    # 检查是否为测试版本
-    def checkIsTestVersion(self) :
-
-        if "Beta" in self.yaml["version"] and self.yaml["dict_info"]["test_version_switch"] != "1" :
-            utils.message.MessageBox("此版本已停止服务",
-                                     "目前您使用的是测试版本, 此版本已经停止更新      \n"
-                                     "请下载正式版本使用, 下载地址:\n%s      "
-                                     %self.yaml["dict_info"]["update_version"], self.yaml["screen_scale_rate"])
-            sys.exit()
-
     # 主函数
     def main(self) :
 
@@ -204,19 +155,19 @@ class DangoTranslator() :
 
         # 唯一进程锁
         if utils.lock.checkLock() :
-            self.checkLockMessage()
+            utils.message.checkLockMessage()
         else :
             utils.lock.createLock()
         # 连接配置中心
         if not self.yaml["dict_info"] :
-            self.serverClientFailMessage()
+            utils.message.serverClientFailMessage(self)
         # 检查是否为测试版本
-        self.checkIsTestVersion()
+        utils.message.checkIsTestVersion(self)
         # 检查字体
         utils.check_font.checkFont(self.logger)
         # 检查版本更新线程
         thread = utils.thread.createCheckVersionQThread(self)
-        thread.signal.connect(self.showCheckVersionMessage)
+        thread.signal.connect(lambda: utils.message.showCheckVersionMessage(self))
         utils.thread.runQThread(thread)
         # 初始化图片资源
         utils.thread.createThread(self.InitLoadFile)
