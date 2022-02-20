@@ -5,12 +5,14 @@ from traceback import format_exc
 import qtawesome
 import webbrowser
 import os
+import re
 
 import utils.thread
 import utils.config
 import utils.message
 import utils.port
 import utils.test
+import utils.http
 
 from ui import image
 import ui.hotkey
@@ -371,6 +373,14 @@ class Settin(QMainWindow) :
         button.setText("教程")
         button.clicked.connect(self.openOnlineOCRTutorials)
         button.setCursor(self.select_pixmap)
+
+        # 节点下拉框
+        self.node_info_comboBox = QComboBox(self.tab_1)
+        self.customSetGeometry(self.node_info_comboBox, 345, 155, 150, 20)
+        self.node_info_comboBox.setStyleSheet("QComboBox{color: %s}"%self.color_2)
+        self.node_info_comboBox.setCursor(self.select_pixmap)
+        # 获取节点信息
+        utils.thread.createThread(self.getNodeInfo)
 
         # 百度OCR标签
         label = QLabel(self.tab_1)
@@ -1633,6 +1643,50 @@ class Settin(QMainWindow) :
         self.show_statusbar_use = self.object.config["showStatusbarUse"]
 
 
+    # 获取节点信息
+    def getNodeInfo(self) :
+
+        # 重置
+        self.node_info_comboBox.clear()
+        # 展开全部节点信息
+        self.node_info = eval(self.object.yaml["dict_info"]["ocr_node"])
+        self.node_info_comboBox.setMaxVisibleItems(len(self.node_info)+1)
+
+        # 自动模式
+        url = self.object.yaml["dict_info"]["ocr_server"]
+        sign, time_diff = utils.http.getOCR(url)
+        model = self.node_info_comboBox.model()
+        if sign :
+            entry = QStandardItem("自动模式  {}s".format(time_diff))
+            entry.setForeground(QColor(Qt.green))
+        else :
+            entry = QStandardItem("自动模式  不可用")
+            entry.setForeground(QColor(Qt.red))
+        model.appendRow(entry)
+
+        # 手动节点
+        try:
+            if type(self.node_info) != dict:
+                self.node_info = {}
+        except Exception:
+            self.node_info = {}
+
+        for node_name in self.node_info.keys() :
+            url = re.sub(r"//.+?/", "//%s/"%self.node_info[node_name], url)
+            sign, time_diff = utils.http.getOCR(url)
+            model = self.node_info_comboBox.model()
+            if sign :
+                entry = QStandardItem("{}  {}s".format(node_name, time_diff))
+                entry.setForeground(QColor(Qt.green))
+            else :
+                entry = QStandardItem("{}  不可用".format(node_name))
+                entry.setForeground(QColor(Qt.red))
+            model.appendRow(entry)
+
+        # 默认选中
+        self.node_info_comboBox.setCurrentIndex(0)
+
+
     # 根据分辨率定义控件位置尺寸
     def customSetGeometry(self, object, x, y, w, h) :
 
@@ -1656,6 +1710,12 @@ class Settin(QMainWindow) :
         shadow.setBlurRadius(50)
         shadow.setColor(color)
         object.setGraphicsEffect(shadow)
+
+
+    # 在线OCR选择节点
+    def chooseOcrNode(self) :
+
+        self.choose_ocr_node_ui.show()
 
 
     # 改变本地OCR开关状态

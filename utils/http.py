@@ -1,5 +1,7 @@
 import requests
 import json
+import re
+import time
 from traceback import format_exc
 
 
@@ -68,3 +70,20 @@ def get(url, logger, timeout=5) :
         return res.text
     except Exception :
         logger.error(format_exc())
+
+
+# 测试在线ocr节点可用性
+def getOCR(url) :
+
+    proxies = {"http": None, "https": None}
+    start = time.time()
+    try :
+        res = requests.get(url, proxies=proxies, verify=False, timeout=3)
+        time_diff = time.time() - start
+        status_code = res.status_code
+    except Exception :
+        return None, 0
+    if status_code != 200 and status_code != 404 :
+        return None, 0
+
+    return True, "{:.2f}".format(time_diff)
