@@ -101,8 +101,6 @@ class DangoTranslator() :
         self.translation_ui.close()
         self.range_ui.close()
         self.settin_ui.show()
-        # 获取节点信息
-        utils.thread.createThread(self.settin_ui.getNodeInfo)
 
 
     # 自动打开本地OCR

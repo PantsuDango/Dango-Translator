@@ -1,6 +1,8 @@
-import base64
 from PIL import Image
+import base64
 import os
+import re
+
 import utils.http
 import utils.range
 
@@ -116,20 +118,21 @@ def dangoOCR(object, test=False) :
     imageBase64 = base64.b64encode(image).decode("utf-8")
 
     token = object.config["DangoToken"]
-    url = object.yaml["dict_info"]["ocr_server"]
+    host = re.findall(r"//(.+?)/", object.yaml["dict_info"]["ocr_server"])[0]
+    url = object.config["nodeURL"]
     language = object.config["language"]
     showTranslateRow = object.config["showTranslateRow"]
     if language == "JAP" and showTranslateRow == "True" :
         language = "Vertical_JAP"
 
+    headers = {"Host": host}
     body = {
         "ImageB64": imageBase64,
         "Language": language,
         "Verify": "Token",
         "Token": token
     }
-
-    res = utils.http.post(url, body, object.logger)
+    res = utils.http.post(url, body, object.logger, headers)
     # 如果出错就直接结束
     if not res :
         return False, "团子OCR错误: 错误未知, 请尝试重试, 如果频繁出现此情况请联系团子"

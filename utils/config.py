@@ -88,6 +88,8 @@ def configConvert(object) :
     object.config["offlineOCR"] = object.config.get("offlineOCR", False)
     # 在线OCR开关
     object.config["onlineOCR"] = object.config.get("onlineOCR", False)
+    # 在线OCR节点
+    object.config["nodeURL"] = object.config.get("nodeURL", object.yaml["dict_info"]["ocr_server"])
     # 百度OCR开关
     object.config["baiduOCR"] = object.config.get("baiduOCR", False)
     # 百度OCR密钥

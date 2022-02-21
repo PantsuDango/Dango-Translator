@@ -1663,6 +1663,8 @@ class Settin(QMainWindow) :
             entry = QStandardItem("自动模式  不可用")
             entry.setForeground(QColor(Qt.red))
         model.appendRow(entry)
+        # 默认选中
+        self.node_info_comboBox.setCurrentIndex(0)
 
         # 手动节点
         try:
@@ -1671,20 +1673,25 @@ class Settin(QMainWindow) :
         except Exception:
             self.node_info = {}
 
+        node_ip = re.findall(r"//(.+?)/", self.object.config["nodeURL"])[0]
         for node_name in self.node_info.keys() :
             url = re.sub(r"//.+?/", "//%s/"%self.node_info[node_name], url)
+            # 校验节点有效性
             sign, time_diff = utils.http.getOCR(url)
             model = self.node_info_comboBox.model()
+
             if sign :
-                entry = QStandardItem("{}  {}s".format(node_name, time_diff))
+                text = "{}  {}s".format(node_name, time_diff)
+                entry = QStandardItem(text)
                 entry.setForeground(QColor(Qt.green))
             else :
-                entry = QStandardItem("{}  不可用".format(node_name))
+                text = "{}  不可用".format(node_name)
+                entry = QStandardItem(text)
                 entry.setForeground(QColor(Qt.red))
             model.appendRow(entry)
 
-        # 默认选中
-        self.node_info_comboBox.setCurrentIndex(0)
+            if self.node_info[node_name] == node_ip :
+                self.node_info_comboBox.setCurrentText(text)
 
 
     # 根据分辨率定义控件位置尺寸
@@ -2541,6 +2548,14 @@ class Settin(QMainWindow) :
         self.object.config["offlineOCR"] = self.offline_ocr_use
         self.object.config["onlineOCR"] = self.online_ocr_use
         self.object.config["baiduOCR"] = self.baidu_ocr_use
+
+        # 节点url
+        node_name = self.node_info_comboBox.currentText().split("  ")[0]
+        if node_name == "自动模式" :
+            node_url = self.object.yaml["dict_info"]["ocr_server"]
+        else :
+            node_url = re.sub(r"//.+?/", "//%s/"%self.node_info[node_name], self.object.yaml["dict_info"]["ocr_server"])
+        self.object.config["nodeURL"] = node_url
 
         # 翻译语种
         if self.language_comboBox.currentIndex() == 1 :
