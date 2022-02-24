@@ -132,6 +132,7 @@ def dangoOCR(object, test=False) :
         "Verify": "Token",
         "Token": token
     }
+
     res = utils.http.post(url, body, object.logger, headers)
     # 如果出错就直接结束
     if not res :
