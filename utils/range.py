@@ -44,7 +44,7 @@ def findRectangular(rr1, ocr_result, index1, tmp_words_list):
     for index2, val in enumerate(ocr_result):
         if index2 <= index1:
             continue
-        word_width = val["Coordinate"]["UpperRight"][0] - val["Coordinate"]["UpperLeft"][0]
+        word_width = (val["Coordinate"]["UpperRight"][0] - val["Coordinate"]["UpperLeft"][0]) // 2
         rr2 = createRectangular(val, word_width)
         if rr2.collision(rr1):
             tmp_words_list.append(val)
