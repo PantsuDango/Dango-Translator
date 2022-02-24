@@ -1940,9 +1940,6 @@ class Settin(QMainWindow) :
         else:
             self.text_direction_use = False
 
-        utils.message.MessageBox("这是来自团子的提示",
-                                 "目前仅有百度OCR支持了竖向的文字识别\n团子的本地和在线OCR还均未支持, 会尽快更新上!       ")
-
 
     # 改变翻译热键开关状态
     def changeTranslateHotkeySwitch(self, checked) :
