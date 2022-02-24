@@ -450,7 +450,7 @@ class Settin(QMainWindow) :
         self.language_comboBox.setItemText(0, "日语（Japanese）")
         self.language_comboBox.setItemText(1, "英语（English）")
         self.language_comboBox.setItemText(2, "韩语（Korean）")
-        self.language_comboBox.setStyleSheet("background: rgba(255, 255, 255, 1);")
+        self.language_comboBox.setStyleSheet("QComboBox{color: %s}"%self.color_2)
         self.language_comboBox.setCursor(self.select_pixmap)
         if self.object.config["language"] == "ENG":
             self.language_comboBox.setCurrentIndex(1)
@@ -878,6 +878,7 @@ class Settin(QMainWindow) :
         self.comboBox_font = QFont(self.font_type)
         self.font_comboBox.setCurrentFont(self.comboBox_font)
         self.font_comboBox.setCursor(self.select_pixmap)
+        self.font_comboBox.setStyleSheet("QComboBox{color: %s}" % self.color_2)
 
         # 字体样式设定标签
         label = QLabel(self.tab_3)
@@ -1657,7 +1658,7 @@ class Settin(QMainWindow) :
         sign, time_diff = utils.http.getOCR(url)
         model = self.node_info_comboBox.model()
         if sign :
-            entry = QStandardItem("自动模式  {}s".format(time_diff))
+            entry = QStandardItem("自动模式  {}ms".format(time_diff))
             entry.setForeground(QColor(Qt.green))
         else :
             entry = QStandardItem("自动模式  不可用")
@@ -1681,7 +1682,7 @@ class Settin(QMainWindow) :
             model = self.node_info_comboBox.model()
 
             if sign :
-                text = "{}  {}s".format(node_name, time_diff)
+                text = "{}  {}ms".format(node_name, time_diff)
                 entry = QStandardItem(text)
                 entry.setForeground(QColor(Qt.green))
             else :
