@@ -89,4 +89,4 @@ def getOCR(url) :
     if status_code != 200 and status_code != 404 :
         return None, 0
 
-    return True, "{:.2f}".format(time_diff)
+    return True, int(time_diff*1000)

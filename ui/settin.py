@@ -1657,7 +1657,7 @@ class Settin(QMainWindow) :
         sign, time_diff = utils.http.getOCR(url)
         model = self.node_info_comboBox.model()
         if sign :
-            entry = QStandardItem("自动模式  {}s".format(time_diff))
+            entry = QStandardItem("自动模式  {}ms".format(time_diff))
             entry.setForeground(QColor(Qt.green))
         else :
             entry = QStandardItem("自动模式  不可用")
@@ -1681,7 +1681,7 @@ class Settin(QMainWindow) :
             model = self.node_info_comboBox.model()
 
             if sign :
-                text = "{}  {}s".format(node_name, time_diff)
+                text = "{}  {}ms".format(node_name, time_diff)
                 entry = QStandardItem(text)
                 entry.setForeground(QColor(Qt.green))
             else :
