@@ -151,7 +151,6 @@ def dangoOCR(object, test=False) :
     showTranslateRow = object.config["showTranslateRow"]
     if language == "JAP" and showTranslateRow == "True" :
         language = "Vertical_JAP"
-        url = "http://g1.node.c4a15wh.cn:11451/OCR"
 
     headers = {"Host": host}
     body = {
@@ -172,7 +171,6 @@ def dangoOCR(object, test=False) :
         # 竖排识别
         if language == "Vertical_JAP" :
             content = resultSort(res.get("Data", []))
-            print(content)
             return True, content
         else :
             content = ""
