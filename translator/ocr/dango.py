@@ -50,7 +50,8 @@ def imageBorder(src, dst, loc="a", width=3, color=(0, 0, 0)):
 
 
 # 结果排序组包
-def resultSort(ocr_result, branchLineUse):
+def resultSort(ocr_result) :
+
     # 文字顺序由右至左排序
     ocr_result.sort(key=lambda x: x["Coordinate"]["UpperRight"][0], reverse=True)
     # ocr结果归类文本块
@@ -61,36 +62,62 @@ def resultSort(ocr_result, branchLineUse):
             continue
         tmp_words_list = []
         tmp_words_list.append(val)
+
         # 以字宽作为碰撞阈值
-        word_width = val["Coordinate"]["UpperRight"][0] - val["Coordinate"]["UpperLeft"][0]
+        word_width = (val["Coordinate"]["UpperRight"][0] - val["Coordinate"]["UpperLeft"][0]) // 2
         rr1 = utils.range.createRectangular(val, word_width)
         utils.range.findRectangular(rr1, ocr_result, index, tmp_words_list)
-        new_words_list.append(tmp_words_list)
+
+        # 文本块聚类
+        x1 = tmp_words_list[-1]["Coordinate"]["UpperLeft"][0]
+        x2 = tmp_words_list[0]["Coordinate"]["UpperRight"][0]
+        y1 = tmp_words_list[0]["Coordinate"]["UpperRight"][1]
+        y2 = tmp_words_list[0]["Coordinate"]["LowerRight"][1]
+        text = ""
         for val in tmp_words_list:
+            if val["Coordinate"]["UpperRight"][1] < y1:
+                y1 = val["Coordinate"]["UpperRight"][1]
+            if val["Coordinate"]["LowerRight"][1] > y2:
+                y2 = val["Coordinate"]["LowerRight"][1]
+            text += val["Words"]
             filter_words_list.append(val)
+        new_words_list.append({
+            "Coordinate": {
+                "UpperLeft": [x1, y1],
+                "UpperRight": [x2, y1],
+                "LowerRight": [x2, y2],
+                "LowerLeft": [x1, y2]
+            },
+            "Words": text
+        })
+
+    # 二次文本块聚类, 水平方向
+    word_width = ocr_result[0]["Coordinate"]["UpperRight"][0]
+    new_words_list2 = []
+    filter_words_list2 = []
+    for index, val in enumerate(new_words_list):
+        if val in filter_words_list2:
+            continue
+        tmp_words_list = []
+        tmp_words_list.append(val)
+        rr1 = utils.range.createRectangular(val, word_width)
+        utils.range.findRectangular2(rr1, new_words_list, index, tmp_words_list, word_width)
+        for val in tmp_words_list:
+            filter_words_list2.append(val)
+        new_words_list2.append(tmp_words_list)
 
     # 文字顺序由上至下排序
-    filter_words_list = []
-    new_ocr_result = []
-    ocr_result.sort(key=lambda x: x["Coordinate"]["UpperRight"][1], reverse=False)
-    for val in ocr_result:
-        if val in filter_words_list:
-            continue
-        for tmp in new_words_list:
-            if val in tmp:
-                filter_words_list += tmp
-                new_ocr_result.append(tmp)
-
+    new_words_list2.sort(
+        key=lambda x: x[0]["Coordinate"]["UpperRight"][1], reverse=False
+    )
     # 整理文本块结果
     text = ""
-    for val in new_ocr_result:
-        content = ""
-        for x in val:
-            content += x["Words"]
-        if val != new_ocr_result[-1] and branchLineUse :
-            text += content + "\n"
-        else :
-            text += content
+    for val in new_words_list2:
+        for v in val:
+            if val == new_words_list2[-1] and v == val[-1]:
+                text += v["Words"]
+            else:
+                text += v["Words"] + "\n"
 
     return text
 
@@ -124,6 +151,7 @@ def dangoOCR(object, test=False) :
     showTranslateRow = object.config["showTranslateRow"]
     if language == "JAP" and showTranslateRow == "True" :
         language = "Vertical_JAP"
+        url = "http://g1.node.c4a15wh.cn:11451/OCR"
 
     headers = {"Host": host}
     body = {
@@ -143,7 +171,8 @@ def dangoOCR(object, test=False) :
     if code == 0 :
         # 竖排识别
         if language == "Vertical_JAP" :
-            content = resultSort(res.get("Data", []), object.config["BranchLineUse"])
+            content = resultSort(res.get("Data", []))
+            print(content)
             return True, content
         else :
             content = ""

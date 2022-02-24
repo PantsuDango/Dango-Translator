@@ -50,3 +50,15 @@ def findRectangular(rr1, ocr_result, index1, tmp_words_list):
             tmp_words_list.append(val)
             findRectangular(rr2, ocr_result, index2, tmp_words_list)
             break
+
+
+# 找出矩形框碰撞对象
+def findRectangular2(rr1, ocr_result, index1, tmp_words_list, word_width):
+    for index2, val in enumerate(ocr_result):
+        if index2 <= index1:
+            continue
+        rr2 = createRectangular(val, word_width)
+        if rr2.collision(rr1):
+            tmp_words_list.append(val)
+            findRectangular2(rr2, ocr_result, index2, tmp_words_list, word_width)
+            break

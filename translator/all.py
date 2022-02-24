@@ -344,6 +344,8 @@ class Webdriver(QObject) :
     # 彩云翻译
     def caiyun(self, content) :
 
+        # 彩云翻译不能识别换行符
+        content = content.replace("\n", "  ")
         try :
             # 清空翻译框
             if self.content :

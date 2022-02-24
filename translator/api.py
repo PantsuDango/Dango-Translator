@@ -176,6 +176,8 @@ def tencent(sentence, secret_id, secret_key, logger):
 # 私人彩云翻译
 def caiyun(sentence, token, logger) :
 
+    # 彩云翻译不能识别换行符
+    sentence = sentence.replace("\n", "  ")
     if not token :
         return "私人彩云: 还未注册私人彩云API, 不可使用"
 
