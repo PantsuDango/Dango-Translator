@@ -339,11 +339,14 @@ class Register(QWidget) :
     # 注册
     def register(self) :
 
-        user = self.user_text.text()
-        password = self.password_text.text()
+        user = self.user_text.text().strip()
+        self.user_text.setText(user)
+        password = self.password_text.text().strip()
+        self.password_text.setText(password)
         email = self.email_text.text().strip()
         self.email_text.setText(email)
-        code_key = self.code_key_text.text()
+        code_key = self.code_key_text.text().strip()
+        self.code_key_text.setText(code_key)
 
         # 校验注册参数合法性
         if not user or re.findall("\s", user) :
