@@ -44,7 +44,7 @@ class TranslaterProcess(QThread) :
         image = Image.open(IMAGE_PATH)
         draw = ImageDraw.Draw(image)
         for val in ocr_result :
-            setFont = ImageFont.truetype(FONT_PATH, val["WordWidth"])
+            setFont = ImageFont.truetype(FONT_PATH, val["WordWidth"]-2)
             x1 = int(val["Coordinate"]["UpperLeft"][0])
             y1 = int(val["Coordinate"]["UpperLeft"][1])
             x2 = int(val["Coordinate"]["LowerRight"][0])
