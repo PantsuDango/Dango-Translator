@@ -37,6 +37,8 @@ class Translation(QMainWindow) :
     range_hotkey_sign = pyqtSignal(bool)
     # 自动翻译模式信号
     auto_open_sign = pyqtSignal(bool)
+    # 隐藏范围窗信号
+    hide_range_ui_sign = pyqtSignal(bool)
 
     def __init__(self, object) :
 
@@ -359,6 +361,8 @@ class Translation(QMainWindow) :
                                                   self.object.config["rangeHotkeyValue1"])
         self.range_hotkey_value2 = hotkey_map.get(self.object.config["rangeHotkeyValue2"],
                                                   self.object.config["rangeHotkeyValue2"])
+        # 竖排翻译贴字
+        self.object.ocr_result = None
 
 
     # 根据分辨率定义控件位置尺寸
@@ -582,6 +586,13 @@ class Translation(QMainWindow) :
         # 如果已处在自动翻译模式下则直接退出
         if self.auto_trans_exist :
             return
+
+        # 隐藏范围框信号
+        if self.object.config["language"] == "JAP" and self.object.config["showTranslateRow"] == "True" :
+            self.hide_range_ui_sign.emit(True)
+            while True :
+                if not self.object.show_range_ui_sign :
+                    break
 
         thread = utils.translater.Translater(self.object)
         thread.clear_text_sign.connect(self.clearText)
@@ -824,7 +835,7 @@ class Translation(QMainWindow) :
         utils.thread.createThreadDaemonFalse(self.webdriver1.close)
         utils.thread.createThreadDaemonFalse(self.webdriver2.close)
         utils.thread.createThreadDaemonFalse(self.webdriver3.close)
-        # 关闭selenuim的driver引擎
+        # 关闭selenium的driver引擎
         self.killDriVer()
         # 退出程序前保存设置
         utils.thread.createThreadDaemonFalse(utils.config.postSaveSettin, self.object)

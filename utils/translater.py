@@ -6,6 +6,7 @@ from difflib import SequenceMatcher
 from traceback import format_exc
 import time
 import pyperclip
+from PIL import Image, ImageDraw, ImageFont
 
 import utils.thread
 import utils.config
@@ -15,20 +16,55 @@ import translator.ocr.dango
 import translator.api
 
 
-IMAGE_PATH = ".\config\image.jpg"
+IMAGE_PATH = "./config/image.jpg"
+DRAW_PATH = "./config/draw.jpg"
+FONT_PATH = "./config/other/华康方圆体W7.TTC"
 
 
 # 翻译处理线程
-class TranslaterProccess(QThread) :
+class TranslaterProcess(QThread) :
 
     display_signal = pyqtSignal(str, str)
+    draw_image_signal = pyqtSignal(bool)
 
     def __init__(self, object, trans_type) :
 
-        super(TranslaterProccess, self).__init__()
+        super(TranslaterProcess, self).__init__()
         self.object = object
         self.trans_type = trans_type
         self.logger = object.logger
+
+
+    # 气泡框抠字
+    def drawRect(self, ocr_result, words) :
+
+        for index, word in enumerate(words.split("\n")) :
+            ocr_result[index]["Words"] = word
+
+        image = Image.open(IMAGE_PATH)
+        draw = ImageDraw.Draw(image)
+        for val in ocr_result :
+            setFont = ImageFont.truetype(FONT_PATH, val["WordWidth"])
+            x1 = int(val["Coordinate"]["UpperLeft"][0])
+            y1 = int(val["Coordinate"]["UpperLeft"][1])
+            x2 = int(val["Coordinate"]["LowerRight"][0])
+            y2 = int(val["Coordinate"]["LowerRight"][1])
+            w = int(val["Coordinate"]["LowerRight"][0] - val["Coordinate"]["LowerLeft"][0])
+            draw.rectangle((x1, y1, x2, y2), fill=("#FFFFFF"))
+            sum_width = 0
+            text = ""
+            for char in val["Words"] :
+                width, height = draw.textsize(char, setFont)
+                sum_width += width
+                text += char
+                if sum_width > w:
+                    sum_width = 0
+                    text += "\n"
+            draw.text((x1, y1), text, fill=(255, 0, 0), font=setFont, direction=None)
+
+        image.save(DRAW_PATH)
+        #self.object.range_ui.drawImage()
+        self.draw_image_signal.emit(True)
 
 
     def run(self) :
@@ -77,6 +113,11 @@ class TranslaterProccess(QThread) :
             result = self.object.translation_ui.original
 
         self.display_signal.emit(result, self.trans_type)
+
+        if self.object.ocr_result and self.trans_type != "original" :
+            ocr_result = self.object.ocr_result
+            self.object.ocr_result = None
+            self.drawRect(ocr_result, result)
 
 
 # 翻译处理模块
@@ -134,8 +175,9 @@ class Translater(QThread) :
             QApplication.processEvents()
 
         self.object.translation_ui.thread_state += 1
-        thread = TranslaterProccess(self.object, trans_type)
+        thread = TranslaterProcess(self.object, trans_type)
         thread.display_signal.connect(self.object.translation_ui.display_text)
+        thread.draw_image_signal.connect(self.object.range_ui.drawImage)
         thread.start()
         thread.wait()
 

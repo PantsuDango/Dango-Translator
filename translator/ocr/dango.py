@@ -88,7 +88,8 @@ def resultSort(ocr_result) :
                 "LowerRight": [x2, y2],
                 "LowerLeft": [x1, y2]
             },
-            "Words": text
+            "Words": text,
+            "WordWidth": int(word_width*2)
         })
 
     # 二次文本块聚类, 水平方向
@@ -119,38 +120,46 @@ def resultSort(ocr_result) :
             else:
                 text += v["Words"] + "\n"
 
-    return text
+    ocr_result = []
+    for val in new_words_list2 :
+        for v in val :
+            ocr_result.append(v)
+
+    return text, ocr_result
 
 
 # 团子在线OCR服务
 def dangoOCR(object, test=False) :
-
-    if not test :
-        try :
-            # 四周加白边
-            imageBorder(IMAGE_PATH, NEW_IMAGE_PATH, "a", 10, color=(255, 255, 255))
-            path = NEW_IMAGE_PATH
-        except Exception:
-            path = IMAGE_PATH
-    else :
-        try :
-            # 四周加白边
-            imageBorder(TEST_IMAGE_PATH, NEW_TEST_IMAGE_PATH, "a", 10, color=(255, 255, 255))
-            path = NEW_TEST_IMAGE_PATH
-        except Exception:
-            path = TEST_IMAGE_PATH
-
-    with open(path, "rb") as file :
-        image = file.read()
-    imageBase64 = base64.b64encode(image).decode("utf-8")
 
     token = object.config["DangoToken"]
     host = re.findall(r"//(.+?)/", object.yaml["dict_info"]["ocr_server"])[0]
     url = object.config["nodeURL"]
     language = object.config["language"]
     showTranslateRow = object.config["showTranslateRow"]
-    if language == "JAP" and showTranslateRow == "True" :
+    if language == "JAP" and showTranslateRow == "True":
         language = "Vertical_JAP"
+
+    if language == "Vertical_JAP" :
+        path = IMAGE_PATH
+    else :
+        if not test :
+            try :
+                # 四周加白边
+                imageBorder(IMAGE_PATH, NEW_IMAGE_PATH, "a", 10, color=(255, 255, 255))
+                path = NEW_IMAGE_PATH
+            except Exception:
+                path = IMAGE_PATH
+        else :
+            try :
+                # 四周加白边
+                imageBorder(TEST_IMAGE_PATH, NEW_TEST_IMAGE_PATH, "a", 10, color=(255, 255, 255))
+                path = NEW_TEST_IMAGE_PATH
+            except Exception:
+                path = TEST_IMAGE_PATH
+
+    with open(path, "rb") as file :
+        image = file.read()
+    imageBase64 = base64.b64encode(image).decode("utf-8")
 
     headers = {"Host": host}
     body = {
@@ -170,7 +179,8 @@ def dangoOCR(object, test=False) :
     if code == 0 :
         # 竖排识别
         if language == "Vertical_JAP" :
-            content = resultSort(res.get("Data", []))
+            content, ocr_result = resultSort(res.get("Data", []))
+            object.ocr_result = ocr_result
             return True, content
         else :
             content = ""

@@ -8,6 +8,7 @@ import utils.thread
 
 PIXMAP_PATH = "./config/icon/pixmap.png"
 PIXMAP2_PATH = "./config/icon/pixmap2.png"
+DRAW_PATH = "./config/draw.jpg"
 
 
 # 选择范围
@@ -194,6 +195,9 @@ class Range(QMainWindow) :
         self.hide_button.clicked.connect(self.quit)
         self.hide_button.hide()
 
+        # 显示翻译结果
+        self.draw_label = QLabel(self)
+
         # 右下角用于拉伸界面的控件
         self.statusbar = QStatusBar(self)
         self.setStatusBar(self.statusbar)
@@ -271,6 +275,36 @@ class Range(QMainWindow) :
         # 如果是自动模式下, 则解除暂停
         if self.object.translation_ui.translate_mode :
             self.object.translation_ui.stop_sign = False
+
+
+    # 将翻译结果显示在原图上
+    def drawImage(self) :
+
+        rect = self.geometry()
+        self.draw_label.setGeometry(0, 0, rect.width(), rect.height())
+        gif = QMovie(DRAW_PATH)
+        self.draw_label.setMovie(gif)
+        self.draw_label.setScaledContents(True)
+        gif.start()
+        self.show()
+
+
+    # 接收隐藏窗体信号
+    def hideRangeUI(self) :
+
+        self.hide()
+
+
+    # 窗口隐藏信号
+    def hideEvent(self, e):
+
+        self.object.show_range_ui_sign = False
+
+
+    # 窗口显示信号
+    def showEvent(self, e):
+
+        self.object.show_range_ui_sign = True
 
 
     def quit(self) :
