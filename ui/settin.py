@@ -939,7 +939,7 @@ class Settin(QMainWindow) :
         self.customSetGeometry(label, 20, 170, 60, 20)
         label.setText("翻译时间:")
 
-        # 显示消息栏
+        # 显示消息栏开关
         self.show_statusbar_switch = ui.switch.ShowSwitch(self.tab_3, sign=self.show_statusbar_use, startX=(65-20)*self.rate)
         self.customSetGeometry(self.show_statusbar_switch, 95, 170, 65, 20)
         self.show_statusbar_switch.checkedChanged.connect(self.changeShowStatusbarSwitch)
@@ -988,6 +988,33 @@ class Settin(QMainWindow) :
         self.customSetGeometry(button, 455, 170, 20, 20)
         button.setStyleSheet("background: transparent;")
         button.clicked.connect(lambda: self.showDesc("originalColor"))
+        button.setCursor(self.question_pixmap)
+
+        # 贴字翻译标签
+        label = QLabel(self.tab_3)
+        self.customSetGeometry(label, 20, 220, 60, 20)
+        label.setText("贴字翻译:")
+
+        # 贴字翻译开关
+        self.draw_image_switch = ui.switch.SwitchOCR(self.tab_3, sign=self.draw_image_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.draw_image_switch, 95, 220, 65, 20)
+        self.draw_image_switch.checkedChanged.connect(self.changeDrawImageSwitch)
+        self.draw_image_switch.setCursor(self.select_pixmap)
+
+        # 贴字翻译说明标签
+        button = QPushButton(self.tab_3)
+        self.customSetGeometry(button, 175, 220, 25, 20)
+        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;" % self.color_2)
+        button.setText("说明")
+        button.clicked.connect(lambda: self.showDesc("drawImage"))
+        button.setCursor(self.question_pixmap)
+
+        # 贴字翻译说明?号图标
+        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_3)
+        self.customSetIconSize(button, 20, 20)
+        self.customSetGeometry(button, 200, 220, 20, 20)
+        button.setStyleSheet("background: transparent;")
+        button.clicked.connect(lambda: self.showDesc("drawImage"))
         button.setCursor(self.question_pixmap)
 
 
@@ -1642,6 +1669,8 @@ class Settin(QMainWindow) :
         self.bilibili_video_url = self.object.yaml["dict_info"]["bilibili_video"]
         # 显示消息栏
         self.show_statusbar_use = self.object.config["showStatusbarUse"]
+        # 贴字翻译开关
+        self.draw_image_use = self.object.config["drawImageUse"]
 
 
     # 获取节点信息
@@ -1898,6 +1927,15 @@ class Settin(QMainWindow) :
             self.show_original_use = True
         else:
             self.show_original_use = False
+
+
+    # 改变贴字翻译开关状态
+    def changeDrawImageSwitch(self, checked) :
+
+        if checked :
+            self.draw_image_use = True
+        else:
+            self.draw_image_use = False
 
 
     # 改变显示消息栏开关状态
@@ -2637,6 +2675,9 @@ class Settin(QMainWindow) :
         self.object.config["OCR"]["highPrecision"] = self.baidu_ocr_high_precision_use
         # 显示消息栏
         self.object.config["showStatusbarUse"] = self.show_statusbar_use
+        # 贴字翻译开关
+        self.object.config["drawImageUse"] = self.draw_image_use
+
 
     # 注册新快捷键
     def registerHotKey(self) :

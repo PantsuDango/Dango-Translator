@@ -209,6 +209,8 @@ def configConvert(object) :
     object.yaml["range"] = {"X1": 0, "Y1": 0, "X2": 0, "Y2": 0}
     # 显示消息栏
     object.config["showStatusbarUse"] = object.config.get("showStatusbarUse", True)
+    # 贴字翻译开关
+    object.config["drawImageUse"] = object.config.get("drawImageUse", False)
 
 
 # 保存配置至服务器
