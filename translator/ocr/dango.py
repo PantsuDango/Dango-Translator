@@ -138,24 +138,10 @@ def dangoOCR(object, test=False) :
     showTranslateRow = object.config["showTranslateRow"]
     if language == "JAP" and showTranslateRow == "True":
         language = "Vertical_JAP"
-
-    if language == "Vertical_JAP" :
-        path = IMAGE_PATH
+    if test :
+        path = TEST_IMAGE_PATH
     else :
-        if not test :
-            try :
-                # 四周加白边
-                imageBorder(IMAGE_PATH, NEW_IMAGE_PATH, "a", 10, color=(255, 255, 255))
-                path = NEW_IMAGE_PATH
-            except Exception:
-                path = IMAGE_PATH
-        else :
-            try :
-                # 四周加白边
-                imageBorder(TEST_IMAGE_PATH, NEW_TEST_IMAGE_PATH, "a", 10, color=(255, 255, 255))
-                path = NEW_TEST_IMAGE_PATH
-            except Exception:
-                path = TEST_IMAGE_PATH
+        path = IMAGE_PATH
 
     with open(path, "rb") as file :
         image = file.read()
@@ -180,11 +166,17 @@ def dangoOCR(object, test=False) :
         # 竖排识别
         if language == "Vertical_JAP" :
             content, ocr_result = resultSort(res.get("Data", []))
+            # 给贴字翻译使用
             object.ocr_result = ocr_result
             return True, content
+        # 横排识别
         else :
             content = ""
-            for index, val in enumerate(res.get("Data", [])) :
+            ocr_result = res.get("Data", [])
+            for index, val in enumerate(ocr_result) :
+                # # 字宽
+                # ocr_result[index]["WordWidth"] = int(val["Coordinate"]["LowerLeft"][1] - val["Coordinate"]["UpperLeft"][1])
+                # 换行翻译
                 if (index+1 != len(res.get("Data", []))) and object.config["BranchLineUse"] :
                     if language == "ENG" :
                         content += (val.get("Words", "") + " \n")
@@ -195,6 +187,8 @@ def dangoOCR(object, test=False) :
                         content += val.get("Words", "") + " "
                     else :
                         content += val.get("Words", "")
+            # # 给贴字翻译使用
+            # object.ocr_result = ocr_result
             return True, content
     else :
         object.logger.error(message)

@@ -74,8 +74,6 @@ class DangoTranslator() :
         self.filter_ui = ui.filter.Filter(self)
         # 范围框界面
         self.range_ui = ui.range.Range(self)
-        # 隐藏范围窗信号
-        self.translation_ui.hide_range_ui_sign.connect(self.range_ui.hideRangeUI)
 
         # 检查邮箱
         thread = utils.thread.createCheckBindEmailQThread(self)

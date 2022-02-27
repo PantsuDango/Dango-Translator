@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QApplication
 from skimage.metrics import structural_similarity
 from cv2 import imread, cvtColor, COLOR_BGR2GRAY
 from difflib import SequenceMatcher
-from traceback import format_exc
+from traceback import format_exc, print_exc
 import time
 import pyperclip
 from PIL import Image, ImageDraw, ImageFont
@@ -60,10 +60,9 @@ class TranslaterProcess(QThread) :
                 if sum_width > w:
                     sum_width = 0
                     text += "\n"
-            draw.text((x1, y1), text, fill=(255, 0, 0), font=setFont, direction=None)
+            draw.text((x1, y1), text, fill=(0, 0, 0), font=setFont, direction=None)
 
         image.save(DRAW_PATH)
-        #self.object.range_ui.drawImage()
         self.draw_image_signal.emit(True)
 
 
@@ -114,16 +113,28 @@ class TranslaterProcess(QThread) :
 
         self.display_signal.emit(result, self.trans_type)
 
-        if self.object.ocr_result and self.trans_type != "original" :
+        # 翻译结果帖字
+        if self.object.config["drawImageUse"] \
+                and self.object.config["onlineOCR"] \
+                and self.object.config["showTranslateRow"] == "True" \
+                and self.object.config["language"] == "JAP" \
+                and self.trans_type != "original" \
+                and self.object.ocr_result :
             ocr_result = self.object.ocr_result
             self.object.ocr_result = None
-            self.drawRect(ocr_result, result)
+            try :
+                self.drawRect(ocr_result, result)
+            except Exception :
+                self.logger.error(format_exc())
 
 
 # 翻译处理模块
 class Translater(QThread) :
 
+    # 清屏翻译框信号
     clear_text_sign = pyqtSignal(bool)
+    # 隐藏范围窗信号
+    hide_range_ui_sign = pyqtSignal(bool)
 
     def __init__(self, object) :
 
@@ -138,6 +149,18 @@ class Translater(QThread) :
         y1 = self.object.yaml["range"]["Y1"]
         x2 = self.object.yaml["range"]["X2"]
         y2 = self.object.yaml["range"]["Y2"]
+
+        # 隐藏范围框信号
+        if self.object.config["drawImageUse"] \
+                and self.object.config["onlineOCR"] \
+                and self.object.config["showTranslateRow"] == "True" \
+                and self.object.config["language"] == "JAP":
+            self.hide_range_ui_sign.emit(True)
+            # 确保已经隐藏了范围框才截图
+            while True :
+                if not self.object.show_range_ui_sign :
+                    break
+
 
         screen = QApplication.primaryScreen()
         pix = screen.grabWindow(QApplication.desktop().winId(), x1, y1, x2-x1, y2-y1)

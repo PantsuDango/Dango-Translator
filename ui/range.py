@@ -135,6 +135,7 @@ class Range(QMainWindow) :
         self.color = "#1E90FF"
         self.font_size = 12
         self.show_sign = False
+        self.object.show_range_ui_sign = False
         self.ui()
 
 
@@ -184,9 +185,12 @@ class Range(QMainWindow) :
         self.font.setFamily(self.font_type)
         self.font.setPointSize(self.font_size)
 
+        # 显示翻译结果
+        self.draw_label = QLabel(self)
+
         # 隐藏按钮
         self.hide_button = QPushButton(self)
-        self.hide_button.setGeometry(QRect(int(X2-X1-40*self.rate), 0, int(40 * self.rate), int(30 * self.rate)))
+        self.hide_button.setGeometry(QRect(int(X2-X1-40*self.rate), 0, int(40*self.rate), int(30*self.rate)))
         self.hide_button.setStyleSheet("background-color:rgba(62, 62, 62, 0.3);"
                                        "color: %s;"%self.color)
         self.hide_button.setFont(self.font)
@@ -194,9 +198,6 @@ class Range(QMainWindow) :
         self.hide_button.setCursor(select_pixmap)
         self.hide_button.clicked.connect(self.quit)
         self.hide_button.hide()
-
-        # 显示翻译结果
-        self.draw_label = QLabel(self)
 
         # 右下角用于拉伸界面的控件
         self.statusbar = QStatusBar(self)
@@ -286,6 +287,7 @@ class Range(QMainWindow) :
         self.draw_label.setMovie(gif)
         self.draw_label.setScaledContents(True)
         gif.start()
+        self.object.range_ui.draw_label.show()
         self.show()
 
 

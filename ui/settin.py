@@ -2677,6 +2677,8 @@ class Settin(QMainWindow) :
         self.object.config["showStatusbarUse"] = self.show_statusbar_use
         # 贴字翻译开关
         self.object.config["drawImageUse"] = self.draw_image_use
+        if not self.draw_image_use :
+            self.object.range_ui.draw_label.hide()
 
 
     # 注册新快捷键
@@ -2695,7 +2697,8 @@ class Settin(QMainWindow) :
         if self.translate_hotkey_use :
             self.object.translation_ui.translate_hotkey.register((self.object.translation_ui.translate_hotkey_value1,
                                                                   self.object.translation_ui.translate_hotkey_value2),
-                                                                  callback=lambda x: self.object.translation_ui.translate_hotkey_sign.emit(True))
+                                                                  callback=lambda x: utils.thread.createThread(self.object.translation_ui.startTranslater))
+
         # 注册新范围快捷键
         if self.range_hotkey_use :
             self.object.translation_ui.range_hotkey.register((self.object.translation_ui.range_hotkey_value1,

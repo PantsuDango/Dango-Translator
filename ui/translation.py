@@ -31,14 +31,10 @@ PIXMAP2_PATH = "./config/icon/pixmap2.png"
 # 翻译界面
 class Translation(QMainWindow) :
 
-    # 翻译快捷键信号
-    translate_hotkey_sign = pyqtSignal(bool)
     # 范围快捷键信号
     range_hotkey_sign = pyqtSignal(bool)
     # 自动翻译模式信号
     auto_open_sign = pyqtSignal(bool)
-    # 隐藏范围窗信号
-    hide_range_ui_sign = pyqtSignal(bool)
 
     def __init__(self, object) :
 
@@ -275,8 +271,7 @@ class Translation(QMainWindow) :
         self.translate_hotkey = SystemHotkey()
         if self.object.config["showHotKey1"] == "True" :
             self.translate_hotkey.register((self.translate_hotkey_value1, self.translate_hotkey_value2),
-                                           callback=lambda x:self.translate_hotkey_sign.emit(True))
-        self.translate_hotkey_sign.connect(self.startTranslater)
+                                           callback=lambda x: utils.thread.createThread(self.startTranslater))
 
         # 注册范围快捷键
         self.range_hotkey = SystemHotkey()
@@ -587,15 +582,9 @@ class Translation(QMainWindow) :
         if self.auto_trans_exist :
             return
 
-        # 隐藏范围框信号
-        if self.object.config["language"] == "JAP" and self.object.config["showTranslateRow"] == "True" :
-            self.hide_range_ui_sign.emit(True)
-            while True :
-                if not self.object.show_range_ui_sign :
-                    break
-
         thread = utils.translater.Translater(self.object)
         thread.clear_text_sign.connect(self.clearText)
+        thread.hide_range_ui_sign.connect(self.object.range_ui.hideRangeUI)
         thread.start()
         thread.wait()
 
