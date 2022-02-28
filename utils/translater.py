@@ -44,23 +44,39 @@ class TranslaterProcess(QThread) :
         image = Image.open(IMAGE_PATH)
         draw = ImageDraw.Draw(image)
         for val in ocr_result :
-            setFont = ImageFont.truetype(FONT_PATH, val["WordWidth"]-2)
+            setFont = ImageFont.truetype(FONT_PATH, val["WordWidth"]-3)
             x1 = int(val["Coordinate"]["UpperLeft"][0])
             y1 = int(val["Coordinate"]["UpperLeft"][1])
             x2 = int(val["Coordinate"]["LowerRight"][0])
             y2 = int(val["Coordinate"]["LowerRight"][1])
             w = int(val["Coordinate"]["LowerRight"][0] - val["Coordinate"]["LowerLeft"][0])
+            h = int(val["Coordinate"]["LowerLeft"][1] - val["Coordinate"]["UpperLeft"][1])
             draw.rectangle((x1, y1, x2, y2), fill=("#FFFFFF"))
-            sum_width = 0
+            # sum_width = 0
+            # text = ""
+            # for char in val["Words"] :
+            #     width, height = draw.textsize(char, setFont)
+            #     sum_width += width
+            #     text += char
+            #     if sum_width > w:
+            #         sum_width = 0
+            #         text += "\n"
+            # draw.text((x1, y1), text, fill=(0, 0, 0), font=setFont, direction=None)
+
             text = ""
+            sum_height = 0
+            width, height = draw.textsize(val["Words"][0], setFont)
+            x = x2 - width
             for char in val["Words"] :
-                width, height = draw.textsize(char, setFont)
-                sum_width += width
-                text += char
-                if sum_width > w:
-                    sum_width = 0
-                    text += "\n"
-            draw.text((x1, y1), text, fill=(0, 0, 0), font=setFont, direction=None)
+                text += char + "\n"
+                sum_height += height
+                if sum_height > h :
+                    draw.text((x, y1), text, fill=(0, 0, 0), font=setFont, direction=None)
+                    text = ""
+                    sum_height = 0
+                    x = x - width - 5
+                elif char == val["Words"][-1] :
+                    draw.text((x, y1), text, fill=(0, 0, 0), font=setFont, direction=None)
 
         image.save(DRAW_PATH)
         self.draw_image_signal.emit(True)
