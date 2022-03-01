@@ -35,8 +35,8 @@ class TranslaterProcess(QThread) :
         self.logger = object.logger
 
 
-    # 气泡框抠字
-    def drawRect(self, ocr_result, words) :
+    # 竖排-气泡框抠字
+    def drawRectMD(self, ocr_result, words) :
 
         for index, word in enumerate(words.split("\n")) :
             ocr_result[index]["Words"] = word
@@ -44,7 +44,7 @@ class TranslaterProcess(QThread) :
         image = Image.open(IMAGE_PATH)
         draw = ImageDraw.Draw(image)
         for val in ocr_result :
-            setFont = ImageFont.truetype(FONT_PATH, val["WordWidth"]-3)
+            setFont = ImageFont.truetype(FONT_PATH, val["WordWidth"])
             x1 = int(val["Coordinate"]["UpperLeft"][0])
             y1 = int(val["Coordinate"]["UpperLeft"][1])
             x2 = int(val["Coordinate"]["LowerRight"][0])
@@ -52,16 +52,6 @@ class TranslaterProcess(QThread) :
             w = int(val["Coordinate"]["LowerRight"][0] - val["Coordinate"]["LowerLeft"][0])
             h = int(val["Coordinate"]["LowerLeft"][1] - val["Coordinate"]["UpperLeft"][1])
             draw.rectangle((x1, y1, x2, y2), fill=("#FFFFFF"))
-            # sum_width = 0
-            # text = ""
-            # for char in val["Words"] :
-            #     width, height = draw.textsize(char, setFont)
-            #     sum_width += width
-            #     text += char
-            #     if sum_width > w:
-            #         sum_width = 0
-            #         text += "\n"
-            # draw.text((x1, y1), text, fill=(0, 0, 0), font=setFont, direction=None)
 
             text = ""
             sum_height = 0
@@ -77,6 +67,39 @@ class TranslaterProcess(QThread) :
                     x = x - width - 5
                 elif char == val["Words"][-1] :
                     draw.text((x, y1), text, fill=(0, 0, 0), font=setFont, direction=None)
+
+        image.save(DRAW_PATH)
+        self.draw_image_signal.emit(True)
+
+
+    # 横排-气泡框抠字
+    def drawRectTD(self, ocr_result, words):
+
+        for index, word in enumerate(words.split("\n")):
+            ocr_result[index]["Words"] = word
+
+        image = Image.open(IMAGE_PATH)
+        draw = ImageDraw.Draw(image)
+        for val in ocr_result:
+            setFont = ImageFont.truetype(FONT_PATH, val["WordWidth"])
+            x1 = int(val["Coordinate"]["UpperLeft"][0])
+            y1 = int(val["Coordinate"]["UpperLeft"][1])
+            x2 = int(val["Coordinate"]["LowerRight"][0])
+            y2 = int(val["Coordinate"]["LowerRight"][1])
+            w = int(val["Coordinate"]["LowerRight"][0] - val["Coordinate"]["LowerLeft"][0])
+            h = int(val["Coordinate"]["LowerLeft"][1] - val["Coordinate"]["UpperLeft"][1])
+            draw.rectangle((x1, y1, x2, y2), fill=("#FFFFFF"))
+
+            sum_width = 0
+            text = ""
+            width, height = draw.textsize(val["Words"][0], setFont)
+            for char in val["Words"] :
+                sum_width += width
+                text += char
+                if sum_width > w:
+                    sum_width = 0
+                    text += "\n"
+            draw.text((x1, y1), text, fill=(0, 0, 0), font=setFont, direction=None)
 
         image.save(DRAW_PATH)
         self.draw_image_signal.emit(True)
@@ -132,14 +155,16 @@ class TranslaterProcess(QThread) :
         # 翻译结果帖字
         if self.object.config["drawImageUse"] \
                 and self.object.config["onlineOCR"] \
-                and self.object.config["showTranslateRow"] == "True" \
-                and self.object.config["language"] == "JAP" \
                 and self.trans_type != "original" \
                 and self.object.ocr_result :
             ocr_result = self.object.ocr_result
             self.object.ocr_result = None
             try :
-                self.drawRect(ocr_result, result)
+                if self.object.config["showTranslateRow"] == "True" :
+                    self.drawRectMD(ocr_result, result)
+                else :
+                    print(ocr_result)
+                    self.drawRectTD(ocr_result, result)
             except Exception :
                 self.logger.error(format_exc())
 
@@ -168,15 +193,12 @@ class Translater(QThread) :
 
         # 隐藏范围框信号
         if self.object.config["drawImageUse"] \
-                and self.object.config["onlineOCR"] \
-                and self.object.config["showTranslateRow"] == "True" \
-                and self.object.config["language"] == "JAP":
+                and self.object.config["onlineOCR"] :
             self.hide_range_ui_sign.emit(True)
             # 确保已经隐藏了范围框才截图
             while True :
                 if not self.object.show_range_ui_sign :
                     break
-
 
         screen = QApplication.primaryScreen()
         pix = screen.grabWindow(QApplication.desktop().winId(), x1, y1, x2-x1, y2-y1)

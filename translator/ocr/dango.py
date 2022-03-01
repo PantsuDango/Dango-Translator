@@ -49,8 +49,69 @@ def imageBorder(src, dst, loc="a", width=3, color=(0, 0, 0)):
     img_new.save(dst)
 
 
-# 结果排序组包
-def resultSort(ocr_result) :
+# 横排结果排序组包
+def resultSortTD(ocr_result, language) :
+
+    # ocr结果归类文本块
+    new_words_list = []
+    filter_words_list = []
+    for index, val in enumerate(ocr_result):
+        if val in filter_words_list:
+            continue
+        tmp_words_list = []
+        tmp_words_list.append(val)
+
+        # 以字高作为碰撞阈值
+        word_height = val["Coordinate"]["LowerRight"][1] - val["Coordinate"]["UpperRight"][1]
+        rr1 = utils.range.createRectangularTD(val, word_height)
+        utils.range.findRectangularTD(rr1, ocr_result, index, tmp_words_list)
+
+        # 文本块聚类
+        x1 = tmp_words_list[0]["Coordinate"]["UpperLeft"][0]
+        y1 = tmp_words_list[0]["Coordinate"]["UpperLeft"][1]
+        x2 = tmp_words_list[0]["Coordinate"]["LowerRight"][0]
+        y2 = tmp_words_list[0]["Coordinate"]["LowerRight"][1]
+        text = ""
+        for val in tmp_words_list :
+            if val["Coordinate"]["UpperLeft"][0] < x1 :
+                x1 = val["Coordinate"]["UpperLeft"][0]
+            if val["Coordinate"]["UpperLeft"][1] < y1 :
+                y1 = val["Coordinate"]["UpperLeft"][1]
+            if val["Coordinate"]["LowerRight"][0] > x2 :
+                x2 = val["Coordinate"]["LowerRight"][0]
+            if val["Coordinate"]["LowerRight"][1] > y2 :
+                y2 = val["Coordinate"]["LowerRight"][1]
+            text += val["Words"]
+            filter_words_list.append(val)
+
+        if language == "ENG":
+            word_width = int(val["Coordinate"]["LowerRight"][1] - val["Coordinate"]["UpperRight"][1]) + 3
+        else :
+            word_width = int(val["Coordinate"]["LowerRight"][1] - val["Coordinate"]["UpperRight"][1]) - 3
+        new_words_list.append({
+            "Coordinate": {
+                "UpperLeft": [x1, y1],
+                "UpperRight": [x2, y1],
+                "LowerRight": [x2, y2],
+                "LowerLeft": [x1, y2]
+            },
+            "Words": text,
+            "WordWidth": word_width
+        })
+
+    # 结果组包
+    text = ""
+    for val in new_words_list :
+        if val == new_words_list[-1] :
+            text += val["Words"]
+        else :
+            text += val["Words"] + "\n"
+
+    return text, new_words_list
+
+
+# 竖排结果排序组包
+def resultSortMD(ocr_result, language) :
 
     # 文字顺序由右至左排序
     ocr_result.sort(key=lambda x: x["Coordinate"]["UpperRight"][0], reverse=True)
@@ -65,8 +126,8 @@ def resultSort(ocr_result) :
 
         # 以字宽作为碰撞阈值
         word_width = (val["Coordinate"]["UpperRight"][0] - val["Coordinate"]["UpperLeft"][0]) // 2
-        rr1 = utils.range.createRectangular(val, word_width)
-        utils.range.findRectangular(rr1, ocr_result, index, tmp_words_list)
+        rr1 = utils.range.createRectangularMD(val, word_width)
+        utils.range.findRectangularMD(rr1, ocr_result, index, tmp_words_list)
 
         # 文本块聚类
         x1 = tmp_words_list[-1]["Coordinate"]["UpperLeft"][0]
@@ -81,6 +142,11 @@ def resultSort(ocr_result) :
                 y2 = val["Coordinate"]["LowerRight"][1]
             text += val["Words"]
             filter_words_list.append(val)
+
+        if language == "ENG":
+            word_width = val["Coordinate"]["UpperRight"][0] - val["Coordinate"]["UpperLeft"][0] + 3
+        else :
+            word_width = val["Coordinate"]["UpperRight"][0] - val["Coordinate"]["UpperLeft"][0] - 3
         new_words_list.append({
             "Coordinate": {
                 "UpperLeft": [x1, y1],
@@ -89,7 +155,7 @@ def resultSort(ocr_result) :
                 "LowerLeft": [x1, y2]
             },
             "Words": text,
-            "WordWidth": int(word_width*2)
+            "WordWidth": word_width
         })
 
     # 二次文本块聚类, 水平方向
@@ -101,8 +167,8 @@ def resultSort(ocr_result) :
             continue
         tmp_words_list = []
         tmp_words_list.append(val)
-        rr1 = utils.range.createRectangular(val, word_width)
-        utils.range.findRectangular2(rr1, new_words_list, index, tmp_words_list, word_width)
+        rr1 = utils.range.createRectangularMD(val, word_width)
+        utils.range.findRectangular2MD(rr1, new_words_list, index, tmp_words_list, word_width)
         for val in tmp_words_list:
             filter_words_list2.append(val)
         new_words_list2.append(tmp_words_list)
@@ -162,34 +228,14 @@ def dangoOCR(object, test=False) :
 
     code = res.get("Code", -1)
     message = res.get("Message", "")
+    ocr_result = res.get("Data", [])
     if code == 0 :
-        # 竖排识别
         if language == "Vertical_JAP" :
-            content, ocr_result = resultSort(res.get("Data", []))
-            # 给贴字翻译使用
-            object.ocr_result = ocr_result
-            return True, content
-        # 横排识别
+            content, ocr_result = resultSortMD(ocr_result, language)
         else :
-            content = ""
-            ocr_result = res.get("Data", [])
-            for index, val in enumerate(ocr_result) :
-                # # 字宽
-                # ocr_result[index]["WordWidth"] = int(val["Coordinate"]["LowerLeft"][1] - val["Coordinate"]["UpperLeft"][1])
-                # 换行翻译
-                if (index+1 != len(res.get("Data", []))) and object.config["BranchLineUse"] :
-                    if language == "ENG" :
-                        content += (val.get("Words", "") + " \n")
-                    else :
-                        content += (val.get("Words", "") + "\n")
-                else :
-                    if language == "ENG" :
-                        content += val.get("Words", "") + " "
-                    else :
-                        content += val.get("Words", "")
-            # # 给贴字翻译使用
-            # object.ocr_result = ocr_result
-            return True, content
+            content, ocr_result = resultSortTD(ocr_result, language)
+        object.ocr_result = ocr_result
+        return True, content
     else :
         object.logger.error(message)
         return False, "团子OCR错误: %s"%message
