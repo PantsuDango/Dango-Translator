@@ -211,6 +211,11 @@ def configConvert(object) :
     object.config["showStatusbarUse"] = object.config.get("showStatusbarUse", True)
     # 贴字翻译开关
     object.config["drawImageUse"] = object.config.get("drawImageUse", False)
+    # 隐藏范围快捷键
+    object.config["hideRangeHotkeyValue1"] = object.config.get("hideRangeHotkeyValue1", "ctrl")
+    object.config["hideRangeHotkeyValue2"] = object.config.get("hideRangeHotkeyValue2", "x")
+    # 隐藏范围快捷键开关
+    object.config["showHotKey3"] = object.config.get("showHotKey3", False)
 
 
 # 保存配置至服务器

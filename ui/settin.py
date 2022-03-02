@@ -1017,6 +1017,25 @@ class Settin(QMainWindow) :
         button.clicked.connect(lambda: self.showDesc("drawImage"))
         button.setCursor(self.question_pixmap)
 
+        # 隐藏范围快捷键标签
+        label = QLabel(self.tab_3)
+        self.customSetGeometry(label, 275, 220, 100, 20)
+        label.setText("隐藏范围热键:")
+
+        # 隐藏快捷键开关
+        self.hide_range_hotkey_switch = ui.switch.SwitchOCR(self.tab_3, sign=self.hide_range_hotkey_use,
+                                                             startX=(65-20) * self.rate)
+        self.customSetGeometry(self.hide_range_hotkey_switch, 380, 220, 65, 20)
+        self.hide_range_hotkey_switch.checkedChanged.connect(self.changeHideRangeHotkeySwitch)
+        self.hide_range_hotkey_switch.setCursor(self.select_pixmap)
+
+        # 隐藏快捷键设定按钮
+        self.hide_range_hotkey_button = QPushButton(self.tab_3)
+        self.customSetGeometry(self.hide_range_hotkey_button, 460, 220, 60, 20)
+        self.hide_range_hotkey_button.setText(self.object.config["hideRangeHotkeyValue1"] + "+" + self.object.config["hideRangeHotkeyValue2"])
+        self.hide_range_hotkey_button.clicked.connect(lambda: self.setHotKey("hideRange"))
+        self.hide_range_hotkey_button.setCursor(self.select_pixmap)
+
 
     # 功能设定标签页
     def setTabFour(self) :
@@ -1671,6 +1690,8 @@ class Settin(QMainWindow) :
         self.show_statusbar_use = self.object.config["showStatusbarUse"]
         # 贴字翻译开关
         self.draw_image_use = self.object.config["drawImageUse"]
+        # 隐藏范围快捷键开关
+        self.hide_range_hotkey_use = self.object.config["showHotKey3"]
 
 
     # 获取节点信息
@@ -1996,6 +2017,15 @@ class Settin(QMainWindow) :
             self.range_hotkey_use = True
         else:
             self.range_hotkey_use = False
+
+
+    # 改变隐藏范围热键开关状态
+    def changeHideRangeHotkeySwitch(self, checked):
+
+        if checked:
+            self.hide_range_hotkey_use = True
+        else:
+            self.hide_range_hotkey_use = False
 
 
     # 改变自动登录开关状态
@@ -2491,6 +2521,12 @@ class Settin(QMainWindow) :
             self.hotkey_ui.comboBox_2.setCurrentText(self.object.config["rangeHotkeyValue2"])
             self.hotkey_ui.sure_button.clicked.connect(lambda: self.hotkey_ui.sure(key_type))
 
+        if key_type == "hideRange" :
+            self.hotkey_ui.setWindowTitle("设定隐藏范围快捷键")
+            self.hotkey_ui.comboBox_1.setCurrentText(self.object.config["hideRangeHotkeyValue1"])
+            self.hotkey_ui.comboBox_2.setCurrentText(self.object.config["hideRangeHotkeyValue2"])
+            self.hotkey_ui.sure_button.clicked.connect(lambda: self.hotkey_ui.sure(key_type))
+
         self.hotkey_ui.show()
 
 
@@ -2679,6 +2715,8 @@ class Settin(QMainWindow) :
         self.object.config["drawImageUse"] = self.draw_image_use
         if not self.draw_image_use :
             self.object.range_ui.draw_label.hide()
+        # 隐藏范围快捷键开关
+        self.object.config["showHotKey3"] = str(self.hide_range_hotkey_use)
 
 
     # 注册新快捷键
@@ -2692,6 +2730,8 @@ class Settin(QMainWindow) :
         self.object.translation_ui.translate_hotkey_value2 = hotkey_map.get(self.object.config["translateHotkeyValue2"], self.object.config["translateHotkeyValue2"])
         self.object.translation_ui.range_hotkey_value1 = hotkey_map.get(self.object.config["rangeHotkeyValue1"], self.object.config["rangeHotkeyValue1"])
         self.object.translation_ui.range_hotkey_value2 = hotkey_map.get(self.object.config["rangeHotkeyValue2"], self.object.config["rangeHotkeyValue2"])
+        self.object.translation_ui.hide_range_hotkey_value1 = hotkey_map.get(self.object.config["hideRangeHotkeyValue1"], self.object.config["hideRangeHotkeyValue1"])
+        self.object.translation_ui.hide_range_hotkey_value2 = hotkey_map.get(self.object.config["hideRangeHotkeyValue2"], self.object.config["hideRangeHotkeyValue2"])
 
         # 注册新翻译快捷键
         if self.translate_hotkey_use :
@@ -2704,6 +2744,12 @@ class Settin(QMainWindow) :
             self.object.translation_ui.range_hotkey.register((self.object.translation_ui.range_hotkey_value1,
                                                               self.object.translation_ui.range_hotkey_value2),
                                                               callback=lambda x: self.object.translation_ui.range_hotkey_sign.emit(True))
+
+        # 注册新隐藏范围快捷键
+        if self.hide_range_hotkey_use :
+            self.object.translation_ui.hide_range_hotkey.register((self.object.translation_ui.hide_range_hotkey_value1,
+                                                                   self.object.translation_ui.hide_range_hotkey_value2),
+                                                                   callback=lambda x: self.object.translation_ui.hide_range_sign.emit(True))
 
 
     # 窗口关闭处理

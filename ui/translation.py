@@ -35,6 +35,8 @@ class Translation(QMainWindow) :
     range_hotkey_sign = pyqtSignal(bool)
     # 自动翻译模式信号
     auto_open_sign = pyqtSignal(bool)
+    # 隐藏范围框快捷键
+    hide_range_sign = pyqtSignal(bool)
 
     def __init__(self, object) :
 
@@ -280,6 +282,12 @@ class Translation(QMainWindow) :
                                        callback=lambda x: self.range_hotkey_sign.emit(True))
         self.range_hotkey_sign.connect(self.clickRange)
 
+        # 注册隐藏范围框快捷键
+        self.hide_range_hotkey = SystemHotkey()
+        if self.object.config["showHotKey3"] :
+            self.hide_range_hotkey.register((self.hide_range_hotkey_value1, self.hide_range_hotkey_value2),
+                                             callback=lambda x: self.hide_range_sign.emit(True))
+
 
     # 窗口显示信号
     def showEvent(self, e) :
@@ -356,6 +364,12 @@ class Translation(QMainWindow) :
                                                   self.object.config["rangeHotkeyValue1"])
         self.range_hotkey_value2 = hotkey_map.get(self.object.config["rangeHotkeyValue2"],
                                                   self.object.config["rangeHotkeyValue2"])
+
+        # 范围快捷键
+        self.hide_range_hotkey_value1 = hotkey_map.get(self.object.config["hideRangeHotkeyValue1"],
+                                                       self.object.config["hideRangeHotkeyValue1"])
+        self.hide_range_hotkey_value2 = hotkey_map.get(self.object.config["hideRangeHotkeyValue2"],
+                                                       self.object.config["hideRangeHotkeyValue2"])
         # 竖排翻译贴字
         self.object.ocr_result = None
 
@@ -612,6 +626,9 @@ class Translation(QMainWindow) :
 
         if self.object.config["showHotKey2"] == "True" :
             self.range_hotkey.unregister((self.range_hotkey_value1, self.range_hotkey_value2))
+
+        if self.object.config["showHotKey3"] :
+            self.hide_range_hotkey.unregister((self.hide_range_hotkey_value1, self.hide_range_hotkey_value2))
 
 
     # 将翻译结果打印

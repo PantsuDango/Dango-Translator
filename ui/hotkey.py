@@ -152,4 +152,9 @@ class HotKey(QWidget):
             self.object.config["rangeHotkeyValue1"] = self.comboBox_1.currentText()
             self.object.config["rangeHotkeyValue2"] = self.comboBox_2.currentText()
 
+        elif key_type == "hideRange" :
+            self.object.settin_ui.hide_range_hotkey_button.setText(content)
+            self.object.config["hideRangeHotkeyValue1"] = self.comboBox_1.currentText()
+            self.object.config["hideRangeHotkeyValue2"] = self.comboBox_2.currentText()
+
         self.close()
