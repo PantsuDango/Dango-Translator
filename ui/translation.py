@@ -600,7 +600,7 @@ class Translation(QMainWindow) :
 
         thread = utils.translater.Translater(self.object)
         thread.clear_text_sign.connect(self.clearText)
-        thread.hide_range_ui_sign.connect(self.object.range_ui.hideRangeUI)
+        thread.hide_range_ui_sign.connect(self.object.range_ui.hideUI)
         thread.start()
         thread.wait()
 

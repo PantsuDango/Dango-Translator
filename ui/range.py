@@ -292,10 +292,16 @@ class Range(QMainWindow) :
 
 
     # 接收隐藏窗体信号
-    def hideRangeUI(self, sign) :
+    def hideUI(self, sign) :
 
-        if not sign :
+        if sign :
+            self.show()
+        else :
             self.hide()
+
+
+    # 隐藏/显示窗体信号
+    def hideRangeUI(self) :
 
         if self.object.show_range_ui_sign :
             self.hide()

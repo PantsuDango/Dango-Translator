@@ -163,7 +163,6 @@ class TranslaterProcess(QThread) :
                 if self.object.config["showTranslateRow"] == "True" :
                     self.drawRectMD(ocr_result, result)
                 else :
-                    print(ocr_result)
                     self.drawRectTD(ocr_result, result)
             except Exception :
                 self.logger.error(format_exc())
@@ -202,6 +201,10 @@ class Translater(QThread) :
 
         screen = QApplication.primaryScreen()
         pix = screen.grabWindow(QApplication.desktop().winId(), x1, y1, x2-x1, y2-y1)
+        if self.object.config["drawImageUse"] \
+            and self.object.config["onlineOCR"] \
+            and self.object.translation_ui.translate_mode :
+            self.hide_range_ui_sign.emit(True)
         pix.save(IMAGE_PATH)
 
 

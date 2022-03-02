@@ -2723,7 +2723,7 @@ class Settin(QMainWindow) :
         self.object.config["showStatusbarUse"] = self.show_statusbar_use
         # 贴字翻译开关
         self.object.config["drawImageUse"] = self.draw_image_use
-        if not self.draw_image_use :
+        if not self.draw_image_use or not self.online_ocr_use :
             self.object.range_ui.draw_label.hide()
         # 隐藏范围快捷键开关
         self.object.config["showHotKey3"] = str(self.hide_range_hotkey_use)
