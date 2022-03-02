@@ -2415,6 +2415,11 @@ class Settin(QMainWindow) :
             self.desc_ui.desc_text.append("\n若屏蔽:\n")
             self.desc_ui.desc_text.insertHtml('<img src="{}" width="{}" >'.format(CLOSE_STATUSBAR_IMG_PATH, 245*self.rate))
 
+        # 贴字翻译
+        elif message_type == "drawImage":
+            self.desc_ui.setWindowTitle("贴字翻译说明")
+            self.desc_ui.desc_text.append("\n开启后会将翻译结果直接贴在截图区域上, 目前仅支持于在线OCR")
+
         self.desc_ui.show()
 
 
