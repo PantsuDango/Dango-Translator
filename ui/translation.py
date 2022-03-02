@@ -6,6 +6,7 @@ import qtawesome
 import os
 import time
 import pyperclip
+import requests
 
 import utils.config
 import utils.range
@@ -349,6 +350,8 @@ class Translation(QMainWindow) :
         self.thread_state = 0
         # 自动翻译线程存在标志
         self.auto_trans_exist = False
+        # 长连接对象, 用于在线OCR
+        self.object.session = requests.Session()
         # 按键转换映射关系
         hotkey_map = {
             "ctrl": "control",
@@ -364,7 +367,6 @@ class Translation(QMainWindow) :
                                                   self.object.config["rangeHotkeyValue1"])
         self.range_hotkey_value2 = hotkey_map.get(self.object.config["rangeHotkeyValue2"],
                                                   self.object.config["rangeHotkeyValue2"])
-
         # 范围快捷键
         self.hide_range_hotkey_value1 = hotkey_map.get(self.object.config["hideRangeHotkeyValue1"],
                                                        self.object.config["hideRangeHotkeyValue1"])

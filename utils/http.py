@@ -6,7 +6,7 @@ from traceback import format_exc
 
 
 # 发送http请求
-def post(url, body, logger, headers=None, timeout=5) :
+def post(url, body, logger, headers=None, timeout=5, session=None) :
 
     proxies = {
         "http": None,
@@ -22,9 +22,15 @@ def post(url, body, logger, headers=None, timeout=5) :
 
     try :
         if headers :
-            response = requests.post(url, headers=headers, data=json.dumps(body), proxies=proxies, verify=False, timeout=timeout)
+            if session :
+                response = session.post(url, headers=headers, data=json.dumps(body), proxies=proxies, verify=False, timeout=timeout)
+            else :
+                response = requests.post(url, headers=headers, data=json.dumps(body), proxies=proxies, verify=False, timeout=timeout)
         else :
-            response = requests.post(url, data=json.dumps(body), proxies=proxies, verify=False, timeout=timeout)
+            if session :
+                response = session.post(url, data=json.dumps(body), proxies=proxies, verify=False, timeout=timeout)
+            else:
+                response = requests.post(url, data=json.dumps(body), proxies=proxies, verify=False, timeout=timeout)
         try :
             response.encoding = "utf-8"
             result = json.loads(response.text)
