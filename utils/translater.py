@@ -150,6 +150,12 @@ class TranslaterProcess(QThread) :
         elif self.trans_type == "original" :
             result = self.object.translation_ui.original
 
+        # 根据屏蔽词过滤
+        for val in self.object.config["Filter"]:
+            if not val[0] :
+                continue
+            result = result.replace(val[0], val[1])
+
         self.display_signal.emit(result, self.trans_type)
 
         # 翻译结果帖字

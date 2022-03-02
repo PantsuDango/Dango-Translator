@@ -663,12 +663,6 @@ class Translation(QMainWindow) :
         else :
             return
 
-        # 根据屏蔽词过滤
-        for val in self.object.config["Filter"] :
-            if not val[0] :
-                continue
-            result = result.replace(val[0], val[1])
-
         # 显示在文本框上
         if self.object.config["showColorType"] == "False" :
             self.format.setTextOutline(QPen(QColor(color), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
