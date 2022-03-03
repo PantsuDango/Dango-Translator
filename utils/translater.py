@@ -6,7 +6,8 @@ from difflib import SequenceMatcher
 from traceback import format_exc, print_exc
 import time
 import pyperclip
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageEnhance
+import colorsys
 
 import utils.thread
 import utils.config
@@ -35,6 +36,42 @@ class TranslaterProcess(QThread) :
         self.logger = object.logger
 
 
+    # 获取图片颜色
+    def getImageColor(self, image, coordinate) :
+
+        region = image.crop(coordinate)
+        #region = ImageEnhance.Contrast(region).enhance(1.5)
+        color_dict = {}
+        for i in region.getdata():
+            if i not in color_dict:
+                color_dict[i] = 0
+            color_dict[i] += 1
+        color_dict = sorted(color_dict.items(), key=lambda x: x[1], reverse=True)
+        if color_dict :
+            # 避免过暗的背景色
+            r = color_dict[0][0][0]
+            g = color_dict[0][0][1]
+            b = color_dict[0][0][2]
+            if (r + g + b) / 3 < 20 :
+                return (255, 255, 255)
+            else :
+                return color_dict[0][0]
+        else :
+            return (255, 255, 255)
+
+
+    def drawRect(self, image_path, ocr_result) :
+        import cv2
+        image = cv2.imread(image_path)
+        for word in ocr_result:
+            x1 = int(word["Coordinate"]["UpperLeft"][0])
+            y1 = int(word["Coordinate"]["UpperLeft"][1])
+            x2 = int(word["Coordinate"]["LowerRight"][0])
+            y2 = int(word["Coordinate"]["LowerRight"][1])
+            image = cv2.rectangle(image, (x1, y1), (x2, y2), (0, 0, 255), 1)
+        cv2.imwrite("demo.jpg", image)
+
+
     # 竖排-气泡框抠字
     def drawRectMD(self, ocr_result, words) :
 
@@ -51,16 +88,31 @@ class TranslaterProcess(QThread) :
             y2 = int(val["Coordinate"]["LowerRight"][1])
             w = int(val["Coordinate"]["LowerRight"][0] - val["Coordinate"]["LowerLeft"][0])
             h = int(val["Coordinate"]["LowerLeft"][1] - val["Coordinate"]["UpperLeft"][1])
-            draw.rectangle((x1, y1, x2, y2), fill=("#FFFFFF"))
+
+            # 获取文字区域基色并涂色
+            num = 20
+            coordinate = (x1-num, y1-num, x2+num, y2+num)
+            color = self.getImageColor(image, coordinate)
+            draw.rectangle((x1, y1, x2, y2), fill=color)
+
+            # 取平均字高字宽
+            width_sum, height_sum, height_max = 0, 0, 0
+            for char in val["Words"] :
+                width, height = draw.textsize(char, setFont)
+                width_sum += width
+                height_sum += height
+                if height > height_max :
+                    height_max = height
+            width = round(width_sum/len(val["Words"]))
+            height = round(height_sum/len(val["Words"]))
 
             text = ""
             sum_height = 0
-            width, height = draw.textsize(val["Words"][0], setFont)
             x = x2 - width
             for char in val["Words"] :
                 text += char + "\n"
-                sum_height += height
-                if sum_height > h :
+                sum_height += height_max
+                if sum_height + height_max > h :
                     draw.text((x, y1), text, fill=(0, 0, 0), font=setFont, direction=None)
                     text = ""
                     sum_height = 0
@@ -88,7 +140,12 @@ class TranslaterProcess(QThread) :
             y2 = int(val["Coordinate"]["LowerRight"][1])
             w = int(val["Coordinate"]["LowerRight"][0] - val["Coordinate"]["LowerLeft"][0])
             h = int(val["Coordinate"]["LowerLeft"][1] - val["Coordinate"]["UpperLeft"][1])
-            draw.rectangle((x1, y1, x2, y2), fill=("#FFFFFF"))
+
+            # 获取文字区域基色并涂色
+            num = 10
+            coordinate = (x1-num, y1-num, x2+num, y2+num)
+            color = self.getImageColor(image, coordinate)
+            draw.rectangle((x1, y1, x2, y2), fill=color)
 
             sum_width = 0
             text = ""
@@ -171,6 +228,7 @@ class TranslaterProcess(QThread) :
                 else :
                     self.drawRectTD(ocr_result, result)
             except Exception :
+                print_exc()
                 self.logger.error(format_exc())
 
 

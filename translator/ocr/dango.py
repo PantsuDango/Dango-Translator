@@ -85,9 +85,9 @@ def resultSortTD(ocr_result, language) :
             filter_words_list.append(val)
 
         if language == "ENG":
-            word_width = int(val["Coordinate"]["LowerRight"][1] - val["Coordinate"]["UpperRight"][1]) + 3
+            word_width = val["Coordinate"]["LowerRight"][1] - val["Coordinate"]["UpperRight"][1] + 3
         else :
-            word_width = int(val["Coordinate"]["LowerRight"][1] - val["Coordinate"]["UpperRight"][1]) - 3
+            word_width = val["Coordinate"]["LowerRight"][1] - val["Coordinate"]["UpperRight"][1] - 3
         new_words_list.append({
             "Coordinate": {
                 "UpperLeft": [x1, y1],
@@ -96,7 +96,7 @@ def resultSortTD(ocr_result, language) :
                 "LowerLeft": [x1, y2]
             },
             "Words": text,
-            "WordWidth": word_width
+            "WordWidth": int(word_width)
         })
 
     # 结果组包
@@ -155,7 +155,7 @@ def resultSortMD(ocr_result, language) :
                 "LowerLeft": [x1, y2]
             },
             "Words": text,
-            "WordWidth": word_width
+            "WordWidth": int(word_width)
         })
 
     # 二次文本块聚类, 水平方向
