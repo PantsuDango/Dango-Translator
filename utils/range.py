@@ -77,7 +77,7 @@ def findRectangularTD(rr1, ocr_result, index1, tmp_words_list):
     for index2, val in enumerate(ocr_result):
         if index2 <= index1:
             continue
-        word_height = val["Coordinate"]["LowerRight"][1] - val["Coordinate"]["UpperRight"][1]
+        word_height = (val["Coordinate"]["LowerRight"][1] - val["Coordinate"]["UpperRight"][1]) * 1.5
         rr2 = createRectangularTD(val, word_height)
         if rr2.collision(rr1):
             tmp_words_list.append(val)

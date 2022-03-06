@@ -62,7 +62,7 @@ def resultSortTD(ocr_result, language) :
         tmp_words_list.append(val)
 
         # 以字高作为碰撞阈值
-        word_height = val["Coordinate"]["LowerRight"][1] - val["Coordinate"]["UpperRight"][1]
+        word_height = (val["Coordinate"]["LowerRight"][1] - val["Coordinate"]["UpperRight"][1]) * 1.5
         rr1 = utils.range.createRectangularTD(val, word_height)
         utils.range.findRectangularTD(rr1, ocr_result, index, tmp_words_list)
 

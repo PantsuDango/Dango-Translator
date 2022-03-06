@@ -39,37 +39,30 @@ class TranslaterProcess(QThread) :
     # 获取图片颜色
     def getImageColor(self, image, coordinate) :
 
-        region = image.crop(coordinate)
-        #region = ImageEnhance.Contrast(region).enhance(1.5)
-        color_dict = {}
-        for i in region.getdata():
-            if i not in color_dict:
-                color_dict[i] = 0
-            color_dict[i] += 1
-        color_dict = sorted(color_dict.items(), key=lambda x: x[1], reverse=True)
-        if color_dict :
-            # 避免过暗的背景色
-            r = color_dict[0][0][0]
-            g = color_dict[0][0][1]
-            b = color_dict[0][0][2]
-            if (r + g + b) / 3 < 20 :
-                return (255, 255, 255)
+        try :
+            region = image.crop(coordinate)
+            #region = ImageEnhance.Contrast(region).enhance(1.5)
+            color_dict = {}
+            for i in region.getdata():
+                if i not in color_dict:
+                    color_dict[i] = 0
+                color_dict[i] += 1
+            color_dict = sorted(color_dict.items(), key=lambda x: x[1], reverse=True)
+            if color_dict :
+                # 避免过暗的背景色
+                r = color_dict[0][0][0]
+                g = color_dict[0][0][1]
+                b = color_dict[0][0][2]
+                if (r + g + b) / 3 < 20 :
+                    return (255, 255, 255)
+                else :
+                    return color_dict[0][0]
             else :
-                return color_dict[0][0]
-        else :
+                return (255, 255, 255)
+        except Exception :
+            import traceback
+            traceback.print_exc()
             return (255, 255, 255)
-
-
-    def drawRect(self, image_path, ocr_result) :
-        import cv2
-        image = cv2.imread(image_path)
-        for word in ocr_result:
-            x1 = int(word["Coordinate"]["UpperLeft"][0])
-            y1 = int(word["Coordinate"]["UpperLeft"][1])
-            x2 = int(word["Coordinate"]["LowerRight"][0])
-            y2 = int(word["Coordinate"]["LowerRight"][1])
-            image = cv2.rectangle(image, (x1, y1), (x2, y2), (0, 0, 255), 1)
-        cv2.imwrite("demo.jpg", image)
 
 
     # 竖排-气泡框抠字
@@ -79,21 +72,21 @@ class TranslaterProcess(QThread) :
             ocr_result[index]["Words"] = word
 
         image = Image.open(IMAGE_PATH)
+        coordinate = (0, 0, image.width, image.height)
+        base_color = self.getImageColor(image, coordinate)
+        font_color = (255-base_color[0], 255-base_color[1], 255-base_color[2])
         draw = ImageDraw.Draw(image)
+
         for val in ocr_result :
             setFont = ImageFont.truetype(FONT_PATH, val["WordWidth"])
             x1 = int(val["Coordinate"]["UpperLeft"][0])
             y1 = int(val["Coordinate"]["UpperLeft"][1])
             x2 = int(val["Coordinate"]["LowerRight"][0])
             y2 = int(val["Coordinate"]["LowerRight"][1])
-            w = int(val["Coordinate"]["LowerRight"][0] - val["Coordinate"]["LowerLeft"][0])
             h = int(val["Coordinate"]["LowerLeft"][1] - val["Coordinate"]["UpperLeft"][1])
 
             # 获取文字区域基色并涂色
-            num = 20
-            coordinate = (x1-num, y1-num, x2+num, y2+num)
-            color = self.getImageColor(image, coordinate)
-            draw.rectangle((x1, y1, x2, y2), fill=color)
+            draw.rectangle((x1, y1, x2, y2), fill=base_color)
 
             # 取平均字高字宽
             width_sum, height_sum, height_max = 0, 0, 0
@@ -104,7 +97,6 @@ class TranslaterProcess(QThread) :
                 if height > height_max :
                     height_max = height
             width = round(width_sum/len(val["Words"]))
-            height = round(height_sum/len(val["Words"]))
 
             text = ""
             sum_height = 0
@@ -113,12 +105,12 @@ class TranslaterProcess(QThread) :
                 text += char + "\n"
                 sum_height += height_max
                 if sum_height + height_max > h :
-                    draw.text((x, y1), text, fill=(0, 0, 0), font=setFont, direction=None)
+                    draw.text((x, y1), text, fill=font_color, font=setFont, direction=None)
                     text = ""
                     sum_height = 0
                     x = x - width - 5
                 elif char == val["Words"][-1] :
-                    draw.text((x, y1), text, fill=(0, 0, 0), font=setFont, direction=None)
+                    draw.text((x, y1), text, fill=font_color, font=setFont, direction=None)
 
         image.save(DRAW_PATH)
         self.draw_image_signal.emit(True)
@@ -131,7 +123,11 @@ class TranslaterProcess(QThread) :
             ocr_result[index]["Words"] = word
 
         image = Image.open(IMAGE_PATH)
+        coordinate = (0, 0, image.width, image.height)
+        base_color = self.getImageColor(image, coordinate)
+        font_color = (255-base_color[0], 255-base_color[1], 255-base_color[2])
         draw = ImageDraw.Draw(image)
+
         for val in ocr_result:
             setFont = ImageFont.truetype(FONT_PATH, val["WordWidth"])
             x1 = int(val["Coordinate"]["UpperLeft"][0])
@@ -139,24 +135,26 @@ class TranslaterProcess(QThread) :
             x2 = int(val["Coordinate"]["LowerRight"][0])
             y2 = int(val["Coordinate"]["LowerRight"][1])
             w = int(val["Coordinate"]["LowerRight"][0] - val["Coordinate"]["LowerLeft"][0])
-            h = int(val["Coordinate"]["LowerLeft"][1] - val["Coordinate"]["UpperLeft"][1])
 
-            # 获取文字区域基色并涂色
-            num = 10
-            coordinate = (x1-num, y1-num, x2+num, y2+num)
-            color = self.getImageColor(image, coordinate)
-            draw.rectangle((x1, y1, x2, y2), fill=color)
+            # 文字区域涂色
+            draw.rectangle((x1, y1, x2, y2), fill=base_color)
 
-            sum_width = 0
+            # 取平均字高字宽
+            width_sum = 0
+            for char in val["Words"]:
+                width, _ = draw.textsize(char, setFont)
+                width_sum += width
+            width = round(width_sum / len(val["Words"]))
+
             text = ""
-            width, height = draw.textsize(val["Words"][0], setFont)
+            sum_width = 0
             for char in val["Words"] :
-                sum_width += width
                 text += char
-                if sum_width > w:
+                sum_width += width
+                if sum_width + width > w :
                     sum_width = 0
                     text += "\n"
-            draw.text((x1, y1), text, fill=(0, 0, 0), font=setFont, direction=None)
+            draw.text((x1, y1), text, fill=font_color, font=setFont, direction=None)
 
         image.save(DRAW_PATH)
         self.draw_image_signal.emit(True)
