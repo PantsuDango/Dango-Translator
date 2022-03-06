@@ -828,8 +828,6 @@ class Translation(QMainWindow) :
         # 界面关闭
         self.hide()
         self.object.range_ui.close()
-        # 删除进程锁
-        utils.lock.deleteLock()
         # 注销快捷键
         utils.thread.createThreadDaemonFalse(self.unregisterHotKey)
         # 关闭引擎模块

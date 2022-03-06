@@ -14,7 +14,6 @@ import utils.email
 import utils.message
 import utils.port
 import utils.update
-import utils.lock
 
 import ui.login
 import ui.register
@@ -154,11 +153,6 @@ class DangoTranslator() :
         QCoreApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
         app = QApplication(sys.argv)
 
-        # 唯一进程锁
-        if utils.lock.checkLock() :
-            utils.message.checkLockMessage()
-        else :
-            utils.lock.createLock()
         # 连接配置中心
         if not self.yaml["dict_info"] :
             utils.message.serverClientFailMessage(self)

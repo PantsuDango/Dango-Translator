@@ -356,7 +356,5 @@ class Login(QWidget) :
     # 退出程序
     def quit(self) :
 
-        # 删除进程锁
-        utils.lock.deleteLock()
         # 退出
         QCoreApplication.instance().quit()

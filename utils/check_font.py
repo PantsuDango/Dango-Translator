@@ -34,7 +34,4 @@ def openFontFile(logger) :
                                  "由于某种神秘力量，打开字体文件失败了(◢д◣)\n"
                                  "请手动打开安装，字体文件路径如下:\n"
                                  "%s     "%FONT_PATH)
-
-    # 删除进程锁
-    utils.lock.deleteLock()
     sys.exit()

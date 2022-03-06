@@ -115,8 +115,6 @@ def updateVersion() :
     except Exception as err :
         MessageBox("自动更新失败", "打开自动更新程序失败:\n%s"%err)
 
-    # 删除进程锁
-    utils.lock.deleteLock()
     sys.exit()
 
 
@@ -194,8 +192,6 @@ def serverClientFailMessage(object) :
                              "请查阅日志文件并联系团子处理\n"
                              "日志文件地址:\n"
                              "%s"%os.path.join(os.path.abspath("../") , "logs", log_file_name), object.yaml["screen_scale_rate"])
-    # 删除进程锁
-    utils.lock.deleteLock()
     sys.exit()
 
 
@@ -233,6 +229,4 @@ def checkIsTestVersion(object) :
                    "目前您使用的是测试版本, 此版本已经停止更新      \n"
                    "请下载正式版本使用, 下载地址:\n%s      "
                    %object.yaml["dict_info"]["update_version"], object.yaml["screen_scale_rate"])
-        # 删除进程锁
-        utils.lock.deleteLock()
         sys.exit()
