@@ -293,7 +293,7 @@ class Translation(QMainWindow) :
     # 窗口显示信号
     def showEvent(self, e) :
 
-        # 如果处于自动模式下则暂停
+        # 如果处于自动模式下则开始
         if self.translate_mode :
             self.stop_sign = False
 
@@ -302,7 +302,7 @@ class Translation(QMainWindow) :
     def hideEvent(self, e) :
 
         # 如果处于自动模式下则暂停
-        if self.translate_mode :
+        if self.translate_mode and not self.object.config["drawImageUse"] :
             self.stop_sign = True
 
 

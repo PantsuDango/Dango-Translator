@@ -2761,6 +2761,13 @@ class Settin(QMainWindow) :
                                                                    self.object.translation_ui.hide_range_hotkey_value2),
                                                                    callback=lambda x: self.object.translation_ui.hide_range_sign.emit(True))
 
+    # 窗口显示信号
+    def showEvent(self, e):
+
+        # 如果处于自动模式下则暂停
+        if self.object.translation_ui.translate_mode :
+            self.object.translation_ui.stop_sign = True
+
 
     # 窗口关闭处理
     def closeEvent(self, event) :
