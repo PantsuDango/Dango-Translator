@@ -243,20 +243,12 @@ def dangoOCR(object, test=False) :
 # 本地OCR
 def offlineOCR(object) :
 
-    image_path = os.path.join(os.getcwd(), "config", "image.jpg")
-    new_image_path = os.path.join(os.getcwd(), "config", "new_image.jpg")
-    language = object.config["language"]
     url = "http://127.0.0.1:6666/ocr/api"
+    language = object.config["language"]
     body = {
-        "ImagePath": new_image_path,
+        "ImagePath": os.path.join(os.getcwd(), "config", "image.jpg"),
         "Language": language
     }
-
-    # 四周加白边
-    try :
-        imageBorder(image_path, new_image_path, "a", 10, color=(255, 255, 255))
-    except Exception :
-        body["ImagePath"] = image_path
 
     res = utils.http.post(url, body, object.logger)
     if not res :
@@ -264,20 +256,15 @@ def offlineOCR(object) :
 
     code = res.get("Code", -1)
     message = res.get("Message", "")
-    if code == -1 :
-        return False, "本地OCR错误: %s"%message
-    else :
-        sentence = ""
-        for index, tmp in enumerate(res.get("Data", [])) :
-            if index+1 != len(res.get("Data", [])) and object.config["BranchLineUse"] :
-                if language == "ENG" :
-                    sentence += (tmp["Words"] + " \n")
-                else :
-                    sentence += (tmp["Words"] + "\n")
-            else :
-                if language == "ENG" :
-                    sentence += (tmp["Words"] + " ")
-                else :
-                    sentence += tmp["Words"]
+    ocr_result = res.get("Data", [])
 
-        return True, sentence
+    if code == 0 :
+        if language == "Vertical_JAP" :
+            content, ocr_result = resultSortMD(ocr_result, language)
+        else :
+            content, ocr_result = resultSortTD(ocr_result, language)
+        object.ocr_result = ocr_result
+        return True, content
+    else :
+        object.logger.error(message)
+        return False, "本地OCR错误: %s"%message

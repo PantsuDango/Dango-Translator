@@ -6,8 +6,7 @@ from difflib import SequenceMatcher
 from traceback import format_exc, print_exc
 import time
 import pyperclip
-from PIL import Image, ImageDraw, ImageFont, ImageEnhance
-import colorsys
+from PIL import Image, ImageDraw, ImageFont
 
 import utils.thread
 import utils.config
@@ -215,7 +214,7 @@ class TranslaterProcess(QThread) :
 
         # 翻译结果帖字
         if self.object.config["drawImageUse"] \
-                and self.object.config["onlineOCR"] \
+                and not self.object.config["baiduOCR"] \
                 and self.trans_type != "original" \
                 and self.object.ocr_result :
             ocr_result = self.object.ocr_result
@@ -254,7 +253,7 @@ class Translater(QThread) :
 
         # 隐藏范围框信号
         if self.object.config["drawImageUse"] \
-                and self.object.config["onlineOCR"] :
+                and not self.object.config["baiduOCR"] :
             self.hide_range_ui_sign.emit(False)
             # 确保已经隐藏了范围框才截图
             while True :
@@ -264,7 +263,7 @@ class Translater(QThread) :
         screen = QApplication.primaryScreen()
         pix = screen.grabWindow(QApplication.desktop().winId(), x1, y1, x2-x1, y2-y1)
         if self.object.config["drawImageUse"] \
-            and self.object.config["onlineOCR"] \
+            and not self.object.config["baiduOCR"] \
             and self.object.translation_ui.translate_mode :
             self.hide_range_ui_sign.emit(True)
         pix.save(IMAGE_PATH)
