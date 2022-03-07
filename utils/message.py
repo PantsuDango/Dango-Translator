@@ -188,8 +188,9 @@ def serverClientFailMessage(object) :
     date = time.strftime("%Y-%m-%d", time.localtime(time.time()))
     log_file_name = date + ".log"
     utils.message.MessageBox("连接服务器失败",
-                             "发生了意料之外的错误, 导致无法连接服务器\n"
-                             "请查阅日志文件并联系团子处理\n"
+                             "无法连接服务器, 请检查你的网络环境是否正常\n"
+                             "并留意是否开启了梯子、加速器等代理软件, 如有可尝试关闭后重试    \n"
+                             "若仍无法解决, 可获取日志文件并通过交流群联系客服处理\n"
                              "日志文件地址:\n"
                              "%s"%os.path.join(os.path.abspath("../") , "logs", log_file_name), object.yaml["screen_scale_rate"])
     sys.exit()
