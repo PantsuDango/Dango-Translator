@@ -20,13 +20,16 @@ def openConfig(logger) :
         # 2022.02.19 添加新参数
         if "auto_login" not in config.keys() :
             config["auto_login"] = False
+        # 2022.03.08 修改参数
+        if "dict_info_url" in config.keys():
+            config["dict_info_url"] = "https://dango.c4a15wh.cn/DangoTranslate/ShowDict"
 
     except Exception :
         logger.error(format_exc())
         config = {
             "user": "",
             "password": "",
-            "dict_info_url": "https://trans.dango.cloud/DangoTranslate/ShowDict",
+            "dict_info_url": "https://dango.c4a15wh.cn/DangoTranslate/ShowDict",
             "ocr_cmd_path": ".\ocr\startOCR.cmd",
             "port": 6666,
             "auto_login": False
@@ -52,7 +55,7 @@ def getDictInfo(url, logger) :
 
     res = utils.http.post(url, {}, logger)
     if not res :
-        res = utils.http.post("https://dango.c4a15wh.cn/DangoTranslate/ShowDict", {}, logger)
+        res = utils.http.post("https://trans.dango.cloud/DangoTranslate/ShowDict", {}, logger)
     result = res.get("Result", {})
 
     return result
