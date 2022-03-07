@@ -52,10 +52,16 @@ def loginDangoOCR(object) :
         "Password": object.yaml["password"],
     }
 
-    res = post(url, body, object.logger)
-    object.config["DangoToken"] = res.get("Token", "")
-    if res.get("Code", -1) != 0 :
-        object.logger.error(res.get("ErrorMsg", ""))
+    for x in range(3) :
+        res = post(url, body, object.logger)
+        token = res.get("Token", "")
+        code = res.get("Code", -1)
+        if token :
+            object.config["DangoToken"] = token
+            break
+        else :
+            if code != 0 :
+                object.logger.error(res.get("ErrorMsg", ""))
 
 
 # 下载文件
