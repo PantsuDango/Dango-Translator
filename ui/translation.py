@@ -73,6 +73,7 @@ class Translation(QMainWindow) :
         # 窗口无标题栏、窗口置顶、窗口透明
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setMouseTracking(True)
 
         # 窗口图标
         icon = QIcon()
@@ -153,6 +154,7 @@ class Translation(QMainWindow) :
         self.drag_label = QLabel(self)
         self.drag_label.setObjectName("drag_label")
         self.customSetGeometry(self.drag_label, 0, 0, 4000, 2000)
+        self.drag_label.setMouseTracking(True)
 
         # 翻译按钮
         self.start_button = QPushButton(qtawesome.icon("fa.play", color=self.icon_color), "", self)
@@ -393,6 +395,12 @@ class Translation(QMainWindow) :
 
     # 鼠标移动事件
     def mouseMoveEvent(self, e: QMouseEvent) :
+
+        # 判断鼠标位置以适配特定位置可拉伸
+        if self.width() - e.x() < 15*self.rate and self.height() - e.y() < 15*self.rate :
+            self.statusbar.show()
+        elif not self.object.config["showStatusbarUse"] :
+            self.statusbar.hide()
 
         if self.lock_sign == True :
             return
