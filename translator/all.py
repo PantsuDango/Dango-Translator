@@ -87,7 +87,7 @@ class Webdriver(QObject) :
                     self.browser_sign = 2
                     self.logger.error(format_exc())
                     self.close()
-                    self.message_sign.emit("翻译模块启动失败, 无法使用公共翻译, 详见公共翻译教程说明")
+                    self.message_sign.emit("公共翻译启动失败, 若需使用公共翻译请下载安装谷歌浏览器后重启翻译器, 若使用私人翻译请忽视此提示")
                     return
 
         self.browser_sign = 1

@@ -352,7 +352,7 @@ class Translater(QThread) :
             ocr_sign, original = translator.ocr.dango.offlineOCR(self.object)
 
         else :
-            original = "OCR错误: 未开启任何OCR, 请在设置-OCR设定中打开OCR开关"
+            original = "OCR错误: 未开启任何OCR, 请在[设置]-[OCR设定]内开启一种OCR, 不同OCR的区别请点击每种OCR对应的说明按钮了解"
             ocr_sign = False
 
         # 记录OCR耗时
@@ -422,7 +422,7 @@ class Translater(QThread) :
         # 显示原文
         if self.object.config["showOriginal"] == "True" or not nothing_sign :
             if not nothing_sign :
-                self.object.translation_ui.original += "\n\n未开启任何翻译源, 无法翻译, 请在设置-翻译源设定-打开要使用的翻译源"
+                self.object.translation_ui.original += "\n\n未开启任何翻译源, 无法翻译, 请在[设置]-[翻译设定]内开启至少一种翻译源, 不同翻译源的区别请点击每种翻译源对应的说明按钮了解"
             utils.thread.createThread(self.creatTranslaterThread, "original")
 
 

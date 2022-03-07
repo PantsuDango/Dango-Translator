@@ -223,7 +223,7 @@ def dangoOCR(object, test=False) :
     res = utils.http.post(url=url, body=body, logger=object.logger, headers=headers, session=object.session)
     # 如果出错就直接结束
     if not res :
-        return False, "团子OCR错误: 错误未知, 请尝试重试, 如果频繁出现此情况请联系团子"
+        return False, "在线OCR错误: 网络超时, 请尝试打开[设置]-[OCR设定]-[在线OCR]右侧切换延迟最低的节点, 切换后重试翻译"
 
     code = res.get("Code", -1)
     message = res.get("Message", "")
@@ -252,7 +252,7 @@ def offlineOCR(object) :
 
     res = utils.http.post(url, body, object.logger)
     if not res :
-        return False, "本地OCR错误: 错误未知, 请尝试重试, 如果频繁出现此情况请联系团子"
+        return False, "本地OCR错误: 本地OCR所使用的端口可能被占用, 请重启电脑以释放端口并重试"
 
     code = res.get("Code", -1)
     message = res.get("Message", "")
