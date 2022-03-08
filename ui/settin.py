@@ -410,7 +410,7 @@ class Settin(QMainWindow) :
         label.setStyleSheet("color: %s" % self.color_2)
 
         # 百度OCR状态开关
-        self.baidu_ocr_switch = ui.switch.SwitchOCR(self.tab_1, self.baidu_ocr_use, startX=(65-20)*self.rate)
+        self.baidu_ocr_switch = ui.switch.BaiduSwitchOCR(self.tab_1, self.baidu_ocr_use, startX=(65-20)*self.rate, object=self.object)
         self.customSetGeometry(self.baidu_ocr_switch, 20, 250, 65, 20)
         self.baidu_ocr_switch.checkedChanged.connect(self.changeBaiduSwitch)
         self.baidu_ocr_switch.setCursor(self.select_pixmap)
@@ -996,7 +996,7 @@ class Settin(QMainWindow) :
         label.setText("贴字翻译:")
 
         # 贴字翻译开关
-        self.draw_image_switch = ui.switch.SwitchOCR(self.tab_3, sign=self.draw_image_use, startX=(65-20)*self.rate)
+        self.draw_image_switch = ui.switch.DrawSwitchOCR(self.tab_3, sign=self.draw_image_use, startX=(65-20)*self.rate, object=self.object)
         self.customSetGeometry(self.draw_image_switch, 95, 220, 65, 20)
         self.draw_image_switch.checkedChanged.connect(self.changeDrawImageSwitch)
         self.draw_image_switch.setCursor(self.select_pixmap)
