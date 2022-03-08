@@ -233,6 +233,12 @@ class OfflineSwitch(QWidget):
                                          "使用期间可以缩小黑窗, 但不可以关闭它")
             return
 
+        if not self.checked and self.object.settin_ui.text_direction_use :
+            MessageBox("竖向翻译开启失败", "检测到已开启竖向翻译, 本地OCR不支持竖向翻译\n"
+                                         "请在[功能设定]里将文字方向开关改为横向, 再开启本地OCR      \n"
+                                         "若想使用竖向翻译, 也可改用其他OCR")
+            return
+
         self.checked = not self.checked
         # 发射信号
         self.checkedChanged.emit(self.checked)
@@ -790,11 +796,11 @@ class SwitchDirection(QWidget):
 
     checkedChanged = pyqtSignal(bool)
 
-    def __init__(self, parent=None, sign=False, startX=45):
+    def __init__(self, parent=None, sign=False, startX=45, object=None):
 
         super(QWidget, self).__init__(parent)
 
-
+        self.object = object
         self.checked = sign
         self.bgColorOff = QColor("#f0f0f0")
 
@@ -849,6 +855,11 @@ class SwitchDirection(QWidget):
 
 
     def mousePressEvent(self, event) :
+
+        if not self.checked and self.object.settin_ui.offline_ocr_use :
+            MessageBox("竖向翻译开启失败", "检测到当前正在使用本地OCR, 本地OCR不支持竖向翻译      \n"
+                                         "请在[OCR设定]中选择其他OCR源再开启竖向翻译")
+            return
 
         self.checked = not self.checked
         # 发射信号

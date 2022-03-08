@@ -1115,7 +1115,7 @@ class Settin(QMainWindow) :
         label.setText("文字方向:")
 
         # 文字方向开关
-        self.text_direction_switch = ui.switch.SwitchDirection(self.tab_4, sign=self.text_direction_use, startX=(65-20)*self.rate)
+        self.text_direction_switch = ui.switch.SwitchDirection(self.tab_4, sign=self.text_direction_use, startX=(65-20)*self.rate, object=self.object)
         self.customSetGeometry(self.text_direction_switch, 95, 70, 65, 20)
         self.text_direction_switch.checkedChanged.connect(self.changeTextDirectionSwitch)
         self.text_direction_switch.setCursor(self.select_pixmap)
