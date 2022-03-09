@@ -49,5 +49,5 @@ def updatePilFile(yaml, logger) :
 
     if not os.path.exists(PIL_FILE_PATH) :
         url = yaml["dict_info"]["pil_file_url"]
-        utils.http.downloadFile(url, PIL_FILE_PATH, logger)
-        sys.exit()
+        if not utils.http.downloadFile(url, PIL_FILE_PATH, logger) :
+            sys.exit()

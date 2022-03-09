@@ -523,13 +523,13 @@ class Translation(QMainWindow) :
             self.translate_text.append("欢迎你 ~ %s 么么哒 ~" % self.user)
             self.format.setTextOutline(QPen(QColor(self.font_color_2), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
             self.translate_text.mergeCurrentCharFormat(self.format)
-            self.translate_text.append("b站关注 团子翻译器 查看动态可了解翻译器最新情况 ~")
+            self.translate_text.append("b站关注[团子翻译器]查看动态可了解翻译器最新情况 ~")
             self.format.setTextOutline(QPen(QColor(self.font_color_1), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
             self.translate_text.mergeCurrentCharFormat(self.format)
             self.translate_text.append("团子一个人开发不易，这个软件真的花了很大很大的精力 _(:з」∠)_")
             self.format.setTextOutline(QPen(QColor(self.font_color_2), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
             self.translate_text.mergeCurrentCharFormat(self.format)
-            self.translate_text.append("喜欢的话能不能点击上方的电池图标支持一下团子，真心感谢你❤")
+            self.translate_text.append("喜欢的话能不能在b站给团子一个关注，团子会很开心的~真心感谢你❤")
 
 
 

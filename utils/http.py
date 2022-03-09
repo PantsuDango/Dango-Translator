@@ -75,6 +75,7 @@ def downloadFile(url, save_path, logger) :
         return True
     except Exception :
         logger.error(format_exc())
+        return True
 
 
 # 发送get请求
