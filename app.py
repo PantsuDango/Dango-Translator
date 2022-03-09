@@ -149,6 +149,8 @@ class DangoTranslator() :
     # 主函数
     def main(self) :
 
+        # 更新贴字翻译所需的pil运行库
+        utils.update.updatePilFile(self.yaml, self.logger)
         # 自适应高分辨率
         QCoreApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
         app = QApplication(sys.argv)
