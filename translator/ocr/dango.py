@@ -2,6 +2,7 @@ from PIL import Image
 import base64
 import os
 import re
+from traceback import format_exc
 
 import utils.http
 import utils.range
@@ -246,10 +247,17 @@ def dangoOCR(object, test=False) :
 # 本地OCR
 def offlineOCR(object) :
 
+    image_path = os.path.join(os.getcwd(), "config", "image.jpg")
+    try :
+        # 四周加白边
+        imageBorder(image_path, image_path, "a", 10, color=(255, 255, 255))
+    except Exception :
+        object.logger.error(format_exc())
+
     url = "http://127.0.0.1:6666/ocr/api"
     language = object.config["language"]
     body = {
-        "ImagePath": os.path.join(os.getcwd(), "config", "image.jpg"),
+        "ImagePath": image_path,
         "Language": language
     }
 
@@ -262,6 +270,23 @@ def offlineOCR(object) :
     ocr_result = res.get("Data", [])
 
     if code == 0 :
+        if object.config["drawImageUse"] :
+            # 去掉白边
+            image = Image.open(image_path)
+            coordinate = (10, 10, image.width - 10, image.height - 10)
+            region = image.crop(coordinate)
+            region.save(image_path)
+            # 裁剪后复位坐标参数
+            for index, val in enumerate(ocr_result) :
+                UpperLeft = val["Coordinate"]["UpperLeft"]
+                UpperRight = val["Coordinate"]["UpperRight"]
+                LowerRight = val["Coordinate"]["LowerRight"]
+                LowerLeft = val["Coordinate"]["LowerLeft"]
+                ocr_result[index]["Coordinate"]["UpperLeft"] = [UpperLeft[0]-10, UpperLeft[1]-10]
+                ocr_result[index]["Coordinate"]["UpperRight"] = [UpperRight[0]-10, UpperRight[1]-10]
+                ocr_result[index]["Coordinate"]["LowerRight"] = [LowerRight[0]-10, LowerRight[1]-10]
+                ocr_result[index]["Coordinate"]["LowerLeft"] = [LowerLeft[0]-10, LowerLeft[1]-10]
+
         if language == "Vertical_JAP" :
             content, ocr_result = resultSortMD(ocr_result, language)
         else :

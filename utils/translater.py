@@ -59,8 +59,6 @@ class TranslaterProcess(QThread) :
             else :
                 return (255, 255, 255)
         except Exception :
-            import traceback
-            traceback.print_exc()
             return (255, 255, 255)
 
 
