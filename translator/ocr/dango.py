@@ -271,21 +271,24 @@ def offlineOCR(object) :
 
     if code == 0 :
         if object.config["drawImageUse"] :
-            # 去掉白边
-            image = Image.open(image_path)
-            coordinate = (10, 10, image.width - 10, image.height - 10)
-            region = image.crop(coordinate)
-            region.save(image_path)
-            # 裁剪后复位坐标参数
-            for index, val in enumerate(ocr_result) :
-                UpperLeft = val["Coordinate"]["UpperLeft"]
-                UpperRight = val["Coordinate"]["UpperRight"]
-                LowerRight = val["Coordinate"]["LowerRight"]
-                LowerLeft = val["Coordinate"]["LowerLeft"]
-                ocr_result[index]["Coordinate"]["UpperLeft"] = [UpperLeft[0]-10, UpperLeft[1]-10]
-                ocr_result[index]["Coordinate"]["UpperRight"] = [UpperRight[0]-10, UpperRight[1]-10]
-                ocr_result[index]["Coordinate"]["LowerRight"] = [LowerRight[0]-10, LowerRight[1]-10]
-                ocr_result[index]["Coordinate"]["LowerLeft"] = [LowerLeft[0]-10, LowerLeft[1]-10]
+            try :
+                # 去掉白边
+                image = Image.open(image_path)
+                coordinate = (10, 10, image.width - 10, image.height - 10)
+                region = image.crop(coordinate)
+                region.save(image_path)
+                # 裁剪后复位坐标参数
+                for index, val in enumerate(ocr_result) :
+                    UpperLeft = val["Coordinate"]["UpperLeft"]
+                    UpperRight = val["Coordinate"]["UpperRight"]
+                    LowerRight = val["Coordinate"]["LowerRight"]
+                    LowerLeft = val["Coordinate"]["LowerLeft"]
+                    ocr_result[index]["Coordinate"]["UpperLeft"] = [UpperLeft[0]-10, UpperLeft[1]-10]
+                    ocr_result[index]["Coordinate"]["UpperRight"] = [UpperRight[0]-10, UpperRight[1]-10]
+                    ocr_result[index]["Coordinate"]["LowerRight"] = [LowerRight[0]-10, LowerRight[1]-10]
+                    ocr_result[index]["Coordinate"]["LowerLeft"] = [LowerLeft[0]-10, LowerLeft[1]-10]
+            except Exception :
+                object.logger.error(message)
 
         if language == "Vertical_JAP" :
             content, ocr_result = resultSortMD(ocr_result, language)
