@@ -1,6 +1,5 @@
 import requests
 import json
-import re
 import time
 from traceback import format_exc
 

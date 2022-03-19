@@ -206,11 +206,18 @@ def dangoOCR(object, test=False) :
     if language == "JAP" and showTranslateRow == "True":
         language = "Vertical_JAP"
     if test :
-        path = TEST_IMAGE_PATH
+        image_path = TEST_IMAGE_PATH
+        language = "JAP"
     else :
-        path = IMAGE_PATH
+        image_path = IMAGE_PATH
 
-    with open(path, "rb") as file :
+    try :
+        # 四周加白边
+        imageBorder(image_path, image_path, "a", 10, color=(255, 255, 255))
+    except Exception :
+        object.logger.error(format_exc())
+
+    with open(image_path, "rb") as file :
         image = file.read()
     imageBase64 = base64.b64encode(image).decode("utf-8")
 
@@ -230,6 +237,25 @@ def dangoOCR(object, test=False) :
     message = res.get("Message", "")
     ocr_result = res.get("Data", [])
     if code == 0 :
+        if object.config["drawImageUse"] :
+            try :
+                # 去掉白边
+                image = Image.open(image_path)
+                coordinate = (10, 10, image.width - 10, image.height - 10)
+                region = image.crop(coordinate)
+                region.save(image_path)
+                # 裁剪后复位坐标参数
+                for index, val in enumerate(ocr_result) :
+                    UpperLeft = val["Coordinate"]["UpperLeft"]
+                    UpperRight = val["Coordinate"]["UpperRight"]
+                    LowerRight = val["Coordinate"]["LowerRight"]
+                    LowerLeft = val["Coordinate"]["LowerLeft"]
+                    ocr_result[index]["Coordinate"]["UpperLeft"] = [UpperLeft[0]-10, UpperLeft[1]-10]
+                    ocr_result[index]["Coordinate"]["UpperRight"] = [UpperRight[0]-10, UpperRight[1]-10]
+                    ocr_result[index]["Coordinate"]["LowerRight"] = [LowerRight[0]-10, LowerRight[1]-10]
+                    ocr_result[index]["Coordinate"]["LowerLeft"] = [LowerLeft[0]-10, LowerLeft[1]-10]
+            except Exception :
+                object.logger.error(message)
         if language == "Vertical_JAP" :
             content, ocr_result = resultSortMD(ocr_result, language)
         else :
