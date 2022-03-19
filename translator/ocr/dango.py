@@ -221,7 +221,7 @@ def dangoOCR(object, test=False) :
         "Verify": "Token",
         "Token": token
     }
-    res = utils.http.post(url=url, body=body, logger=object.logger, headers=headers, session=object.session)
+    res = utils.http.post(url=url, body=body, logger=object.logger, headers=headers)
     # 如果出错就直接结束
     if not res :
         return False, "在线OCR错误: 网络超时, 请尝试在[设置]-[OCR设定]-[在线OCR]右侧切换延迟最低的节点, 切换后重试翻译"

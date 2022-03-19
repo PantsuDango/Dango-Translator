@@ -6,7 +6,6 @@ import qtawesome
 import os
 import time
 import pyperclip
-import requests
 
 import utils.config
 import utils.range
@@ -352,8 +351,6 @@ class Translation(QMainWindow) :
         self.thread_state = 0
         # 自动翻译线程存在标志
         self.auto_trans_exist = False
-        # 长连接对象, 用于在线OCR
-        self.object.session = requests.Session()
         # 按键转换映射关系
         hotkey_map = {
             "ctrl": "control",
