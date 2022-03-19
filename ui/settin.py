@@ -1532,7 +1532,7 @@ class Settin(QMainWindow) :
         label = QLabel(self.tab_6)
         self.customSetGeometry(label, 30, 20, 400, 145)
         label.setText("<html><head/><body><p>你好呀, 这里是胖次团子 ❤\
-                       </p><p>不知不觉软件已经更新到Ver%s了, 这是团子最自豪的版本!\
+                       </p><p>不知不觉软件已经更新到Ver%s了, 谢谢下载使用~!\
                        </p><p>然后感谢你也成为团子用户的一员 ~\
                        </p><p>软件是免费的, 希望你没有被第三方渠道坑到 ~\
                        </p><p>欢迎你的投喂 ~ 团子会非常开心的! \
