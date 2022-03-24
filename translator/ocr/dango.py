@@ -85,10 +85,11 @@ def resultSortTD(ocr_result, language) :
             text += val["Words"]
             filter_words_list.append(val)
 
+        # 获取字宽
+        word_width = val["Coordinate"]["LowerRight"][1] - val["Coordinate"]["UpperRight"][1]
         if language == "ENG":
             word_width = val["Coordinate"]["LowerRight"][1] - val["Coordinate"]["UpperRight"][1] + 3
-        else :
-            word_width = val["Coordinate"]["LowerRight"][1] - val["Coordinate"]["UpperRight"][1] - 3
+
         new_words_list.append({
             "Coordinate": {
                 "UpperLeft": [x1, y1],
@@ -203,6 +204,7 @@ def dangoOCR(object, test=False) :
     url = object.config["nodeURL"]
     language = object.config["language"]
     showTranslateRow = object.config["showTranslateRow"]
+    branchLineUse = object.config["BranchLineUse"]
     if language == "JAP" and showTranslateRow == "True":
         language = "Vertical_JAP"
     if test :
@@ -237,6 +239,7 @@ def dangoOCR(object, test=False) :
     message = res.get("Message", "")
     ocr_result = res.get("Data", [])
     if code == 0 :
+        # 如果开启了贴字翻译就去掉白边
         if object.config["drawImageUse"] :
             try :
                 # 去掉白边
@@ -256,11 +259,42 @@ def dangoOCR(object, test=False) :
                     ocr_result[index]["Coordinate"]["LowerLeft"] = [LowerLeft[0]-10, LowerLeft[1]-10]
             except Exception :
                 object.logger.error(message)
+
+        content = ""
+        # 竖向翻译
         if language == "Vertical_JAP" :
             content, ocr_result = resultSortMD(ocr_result, language)
+            if object.config["drawImageUse"] :
+                object.ocr_result = ocr_result
+
+        # 横向翻译
         else :
-            content, ocr_result = resultSortTD(ocr_result, language)
-        object.ocr_result = ocr_result
+            # 贴字翻译采用文本聚类
+            if object.config["drawImageUse"] :
+                # 开启了自动换行
+                if branchLineUse :
+                    for index, val in enumerate(ocr_result) :
+                        # 获取字宽
+                        word_width = val["Coordinate"]["LowerRight"][1] - val["Coordinate"]["UpperRight"][1]
+                        if language == "ENG":
+                            word_width += 3
+                        ocr_result[index]["WordWidth"] = int(word_width)
+                        # 自动换行
+                        if val != ocr_result[-1] :
+                            content += val["Words"] + "\n"
+                        else :
+                            content += val["Words"]
+                else :
+                    content, ocr_result = resultSortTD(ocr_result, language)
+                object.ocr_result = ocr_result
+            # 普通翻译文字直接拼接
+            else :
+                for val in ocr_result :
+                    # 开启了自动换行
+                    if branchLineUse and val != ocr_result[-1] :
+                        content += val["Words"] + "\n"
+                    else :
+                        content += val["Words"]
         return True, content
     else :
         if code == -3 :

@@ -49,7 +49,7 @@ class Webdriver(QObject) :
         try:
             # 使用谷歌浏览器
             option = webdriver.ChromeOptions()
-            option.add_argument("--headless")
+            #option.add_argument("--headless")
             self.browser = webdriver.Chrome(executable_path="./config/tools/chromedriver.exe",
                                             service_log_path="nul",
                                             options=option)
@@ -344,8 +344,6 @@ class Webdriver(QObject) :
     # 彩云翻译
     def caiyun(self, content) :
 
-        # 彩云翻译不能识别换行符
-        content = content.replace("\n", "  ")
         try :
             # 清空翻译框
             if self.content :
@@ -360,7 +358,7 @@ class Webdriver(QObject) :
                 # 提取翻译信息
                 try :
                     # 提取翻译信息
-                    text = self.browser.find_element_by_xpath('//*[@id="texttarget"]/p/span').text
+                    text = self.browser.find_element_by_xpath('//*[@id="texttarget"]').text
                     if text :
                         self.content = text
                         return self.content
@@ -384,7 +382,7 @@ class Webdriver(QObject) :
             if self.content :
                 self.browserClickTimeout('/html[1]/body[1]/c-wiz[1]/div[1]/div[2]/c-wiz[1]/div[2]/c-wiz[1]/div[1]/div[2]/div[2]/c-wiz[1]/div[1]/div[1]/div[1]/span[1]/button[1]/div[2]')
             # 输入要翻译的文本
-            self.browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[2]/div[2]/c-wiz[1]/span/span/div/textarea').send_keys(content)
+            self.browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[2]/div[3]/c-wiz[1]/span/span/div/textarea').send_keys(content)
 
             start = time.time()
             while True :
@@ -396,9 +394,8 @@ class Webdriver(QObject) :
                         self.browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[2]/div[2]/c-wiz[2]/div[4]/div[2]/button/span').click()
                     except Exception :
                         pass
-                    text = self.browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[2]/div[2]/c-wiz[2]/div[5]/div/div[1]').text
+                    text = self.browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[2]/div[3]/c-wiz[2]/div[6]/div/div[1]').text
                     if text :
-                        text = text.replace("\n", "")
                         self.content = text
                         return self.content
                 except Exception :

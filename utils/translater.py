@@ -116,7 +116,8 @@ class TranslaterProcess(QThread) :
     # 横排-气泡框抠字
     def drawRectTD(self, ocr_result, words):
 
-        for index, word in enumerate(words.split("\n")):
+        for index, word in enumerate(words.split("\n")) :
+            print(word)
             ocr_result[index]["Words"] = word
 
         image = Image.open(IMAGE_PATH)
@@ -208,6 +209,7 @@ class TranslaterProcess(QThread) :
                 continue
             result = result.replace(val[0], val[1])
 
+        result = result.strip()
         self.display_signal.emit(result, self.trans_type)
 
         # 翻译结果帖字
