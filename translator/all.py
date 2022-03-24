@@ -49,7 +49,7 @@ class Webdriver(QObject) :
         try:
             # 使用谷歌浏览器
             option = webdriver.ChromeOptions()
-            #option.add_argument("--headless")
+            option.add_argument("--headless")
             self.browser = webdriver.Chrome(executable_path="./config/tools/chromedriver.exe",
                                             service_log_path="nul",
                                             options=option)
@@ -122,8 +122,6 @@ class Webdriver(QObject) :
             self.open_sign = True
             self.transInit(web_type)
         except Exception :
-            import traceback
-            traceback.print_exc()
             self.logger.error(format_exc())
 
         open_sign_list = [
@@ -293,7 +291,7 @@ class Webdriver(QObject) :
                 time.sleep(0.1)
                 # 提取翻译信息
                 try :
-                    text = self.browser.find_element_by_xpath('//*[@id="main-outer"]/div/div/div[1]/div[2]/div[1]/div[2]/div/div/div[1]/p[2]').text
+                    text = self.browser.find_element_by_xpath('//*[@id="main-outer"]/div/div/div[1]/div[2]/div[1]/div[2]/div/div/div[1]').text
                     if text :
                         self.content = text
                         return self.content
@@ -327,7 +325,7 @@ class Webdriver(QObject) :
                 try :
                     text = self.browser.find_element_by_xpath('/html/body/div[2]/div[2]/div[2]/div[2]/div[2]').text
                     if text :
-                        self.content = text.replace("\n", "")
+                        self.content = text.replace("\n\n", "")
                         return self.content
                 except Exception :
                     pass

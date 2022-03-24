@@ -65,7 +65,7 @@ class TranslaterProcess(QThread) :
     # 竖排-气泡框抠字
     def drawRectMD(self, ocr_result, words) :
 
-        for index, word in enumerate(words.split("\n")) :
+        for index, word in enumerate(words.split("\n")[:len(ocr_result)]) :
             ocr_result[index]["Words"] = word
 
         image = Image.open(IMAGE_PATH)
@@ -116,8 +116,7 @@ class TranslaterProcess(QThread) :
     # 横排-气泡框抠字
     def drawRectTD(self, ocr_result, words):
 
-        for index, word in enumerate(words.split("\n")) :
-            print(word)
+        for index, word in enumerate(words.split("\n")[:len(ocr_result)]) :
             ocr_result[index]["Words"] = word
 
         image = Image.open(IMAGE_PATH)
