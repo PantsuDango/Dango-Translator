@@ -33,7 +33,7 @@ class SendEmail(QThread) :
             self.url = "https://dango.c4a15wh.cn/DangoTranslate/SendEmail"
             res = utils.http.post(self.url, body, self.logger, timeout=10)
         result = res.get("Status", "")
-        error = res.get("Message", "")
+        error = res.get("Error", "")
         if result != "Success" :
             self.logger.error(error)
             self.signal.emit(False, error)

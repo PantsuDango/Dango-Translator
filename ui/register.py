@@ -447,7 +447,7 @@ class Register(QWidget) :
         # 请求服务器
         res = utils.http.post(url, body, self.logger)
         result = res.get("Status", "")
-        message = res.get("Message", "")
+        message = res.get("Error", "")
 
         if result == "Success" :
             utils.message.MessageBox("修改成功",
@@ -515,7 +515,7 @@ class Register(QWidget) :
         # 请求服务器
         res = utils.http.post(url, body, self.logger)
         result = res.get("Status", "")
-        message = res.get("Message", "")
+        message = res.get("Error", "")
         if result == "Success" :
             utils.message.MessageBox("绑定成功",
                                      "你已经成功绑定邮箱啦~     ")
