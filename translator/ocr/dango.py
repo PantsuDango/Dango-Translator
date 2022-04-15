@@ -200,7 +200,6 @@ def resultSortMD(ocr_result, language) :
 def dangoOCR(object, test=False) :
 
     token = object.config["DangoToken"]
-    host = re.findall(r"//(.+?)/", object.yaml["dict_info"]["ocr_server"])[0]
     url = object.config["nodeURL"]
     language = object.config["language"]
     showTranslateRow = object.config["showTranslateRow"]
@@ -223,13 +222,18 @@ def dangoOCR(object, test=False) :
         image = file.read()
     imageBase64 = base64.b64encode(image).decode("utf-8")
 
-    headers = {"Host": host}
+    headers = {}
+    host = object.yaml["dict_info"].get("ocr_host", "")
+    if url != object.yaml["dict_info"]["ocr_server"] and host :
+        headers["Host"] = host
+
     body = {
         "ImageB64": imageBase64,
         "Language": language,
         "Verify": "Token",
         "Token": token
     }
+
     res = utils.http.post(url=url, body=body, logger=object.logger, headers=headers)
     # 如果出错就直接结束
     if not res :
