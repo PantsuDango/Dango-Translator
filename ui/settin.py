@@ -1744,6 +1744,8 @@ class Settin(QMainWindow) :
             if self.node_info[node_name] == node_ip :
                 self.node_info_comboBox.setCurrentText(text)
 
+        if not self.node_info.keys() :
+            self.object.config["nodeURL"] = self.object.yaml["dict_info"]["ocr_server"]
         self.node_info_comboBox.currentIndexChanged.connect(self.changeNodeInfo)
 
 
