@@ -8,6 +8,7 @@ import utils.thread
 
 PIXMAP_PATH = "./config/icon/pixmap.png"
 PIXMAP2_PATH = "./config/icon/pixmap2.png"
+DRAW_PATH = "./config/draw.jpg"
 
 
 # 选择范围
@@ -134,6 +135,7 @@ class Range(QMainWindow) :
         self.color = "#1E90FF"
         self.font_size = 12
         self.show_sign = False
+        self.object.show_range_ui_sign = False
         self.ui()
 
 
@@ -183,9 +185,12 @@ class Range(QMainWindow) :
         self.font.setFamily(self.font_type)
         self.font.setPointSize(self.font_size)
 
+        # 显示翻译结果
+        self.draw_label = QLabel(self)
+
         # 隐藏按钮
         self.hide_button = QPushButton(self)
-        self.hide_button.setGeometry(QRect(int(X2-X1-40*self.rate), 0, int(40 * self.rate), int(30 * self.rate)))
+        self.hide_button.setGeometry(QRect(int(X2-X1-40*self.rate), 0, int(40*self.rate), int(30*self.rate)))
         self.hide_button.setStyleSheet("background-color:rgba(62, 62, 62, 0.3);"
                                        "color: %s;"%self.color)
         self.hide_button.setFont(self.font)
@@ -271,6 +276,49 @@ class Range(QMainWindow) :
         # 如果是自动模式下, 则解除暂停
         if self.object.translation_ui.translate_mode :
             self.object.translation_ui.stop_sign = False
+
+
+    # 将翻译结果显示在原图上
+    def drawImage(self) :
+
+        rect = self.geometry()
+        self.draw_label.setGeometry(0, 0, rect.width(), rect.height())
+        gif = QMovie(DRAW_PATH)
+        self.draw_label.setMovie(gif)
+        self.draw_label.setScaledContents(True)
+        gif.start()
+        self.object.range_ui.draw_label.show()
+        self.show()
+
+
+    # 接收隐藏窗体信号
+    def hideUI(self, sign) :
+
+        if sign :
+            self.show()
+        else :
+            self.hide()
+
+
+    # 隐藏/显示窗体信号
+    def hideRangeUI(self) :
+
+        if self.object.show_range_ui_sign :
+            self.hide()
+        else :
+            self.show()
+
+
+    # 窗口隐藏信号
+    def hideEvent(self, e):
+
+        self.object.show_range_ui_sign = False
+
+
+    # 窗口显示信号
+    def showEvent(self, e):
+
+        self.object.show_range_ui_sign = True
 
 
     def quit(self) :

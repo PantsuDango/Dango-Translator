@@ -5,12 +5,14 @@ from traceback import format_exc
 import qtawesome
 import webbrowser
 import os
+import re
 
 import utils.thread
 import utils.config
 import utils.message
 import utils.port
 import utils.test
+import utils.http
 
 from ui import image
 import ui.hotkey
@@ -372,6 +374,14 @@ class Settin(QMainWindow) :
         button.clicked.connect(self.openOnlineOCRTutorials)
         button.setCursor(self.select_pixmap)
 
+        # 节点下拉框
+        self.node_info_comboBox = QComboBox(self.tab_1)
+        self.customSetGeometry(self.node_info_comboBox, 345, 155, 150, 20)
+        self.node_info_comboBox.setStyleSheet("QComboBox{color: %s}"%self.color_2)
+        self.node_info_comboBox.setCursor(self.select_pixmap)
+        # 获取节点信息
+        utils.thread.createThread(self.getNodeInfo)
+
         # 百度OCR标签
         label = QLabel(self.tab_1)
         self.customSetGeometry(label, 20, 215, 60, 20)
@@ -400,7 +410,7 @@ class Settin(QMainWindow) :
         label.setStyleSheet("color: %s" % self.color_2)
 
         # 百度OCR状态开关
-        self.baidu_ocr_switch = ui.switch.SwitchOCR(self.tab_1, self.baidu_ocr_use, startX=(65-20)*self.rate)
+        self.baidu_ocr_switch = ui.switch.BaiduSwitchOCR(self.tab_1, self.baidu_ocr_use, startX=(65-20)*self.rate, object=self.object)
         self.customSetGeometry(self.baidu_ocr_switch, 20, 250, 65, 20)
         self.baidu_ocr_switch.checkedChanged.connect(self.changeBaiduSwitch)
         self.baidu_ocr_switch.setCursor(self.select_pixmap)
@@ -440,7 +450,7 @@ class Settin(QMainWindow) :
         self.language_comboBox.setItemText(0, "日语（Japanese）")
         self.language_comboBox.setItemText(1, "英语（English）")
         self.language_comboBox.setItemText(2, "韩语（Korean）")
-        self.language_comboBox.setStyleSheet("background: rgba(255, 255, 255, 1);")
+        self.language_comboBox.setStyleSheet("QComboBox{color: %s}"%self.color_2)
         self.language_comboBox.setCursor(self.select_pixmap)
         if self.object.config["language"] == "ENG":
             self.language_comboBox.setCurrentIndex(1)
@@ -868,6 +878,7 @@ class Settin(QMainWindow) :
         self.comboBox_font = QFont(self.font_type)
         self.font_comboBox.setCurrentFont(self.comboBox_font)
         self.font_comboBox.setCursor(self.select_pixmap)
+        self.font_comboBox.setStyleSheet("QComboBox{color: %s}" % self.color_2)
 
         # 字体样式设定标签
         label = QLabel(self.tab_3)
@@ -928,7 +939,7 @@ class Settin(QMainWindow) :
         self.customSetGeometry(label, 20, 170, 60, 20)
         label.setText("翻译时间:")
 
-        # 显示消息栏
+        # 显示消息栏开关
         self.show_statusbar_switch = ui.switch.ShowSwitch(self.tab_3, sign=self.show_statusbar_use, startX=(65-20)*self.rate)
         self.customSetGeometry(self.show_statusbar_switch, 95, 170, 65, 20)
         self.show_statusbar_switch.checkedChanged.connect(self.changeShowStatusbarSwitch)
@@ -978,6 +989,52 @@ class Settin(QMainWindow) :
         button.setStyleSheet("background: transparent;")
         button.clicked.connect(lambda: self.showDesc("originalColor"))
         button.setCursor(self.question_pixmap)
+
+        # 贴字翻译标签
+        label = QLabel(self.tab_3)
+        self.customSetGeometry(label, 20, 220, 60, 20)
+        label.setText("贴字翻译:")
+
+        # 贴字翻译开关
+        self.draw_image_switch = ui.switch.DrawSwitchOCR(self.tab_3, sign=self.draw_image_use, startX=(65-20)*self.rate, object=self.object)
+        self.customSetGeometry(self.draw_image_switch, 95, 220, 65, 20)
+        self.draw_image_switch.checkedChanged.connect(self.changeDrawImageSwitch)
+        self.draw_image_switch.setCursor(self.select_pixmap)
+
+        # 贴字翻译说明标签
+        button = QPushButton(self.tab_3)
+        self.customSetGeometry(button, 175, 220, 25, 20)
+        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;" % self.color_2)
+        button.setText("说明")
+        button.clicked.connect(lambda: self.showDesc("drawImage"))
+        button.setCursor(self.question_pixmap)
+
+        # 贴字翻译说明?号图标
+        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_3)
+        self.customSetIconSize(button, 20, 20)
+        self.customSetGeometry(button, 200, 220, 20, 20)
+        button.setStyleSheet("background: transparent;")
+        button.clicked.connect(lambda: self.showDesc("drawImage"))
+        button.setCursor(self.question_pixmap)
+
+        # 隐藏范围快捷键标签
+        label = QLabel(self.tab_3)
+        self.customSetGeometry(label, 275, 220, 100, 20)
+        label.setText("隐藏范围热键:")
+
+        # 隐藏快捷键开关
+        self.hide_range_hotkey_switch = ui.switch.SwitchOCR(self.tab_3, sign=self.hide_range_hotkey_use,
+                                                             startX=(65-20) * self.rate)
+        self.customSetGeometry(self.hide_range_hotkey_switch, 380, 220, 65, 20)
+        self.hide_range_hotkey_switch.checkedChanged.connect(self.changeHideRangeHotkeySwitch)
+        self.hide_range_hotkey_switch.setCursor(self.select_pixmap)
+
+        # 隐藏快捷键设定按钮
+        self.hide_range_hotkey_button = QPushButton(self.tab_3)
+        self.customSetGeometry(self.hide_range_hotkey_button, 460, 220, 60, 20)
+        self.hide_range_hotkey_button.setText(self.object.config["hideRangeHotkeyValue1"] + "+" + self.object.config["hideRangeHotkeyValue2"])
+        self.hide_range_hotkey_button.clicked.connect(lambda: self.setHotKey("hideRange"))
+        self.hide_range_hotkey_button.setCursor(self.select_pixmap)
 
 
     # 功能设定标签页
@@ -1058,7 +1115,7 @@ class Settin(QMainWindow) :
         label.setText("文字方向:")
 
         # 文字方向开关
-        self.text_direction_switch = ui.switch.SwitchDirection(self.tab_4, sign=self.text_direction_use, startX=(65-20)*self.rate)
+        self.text_direction_switch = ui.switch.SwitchDirection(self.tab_4, sign=self.text_direction_use, startX=(65-20)*self.rate, object=self.object)
         self.customSetGeometry(self.text_direction_switch, 95, 70, 65, 20)
         self.text_direction_switch.checkedChanged.connect(self.changeTextDirectionSwitch)
         self.text_direction_switch.setCursor(self.select_pixmap)
@@ -1204,6 +1261,32 @@ class Settin(QMainWindow) :
         button.setStyleSheet("background: transparent;")
         button.clicked.connect(lambda: self.showDesc("textRefresh"))
         button.setCursor(self.question_pixmap)
+
+        # 自动登录标签
+        label = QLabel(self.tab_4)
+        self.customSetGeometry(label, 20, 220, 80, 20)
+        label.setText("自动登录:")
+
+        # 自动登录开关
+        self.auto_login_switch = ui.switch.SwitchOCR(self.tab_4,
+                                                     sign=self.auto_login_use,
+                                                     startX=(65-20) * self.rate)
+        self.customSetGeometry(self.auto_login_switch, 95, 220, 65, 20)
+        self.auto_login_switch.checkedChanged.connect(self.changeAutoLoginSwitch)
+        self.auto_login_switch.setCursor(self.select_pixmap)
+
+        # 百度OCR高精度模式备注
+        label = QLabel(self.tab_4)
+        self.customSetGeometry(label, 275, 220, 150, 20)
+        label.setText("百度OCR高精度:")
+
+        # 百度OCR高精度模式开关
+        self.baidu_ocr_high_precision_switch = ui.switch.SwitchOCR(self.tab_4,
+                                                                   self.baidu_ocr_high_precision_use,
+                                                                   startX=(65-20) * self.rate)
+        self.customSetGeometry(self.baidu_ocr_high_precision_switch, 390, 220, 65, 20)
+        self.baidu_ocr_high_precision_switch.checkedChanged.connect(self.changeBaiduOcrHighPrecisionSwitch)
+        self.baidu_ocr_high_precision_switch.setCursor(self.select_pixmap)
 
 
     # 关于标签页
@@ -1449,7 +1532,7 @@ class Settin(QMainWindow) :
         label = QLabel(self.tab_6)
         self.customSetGeometry(label, 30, 20, 400, 145)
         label.setText("<html><head/><body><p>你好呀, 这里是胖次团子 ❤\
-                       </p><p>不知不觉软件已经更新到Ver%s了, 这是团子最自豪的版本!\
+                       </p><p>不知不觉软件已经更新到Ver%s了, 谢谢下载使用~!\
                        </p><p>然后感谢你也成为团子用户的一员 ~\
                        </p><p>软件是免费的, 希望你没有被第三方渠道坑到 ~\
                        </p><p>欢迎你的投喂 ~ 团子会非常开心的! \
@@ -1498,6 +1581,7 @@ class Settin(QMainWindow) :
         self.offline_ocr_use = self.object.config["offlineOCR"]
         self.online_ocr_use = self.object.config["onlineOCR"]
         self.baidu_ocr_use = self.object.config["baiduOCR"]
+        self.baidu_ocr_high_precision_use = self.object.config["OCR"]["highPrecision"]
 
         # 公共有道翻译开关
         self.youdao_use = eval(self.object.config["youdaoUse"])
@@ -1579,6 +1663,8 @@ class Settin(QMainWindow) :
         self.translate_hotkey_use = eval(self.object.config["showHotKey1"])
         # 范围快捷键开关
         self.range_hotkey_use = eval(self.object.config["showHotKey2"])
+        # 自动登录开关
+        self.auto_login_use = self.object.yaml["auto_login"]
         # 自动翻译图片刷新相似度
         self.image_refresh_score = self.object.config["imageSimilarity"]
         # 自动翻译文字刷新相似度
@@ -1602,6 +1688,65 @@ class Settin(QMainWindow) :
         self.bilibili_video_url = self.object.yaml["dict_info"]["bilibili_video"]
         # 显示消息栏
         self.show_statusbar_use = self.object.config["showStatusbarUse"]
+        # 贴字翻译开关
+        self.draw_image_use = self.object.config["drawImageUse"]
+        # 隐藏范围快捷键开关
+        self.hide_range_hotkey_use = self.object.config["showHotKey3"]
+
+
+    # 获取节点信息
+    def getNodeInfo(self) :
+
+        # 重置
+        self.node_info_comboBox.clear()
+        # 展开全部节点信息
+        self.node_info = eval(self.object.yaml["dict_info"]["ocr_node"])
+        self.node_info_comboBox.setMaxVisibleItems(len(self.node_info)+1)
+
+        # 自动模式
+        url = self.object.yaml["dict_info"]["ocr_server"]
+        sign, time_diff = utils.http.getOCR(url)
+        model = self.node_info_comboBox.model()
+        if sign :
+            entry = QStandardItem("自动模式  {}ms".format(time_diff))
+            entry.setForeground(QColor(Qt.green))
+        else :
+            entry = QStandardItem("自动模式  不可用")
+            entry.setForeground(QColor(Qt.red))
+        model.appendRow(entry)
+        # 默认选中
+        self.node_info_comboBox.setCurrentIndex(0)
+
+        # 手动节点
+        try:
+            if type(self.node_info) != dict:
+                self.node_info = {}
+        except Exception:
+            self.node_info = {}
+
+        node_ip = re.findall(r"//(.+?)/", self.object.config["nodeURL"])[0]
+        for node_name in self.node_info.keys() :
+            url = re.sub(r"//.+?/", "//%s/"%self.node_info[node_name], url)
+            # 校验节点有效性
+            sign, time_diff = utils.http.getOCR(url)
+            model = self.node_info_comboBox.model()
+
+            if sign :
+                text = "{}  {}ms".format(node_name, time_diff)
+                entry = QStandardItem(text)
+                entry.setForeground(QColor(Qt.green))
+            else :
+                text = "{}  不可用".format(node_name)
+                entry = QStandardItem(text)
+                entry.setForeground(QColor(Qt.red))
+            model.appendRow(entry)
+
+            if self.node_info[node_name] == node_ip :
+                self.node_info_comboBox.setCurrentText(text)
+
+        if not self.node_info.keys() :
+            self.object.config["nodeURL"] = self.object.yaml["dict_info"]["ocr_server"]
+        self.node_info_comboBox.currentIndexChanged.connect(self.changeNodeInfo)
 
 
     # 根据分辨率定义控件位置尺寸
@@ -1627,6 +1772,12 @@ class Settin(QMainWindow) :
         shadow.setBlurRadius(50)
         shadow.setColor(color)
         object.setGraphicsEffect(shadow)
+
+
+    # 在线OCR选择节点
+    def chooseOcrNode(self) :
+
+        self.choose_ocr_node_ui.show()
 
 
     # 改变本地OCR开关状态
@@ -1666,6 +1817,15 @@ class Settin(QMainWindow) :
             self.baidu_ocr_use = True
         else :
             self.baidu_ocr_use = False
+
+
+    # 改变百度OCR高精度开关状态
+    def changeBaiduOcrHighPrecisionSwitch(self, checked):
+
+        if checked :
+            self.baidu_ocr_high_precision_use = True
+        else:
+            self.baidu_ocr_high_precision_use = False
 
 
     # 改变公共有道翻译开关状态
@@ -1794,6 +1954,15 @@ class Settin(QMainWindow) :
             self.show_original_use = False
 
 
+    # 改变贴字翻译开关状态
+    def changeDrawImageSwitch(self, checked) :
+
+        if checked :
+            self.draw_image_use = True
+        else:
+            self.draw_image_use = False
+
+
     # 改变显示消息栏开关状态
     def changeShowStatusbarSwitch(self, checked):
 
@@ -1835,9 +2004,6 @@ class Settin(QMainWindow) :
         else:
             self.text_direction_use = False
 
-        utils.message.MessageBox("这是来自团子的提示",
-                                 "目前仅有百度OCR支持了竖向的文字识别\n团子的本地和在线OCR还均未支持, 会尽快更新上!       ")
-
 
     # 改变翻译热键开关状态
     def changeTranslateHotkeySwitch(self, checked) :
@@ -1856,6 +2022,23 @@ class Settin(QMainWindow) :
         else:
             self.range_hotkey_use = False
 
+
+    # 改变隐藏范围热键开关状态
+    def changeHideRangeHotkeySwitch(self, checked):
+
+        if checked:
+            self.hide_range_hotkey_use = True
+        else:
+            self.hide_range_hotkey_use = False
+
+
+    # 改变自动登录开关状态
+    def changeAutoLoginSwitch(self, checked) :
+
+        if checked :
+            self.auto_login_use = True
+        else:
+            self.auto_login_use = False
 
 
     # 重置开关状态
@@ -2236,6 +2419,11 @@ class Settin(QMainWindow) :
             self.desc_ui.desc_text.append("\n若屏蔽:\n")
             self.desc_ui.desc_text.insertHtml('<img src="{}" width="{}" >'.format(CLOSE_STATUSBAR_IMG_PATH, 245*self.rate))
 
+        # 贴字翻译
+        elif message_type == "drawImage":
+            self.desc_ui.setWindowTitle("贴字翻译说明")
+            self.desc_ui.desc_text.append("\n开启后会将翻译结果直接贴在截图区域上, 目前仅支持于在线OCR")
+
         self.desc_ui.show()
 
 
@@ -2342,6 +2530,12 @@ class Settin(QMainWindow) :
             self.hotkey_ui.comboBox_2.setCurrentText(self.object.config["rangeHotkeyValue2"])
             self.hotkey_ui.sure_button.clicked.connect(lambda: self.hotkey_ui.sure(key_type))
 
+        if key_type == "hideRange" :
+            self.hotkey_ui.setWindowTitle("设定隐藏范围快捷键")
+            self.hotkey_ui.comboBox_1.setCurrentText(self.object.config["hideRangeHotkeyValue1"])
+            self.hotkey_ui.comboBox_2.setCurrentText(self.object.config["hideRangeHotkeyValue2"])
+            self.hotkey_ui.sure_button.clicked.connect(lambda: self.hotkey_ui.sure(key_type))
+
         self.hotkey_ui.show()
 
 
@@ -2428,6 +2622,17 @@ class Settin(QMainWindow) :
                 utils.thread.createThread(self.object.translation_ui.webdriver3.openWeb, web_type)
 
 
+    # 改变节点
+    def changeNodeInfo(self) :
+
+        node_name = self.node_info_comboBox.currentText().split("  ")[0]
+        if node_name == "自动模式":
+            node_url = self.object.yaml["dict_info"]["ocr_server"]
+        else:
+            node_url = re.sub(r"//.+?/", "//%s/" % self.node_info[node_name], self.object.yaml["dict_info"]["ocr_server"])
+        self.object.config["nodeURL"] = node_url
+
+
     # 退出前保存设置
     def saveConfig(self) :
 
@@ -2512,8 +2717,18 @@ class Settin(QMainWindow) :
         self.object.config["imageSimilarity"] = self.image_refresh_spinBox.value()
         # 自动翻译文字刷新相似度
         self.object.config["textSimilarity"] = self.text_refresh_spinBox.value()
+        # 自动登录开关
+        self.object.yaml["auto_login"] = self.auto_login_use
+        # 百度OCR高精度开关
+        self.object.config["OCR"]["highPrecision"] = self.baidu_ocr_high_precision_use
         # 显示消息栏
         self.object.config["showStatusbarUse"] = self.show_statusbar_use
+        # 贴字翻译开关
+        self.object.config["drawImageUse"] = self.draw_image_use
+        if not self.draw_image_use or not self.online_ocr_use :
+            self.object.range_ui.draw_label.hide()
+        # 隐藏范围快捷键开关
+        self.object.config["showHotKey3"] = str(self.hide_range_hotkey_use)
 
 
     # 注册新快捷键
@@ -2527,17 +2742,33 @@ class Settin(QMainWindow) :
         self.object.translation_ui.translate_hotkey_value2 = hotkey_map.get(self.object.config["translateHotkeyValue2"], self.object.config["translateHotkeyValue2"])
         self.object.translation_ui.range_hotkey_value1 = hotkey_map.get(self.object.config["rangeHotkeyValue1"], self.object.config["rangeHotkeyValue1"])
         self.object.translation_ui.range_hotkey_value2 = hotkey_map.get(self.object.config["rangeHotkeyValue2"], self.object.config["rangeHotkeyValue2"])
+        self.object.translation_ui.hide_range_hotkey_value1 = hotkey_map.get(self.object.config["hideRangeHotkeyValue1"], self.object.config["hideRangeHotkeyValue1"])
+        self.object.translation_ui.hide_range_hotkey_value2 = hotkey_map.get(self.object.config["hideRangeHotkeyValue2"], self.object.config["hideRangeHotkeyValue2"])
 
         # 注册新翻译快捷键
         if self.translate_hotkey_use :
             self.object.translation_ui.translate_hotkey.register((self.object.translation_ui.translate_hotkey_value1,
                                                                   self.object.translation_ui.translate_hotkey_value2),
-                                                                  callback=lambda x: self.object.translation_ui.translate_hotkey_sign.emit(True))
+                                                                  callback=lambda x: utils.thread.createThread(self.object.translation_ui.startTranslater))
+
         # 注册新范围快捷键
         if self.range_hotkey_use :
             self.object.translation_ui.range_hotkey.register((self.object.translation_ui.range_hotkey_value1,
                                                               self.object.translation_ui.range_hotkey_value2),
                                                               callback=lambda x: self.object.translation_ui.range_hotkey_sign.emit(True))
+
+        # 注册新隐藏范围快捷键
+        if self.hide_range_hotkey_use :
+            self.object.translation_ui.hide_range_hotkey.register((self.object.translation_ui.hide_range_hotkey_value1,
+                                                                   self.object.translation_ui.hide_range_hotkey_value2),
+                                                                   callback=lambda x: self.object.translation_ui.hide_range_sign.emit(True))
+
+    # 窗口显示信号
+    def showEvent(self, e):
+
+        # 如果处于自动模式下则暂停
+        if self.object.translation_ui.translate_mode :
+            self.object.translation_ui.stop_sign = True
 
 
     # 窗口关闭处理
@@ -2545,6 +2776,8 @@ class Settin(QMainWindow) :
 
         # 保存设置
         self.saveConfig()
+        # 保存本地配置
+        utils.config.saveConfig(self.object.yaml, self.logger)
         # 注册新快捷键
         utils.thread.createThread(self.registerHotKey)
         # 重置翻译引擎

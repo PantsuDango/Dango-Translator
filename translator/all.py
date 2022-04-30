@@ -87,7 +87,7 @@ class Webdriver(QObject) :
                     self.browser_sign = 2
                     self.logger.error(format_exc())
                     self.close()
-                    self.message_sign.emit("翻译模块启动失败, 无法使用公共翻译, 详见公共翻译教程说明")
+                    self.message_sign.emit("公共翻译启动失败, 若需使用公共翻译请下载安装谷歌浏览器后重启翻译器, 若使用私人翻译请忽视此提示")
                     return
 
         self.browser_sign = 1
@@ -122,8 +122,6 @@ class Webdriver(QObject) :
             self.open_sign = True
             self.transInit(web_type)
         except Exception :
-            import traceback
-            traceback.print_exc()
             self.logger.error(format_exc())
 
         open_sign_list = [
@@ -293,7 +291,7 @@ class Webdriver(QObject) :
                 time.sleep(0.1)
                 # 提取翻译信息
                 try :
-                    text = self.browser.find_element_by_xpath('//*[@id="main-outer"]/div/div/div[1]/div[2]/div[1]/div[2]/div/div/div[1]/p[2]').text
+                    text = self.browser.find_element_by_xpath('//*[@id="main-outer"]/div/div/div[1]/div[2]/div[1]/div[2]/div/div/div[1]').text
                     if text :
                         self.content = text
                         return self.content
@@ -327,7 +325,7 @@ class Webdriver(QObject) :
                 try :
                     text = self.browser.find_element_by_xpath('/html/body/div[2]/div[2]/div[2]/div[2]/div[2]').text
                     if text :
-                        self.content = text.replace("\n", "")
+                        self.content = text.replace("\n\n", "")
                         return self.content
                 except Exception :
                     pass
@@ -358,7 +356,7 @@ class Webdriver(QObject) :
                 # 提取翻译信息
                 try :
                     # 提取翻译信息
-                    text = self.browser.find_element_by_xpath('//*[@id="texttarget"]/p/span').text
+                    text = self.browser.find_element_by_xpath('//*[@id="texttarget"]').text
                     if text :
                         self.content = text
                         return self.content
@@ -382,7 +380,7 @@ class Webdriver(QObject) :
             if self.content :
                 self.browserClickTimeout('/html[1]/body[1]/c-wiz[1]/div[1]/div[2]/c-wiz[1]/div[2]/c-wiz[1]/div[1]/div[2]/div[2]/c-wiz[1]/div[1]/div[1]/div[1]/span[1]/button[1]/div[2]')
             # 输入要翻译的文本
-            self.browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[2]/div[2]/c-wiz[1]/span/span/div/textarea').send_keys(content)
+            self.browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[2]/div[3]/c-wiz[1]/span/span/div/textarea').send_keys(content)
 
             start = time.time()
             while True :
@@ -394,9 +392,8 @@ class Webdriver(QObject) :
                         self.browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[2]/div[2]/c-wiz[2]/div[4]/div[2]/button/span').click()
                     except Exception :
                         pass
-                    text = self.browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[2]/div[2]/c-wiz[2]/div[5]/div/div[1]').text
+                    text = self.browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[2]/div[3]/c-wiz[2]/div[6]/div/div[1]').text
                     if text :
-                        text = text.replace("\n", "")
                         self.content = text
                         return self.content
                 except Exception :

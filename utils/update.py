@@ -1,6 +1,8 @@
 import re
 import os
+import sys
 from traceback import format_exc
+
 import utils.http
 
 
@@ -8,6 +10,7 @@ OCR_SRC_FILE_PATH = "./ocr/resources/app.py"
 FUNCTION_ICON_PATH = "./config/icon/function.png"
 OPEN_STATUSBAR_IMG_PATH = "./config/other/显示消息栏.png"
 CLOSE_STATUSBAR_IMG_PATH = "./config/other/屏蔽消息栏.png"
+PIL_FILE_PATH = "./PIL/_imagingft.cp38-win32.pyd"
 
 
 # 更新本地ocr源码文件
@@ -39,3 +42,12 @@ def updateIcon(yaml, logger) :
     if not os.path.exists(CLOSE_STATUSBAR_IMG_PATH) :
         url = yaml["dict_info"]["close_statusbar_url"]
         utils.http.downloadFile(url, CLOSE_STATUSBAR_IMG_PATH, logger)
+
+
+# 更新贴字翻译所需的文件
+def updatePilFile(yaml, logger) :
+
+    if not os.path.exists(PIL_FILE_PATH) :
+        url = yaml["dict_info"]["pil_file_url"]
+        if utils.http.downloadFile(url, PIL_FILE_PATH, logger) :
+            sys.exit()

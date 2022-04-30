@@ -181,7 +181,7 @@ def caiyun(sentence, token, logger) :
 
     url = "http://api.interpreter.caiyunai.com/v1/translator"
     payload = {
-        "source": [sentence],
+        "source": sentence.split("\n"),
         "trans_type": "auto2zh",
         "request_id": "demo",
         "detect": True,
@@ -193,10 +193,16 @@ def caiyun(sentence, token, logger) :
     proxies = {"http": None, "https": None}
     try:
         response = requests.request("POST", url, data=json.dumps(payload), headers=headers, proxies=proxies, timeout=5)
-        result = json.loads(response.text)['target'][0]
+        result = json.loads(response.text)['target']
 
     except Exception:
         logger.error(format_exc())
         result = "私人彩云: 我抽风啦!"
 
-    return result
+    text = ""
+    for word in result :
+        text += word
+        if word != result[-1] :
+            text += "\n"
+
+    return text

@@ -311,7 +311,8 @@ class Register(QWidget) :
     def sendEmail(self) :
 
         user = self.user_text.text()
-        email = self.email_text.text()
+        email = self.email_text.text().strip()
+        self.email_text.setText(email)
 
         if not user or re.findall("\s", user):
             utils.message.MessageBox("发送失败",
@@ -338,10 +339,14 @@ class Register(QWidget) :
     # 注册
     def register(self) :
 
-        user = self.user_text.text()
-        password = self.password_text.text()
-        email = self.email_text.text()
-        code_key = self.code_key_text.text()
+        user = self.user_text.text().strip()
+        self.user_text.setText(user)
+        password = self.password_text.text().strip()
+        self.password_text.setText(password)
+        email = self.email_text.text().strip()
+        self.email_text.setText(email)
+        code_key = self.code_key_text.text().strip()
+        self.code_key_text.setText(code_key)
 
         # 校验注册参数合法性
         if not user or re.findall("\s", user) :
@@ -376,6 +381,9 @@ class Register(QWidget) :
 
         # 请求服务器
         res = utils.http.post(url, body, self.logger)
+        if not res:
+            url = "https://trans.dango.cloud/DangoTranslate/Register"
+            res = utils.http.post(url, body, self.logger)
         result = res.get("Result", "")
 
         if result == "User already exists" :
@@ -401,7 +409,8 @@ class Register(QWidget) :
 
         user = self.user_text.text()
         password = self.password_text.text()
-        email = self.email_text.text()
+        email = self.email_text.text().strip()
+        self.email_text.setText(email)
         code_key = self.code_key_text.text()
 
         # 校验注册参数合法性
@@ -440,8 +449,11 @@ class Register(QWidget) :
 
         # 请求服务器
         res = utils.http.post(url, body, self.logger)
+        if not res:
+            url = "https://trans.dango.cloud/DangoTranslate/ModifyPassword"
+            res = utils.http.post(url, body, self.logger)
         result = res.get("Status", "")
-        message = res.get("Message", "")
+        message = res.get("Error", "")
 
         if result == "Success" :
             utils.message.MessageBox("修改成功",
@@ -480,7 +492,8 @@ class Register(QWidget) :
     # 绑定邮箱确定键
     def bindEmail(self) :
 
-        email = self.email_text.text()
+        email = self.email_text.text().strip()
+        self.email_text.setText(email)
         code_key = self.code_key_text.text()
 
         if not self.checkEmailValidity(email) :
@@ -507,8 +520,11 @@ class Register(QWidget) :
 
         # 请求服务器
         res = utils.http.post(url, body, self.logger)
+        if not res:
+            url = "https://trans.dango.cloud/DangoTranslate/ModifyEmail"
+            res = utils.http.post(url, body, self.logger)
         result = res.get("Status", "")
-        message = res.get("Message", "")
+        message = res.get("Error", "")
         if result == "Success" :
             utils.message.MessageBox("绑定成功",
                                      "你已经成功绑定邮箱啦~     ")

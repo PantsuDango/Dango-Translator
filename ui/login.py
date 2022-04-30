@@ -8,6 +8,7 @@ import re
 import utils.message
 import utils.http
 import utils.config
+import utils.lock
 
 
 LOGO_PATH = "./config/icon/logo.ico"
@@ -134,7 +135,7 @@ class Login(QWidget) :
         self.customSetGeometry(button, 370, 360, 20, 20)
         button.setStyleSheet("background: transparent;")
         button.setCursor(select_pixmap)
-        button.clicked.connect(QCoreApplication.instance().quit)
+        button.clicked.connect(self.quit)
 
         # 账号输入框
         self.user_text = QLineEdit(self)
@@ -192,7 +193,7 @@ class Login(QWidget) :
         # 版本号
         label = QLabel(self)
         self.customSetGeometry(label, 20, 540, 380, 15)
-        label.setText("版本号: %s  更新时间: 2021-12-21  By: 胖次团子"%self.object.yaml["version"])
+        label.setText("版本号: %s  更新时间: 2022-05-01  By: 胖次团子"%self.object.yaml["version"])
         label.setStyleSheet("color: %s;"
                             "background: transparent;"
                             "font-weight:bold;"
@@ -300,6 +301,9 @@ class Login(QWidget) :
             "Password": self.password
         }
         res = utils.http.post(url=url, body=body, logger=self.logger)
+        if not res:
+            url = "https://trans.dango.cloud/DangoTranslate/Login"
+            res = utils.http.post(url=url, body=body, logger=self.logger)
         result = res.get("Result", "")
 
         if result == "User dose not exist":
@@ -350,3 +354,10 @@ class Login(QWidget) :
         # 如果按下回车键
         if event.key() == 16777220 :
             self.object.login()
+
+
+    # 退出程序
+    def quit(self) :
+
+        # 退出
+        QCoreApplication.instance().quit()

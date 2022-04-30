@@ -14,6 +14,7 @@ import utils.translater
 import utils.http
 import utils.range
 import utils.message
+import utils.lock
 
 import translator.sound
 import translator.all
@@ -30,12 +31,12 @@ PIXMAP2_PATH = "./config/icon/pixmap2.png"
 # 翻译界面
 class Translation(QMainWindow) :
 
-    # 翻译快捷键信号
-    translate_hotkey_sign = pyqtSignal(bool)
     # 范围快捷键信号
     range_hotkey_sign = pyqtSignal(bool)
     # 自动翻译模式信号
     auto_open_sign = pyqtSignal(bool)
+    # 隐藏范围框快捷键
+    hide_range_sign = pyqtSignal(bool)
 
     def __init__(self, object) :
 
@@ -71,6 +72,7 @@ class Translation(QMainWindow) :
         # 窗口无标题栏、窗口置顶、窗口透明
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setMouseTracking(True)
 
         # 窗口图标
         icon = QIcon()
@@ -151,6 +153,7 @@ class Translation(QMainWindow) :
         self.drag_label = QLabel(self)
         self.drag_label.setObjectName("drag_label")
         self.customSetGeometry(self.drag_label, 0, 0, 4000, 2000)
+        self.drag_label.setMouseTracking(True)
 
         # 翻译按钮
         self.start_button = QPushButton(qtawesome.icon("fa.play", color=self.icon_color), "", self)
@@ -272,8 +275,7 @@ class Translation(QMainWindow) :
         self.translate_hotkey = SystemHotkey()
         if self.object.config["showHotKey1"] == "True" :
             self.translate_hotkey.register((self.translate_hotkey_value1, self.translate_hotkey_value2),
-                                           callback=lambda x:self.translate_hotkey_sign.emit(True))
-        self.translate_hotkey_sign.connect(self.startTranslater)
+                                           callback=lambda x: utils.thread.createThread(self.startTranslater))
 
         # 注册范围快捷键
         self.range_hotkey = SystemHotkey()
@@ -282,11 +284,17 @@ class Translation(QMainWindow) :
                                        callback=lambda x: self.range_hotkey_sign.emit(True))
         self.range_hotkey_sign.connect(self.clickRange)
 
+        # 注册隐藏范围框快捷键
+        self.hide_range_hotkey = SystemHotkey()
+        if self.object.config["showHotKey3"] :
+            self.hide_range_hotkey.register((self.hide_range_hotkey_value1, self.hide_range_hotkey_value2),
+                                             callback=lambda x: self.hide_range_sign.emit(True))
+
 
     # 窗口显示信号
     def showEvent(self, e) :
 
-        # 如果处于自动模式下则暂停
+        # 如果处于自动模式下则开始
         if self.translate_mode :
             self.stop_sign = False
 
@@ -295,7 +303,7 @@ class Translation(QMainWindow) :
     def hideEvent(self, e) :
 
         # 如果处于自动模式下则暂停
-        if self.translate_mode :
+        if self.translate_mode and not self.object.config["drawImageUse"] :
             self.stop_sign = True
 
 
@@ -358,6 +366,13 @@ class Translation(QMainWindow) :
                                                   self.object.config["rangeHotkeyValue1"])
         self.range_hotkey_value2 = hotkey_map.get(self.object.config["rangeHotkeyValue2"],
                                                   self.object.config["rangeHotkeyValue2"])
+        # 范围快捷键
+        self.hide_range_hotkey_value1 = hotkey_map.get(self.object.config["hideRangeHotkeyValue1"],
+                                                       self.object.config["hideRangeHotkeyValue1"])
+        self.hide_range_hotkey_value2 = hotkey_map.get(self.object.config["hideRangeHotkeyValue2"],
+                                                       self.object.config["hideRangeHotkeyValue2"])
+        # 竖排翻译贴字
+        self.object.ocr_result = None
 
 
     # 根据分辨率定义控件位置尺寸
@@ -377,6 +392,12 @@ class Translation(QMainWindow) :
 
     # 鼠标移动事件
     def mouseMoveEvent(self, e: QMouseEvent) :
+
+        # 判断鼠标位置以适配特定位置可拉伸
+        if self.width() - e.x() < 15*self.rate and self.height() - e.y() < 15*self.rate :
+            self.statusbar.show()
+        elif not self.object.config["showStatusbarUse"] :
+            self.statusbar.hide()
 
         if self.lock_sign == True :
             return
@@ -499,13 +520,13 @@ class Translation(QMainWindow) :
             self.translate_text.append("欢迎你 ~ %s 么么哒 ~" % self.user)
             self.format.setTextOutline(QPen(QColor(self.font_color_2), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
             self.translate_text.mergeCurrentCharFormat(self.format)
-            self.translate_text.append("b站关注 团子翻译器 查看动态可了解翻译器最新情况 ~")
+            self.translate_text.append("b站关注[团子翻译器]查看动态可了解翻译器最新情况 ~")
             self.format.setTextOutline(QPen(QColor(self.font_color_1), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
             self.translate_text.mergeCurrentCharFormat(self.format)
             self.translate_text.append("团子一个人开发不易，这个软件真的花了很大很大的精力 _(:з」∠)_")
             self.format.setTextOutline(QPen(QColor(self.font_color_2), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
             self.translate_text.mergeCurrentCharFormat(self.format)
-            self.translate_text.append("喜欢的话能不能点击上方的电池图标支持一下团子，真心感谢你❤")
+            self.translate_text.append("喜欢的话能不能在b站给团子一个关注，团子会很开心的~真心感谢你❤")
 
 
 
@@ -584,6 +605,7 @@ class Translation(QMainWindow) :
 
         thread = utils.translater.Translater(self.object)
         thread.clear_text_sign.connect(self.clearText)
+        thread.hide_range_ui_sign.connect(self.object.range_ui.hideUI)
         thread.start()
         thread.wait()
 
@@ -611,6 +633,9 @@ class Translation(QMainWindow) :
 
         if self.object.config["showHotKey2"] == "True" :
             self.range_hotkey.unregister((self.range_hotkey_value1, self.range_hotkey_value2))
+
+        if self.object.config["showHotKey3"] :
+            self.hide_range_hotkey.unregister((self.hide_range_hotkey_value1, self.hide_range_hotkey_value2))
 
 
     # 将翻译结果打印
@@ -642,12 +667,6 @@ class Translation(QMainWindow) :
             color = self.object.config.get("fontColor", {}).get("original", self.font_color_1)
         else :
             return
-
-        # 根据屏蔽词过滤
-        for val in self.object.config["Filter"] :
-            if not val[0] :
-                continue
-            result = result.replace(val[0], val[1])
 
         # 显示在文本框上
         if self.object.config["showColorType"] == "False" :
@@ -811,16 +830,17 @@ class Translation(QMainWindow) :
     # 退出程序
     def quit(self) :
 
+        # 界面关闭
         self.hide()
         self.object.range_ui.close()
+        # 注销快捷键
         utils.thread.createThreadDaemonFalse(self.unregisterHotKey)
-
         # 关闭引擎模块
         utils.thread.createThreadDaemonFalse(self.sound.close)
         utils.thread.createThreadDaemonFalse(self.webdriver1.close)
         utils.thread.createThreadDaemonFalse(self.webdriver2.close)
         utils.thread.createThreadDaemonFalse(self.webdriver3.close)
-        # 关闭selenuim的driver引擎
+        # 关闭selenium的driver引擎
         self.killDriVer()
         # 退出程序前保存设置
         utils.thread.createThreadDaemonFalse(utils.config.postSaveSettin, self.object)

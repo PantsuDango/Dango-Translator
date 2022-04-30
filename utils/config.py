@@ -16,14 +16,23 @@ def openConfig(logger) :
     try :
         with open(YAML_PATH, "r", encoding="utf-8") as file :
             config = yaml.load(file.read(), Loader=yaml.FullLoader)
+
+        # 2022.02.19 添加新参数
+        if "auto_login" not in config.keys() :
+            config["auto_login"] = False
+        # 2022.03.08 修改参数
+        if "dict_info_url" in config.keys():
+            config["dict_info_url"] = "https://dango.c4a15wh.cn/DangoTranslate/ShowDict"
+
     except Exception :
         logger.error(format_exc())
         config = {
             "user": "",
             "password": "",
-            "dict_info_url": "https://trans.dango.cloud/DangoTranslate/ShowDict",
+            "dict_info_url": "https://dango.c4a15wh.cn/DangoTranslate/ShowDict",
             "ocr_cmd_path": ".\ocr\startOCR.cmd",
-            "port": 6666
+            "port": 6666,
+            "auto_login": False
         }
 
     return config
@@ -46,7 +55,7 @@ def getDictInfo(url, logger) :
 
     res = utils.http.post(url, {}, logger)
     if not res :
-        res = utils.http.post("https://dango.c4a15wh.cn/DangoTranslate/ShowDict", {}, logger)
+        res = utils.http.post("https://trans.dango.cloud/DangoTranslate/ShowDict", {}, logger)
     result = res.get("Result", {})
 
     return result
@@ -61,6 +70,9 @@ def getDangoSettin(object) :
     }
 
     res = utils.http.post(url, body, object.logger)
+    if not res:
+        url = "https://trans.dango.cloud/DangoTranslate/GetSettin"
+        res = utils.http.post(url, body, object.logger)
     result = res.get("Result", {})
     try :
         result = json.loads(result)
@@ -82,6 +94,11 @@ def configConvert(object) :
     object.config["offlineOCR"] = object.config.get("offlineOCR", False)
     # 在线OCR开关
     object.config["onlineOCR"] = object.config.get("onlineOCR", False)
+    # 在线OCR节点
+    object.config["nodeURL"] = object.config.get("nodeURL", object.yaml["dict_info"]["ocr_server"])
+    node_info = eval(object.yaml["dict_info"]["ocr_node"])
+    if object.config["nodeURL"] not in node_info.values() :
+        object.config["nodeURL"] = object.yaml["dict_info"]["ocr_server"]
     # 百度OCR开关
     object.config["baiduOCR"] = object.config.get("baiduOCR", False)
     # 百度OCR密钥
@@ -89,6 +106,8 @@ def configConvert(object) :
     object.config["OCR"]["Secret"] = object.config["OCR"].get("Secret", "")
     object.config["OCR"]["Key"] = object.config["OCR"].get("Key", "")
     object.config["AccessToken"] = object.config.get("AccessToken", "")
+    # 百度OCR高精度开关
+    object.config["OCR"]["highPrecision"] = object.config["OCR"].get("highPrecision", False)
     # 翻译语种
     object.config["language"] = object.config.get("language", "JAP")
 
@@ -199,6 +218,13 @@ def configConvert(object) :
     object.yaml["range"] = {"X1": 0, "Y1": 0, "X2": 0, "Y2": 0}
     # 显示消息栏
     object.config["showStatusbarUse"] = object.config.get("showStatusbarUse", True)
+    # 贴字翻译开关
+    object.config["drawImageUse"] = object.config.get("drawImageUse", False)
+    # 隐藏范围快捷键
+    object.config["hideRangeHotkeyValue1"] = object.config.get("hideRangeHotkeyValue1", "ctrl")
+    object.config["hideRangeHotkeyValue2"] = object.config.get("hideRangeHotkeyValue2", "x")
+    # 隐藏范围快捷键开关
+    object.config["showHotKey3"] = object.config.get("showHotKey3", False)
 
 
 # 保存配置至服务器
@@ -209,7 +235,10 @@ def postSaveSettin(object) :
         "User": object.yaml["user"],
         "Data": json.dumps(object.config)
     }
-    utils.http.post(url, body, object.logger)
+    res = utils.http.post(url, body, object.logger)
+    if not res:
+        url = "https://trans.dango.cloud/DangoTranslate/SaveSettin"
+        utils.http.post(url, body, object.logger)
 
 
 # 保存识别到的原文
@@ -258,4 +287,7 @@ def getVersionMessage(object) :
         "version": object.yaml["version"]
     }
     res = utils.http.post(url, body, object.logger)
+    if not res:
+        url = "https://trans.dango.cloud/DangoTranslate/Getinform"
+        res = utils.http.post(url, body, object.logger)
     return res.get("Result", "")
