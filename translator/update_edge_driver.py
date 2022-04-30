@@ -33,7 +33,7 @@ def checkEdgeVersion() :
         driver.close()
         driver.quit()
     except Exception as err :
-        regex = re.findall("[0-9.]+", str(err))
+        regex = re.findall("[0-9.]{8,}", str(err))
         if regex :
             return regex[0]
 
