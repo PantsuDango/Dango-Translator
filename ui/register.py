@@ -381,6 +381,9 @@ class Register(QWidget) :
 
         # 请求服务器
         res = utils.http.post(url, body, self.logger)
+        if not res:
+            url = "https://trans.dango.cloud/DangoTranslate/Register"
+            res = utils.http.post(url, body, self.logger)
         result = res.get("Result", "")
 
         if result == "User already exists" :
@@ -446,6 +449,9 @@ class Register(QWidget) :
 
         # 请求服务器
         res = utils.http.post(url, body, self.logger)
+        if not res:
+            url = "https://trans.dango.cloud/DangoTranslate/ModifyPassword"
+            res = utils.http.post(url, body, self.logger)
         result = res.get("Status", "")
         message = res.get("Error", "")
 
@@ -514,6 +520,9 @@ class Register(QWidget) :
 
         # 请求服务器
         res = utils.http.post(url, body, self.logger)
+        if not res:
+            url = "https://trans.dango.cloud/DangoTranslate/ModifyEmail"
+            res = utils.http.post(url, body, self.logger)
         result = res.get("Status", "")
         message = res.get("Error", "")
         if result == "Success" :

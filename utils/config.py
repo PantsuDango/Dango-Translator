@@ -70,6 +70,9 @@ def getDangoSettin(object) :
     }
 
     res = utils.http.post(url, body, object.logger)
+    if not res:
+        url = "https://trans.dango.cloud/DangoTranslate/GetSettin"
+        res = utils.http.post(url, body, object.logger)
     result = res.get("Result", {})
     try :
         result = json.loads(result)
@@ -232,7 +235,10 @@ def postSaveSettin(object) :
         "User": object.yaml["user"],
         "Data": json.dumps(object.config)
     }
-    utils.http.post(url, body, object.logger)
+    res = utils.http.post(url, body, object.logger)
+    if not res:
+        url = "https://trans.dango.cloud/DangoTranslate/SaveSettin"
+        utils.http.post(url, body, object.logger)
 
 
 # 保存识别到的原文
@@ -281,4 +287,7 @@ def getVersionMessage(object) :
         "version": object.yaml["version"]
     }
     res = utils.http.post(url, body, object.logger)
+    if not res:
+        url = "https://trans.dango.cloud/DangoTranslate/Getinform"
+        res = utils.http.post(url, body, object.logger)
     return res.get("Result", "")

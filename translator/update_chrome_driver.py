@@ -51,9 +51,10 @@ def getChromeVersionInfo(chrome_version, logger) :
     max_score = 0
     for val in res :
         # 正则过滤无关的内容
-        regex = re.findall("\d{2}\.0\.\d{4}\.\d{1,3}", val["name"])
+        regex = re.findall("\d{2,3}\.0\.\d{4}\.\d{1,3}", val["name"])
         if not regex :
             continue
+        print(regex[0])
         # 文本对比找出最匹配的引擎版本
         score = getEqualRate(regex[0], chrome_version)
         if score > max_score :

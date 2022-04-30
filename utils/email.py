@@ -30,7 +30,7 @@ class SendEmail(QThread) :
         # 请求注册服务器
         res = utils.http.post(self.url, body, self.logger)
         if not res :
-            self.url = "https://dango.c4a15wh.cn/DangoTranslate/SendEmail"
+            self.url = "https://trans.dango.cloud/DangoTranslate/SendEmail"
             res = utils.http.post(self.url, body, self.logger, timeout=10)
         result = res.get("Status", "")
         error = res.get("Error", "")
@@ -51,6 +51,9 @@ def bindEmail(object, user="") :
     else :
         body = {"User": object.yaml["user"]}
     res = utils.http.post(url, body, object.logger)
+    if not res:
+        url = "https://trans.dango.cloud/DangoTranslate/CheckEmail"
+        res = utils.http.post(url, body, object.logger)
     if res.get("Status", "") == "Success" :
         return res.get("Result", {}).get("Email", "")
     else :

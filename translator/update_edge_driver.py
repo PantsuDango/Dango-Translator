@@ -33,7 +33,7 @@ def checkEdgeVersion() :
         driver.close()
         driver.quit()
     except Exception as err :
-        regex = re.findall("Current browser version is (.+?) with binary", str(err))
+        regex = re.findall("[0-9.]+", str(err))
         if regex :
             return regex[0]
 
@@ -54,7 +54,7 @@ def downloadDriver(driver_version, logger) :
         zip_file.close()
         # 删除压缩包
         os.remove(DRIVER_ZIP_NAME)
-        shutil.rmtree(os.path.join(CHROMEDRIVER_DIR_PATH, "Driver_Notes"))
+        os.remove(os.path.join(CHROMEDRIVER_DIR_PATH, "Driver_Notes"))
     except Exception :
         logger.error(format_exc())
 
