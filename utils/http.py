@@ -27,11 +27,13 @@ def post(url, body, logger, headers=None, timeout=5) :
         try :
             response.encoding = "utf-8"
             result = json.loads(response.text)
+            response.close()
         except Exception :
             response.encoding = "gb18030"
             result = json.loads(response.text)
     except Exception :
         logger.error(format_exc())
+
 
     return result
 

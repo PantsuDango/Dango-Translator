@@ -98,12 +98,12 @@ def baiduOCR(config, logger, test=False) :
         with open(path, "rb") as file :
             image = base64.b64encode(file.read())
         params = {"image": image, "language_type": language}
-        headers = {"content-type": "application/x-www-form-urlencoded"}
+        headers = {"content-type": "application/x-www-form-urlencoded", "Connection": "close"}
         proxies = {"http": None, "https": None}
         request_url = request_url + "?access_token=" + access_token
 
         try:
-            response = requests.post(request_url, data=params, headers=headers, proxies=proxies, timeout=10)
+            response = requests.post(request_url, data=params, headers=headers, proxies=proxies, timeout=5)
 
         except TypeError:
             logger.error(format_exc())

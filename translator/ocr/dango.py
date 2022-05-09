@@ -1,7 +1,9 @@
+import time
+
 from PIL import Image
 import base64
 import os
-import re
+import hashlib
 from traceback import format_exc
 
 import utils.http
@@ -196,6 +198,22 @@ def resultSortMD(ocr_result, language) :
     return text, ocr_result
 
 
+# 校验图片md5
+def checkImageMD5(imageBase64, res) :
+
+    if res.get("Code", -1) != 0 :
+        return False
+    request_id = res.get("RequestId", "")
+    if request_id :
+        split = request_id.split("_")
+        if len(split) == 3 :
+            image_md5 = hashlib.md5(imageBase64.encode("utf-8")).hexdigest()
+            if (split[1] == image_md5) and (split[2] == str(len(imageBase64))):
+                return True
+
+    return False
+
+
 # 团子在线OCR服务
 def dangoOCR(object, test=False) :
 
@@ -234,10 +252,16 @@ def dangoOCR(object, test=False) :
         "Token": token
     }
 
-    res = utils.http.post(url=url, body=body, logger=object.logger, headers=headers)
-    # 如果出错就直接结束
-    if not res :
-        return False, "在线OCR错误: 网络超时, 请尝试在[设置]-[OCR设定]-[在线OCR]右侧切换延迟最低的节点, 切换后重试翻译"
+    for index in range(2) :
+        res = utils.http.post(url=url, body=body, logger=object.logger, headers=headers)
+        # 如果出错就直接结束
+        if not res :
+            return False, "在线OCR错误: 网络超时, 请尝试在[设置]-[OCR设定]-[在线OCR]右侧切换延迟最低的节点, 切换后重试翻译"
+        if index == 1 :
+            break
+        # 校验图片md5
+        if checkImageMD5(imageBase64, res) :
+            break
 
     code = res.get("Code", -1)
     message = res.get("Message", "")
