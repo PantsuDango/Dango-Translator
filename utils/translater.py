@@ -166,21 +166,21 @@ class TranslaterProcess(QThread) :
             if self.object.translation_ui.webdriver1.open_sign :
                 result = self.object.translation_ui.webdriver1.translater(self.object.translation_ui.original)
             else :
-                result = "%s翻译: 我抽风啦"%self.object.translation_ui.webdriver1.translater_map[self.object.translation_ui.webdriver1.web_type]
+                result = "%s翻译: 我抽风啦, 请尝试重新翻译! 如果频繁出现, 建议直接注册使用私人翻译"%self.object.translation_ui.webdriver1.translater_map[self.object.translation_ui.webdriver1.web_type]
 
         # 公共翻译二
         elif self.trans_type == "webdriver_2" :
             if self.object.translation_ui.webdriver2.open_sign :
                 result = self.object.translation_ui.webdriver2.translater(self.object.translation_ui.original)
             else :
-                result = "%s翻译: 我抽风啦"%self.object.translation_ui.webdriver2.translater_map[self.object.translation_ui.webdriver2.web_type]
+                result = "%s翻译: 我抽风啦, 请尝试重新翻译! 如果频繁出现, 建议直接注册使用私人翻译"%self.object.translation_ui.webdriver2.translater_map[self.object.translation_ui.webdriver2.web_type]
 
         # 公共翻译三
         elif self.trans_type == "webdriver_3":
             if self.object.translation_ui.webdriver3.open_sign :
                 result = self.object.translation_ui.webdriver3.translater(self.object.translation_ui.original)
             else:
-                result = "%s翻译: 我抽风啦" % self.object.translation_ui.webdriver3.translater_map[self.object.translation_ui.webdriver3.web_type]
+                result = "%s翻译: 我抽风啦, 请尝试重新翻译! 如果频繁出现, 建议直接注册使用私人翻译" % self.object.translation_ui.webdriver3.translater_map[self.object.translation_ui.webdriver3.web_type]
 
         # 私人百度
         elif self.trans_type == "baidu_private" :

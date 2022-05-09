@@ -57,7 +57,7 @@ def baidu(sentence, app_id, secret_key, logger):
 
             error_code = result["error_code"]
             if error_code == "54003":
-                string = "私人百度: 我抽风啦!"
+                string = "私人百度: 我抽风啦, 请尝试重新翻译!"
             elif error_code == "52001":
                 string = "私人百度: 请求超时, 请重试"
             elif error_code == "52002":
@@ -79,7 +79,7 @@ def baidu(sentence, app_id, secret_key, logger):
 
     except Exception :
         logger.error(format_exc())
-        string = "私人百度：我抽风啦！"
+        string = "私人百度：我抽风啦, 请尝试重新翻译!"
 
     return string
 
@@ -121,7 +121,7 @@ def tencent(sentence, secret_id, secret_key, logger):
 
         except Exception :
             logger.error(format_exc())
-            result = "私人腾讯：我抽风啦!"
+            result = "私人腾讯：我抽风啦, 请尝试重新翻译!"
 
         else:
             if code == "MissingParameter" :
@@ -168,7 +168,7 @@ def tencent(sentence, secret_id, secret_key, logger):
 
     except Exception:
         logger.error(format_exc())
-        result = "私人腾讯：我抽风啦!"
+        result = "私人腾讯：我抽风啦, 请尝试重新翻译!"
 
     return result
 
@@ -197,7 +197,7 @@ def caiyun(sentence, token, logger) :
 
     except Exception:
         logger.error(format_exc())
-        result = "私人彩云: 我抽风啦!"
+        result = "私人彩云: 我抽风啦, 请尝试重新翻译!"
 
     text = ""
     for word in result :
