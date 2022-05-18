@@ -1,13 +1,13 @@
 # 团子翻译器 - 基于OCR的生肉翻译软件
 
 
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.0.5-ff69b4)](https://github.com/PantsuDango/Dango-Translator)
-[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2021--12--21-ff69b4)]()
+[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.2.5-ff69b4)](https://github.com/PantsuDango/Dango-Translator)
+[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2022--05--09-ff69b4)]()
 [![更新时间](https://img.shields.io/badge/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-win7--10-ff69b4)]()
 [![GitHubStars](https://img.shields.io/github/stars/PantsuDango/Dango-Translator)]()
 [![GitHubForks](https://img.shields.io/github/forks/PantsuDango/Dango-Translator)]()
 [![作者](https://img.shields.io/badge/QQ-%E8%83%96%E6%AC%A1%E5%9B%A2%E5%AD%90-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E4%BD%9C%E8%80%85.png)
-[![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-8%E7%BE%A41064777983-ff69b4)](https://github.com/PantsuDango/Dango-Translator/blob/dev/4.0/config/other/%E4%BA%A4%E6%B5%81%E7%BE%A4.png)
+[![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-1%E7%BE%A4779594427-ff69b4)](https://l2.drive.c4a15wh.cn/api/v3/slave/source/0/dXBsb2Fkcy8yMDIyLzA1LzE5LzhPQWxHM1NMLzHnvqQucG5n/1%E7%BE%A4.png?sign=WcPHH8F_x-ERGO7xgvGD_xOb99W0eBoCxUoGjOUmiuk%3D%3A0)
 
   
 ## 简介
@@ -24,7 +24,7 @@
   
 ## 安装版下载
 
-- 群文件下载：[![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-8%E7%BE%A41064777983-ff69b4)](https://github.com/PantsuDango/Dango-Translator/blob/dev/4.0/config/other/%E4%BA%A4%E6%B5%81%E7%BE%A4.png)  
+- 群文件下载：[![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-1%E7%BE%A4779594427-ff69b4)](https://l2.drive.c4a15wh.cn/api/v3/slave/source/0/dXBsb2Fkcy8yMDIyLzA1LzE5LzhPQWxHM1NMLzHnvqQucG5n/1%E7%BE%A4.png?sign=WcPHH8F_x-ERGO7xgvGD_xOb99W0eBoCxUoGjOUmiuk%3D%3A0)  
 - 官网下载：[下载地址](https://translator.dango.cloud)
 
   
@@ -32,19 +32,11 @@
 
 #### 翻译器相关 
 
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.0.5-ff69b4)]()
-[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2021--12--21-ff69b4)]()
+[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.2.5-ff69b4)]()
+[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2022--05--09-ff69b4)]()
 
-+ 更新了全新的4.0版本，完全重构；
-+ 优化了所有公共翻译的质量和速度，新加入了DeepL翻译源；
-+ 修复了快捷键一段时间会失效的问题；
-+ 加入了修改密码绑定邮箱的逻辑；
-+ 加入了星团云在线OCR系统，弥补离线的不足；
-+ 优化了离线OCR的启动方式在翻译器内置启动；
-+ 所有OCR接口和私人翻译接口加入了测试按钮；
-+ 所有配置项都加入了说明解释；
-+ 加入了图像相似度和文字相似度的配置，可以调节频繁闪烁的翻译问题；
-+ 优化了翻译逻辑，解决卡死的问题；
++ 修复串台, 出现其他人的翻译内容问题（大概）；
++ 修改了翻译出错时"我抽风啦"的说法；
 + 更多更新日志：[查看](https://github.com/PantsuDango/Dango-Translator/blob/master/docx/%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97.md)  
 
 #### OCR相关
@@ -60,7 +52,7 @@
   
 ## 使用教程
 
-[翻译器教程](https://docs.ayano.top)
+[翻译器教程]([https://docs.ayano.top](https://docs.dango.c4a15wh.cn/#/4.0/FAQ/faq))
 
   
 ## 原理说明
@@ -84,7 +76,7 @@
 - [x] 优化公共翻译和网页翻译，提高翻译质量，降低抽风率
 - [ ] 离线OCR取消黑窗，加入简单的GUI界面，最小化从任务栏改为系统托盘
 - [x] 对屏幕缩放比例175%以上做适配
-- [ ] 离线OCR加入竖排文本检测模式用于翻译生肉本
+- [x] 离线OCR加入竖排文本检测模式用于翻译生肉本
 
 #### 修复项
 
