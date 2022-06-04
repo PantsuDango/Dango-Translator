@@ -1,5 +1,6 @@
 import os
 import sys
+import locale
 import tkinter.font
 from traceback import format_exc
 
@@ -12,6 +13,12 @@ FONT_PATH = os.path.join(os.getcwd(), "config", "other", "华康方圆体W7.TTC"
 
 # 检查字体是否存在
 def checkFont(logger) :
+
+    try :
+        if locale.getdefaultlocale()[1] != "cp936" :
+            return
+    except Exception :
+        logger.error(format_exc())
 
     tkinter.Tk()
     font_list = tkinter.font.families()
