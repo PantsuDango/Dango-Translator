@@ -2402,7 +2402,7 @@ class Settin(QMainWindow) :
         # 文字换行
         elif message_type == "branchLine" :
             self.desc_ui.setWindowTitle("文字换行说明")
-            self.setTextColor(self.desc_ui.desc_text, "#FF0000", "如果看不懂请打开此开关.")
+            self.setTextColor(self.desc_ui.desc_text, "#FF0000", "如果看不懂请不要打开此开关.")
             self.desc_ui.desc_text.append("\n会将识别到的原文换行后再翻译, 可能会出现断句错误情况")
 
         # 原文颜色
