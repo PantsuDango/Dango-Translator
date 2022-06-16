@@ -202,12 +202,6 @@ class TranslaterProcess(QThread) :
         elif self.trans_type == "original" :
             result = self.object.translation_ui.original
 
-        # 根据屏蔽词过滤
-        for val in self.object.config["Filter"]:
-            if not val[0] :
-                continue
-            result = result.replace(val[0], val[1])
-
         result = result.strip()
         self.display_signal.emit(result, self.trans_type)
 
@@ -224,7 +218,6 @@ class TranslaterProcess(QThread) :
                 else :
                     self.drawRectTD(ocr_result, result)
             except Exception :
-                print_exc()
                 self.logger.error(format_exc())
 
 
@@ -367,6 +360,12 @@ class Translater(QThread) :
         # 如果检测不到文字则跳过
         if not original :
             return
+
+        # 根据屏蔽词过滤
+        for val in self.object.config["Filter"]:
+            if not val[0]:
+                continue
+            original = original.replace(val[0], val[1])
 
         # 自动模式下文字和上一次一样则跳过
         if self.object.translation_ui.translate_mode and original == self.object.translation_ui.original :
