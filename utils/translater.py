@@ -336,6 +336,10 @@ class Translater(QThread) :
         # 百度OCR
         if self.object.config["baiduOCR"] :
             ocr_sign, original = translator.ocr.baidu.baiduOCR(self.object.config, self.logger)
+            # 如果网络出错重试一次
+            if original == "百度OCR错误: 请打开[网络和Internet设置]的[代理]页面, 将其中的全部代理设置开关都关掉, 保证关闭后请重试" :
+                ocr_sign, original = translator.ocr.baidu.baiduOCR(self.object.config, self.logger)
+
         # 团子OCR
         elif self.object.config["onlineOCR"] :
             ocr_sign, original = translator.ocr.dango.dangoOCR(self.object)
