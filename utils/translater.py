@@ -343,6 +343,10 @@ class Translater(QThread) :
         # 团子OCR
         elif self.object.config["onlineOCR"] :
             ocr_sign, original = translator.ocr.dango.dangoOCR(self.object)
+            # 如果网络出错重试一次
+            if original == "在线OCR错误: 网络超时, 请尝试在[设置]-[OCR设定]-[在线OCR]右侧切换延迟最低的节点, 切换后重试翻译":
+                ocr_sign, original = translator.ocr.dango.dangoOCR(self.object)
+
         # 本地OCR
         elif self.object.config["offlineOCR"] :
             ocr_sign, original = translator.ocr.dango.offlineOCR(self.object)
