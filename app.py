@@ -14,6 +14,7 @@ import utils.email
 import utils.message
 import utils.port
 import utils.update
+import utils.hwnd
 
 import ui.login
 import ui.register
@@ -82,6 +83,8 @@ class DangoTranslator() :
 
         # 自动启动本地OCR
         utils.thread.createThread(self.autoOpenOfflineOCR)
+        # 置顶窗口
+        utils.thread.createThread(utils.hwnd.setWindowTop, self)
 
 
     # 按下充电键后做的事情
