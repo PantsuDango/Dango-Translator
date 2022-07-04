@@ -15,6 +15,7 @@ import utils.http
 import utils.range
 import utils.message
 import utils.lock
+import utils.hwnd
 
 import translator.sound
 import translator.all
@@ -799,6 +800,8 @@ class Translation(QMainWindow) :
 
         self.hide()
         self.object.filter_ui.show()
+        # 屏蔽词界面置顶
+        utils.thread.createThread(utils.hwnd.setWindowTop, int(self.object.filter_ui.winId()))
 
 
     # 按下范围框选键

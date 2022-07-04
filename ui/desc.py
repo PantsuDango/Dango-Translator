@@ -4,6 +4,9 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
+import utils.thread
+import utils.hwnd
+
 
 LOGO_PATH = "./config/icon/logo.ico"
 PIXMAP_PATH = "./config/icon/pixmap.png"
@@ -21,6 +24,8 @@ class Desc(QWidget) :
         self.getInitConfig()
 
         self.ui()
+        # 界面置顶
+        utils.thread.createThread(utils.hwnd.setWindowTop, int(self.winId()))
 
 
     def ui(self) :

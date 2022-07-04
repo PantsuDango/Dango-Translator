@@ -62,6 +62,8 @@ class DangoTranslator() :
         self.translation_ui = ui.translation.Translation(self)
         self.login_ui.close()
         self.translation_ui.show()
+        # 翻译界面置顶
+        utils.thread.createThread(utils.hwnd.setWindowTop, int(self.translation_ui.winId()))
 
         # 设置界面
         self.settin_ui = ui.settin.Settin(self)
@@ -75,6 +77,8 @@ class DangoTranslator() :
         # 范围框界面
         self.range_ui = ui.range.Range(self)
         self.translation_ui.hide_range_sign.connect(self.range_ui.hideRangeUI)
+        # 范围框界面置顶
+        utils.thread.createThread(utils.hwnd.setWindowTop, int(self.range_ui.winId()))
 
         # 检查邮箱
         thread = utils.thread.createCheckBindEmailQThread(self)
@@ -83,8 +87,6 @@ class DangoTranslator() :
 
         # 自动启动本地OCR
         utils.thread.createThread(self.autoOpenOfflineOCR)
-        # 置顶窗口
-        utils.thread.createThread(utils.hwnd.setWindowTop, self)
 
 
     # 按下充电键后做的事情
@@ -95,6 +97,8 @@ class DangoTranslator() :
         self.range_ui.close()
         self.settin_ui.tab_widget.setCurrentIndex(4)
         self.settin_ui.show()
+        # 设置界面置顶
+        utils.thread.createThread(utils.hwnd.setWindowTop, int(self.settin_ui.winId()))
 
 
     # 按下设置键后做的事情
@@ -104,6 +108,8 @@ class DangoTranslator() :
         self.translation_ui.close()
         self.range_ui.close()
         self.settin_ui.show()
+        # 设置界面置顶
+        utils.thread.createThread(utils.hwnd.setWindowTop, int(self.settin_ui.winId()))
 
 
     # 自动打开本地OCR
