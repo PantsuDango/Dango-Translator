@@ -95,6 +95,8 @@ def baiduOCR(config, logger, test=False) :
             path = "./config/image.jpg"
         else :
             path = "./config/other/image.jpg"
+            language = "JAP"
+
         with open(path, "rb") as file :
             image = base64.b64encode(file.read())
         params = {"image": image, "language_type": language}
