@@ -1,12 +1,12 @@
 import time
 from win32 import win32api, win32gui, win32print
 from win32.lib import win32con
-import win32gui
-import win32con
+from traceback import format_exc
+
 import utils.thread
-from traceback import format_exc, print_exc
 
 
+# 窗口句柄操作
 class WindowHwnd() :
 
     def __init__(self, object) :
@@ -54,7 +54,6 @@ class WindowHwnd() :
                 win32gui.SetWindowPos(hwnd, win32con.HWND_TOPMOST, 0, 0, 0, 0, win32con.SWP_NOSIZE | win32con.SWP_NOMOVE)
                 return hwnd
         except Exception :
-            print_exc()
             self.logger.error(format_exc())
 
         return 0
