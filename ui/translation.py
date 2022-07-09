@@ -1,3 +1,5 @@
+import sys
+
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -15,7 +17,6 @@ import utils.http
 import utils.range
 import utils.message
 import utils.lock
-import utils.hwnd
 
 import translator.sound
 import translator.all
@@ -800,8 +801,6 @@ class Translation(QMainWindow) :
 
         self.hide()
         self.object.filter_ui.show()
-        # 屏蔽词界面置顶
-        utils.thread.createThread(utils.hwnd.setWindowTop, int(self.object.filter_ui.winId()))
 
 
     # 按下范围框选键
@@ -849,3 +848,4 @@ class Translation(QMainWindow) :
         utils.thread.createThreadDaemonFalse(utils.config.postSaveSettin, self.object)
 
         self.close()
+        sys.exit()

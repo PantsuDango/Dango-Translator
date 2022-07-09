@@ -13,7 +13,6 @@ import utils.message
 import utils.port
 import utils.test
 import utils.http
-import utils.hwnd
 
 from ui import image
 import ui.hotkey
@@ -104,8 +103,10 @@ class Settin(QMainWindow) :
         self.getInitConfig()
         self.ui()
 
-        # 初始化密钥界面
+        # 初始化界面
         self.key_ui = ui.key.Key(self.object)
+        self.desc_ui = ui.desc.Desc(self.object)
+        self.hotkey_ui = ui.hotkey.HotKey(self.object)
 
 
     def ui(self):
@@ -2518,8 +2519,6 @@ class Settin(QMainWindow) :
 
         # 快捷键界面
         self.hotkey_ui = ui.hotkey.HotKey(self.object)
-        # 界面置顶
-        utils.thread.createThread(utils.hwnd.setWindowTop, int(self.hotkey_ui.winId()))
 
         if key_type == "translate" :
             self.hotkey_ui.setWindowTitle("设定翻译快捷键")

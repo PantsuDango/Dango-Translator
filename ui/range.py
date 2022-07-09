@@ -4,7 +4,6 @@ from PyQt5.QtCore import *
 import re
 
 import utils.thread
-import utils.hwnd
 
 
 PIXMAP_PATH = "./config/icon/pixmap.png"
@@ -24,15 +23,13 @@ class WScreenShot(QWidget) :
         desktop_rect = QDesktopWidget().screenGeometry()
         self.setGeometry(desktop_rect)
         self.setCursor(Qt.CrossCursor)
-        self.black_mask = QBitmap(QSize(desktop_rect.width()-1, desktop_rect.height()-1))
+        self.black_mask = QBitmap(QSize(desktop_rect.width(), desktop_rect.height()))
         self.black_mask.fill(Qt.black)
         self.mask = self.black_mask.copy()
         self.is_drawing = False
         self.start_point = QPoint()
         self.end_point = QPoint()
         self.object = object
-        # 设置窗口置顶且无焦点
-        utils.hwnd.setWindowPos(int(self.winId()))
 
 
     def paintEvent(self, event):
