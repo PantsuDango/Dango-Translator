@@ -848,4 +848,3 @@ class Translation(QMainWindow) :
         utils.thread.createThreadDaemonFalse(utils.config.postSaveSettin, self.object)
 
         self.close()
-        sys.exit()

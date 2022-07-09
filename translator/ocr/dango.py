@@ -230,11 +230,12 @@ def dangoOCR(object, test=False) :
     else :
         image_path = IMAGE_PATH
 
-    try :
-        # 四周加白边
-        imageBorder(image_path, image_path, "a", 10, color=(255, 255, 255))
-    except Exception :
-        object.logger.error(format_exc())
+    if not test :
+        try :
+            # 四周加白边
+            imageBorder(image_path, image_path, "a", 10, color=(255, 255, 255))
+        except Exception :
+            object.logger.error(format_exc())
 
     with open(image_path, "rb") as file :
         image = file.read()

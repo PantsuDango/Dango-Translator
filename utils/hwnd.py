@@ -17,11 +17,11 @@ class WindowHwnd() :
         self.hwnd_list = [
             self.object.translation_ui,
             self.object.settin_ui,
-            # self.object.filter_ui,
-            # self.object.range_ui,
-            # self.object.settin_ui.desc_ui,
-            # self.object.settin_ui.hotkey_ui,
-            # self.object.settin_ui.key_ui,
+            self.object.filter_ui,
+            self.object.range_ui,
+            self.object.settin_ui.desc_ui,
+            self.object.settin_ui.hotkey_ui,
+            self.object.settin_ui.key_ui,
         ]
         self.full_screen_sign = False
 
