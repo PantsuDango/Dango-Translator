@@ -41,22 +41,28 @@ class WindowHwnd() :
 
 
     # 设置窗口置顶且无焦点
-    def setTop(self, window) :
+    def setTop(self, window, hwnd) :
 
         try :
+            # 校验窗口是否存在
             if not window.isVisible() :
-                return  0
-            hwnd = int(window.winId())
-            if not hwnd :
-                return 0
-            if win32gui.IsWindow(hwnd) :
-                win32gui.SetWindowLong(hwnd, win32con.GWL_EXSTYLE, win32con.WS_EX_NOACTIVATE)
-                win32gui.SetWindowPos(hwnd, win32con.HWND_TOPMOST, 0, 0, 0, 0, win32con.SWP_NOSIZE | win32con.SWP_NOMOVE)
-                return hwnd
+                return
+            # 如果句柄不存在就获取
+            if not hwnd  :
+                hwnd = int(window.winId())
+            # 校验句柄是否有效
+            if not win32gui.IsWindow(hwnd) :
+                return
+            # 窗口无焦点
+            win32gui.SetWindowLong(hwnd, win32con.GWL_EXSTYLE, win32con.WS_EX_NOACTIVATE)
+            # 窗口置顶
+            win32gui.SetWindowPos(hwnd, win32con.HWND_TOPMOST, 0, 0, 0, 0, win32con.SWP_NOSIZE | win32con.SWP_NOMOVE)
+            return hwnd
+
         except Exception :
             self.logger.error(format_exc())
 
-        return 0
+        return
 
 
     # 解除窗口焦点
@@ -71,7 +77,6 @@ class WindowHwnd() :
             style = win32gui.GetWindowLong(hwnd, win32con.GWL_EXSTYLE)
             win32gui.SetWindowLong(hwnd, win32con.GWL_EXSTYLE, style & ~ win32con.WS_EX_NOACTIVATE)
         except Exception :
-            print_exc()
             self.logger.error(format_exc())
 
 
@@ -95,7 +100,7 @@ class WindowHwnd() :
 
             if not sign :
                 # 设置窗口置顶且无焦点
-                hwnd = self.setTop(window)
+                hwnd = self.setTop(window, hwnd)
                 if hwnd :
                     sign = True
 
