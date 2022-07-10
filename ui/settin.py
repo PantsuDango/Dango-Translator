@@ -2149,7 +2149,7 @@ class Settin(QMainWindow) :
     def openHomePage(self):
 
         try :
-            url = self.object.yaml["dict_info"]["dange_home_page"]
+            url = self.object.yaml["dict_info"]["dango_home_page"]
             webbrowser.open(url, new=0, autoraise=True)
         except Exception :
             self.logger.error(format_exc())
