@@ -148,6 +148,9 @@ class DangoTranslator() :
         # 加载屏蔽词界面图片
         settin_image_url = self.yaml["dict_info"]["settin_desc_image_url"]
         utils.http.downloadFile(settin_image_url, "./config/background/settin-desc.jpg", self.logger)
+        # 加载测试ocr图片
+        test_image_url = self.yaml["dict_info"]["test_image"]
+        utils.http.downloadFile(test_image_url, "./config/other/image.jpg", self.logger)
 
 
     # 主函数
