@@ -13,64 +13,49 @@ class WindowHwnd() :
 
         self.object = object
         self.logger = object.logger
-        self.rect_desk = win32gui.GetWindowRect(win32gui.GetDesktopWindow())
-        self.hwnd_list = [
-            self.object.translation_ui,
-            self.object.settin_ui,
-            self.object.filter_ui,
-            self.object.range_ui,
-            self.object.settin_ui.desc_ui,
-            self.object.settin_ui.hotkey_ui,
-            self.object.settin_ui.key_ui,
-        ]
-        self.full_screen_sign = False
-
-
-    # 判断当前激活窗体是否为全屏
-    def checkIsFullScreen(self) :
-
-        hwnd = win32gui.GetForegroundWindow()
-        title = win32gui.GetWindowText(hwnd)
-        if hwnd == win32gui.GetDesktopWindow() or title == "" :
-            return False
-        if win32gui.GetWindowRect(hwnd) != self.rect_desk :
-            return False
-
-        self.full_screen_hwnd = hwnd
-        return True
+        self.translation_ui_hwnd = self.object.translation_ui.winId()
+        self.range_ui_hwnd = self.object.range_ui.winId()
 
 
     # 设置窗口置顶且无焦点
-    def setTop(self, window, hwnd) :
+    def setTop(self, hwnd) :
 
         try :
-            # 校验窗口是否存在
-            if not window.isVisible() :
-                return
-            # 如果句柄不存在就获取
-            if not hwnd  :
-                hwnd = int(window.winId())
             # 校验句柄是否有效
             if not win32gui.IsWindow(hwnd) :
                 return
-            # 窗口无焦点
-            win32gui.SetWindowLong(hwnd, win32con.GWL_EXSTYLE, win32con.WS_EX_NOACTIVATE)
-            # 窗口置顶
-            win32gui.SetWindowPos(hwnd, win32con.HWND_TOPMOST, 0, 0, 0, 0, win32con.SWP_NOSIZE | win32con.SWP_NOMOVE)
-            return hwnd
-
+            while True :
+                time.sleep(0.5)
+                # 如果置顶开关被关闭则直接结束
+                if not self.object.settin_ui.set_top_use :
+                    return
+                # 判断是否有全屏程序
+                if not self.checkIsFullScreen() :
+                    continue
+                # 窗口无焦点
+                win32gui.SetWindowLong(hwnd, win32con.GWL_EXSTYLE, win32con.WS_EX_NOACTIVATE)
+                while True :
+                    time.sleep(0.5)
+                    # 窗口置顶
+                    win32gui.SetWindowPos(hwnd, win32con.HWND_TOPMOST, 0, 0, 0, 0, win32con.SWP_NOSIZE | win32con.SWP_NOMOVE)
+                    # 如果退出了全屏
+                    rect_desk = win32gui.GetWindowRect(win32gui.GetDesktopWindow())
+                    if win32gui.GetWindowRect(self.full_screen_hwnd) != rect_desk :
+                        self.releaseFocus(hwnd)
+                        break
+                    # 如果置顶开关被关闭则直接结束
+                    if not self.object.settin_ui.set_top_use :
+                        self.releaseFocus(hwnd)
+                        return
         except Exception :
             self.logger.error(format_exc())
-
-        return
 
 
     # 解除窗口焦点
     def releaseFocus(self, hwnd) :
 
         try :
-            if not hwnd :
-                return
+            # 校验句柄是否有效
             if not win32gui.IsWindow(hwnd) :
                 return
             # 恢复窗口焦点
@@ -80,45 +65,22 @@ class WindowHwnd() :
             self.logger.error(format_exc())
 
 
-    # 监听窗体
-    def windowMonitor(self, window) :
+    # 判断当前激活窗体是否为全屏
+    def checkIsFullScreen(self) :
 
-        # 用于判断是否执行过置顶语句, 避免重复执行
-        sign = False
-        hwnd = 0
+        rect_desk = win32gui.GetWindowRect(win32gui.GetDesktopWindow())
+        hwnd = win32gui.GetForegroundWindow()
+        title = win32gui.GetWindowText(hwnd)
+        if hwnd == win32gui.GetDesktopWindow() or title == "":
+            return False
+        if win32gui.GetWindowRect(hwnd) != rect_desk :
+            return False
 
-        while True:
-            time.sleep(0.1)
-            # 如果退出全屏, 结束循环
-            if not self.full_screen_sign :
-                break
-
-            # 如果句柄失效则退出
-            if hwnd and not win32gui.IsWindow(hwnd) :
-                sign = False
-                hwnd = 0
-
-            if not sign :
-                # 设置窗口置顶且无焦点
-                hwnd = self.setTop(window, hwnd)
-                if hwnd :
-                    sign = True
-
-        # 解除窗口焦点
-        self.releaseFocus(hwnd)
+        self.full_screen_hwnd = hwnd
+        return True
 
 
     def run(self) :
 
-        while True :
-            time.sleep(0.1)
-            if not self.checkIsFullScreen() :
-                continue
-            self.full_screen_sign = True
-            for window in self.hwnd_list :
-                utils.thread.createThread(self.windowMonitor, window)
-            while True :
-                time.sleep(0.1)
-                if win32gui.GetWindowRect(self.full_screen_hwnd) != self.rect_desk :
-                    self.full_screen_sign = False
-                    break
+        utils.thread.createThread(self.setTop, self.translation_ui_hwnd)
+        utils.thread.createThread(self.setTop, self.range_ui_hwnd)

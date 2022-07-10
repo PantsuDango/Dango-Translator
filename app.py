@@ -85,7 +85,8 @@ class DangoTranslator() :
         utils.thread.createThread(self.autoOpenOfflineOCR)
         # 界面置顶
         self.hwndObj = utils.hwnd.WindowHwnd(self)
-        utils.thread.createThread(self.hwndObj.run)
+        if self.settin_ui.set_top_use :
+            self.hwndObj.run()
 
 
     # 按下充电键后做的事情
