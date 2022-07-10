@@ -34,6 +34,11 @@ class WindowHwnd() :
                     continue
                 # 窗口无焦点
                 win32gui.SetWindowLong(hwnd, win32con.GWL_EXSTYLE, win32con.WS_EX_NOACTIVATE)
+                # 防止黑屏
+                if hwnd == self.range_ui_hwnd :
+                    self.object.range_ui.drag_label.setStyleSheet("background-color:none")
+                if hwnd == self.translation_ui_hwnd :
+                    self.object.translation_ui.drag_label.setStyleSheet("{background-color:none}")
                 while True :
                     time.sleep(0.5)
                     # 窗口置顶
@@ -54,8 +59,10 @@ class WindowHwnd() :
     # 解除窗口焦点
     def releaseFocus(self, hwnd) :
 
+        # 范围界面不需要显示焦点
+        if hwnd == self.range_ui_hwnd :
+            return
         try :
-            # 校验句柄是否有效
             if not win32gui.IsWindow(hwnd) :
                 return
             # 恢复窗口焦点

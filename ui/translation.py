@@ -99,9 +99,9 @@ class Translation(QMainWindow) :
         select_pixmap = QCursor(select_pixmap, 0, 0)
 
         # 工具栏标签
-        label = QLabel(self)
-        self.customSetGeometry(label, 0, 0, 800, 30)
-        label.setStyleSheet("background-color: rgba(62, 62, 62, 0.01)")
+        self.label = QLabel(self)
+        self.customSetGeometry(self.label, 0, 0, 800, 30)
+        self.label.setStyleSheet("background-color: rgba(62, 62, 62, 0.01)")
 
         # 翻译框字体
         self.font = QFont()
@@ -529,7 +529,6 @@ class Translation(QMainWindow) :
             self.format.setTextOutline(QPen(QColor(self.font_color_2), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
             self.translate_text.mergeCurrentCharFormat(self.format)
             self.translate_text.append("喜欢的话能不能在b站给团子一个关注，团子会很开心的~真心感谢你❤")
-
 
 
     # 当翻译内容改变时界面自适应窗口大小
