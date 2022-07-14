@@ -11,7 +11,8 @@
 
   
 ## 简介
-> 因安装包文件过大，软件下载请前往[团子翻译器官网](https://translator.dango.cloud)进行下载，新版本不再发布于github Releases
+> 因安装包文件过大，软件下载请前往[团子翻译器官网](https://translator.dango.cloud)进行下载，新版本不再发布github Releases
+
 
 团子翻译器是一款生肉翻译软件，通过OCR识别屏幕特定范围内的文字，然后将识别到的文字调取各大厂的翻译，并输出翻译结果。
 
