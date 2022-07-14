@@ -11,6 +11,8 @@
 
   
 ## 简介
+> 因安装包文件过大，软件下载请前往[团子翻译器官网](https://translator.dango.cloud)进行下载，新版本不再发布github Releases
+
 
 团子翻译器是一款生肉翻译软件，通过OCR识别屏幕特定范围内的文字，然后将识别到的文字调取各大厂的翻译，并输出翻译结果。
 
@@ -47,12 +49,12 @@
 + 优化了识别速度和识别质量;
 + 优化了对个别环境的适配问题
 
-+ 更多更新日志：[查看]()
++ 更多更新日志：[查看](https://docs1.ayano.top/#/4.0/develop/changelog)  
 
   
 ## 使用教程
 
-[翻译器教程]([https://docs1.ayano.top](https://docs1.ayano.top))
+[翻译器使用文档教程](https://docs1.ayano.top)
 
   
 ## 原理说明
