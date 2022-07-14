@@ -52,7 +52,7 @@
   
 ## 使用教程
 
-[翻译器教程]([https://docs1.ayano.top](https://docs1.ayano.top))
+[翻译器使用文档教程](https://docs1.ayano.top)
 
   
 ## 原理说明
