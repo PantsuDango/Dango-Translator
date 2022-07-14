@@ -37,7 +37,7 @@
 
 + 修复串台, 出现其他人的翻译内容问题（大概）；
 + 修改了翻译出错时"我抽风啦"的说法；
-+ 更多更新日志：[查看](https://github.com/PantsuDango/Dango-Translator/blob/master/docx/%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97.md)  
++ 更多更新日志：[查看](https://docs1.ayano.top/#/4.0/develop/changelog)  
 
 #### OCR相关
 
@@ -52,7 +52,7 @@
   
 ## 使用教程
 
-[翻译器教程]([https://docs.ayano.top](https://docs.dango.c4a15wh.cn/#/4.0/FAQ/faq))
+[翻译器教程]([https://docs1.ayano.top](https://docs1.ayano.top))
 
   
 ## 原理说明
