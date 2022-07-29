@@ -7,7 +7,7 @@
 [![GitHubStars](https://img.shields.io/github/stars/PantsuDango/Dango-Translator)]()
 [![GitHubForks](https://img.shields.io/github/forks/PantsuDango/Dango-Translator)]()
 [![作者](https://img.shields.io/badge/QQ-%E8%83%96%E6%AC%A1%E5%9B%A2%E5%AD%90-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E4%BD%9C%E8%80%85.png)
-[![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-1%E7%BE%A4779594427-ff69b4)](https://l2.drive.c4a15wh.cn/api/v3/slave/source/0/dXBsb2Fkcy8yMDIyLzA1LzE5LzhPQWxHM1NMLzHnvqQucG5n/1%E7%BE%A4.png?sign=WcPHH8F_x-ERGO7xgvGD_xOb99W0eBoCxUoGjOUmiuk%3D%3A0)
+[![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-18%E7%BE%A4794893584-ff69b4)](https://l2.drive.c4a15wh.cn/api/v3/slave/source/0/dXBsb2Fkcy8yMDIyLzA3LzI5LzFZNThpbGVzX0dyb3VwMTgtSW1hZ2UuanBn/18%E7%BE%A4.jpg?sign=rzrePnnOXo1s54x5GPCjGEKGkdH6jYaIKwHUxRjA23Y%3D%3A0)
 
   
 ## 简介
