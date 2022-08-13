@@ -992,51 +992,36 @@ class Settin(QMainWindow) :
         button.clicked.connect(lambda: self.showDesc("originalColor"))
         button.setCursor(self.question_pixmap)
 
-        # 贴字翻译标签
-        label = QLabel(self.tab_3)
-        self.customSetGeometry(label, 20, 220, 60, 20)
-        label.setText("贴字翻译:")
+        # 是否全屏下置顶
+        label = QLabel(self.tab_4)
+        self.customSetGeometry(label, 20, 220, 150, 20)
+        label.setText("是否全屏下置顶:")
 
-        # 贴字翻译开关
-        self.draw_image_switch = ui.switch.DrawSwitchOCR(self.tab_3, sign=self.draw_image_use, startX=(65-20)*self.rate, object=self.object)
-        self.customSetGeometry(self.draw_image_switch, 95, 220, 65, 20)
-        self.draw_image_switch.checkedChanged.connect(self.changeDrawImageSwitch)
-        self.draw_image_switch.setCursor(self.select_pixmap)
+        # 是否全屏下置顶开关
+        self.set_top_switch = ui.switch.SwitchOCR(self.tab_4,
+                                                  self.set_top_use,
+                                                  startX=(65-20) * self.rate)
+        self.customSetGeometry(self.set_top_switch, 140, 270, 65, 20)
+        self.set_top_switch.checkedChanged.connect(self.changeSetTopSwitch)
+        self.set_top_switch.setCursor(self.select_pixmap)
 
-        # 贴字翻译说明标签
-        button = QPushButton(self.tab_3)
-        self.customSetGeometry(button, 175, 220, 25, 20)
-        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;" % self.color_2)
+        # 是否全屏下置顶说明标签
+        button = QPushButton(self.tab_4)
+        self.customSetGeometry(button, 220, 220, 25, 20)
+        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;"%self.color_2)
         button.setText("说明")
-        button.clicked.connect(lambda: self.showDesc("drawImage"))
+        button.clicked.connect(lambda: self.showDesc("setTop"))
         button.setCursor(self.question_pixmap)
 
-        # 贴字翻译说明?号图标
-        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_3)
+        # 是否全屏下置顶说明?号图标
+        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_4)
         self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 200, 220, 20, 20)
+        self.customSetGeometry(button, 245, 220, 20, 20)
         button.setStyleSheet("background: transparent;")
-        button.clicked.connect(lambda: self.showDesc("drawImage"))
+        button.clicked.connect(lambda: self.showDesc("setTop"))
         button.setCursor(self.question_pixmap)
 
-        # 隐藏范围快捷键标签
-        label = QLabel(self.tab_3)
-        self.customSetGeometry(label, 275, 220, 100, 20)
-        label.setText("隐藏范围热键:")
 
-        # 隐藏快捷键开关
-        self.hide_range_hotkey_switch = ui.switch.SwitchOCR(self.tab_3, sign=self.hide_range_hotkey_use,
-                                                             startX=(65-20) * self.rate)
-        self.customSetGeometry(self.hide_range_hotkey_switch, 380, 220, 65, 20)
-        self.hide_range_hotkey_switch.checkedChanged.connect(self.changeHideRangeHotkeySwitch)
-        self.hide_range_hotkey_switch.setCursor(self.select_pixmap)
-
-        # 隐藏快捷键设定按钮
-        self.hide_range_hotkey_button = QPushButton(self.tab_3)
-        self.customSetGeometry(self.hide_range_hotkey_button, 460, 220, 60, 20)
-        self.hide_range_hotkey_button.setText(self.object.config["hideRangeHotkeyValue1"] + "+" + self.object.config["hideRangeHotkeyValue2"])
-        self.hide_range_hotkey_button.clicked.connect(lambda: self.setHotKey("hideRange"))
-        self.hide_range_hotkey_button.setCursor(self.select_pixmap)
 
 
     # 功能设定标签页
@@ -1290,35 +1275,52 @@ class Settin(QMainWindow) :
         self.baidu_ocr_high_precision_switch.checkedChanged.connect(self.changeBaiduOcrHighPrecisionSwitch)
         self.baidu_ocr_high_precision_switch.setCursor(self.select_pixmap)
 
-        # 是否全屏下置顶
-        label = QLabel(self.tab_4)
-        self.customSetGeometry(label, 20, 270, 150, 20)
-        label.setText("是否全屏下置顶:")
 
-        # 是否全屏下置顶开关
-        self.set_top_switch = ui.switch.SwitchOCR(self.tab_4,
-                                                  self.set_top_use,
-                                                  startX=(65-20) * self.rate)
-        self.customSetGeometry(self.set_top_switch, 140, 270, 65, 20)
-        self.set_top_switch.checkedChanged.connect(self.changeSetTopSwitch)
-        self.set_top_switch.setCursor(self.select_pixmap)
+        # 贴字翻译标签
+        label = QLabel(self.tab_3)
+        self.customSetGeometry(label, 20, 220, 60, 20)
+        label.setText("贴字翻译:")
 
-        # 是否全屏下置顶说明标签
-        button = QPushButton(self.tab_4)
-        self.customSetGeometry(button, 220, 270, 25, 20)
-        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;"%self.color_2)
+        # 贴字翻译开关
+        self.draw_image_switch = ui.switch.DrawSwitchOCR(self.tab_3, sign=self.draw_image_use, startX=(65-20)*self.rate, object=self.object)
+        self.customSetGeometry(self.draw_image_switch, 95, 220, 65, 20)
+        self.draw_image_switch.checkedChanged.connect(self.changeDrawImageSwitch)
+        self.draw_image_switch.setCursor(self.select_pixmap)
+
+        # 贴字翻译说明标签
+        button = QPushButton(self.tab_3)
+        self.customSetGeometry(button, 175, 220, 25, 20)
+        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;" % self.color_2)
         button.setText("说明")
-        button.clicked.connect(lambda: self.showDesc("setTop"))
+        button.clicked.connect(lambda: self.showDesc("drawImage"))
         button.setCursor(self.question_pixmap)
 
-        # 是否全屏下置顶说明?号图标
-        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_4)
+        # 贴字翻译说明?号图标
+        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_3)
         self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 245, 270, 20, 20)
+        self.customSetGeometry(button, 200, 220, 20, 20)
         button.setStyleSheet("background: transparent;")
-        button.clicked.connect(lambda: self.showDesc("setTop"))
+        button.clicked.connect(lambda: self.showDesc("drawImage"))
         button.setCursor(self.question_pixmap)
 
+        # 隐藏范围快捷键标签
+        label = QLabel(self.tab_3)
+        self.customSetGeometry(label, 275, 220, 100, 20)
+        label.setText("隐藏范围热键:")
+
+        # 隐藏快捷键开关
+        self.hide_range_hotkey_switch = ui.switch.SwitchOCR(self.tab_3, sign=self.hide_range_hotkey_use,
+                                                             startX=(65-20) * self.rate)
+        self.customSetGeometry(self.hide_range_hotkey_switch, 380, 220, 65, 20)
+        self.hide_range_hotkey_switch.checkedChanged.connect(self.changeHideRangeHotkeySwitch)
+        self.hide_range_hotkey_switch.setCursor(self.select_pixmap)
+
+        # 隐藏快捷键设定按钮
+        self.hide_range_hotkey_button = QPushButton(self.tab_3)
+        self.customSetGeometry(self.hide_range_hotkey_button, 460, 220, 60, 20)
+        self.hide_range_hotkey_button.setText(self.object.config["hideRangeHotkeyValue1"] + "+" + self.object.config["hideRangeHotkeyValue2"])
+        self.hide_range_hotkey_button.clicked.connect(lambda: self.setHotKey("hideRange"))
+        self.hide_range_hotkey_button.setCursor(self.select_pixmap)
 
     # 关于标签页
     def setTabFive(self) :
