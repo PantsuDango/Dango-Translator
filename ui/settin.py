@@ -103,10 +103,8 @@ class Settin(QMainWindow) :
         self.getInitConfig()
         self.ui()
 
-        # 初始化界面
+        # 初始化密钥界面
         self.key_ui = ui.key.Key(self.object)
-        self.desc_ui = ui.desc.Desc(self.object)
-        self.hotkey_ui = ui.hotkey.HotKey(self.object)
 
 
     def ui(self):
@@ -1290,35 +1288,6 @@ class Settin(QMainWindow) :
         self.baidu_ocr_high_precision_switch.checkedChanged.connect(self.changeBaiduOcrHighPrecisionSwitch)
         self.baidu_ocr_high_precision_switch.setCursor(self.select_pixmap)
 
-        # 是否全屏下置顶
-        label = QLabel(self.tab_4)
-        self.customSetGeometry(label, 20, 270, 150, 20)
-        label.setText("是否全屏下置顶:")
-
-        # 是否全屏下置顶开关
-        self.set_top_switch = ui.switch.SwitchOCR(self.tab_4,
-                                                  self.set_top_use,
-                                                  startX=(65-20) * self.rate)
-        self.customSetGeometry(self.set_top_switch, 140, 270, 65, 20)
-        self.set_top_switch.checkedChanged.connect(self.changeSetTopSwitch)
-        self.set_top_switch.setCursor(self.select_pixmap)
-
-        # 是否全屏下置顶说明标签
-        button = QPushButton(self.tab_4)
-        self.customSetGeometry(button, 220, 270, 25, 20)
-        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;"%self.color_2)
-        button.setText("说明")
-        button.clicked.connect(lambda: self.showDesc("setTop"))
-        button.setCursor(self.question_pixmap)
-
-        # 是否全屏下置顶说明?号图标
-        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_4)
-        self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 245, 270, 20, 20)
-        button.setStyleSheet("background: transparent;")
-        button.clicked.connect(lambda: self.showDesc("setTop"))
-        button.setCursor(self.question_pixmap)
-
 
     # 关于标签页
     def setTabFive(self) :
@@ -1723,8 +1692,6 @@ class Settin(QMainWindow) :
         self.draw_image_use = self.object.config["drawImageUse"]
         # 隐藏范围快捷键开关
         self.hide_range_hotkey_use = self.object.config["showHotKey3"]
-        # 是否全屏下置顶开关
-        self.set_top_use = self.object.config["setTop"]
 
 
     # 获取节点信息
@@ -1859,16 +1826,6 @@ class Settin(QMainWindow) :
             self.baidu_ocr_high_precision_use = True
         else:
             self.baidu_ocr_high_precision_use = False
-
-
-    # 改变是否全屏下置顶开关状态
-    def changeSetTopSwitch(self, checked):
-
-        if checked:
-            self.set_top_use = True
-            utils.thread.createThread(self.object.hwndObj.run)
-        else:
-            self.set_top_use = False
 
 
     # 改变公共有道翻译开关状态
@@ -2190,7 +2147,7 @@ class Settin(QMainWindow) :
     def openHomePage(self):
 
         try :
-            url = self.object.yaml["dict_info"]["dango_home_page"]
+            url = self.object.yaml["dict_info"]["dange_home_page"]
             webbrowser.open(url, new=0, autoraise=True)
         except Exception :
             self.logger.error(format_exc())
@@ -2445,7 +2402,7 @@ class Settin(QMainWindow) :
         # 文字换行
         elif message_type == "branchLine" :
             self.desc_ui.setWindowTitle("文字换行说明")
-            self.setTextColor(self.desc_ui.desc_text, "#FF0000", "如果看不懂请不要打开此开关.")
+            self.setTextColor(self.desc_ui.desc_text, "#FF0000", "如果看不懂请打开此开关.")
             self.desc_ui.desc_text.append("\n会将识别到的原文换行后再翻译, 可能会出现断句错误情况")
 
         # 原文颜色
@@ -2466,11 +2423,6 @@ class Settin(QMainWindow) :
         elif message_type == "drawImage":
             self.desc_ui.setWindowTitle("贴字翻译说明")
             self.desc_ui.desc_text.append("\n开启后会将翻译结果直接贴在截图区域上, 目前仅支持于在线OCR")
-
-        # 贴字翻译
-        elif message_type == "setTop":
-            self.desc_ui.setWindowTitle("全屏下置顶说明")
-            self.desc_ui.desc_text.append("\n如果需要游玩全屏游戏, 则打开此开关, 否则平时请保持关闭")
 
         self.desc_ui.show()
 
@@ -2777,8 +2729,6 @@ class Settin(QMainWindow) :
             self.object.range_ui.draw_label.hide()
         # 隐藏范围快捷键开关
         self.object.config["showHotKey3"] = str(self.hide_range_hotkey_use)
-        # 是否全屏下置顶开关
-        self.object.config["setTop"] = self.set_top_use
 
 
     # 注册新快捷键
