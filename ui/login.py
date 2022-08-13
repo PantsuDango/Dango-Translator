@@ -9,7 +9,7 @@ import utils.message
 import utils.http
 import utils.config
 import utils.lock
-
+import utils.enctry
 
 LOGO_PATH = "./config/icon/logo.ico"
 PIXMAP_PATH = "./config/icon/pixmap.png"
@@ -19,9 +19,9 @@ EDIT_PATH = "./config/icon/edit.png"
 
 
 # 登录界面
-class Login(QWidget) :
+class Login(QWidget):
 
-    def __init__(self, object) :
+    def __init__(self, object):
 
         super(Login, self).__init__()
         self.object = object
@@ -29,11 +29,10 @@ class Login(QWidget) :
         self.getInitConfig()
         self.ui()
 
-
     def ui(self):
 
         # 窗口尺寸
-        self.resize(int(400*self.rate), int(566*self.rate))
+        self.resize(int(400 * self.rate), int(566 * self.rate))
 
         # 窗口无标题栏、窗口置顶、窗口透明
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
@@ -46,8 +45,8 @@ class Login(QWidget) :
 
         # 鼠标样式, 光标长宽比1.133333
         pixmap = QPixmap(PIXMAP_PATH)
-        pixmap = pixmap.scaled(int(20*self.rate),
-                               int(20*self.rate),
+        pixmap = pixmap.scaled(int(20 * self.rate),
+                               int(20 * self.rate),
                                Qt.KeepAspectRatio,
                                Qt.SmoothTransformation)
         cursor = QCursor(pixmap, 0, 0)
@@ -55,20 +54,19 @@ class Login(QWidget) :
 
         # 鼠标选中状态图标
         select_pixmap = QPixmap(PIXMAP2_PATH)
-        select_pixmap = select_pixmap.scaled(int(20*self.rate),
-                                             int(20*self.rate),
+        select_pixmap = select_pixmap.scaled(int(20 * self.rate),
+                                             int(20 * self.rate),
                                              Qt.KeepAspectRatio,
                                              Qt.SmoothTransformation)
         select_pixmap = QCursor(select_pixmap, 0, 0)
 
         # 鼠标编辑状态图标
         edit_pixmap = QPixmap(EDIT_PATH)
-        edit_pixmap = edit_pixmap.scaled(int(20*self.rate),
-                                         int(25*self.rate),
+        edit_pixmap = edit_pixmap.scaled(int(20 * self.rate),
+                                         int(25 * self.rate),
                                          Qt.KeepAspectRatio,
                                          Qt.SmoothTransformation)
         edit_pixmap = QCursor(edit_pixmap, 0, 0)
-
 
         # 设置字体
         font = QFont()
@@ -84,12 +82,12 @@ class Login(QWidget) :
                            "font-weight: bold;"
                            "border-bottom: 2px solid %s; }"
                            "QTextEdit:focus { border-bottom: 2px dashed %s; }"
-                           %(self.color, self.color, self.color))
+                           % (self.color, self.color, self.color))
 
         # 背景图片, 长宽比: 1.39
         label = QLabel(self)
         self.customSetGeometry(label, 0, 0, 400, 566)
-        label.setStyleSheet("border-image: url(%s);"%BACKGROUND_PATH)
+        label.setStyleSheet("border-image: url(%s);" % BACKGROUND_PATH)
 
         # 版本号
         label = QLabel(self)
@@ -97,7 +95,7 @@ class Login(QWidget) :
         label.setStyleSheet("color: %s;"
                             "background: transparent;"
                             "font: 10pt %s;" % (self.color, self.font_type))
-        label.setText("封面图 pixiv id: %s"%self.object.yaml["dict_info"]["cover_pixiv_id"])
+        label.setText("封面图 pixiv id: %s" % self.object.yaml["dict_info"]["cover_pixiv_id"])
 
         # 矩形框
         label = QLabel(self)
@@ -105,12 +103,12 @@ class Login(QWidget) :
         label.setStyleSheet("background-color: rgba(255, 255, 255, 0.7);"
                             "border-width: 5px 5px 5px 5px;"
                             "border:2px solid %s;"
-                            "border-radius:15px;"%self.color)
+                            "border-radius:15px;" % self.color)
 
         # Logo
         label = QLabel(self)
         self.customSetGeometry(label, 80, 365, 35, 35)
-        label.setStyleSheet("border-image: url(%s);"%LOGO_PATH)
+        label.setStyleSheet("border-image: url(%s);" % LOGO_PATH)
 
         # 标题
         label = QLabel(self)
@@ -193,18 +191,17 @@ class Login(QWidget) :
         # 版本号
         label = QLabel(self)
         self.customSetGeometry(label, 20, 540, 380, 15)
-        label.setText("版本号: %s  更新时间: 2022-07-11  By: 胖次团子"%self.object.yaml["version"])
+        label.setText("版本号: %s  更新时间: 2022-07-11  By: 胖次团子" % self.object.yaml["version"])
         label.setStyleSheet("color: %s;"
                             "background: transparent;"
                             "font-weight:bold;"
                             "font: 10pt %s;"
-                            %(self.color, self.font_type))
+                            % (self.color, self.font_type))
 
         self.setTabOrder(self.user_text, self.password_text)
 
-
     # 初始化配置
-    def getInitConfig(self) :
+    def getInitConfig(self):
 
         # 界面缩放比例
         self.rate = self.object.yaml["screen_scale_rate"]
@@ -217,8 +214,11 @@ class Login(QWidget) :
         # 用户名
         self.user = str(self.object.yaml["user"])
         # 密码
-        self.password = str(self.object.yaml["password"])
-
+        psw = str(self.object.yaml["password"])
+        if psw.find('%6?u!') != -1:
+            self.password = utils.enctry.dectry(psw)
+        else:
+            self.password = psw
 
     # 根据分辨率定义控件位置尺寸
     def customSetGeometry(self, object, x, y, w, h):
@@ -227,51 +227,45 @@ class Login(QWidget) :
                                  int(y * self.rate), int(w * self.rate),
                                  int(h * self.rate)))
 
-
     # 根据分辨率定义图标位置尺寸
-    def customSetIconSize(self, object, w, h) :
+    def customSetIconSize(self, object, w, h):
 
-        object.setIconSize(QSize(int(w*self.rate),
-                                 int(h*self.rate)))
-
+        object.setIconSize(QSize(int(w * self.rate),
+                                 int(h * self.rate)))
 
     # 鼠标移动事件
-    def mouseMoveEvent(self, e: QMouseEvent) :
+    def mouseMoveEvent(self, e: QMouseEvent):
 
         self._endPos = e.pos() - self._startPos
         self.move(self.pos() + self._endPos)
 
-
     # 鼠标按下事件
-    def mousePressEvent(self, e: QMouseEvent) :
+    def mousePressEvent(self, e: QMouseEvent):
 
         if e.button() == Qt.LeftButton:
             self._isTracking = True
             self._startPos = QPoint(e.x(), e.y())
 
-
     # 鼠标松开事件
-    def mouseReleaseEvent(self, e: QMouseEvent) :
+    def mouseReleaseEvent(self, e: QMouseEvent):
 
         if e.button() == Qt.LeftButton:
             self._isTracking = False
             self._startPos = None
             self._endPos = None
 
-
     # 点击眼睛
-    def clickEyeButton(self) :
+    def clickEyeButton(self):
 
-        if self.password_text.echoMode() == QLineEdit.Password :
+        if self.password_text.echoMode() == QLineEdit.Password:
             self.eye_button.setIcon(qtawesome.icon('fa.eye', color=self.color))
             self.password_text.setEchoMode(QLineEdit.Normal)
-        else :
+        else:
             self.eye_button.setIcon(qtawesome.icon('fa.eye-slash', color=self.color))
             self.password_text.setEchoMode(QLineEdit.Password)
 
-
     # 检查登录参数
-    def checkLogin(self) :
+    def checkLogin(self):
 
         self.user = self.user_text.text()
         self.password = self.password_text.text()
@@ -290,9 +284,8 @@ class Login(QWidget) :
 
         return True
 
-
     # 登录请求
-    def postLogin(self) :
+    def postLogin(self):
 
         # 请求服务器
         url = self.object.yaml["dict_info"]["dango_login"]
@@ -324,7 +317,7 @@ class Login(QWidget) :
         elif result == "OK":
             # 保存配置
             self.object.yaml["user"] = self.user
-            self.object.yaml["password"] = self.password
+            self.object.yaml["password"] = utils.enctry.enctry(self.password)
             utils.config.saveConfig(self.object.yaml, self.logger)
             return True
 
@@ -333,31 +326,28 @@ class Login(QWidget) :
                                      "出现了出乎意料的情况\n请联系团子解决!     ")
             return False
 
-
     # 登录
-    def login(self) :
+    def login(self):
 
         # 检查登录参数
-        if not self.checkLogin() :
+        if not self.checkLogin():
             return False
 
         # 登录请求
-        if not self.postLogin() :
+        if not self.postLogin():
             return False
 
         return True
 
-
     # 热键检测
-    def keyPressEvent(self, event) :
+    def keyPressEvent(self, event):
 
         # 如果按下回车键
-        if event.key() == 16777220 :
+        if event.key() == 16777220:
             self.object.login()
 
-
     # 退出程序
-    def quit(self) :
+    def quit(self):
 
         # 退出
         QCoreApplication.instance().quit()
