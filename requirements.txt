@@ -1,7 +1,6 @@
 selenium==3.141.0
-Flask==1.1.1
 opencv_python==4.2.0.34
-win32gui==221.6
+pywin32==304
 QtAwesome==0.7.1
 scikit_image==0.15.0
 system_hotkey==1.0.3
