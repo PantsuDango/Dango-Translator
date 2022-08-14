@@ -27,10 +27,10 @@ import translator.update_chrome_driver
 import translator.update_edge_driver
 
 
-class DangoTranslator():
+class DangoTranslator() :
 
     # 配置初始化
-    def __init__(self):
+    def __init__(self) :
 
         # 错误日志
         self.logger = utils.logger.setLog()
@@ -45,10 +45,11 @@ class DangoTranslator():
         # 保存配置
         utils.config.saveConfig(self.yaml, self.logger)
 
-    # 登录
-    def login(self):
 
-        if not self.login_ui.login():
+    # 登录
+    def login(self) :
+
+        if not self.login_ui.login() :
             return
 
         # 从云端获取配置信息
@@ -87,8 +88,9 @@ class DangoTranslator():
         if self.settin_ui.set_top_use :
             self.hwndObj.run()
 
+
     # 按下充电键后做的事情
-    def clickBattery(self):
+    def clickBattery(self) :
 
         self.translation_ui.unregisterHotKey()
         self.translation_ui.close()
@@ -96,28 +98,31 @@ class DangoTranslator():
         self.settin_ui.tab_widget.setCurrentIndex(4)
         self.settin_ui.show()
 
+
     # 按下设置键后做的事情
-    def clickSettin(self):
+    def clickSettin(self) :
 
         self.translation_ui.unregisterHotKey()
         self.translation_ui.close()
         self.range_ui.close()
         self.settin_ui.show()
 
-    # 自动打开本地OCR
-    def autoOpenOfflineOCR(self):
 
-        if not self.config["offlineOCR"]:
+    # 自动打开本地OCR
+    def autoOpenOfflineOCR(self) :
+
+        if not self.config["offlineOCR"] :
             return
-        if not utils.port.detectPort(self.yaml["port"]):
-            try:
+        if not utils.port.detectPort(self.yaml["port"]) :
+            try :
                 # 启动本地OCR
                 os.startfile(self.yaml["ocr_cmd_path"])
-            except Exception:
+            except Exception :
                 self.logger.error(format_exc())
 
+
     # 初始化资源
-    def InitLoadFile(self):
+    def InitLoadFile(self) :
 
         # 更新谷歌浏览器引擎文件
         utils.thread.createThread(translator.update_chrome_driver.updateChromeDriver, self.logger)
@@ -148,8 +153,9 @@ class DangoTranslator():
         test_image_url = self.yaml["dict_info"]["test_image"]
         utils.http.downloadFile(test_image_url, "./config/other/image.jpg", self.logger)
 
+
     # 主函数
-    def main(self):
+    def main(self) :
 
         # 更新贴字翻译所需的pil运行库
         utils.update.updatePilFile(self.yaml, self.logger)
@@ -158,14 +164,14 @@ class DangoTranslator():
         app = QApplication(sys.argv)
 
         # 连接配置中心
-        if not self.yaml["dict_info"]:
+        if not self.yaml["dict_info"] :
             utils.message.serverClientFailMessage(self)
         # 检查是否为测试版本
         utils.message.checkIsTestVersion(self)
         # 检查字体
         utils.check_font.checkFont(self.logger)
         # 检查版本更新线程
-        if "Beta" not in self.yaml["version"]:
+        if "Beta" not in self.yaml["version"] :
             thread = utils.thread.createCheckVersionQThread(self)
             thread.signal.connect(lambda: utils.message.showCheckVersionMessage(self))
             utils.thread.runQThread(thread)
@@ -185,12 +191,13 @@ class DangoTranslator():
         self.login_ui.forget_password_button.clicked.connect(self.register_ui.clickForgetPassword)
 
         # 自动登录
-        if self.yaml["auto_login"]:
+        if self.yaml["auto_login"] :
             self.login()
 
         app.exit(app.exec_())
 
 
-if __name__ == "__main__":
+if __name__ == "__main__" :
+
     app = DangoTranslator()
     app.main()
