@@ -22,10 +22,10 @@
   <widget class="QTabWidget" name="tabWidget">
    <property name="geometry">
     <rect>
-     <x>-10</x>
+     <x>0</x>
      <y>0</y>
-     <width>691</width>
-     <height>381</height>
+     <width>800</width>
+     <height>400</height>
     </rect>
    </property>
    <property name="currentIndex">
@@ -53,10 +53,10 @@
     <widget class="Line" name="line_8">
      <property name="geometry">
       <rect>
-       <x>240</x>
+       <x>140</x>
        <y>270</y>
-       <width>61</width>
-       <height>16</height>
+       <width>60</width>
+       <height>15</height>
       </rect>
      </property>
      <property name="orientation">
@@ -66,10 +66,10 @@
     <widget class="QLabel" name="label_5">
      <property name="geometry">
       <rect>
-       <x>560</x>
-       <y>30</y>
-       <width>53</width>
-       <height>16</height>
+       <x>460</x>
+       <y>20</y>
+       <width>25</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="text">
@@ -79,10 +79,10 @@
     <widget class="QLabel" name="label_19">
      <property name="geometry">
       <rect>
-       <x>260</x>
-       <y>240</y>
-       <width>53</width>
-       <height>16</height>
+       <x>205</x>
+       <y>230</y>
+       <width>25</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="text">
@@ -92,10 +92,10 @@
     <widget class="Line" name="line_6">
      <property name="geometry">
       <rect>
-       <x>130</x>
+       <x>20</x>
        <y>180</y>
-       <width>61</width>
-       <height>16</height>
+       <width>60</width>
+       <height>15</height>
       </rect>
      </property>
      <property name="orientation">
@@ -105,10 +105,10 @@
     <widget class="QSlider" name="horizontalSlider_3">
      <property name="geometry">
       <rect>
-       <x>190</x>
-       <y>120</y>
-       <width>61</width>
-       <height>16</height>
+       <x>95</x>
+       <y>110</y>
+       <width>65</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="orientation">
@@ -118,10 +118,10 @@
     <widget class="QLabel" name="label_6">
      <property name="geometry">
       <rect>
-       <x>600</x>
-       <y>30</y>
-       <width>53</width>
-       <height>16</height>
+       <x>485</x>
+       <y>20</y>
+       <width>20</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="text">
@@ -131,10 +131,10 @@
     <widget class="QLabel" name="label_23">
      <property name="geometry">
       <rect>
-       <x>410</x>
+       <x>280</x>
        <y>200</y>
-       <width>53</width>
-       <height>16</height>
+       <width>140</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="text">
@@ -144,10 +144,10 @@
     <widget class="Line" name="line_4">
      <property name="geometry">
       <rect>
-       <x>240</x>
-       <y>100</y>
-       <width>61</width>
-       <height>16</height>
+       <x>140</x>
+       <y>90</y>
+       <width>60</width>
+       <height>15</height>
       </rect>
      </property>
      <property name="orientation">
@@ -157,10 +157,10 @@
     <widget class="Line" name="line_3">
      <property name="geometry">
       <rect>
-       <x>130</x>
-       <y>100</y>
-       <width>61</width>
-       <height>16</height>
+       <x>20</x>
+       <y>90</y>
+       <width>60</width>
+       <height>15</height>
       </rect>
      </property>
      <property name="orientation">
@@ -170,23 +170,10 @@
     <widget class="QLabel" name="label_18">
      <property name="geometry">
       <rect>
-       <x>310</x>
-       <y>240</y>
-       <width>53</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>？</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_13">
-     <property name="geometry">
-      <rect>
-       <x>620</x>
-       <y>120</y>
-       <width>53</width>
-       <height>16</height>
+       <x>230</x>
+       <y>230</y>
+       <width>20</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="text">
@@ -196,36 +183,23 @@
     <widget class="QLabel" name="label_26">
      <property name="geometry">
       <rect>
-       <x>130</x>
-       <y>240</y>
-       <width>53</width>
-       <height>16</height>
+       <x>20</x>
+       <y>230</y>
+       <width>100</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="text">
       <string>文字相似度(%):</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_15">
-     <property name="geometry">
-      <rect>
-       <x>260</x>
-       <y>160</y>
-       <width>53</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>说明</string>
-     </property>
-    </widget>
     <widget class="QLabel" name="label">
      <property name="geometry">
       <rect>
-       <x>210</x>
-       <y>10</y>
-       <width>53</width>
-       <height>16</height>
+       <x>80</x>
+       <y>0</y>
+       <width>50</width>
+       <height>15</height>
       </rect>
      </property>
      <property name="text">
@@ -235,36 +209,23 @@
     <widget class="Line" name="line">
      <property name="geometry">
       <rect>
-       <x>150</x>
-       <y>10</y>
-       <width>61</width>
-       <height>16</height>
+       <x>20</x>
+       <y>0</y>
+       <width>60</width>
+       <height>15</height>
       </rect>
      </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
-    <widget class="QLabel" name="label_9">
-     <property name="geometry">
-      <rect>
-       <x>260</x>
-       <y>120</y>
-       <width>53</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>说明</string>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_2">
      <property name="geometry">
       <rect>
-       <x>150</x>
-       <y>30</y>
-       <width>53</width>
-       <height>16</height>
+       <x>20</x>
+       <y>20</y>
+       <width>80</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="text">
@@ -274,10 +235,10 @@
     <widget class="QSlider" name="horizontalSlider_7">
      <property name="geometry">
       <rect>
-       <x>190</x>
+       <x>125</x>
        <y>200</y>
-       <width>61</width>
-       <height>16</height>
+       <width>65</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="orientation">
@@ -287,10 +248,10 @@
     <widget class="QSlider" name="horizontalSlider_4">
      <property name="geometry">
       <rect>
-       <x>470</x>
-       <y>120</y>
-       <width>61</width>
-       <height>16</height>
+       <x>95</x>
+       <y>140</y>
+       <width>65</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="orientation">
@@ -300,10 +261,10 @@
     <widget class="QSlider" name="horizontalSlider_5">
      <property name="geometry">
       <rect>
-       <x>190</x>
-       <y>160</y>
-       <width>61</width>
-       <height>16</height>
+       <x>380</x>
+       <y>110</y>
+       <width>65</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="orientation">
@@ -313,10 +274,10 @@
     <widget class="QLabel" name="label_3">
      <property name="geometry">
       <rect>
-       <x>280</x>
-       <y>30</y>
-       <width>53</width>
-       <height>16</height>
+       <x>175</x>
+       <y>20</y>
+       <width>25</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="text">
@@ -326,10 +287,10 @@
     <widget class="QLabel" name="label_11">
      <property name="geometry">
       <rect>
-       <x>130</x>
-       <y>120</y>
-       <width>53</width>
-       <height>16</height>
+       <x>20</x>
+       <y>110</y>
+       <width>80</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="text">
@@ -339,10 +300,10 @@
     <widget class="Line" name="line_7">
      <property name="geometry">
       <rect>
-       <x>130</x>
+       <x>20</x>
        <y>270</y>
-       <width>61</width>
-       <height>16</height>
+       <width>60</width>
+       <height>15</height>
       </rect>
      </property>
      <property name="orientation">
@@ -352,10 +313,10 @@
     <widget class="QSlider" name="horizontalSlider">
      <property name="geometry">
       <rect>
-       <x>210</x>
-       <y>30</y>
-       <width>61</width>
-       <height>16</height>
+       <x>95</x>
+       <y>20</y>
+       <width>65</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="orientation">
@@ -365,10 +326,10 @@
     <widget class="Line" name="line_5">
      <property name="geometry">
       <rect>
-       <x>240</x>
+       <x>140</x>
        <y>180</y>
-       <width>61</width>
-       <height>16</height>
+       <width>60</width>
+       <height>15</height>
       </rect>
      </property>
      <property name="orientation">
@@ -378,10 +339,10 @@
     <widget class="QLabel" name="label_17">
      <property name="geometry">
       <rect>
-       <x>130</x>
-       <y>160</y>
-       <width>53</width>
-       <height>16</height>
+       <x>280</x>
+       <y>110</y>
+       <width>90</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="text">
@@ -391,75 +352,39 @@
     <widget class="QLabel" name="label_28">
      <property name="geometry">
       <rect>
-       <x>190</x>
+       <x>80</x>
        <y>270</y>
-       <width>53</width>
-       <height>16</height>
+       <width>50</width>
+       <height>15</height>
       </rect>
      </property>
      <property name="text">
       <string>杂项</string>
      </property>
-    </widget>
-    <widget class="QLabel" name="label_20">
-     <property name="geometry">
-      <rect>
-       <x>310</x>
-       <y>200</y>
-       <width>53</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>？</string>
+     <property name="textFormat">
+      <enum>Qt::PlainText</enum>
      </property>
     </widget>
     <widget class="QLabel" name="label_21">
      <property name="geometry">
       <rect>
-       <x>190</x>
+       <x>80</x>
        <y>180</y>
-       <width>53</width>
-       <height>16</height>
+       <width>50</width>
+       <height>15</height>
       </rect>
      </property>
      <property name="text">
       <string>高级设置</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_16">
-     <property name="geometry">
-      <rect>
-       <x>350</x>
-       <y>160</y>
-       <width>53</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>？</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_10">
-     <property name="geometry">
-      <rect>
-       <x>350</x>
-       <y>120</y>
-       <width>53</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>？</string>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_4">
      <property name="geometry">
       <rect>
-       <x>330</x>
-       <y>30</y>
-       <width>53</width>
-       <height>16</height>
+       <x>200</x>
+       <y>20</y>
+       <width>20</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="text">
@@ -469,10 +394,10 @@
     <widget class="QLabel" name="label_8">
      <property name="geometry">
       <rect>
-       <x>190</x>
-       <y>100</y>
-       <width>53</width>
-       <height>16</height>
+       <x>80</x>
+       <y>90</y>
+       <width>50</width>
+       <height>15</height>
       </rect>
      </property>
      <property name="text">
@@ -482,10 +407,10 @@
     <widget class="QLabel" name="label_14">
      <property name="geometry">
       <rect>
-       <x>410</x>
-       <y>120</y>
-       <width>53</width>
-       <height>16</height>
+       <x>20</x>
+       <y>140</y>
+       <width>80</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="text">
@@ -495,10 +420,10 @@
     <widget class="QLabel" name="label_7">
      <property name="geometry">
       <rect>
-       <x>430</x>
-       <y>30</y>
-       <width>53</width>
-       <height>16</height>
+       <x>280</x>
+       <y>20</y>
+       <width>80</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="text">
@@ -508,10 +433,10 @@
     <widget class="QLabel" name="label_25">
      <property name="geometry">
       <rect>
-       <x>540</x>
+       <x>475</x>
        <y>200</y>
-       <width>53</width>
-       <height>16</height>
+       <width>25</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="text">
@@ -521,36 +446,23 @@
     <widget class="QSlider" name="horizontalSlider_2">
      <property name="geometry">
       <rect>
-       <x>490</x>
-       <y>30</y>
-       <width>61</width>
-       <height>16</height>
+       <x>380</x>
+       <y>20</y>
+       <width>65</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
-    <widget class="QLabel" name="label_12">
-     <property name="geometry">
-      <rect>
-       <x>540</x>
-       <y>120</y>
-       <width>53</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>说明</string>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_22">
      <property name="geometry">
       <rect>
-       <x>130</x>
+       <x>20</x>
        <y>200</y>
-       <width>53</width>
-       <height>16</height>
+       <width>100</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="text">
@@ -560,10 +472,10 @@
     <widget class="QLabel" name="label_27">
      <property name="geometry">
       <rect>
-       <x>590</x>
+       <x>500</x>
        <y>200</y>
-       <width>53</width>
-       <height>16</height>
+       <width>20</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="text">
@@ -573,10 +485,10 @@
     <widget class="Line" name="line_2">
      <property name="geometry">
       <rect>
-       <x>260</x>
-       <y>10</y>
-       <width>61</width>
-       <height>16</height>
+       <x>140</x>
+       <y>0</y>
+       <width>60</width>
+       <height>15</height>
       </rect>
      </property>
      <property name="orientation">
@@ -586,10 +498,10 @@
     <widget class="QLabel" name="label_24">
      <property name="geometry">
       <rect>
-       <x>260</x>
+       <x>205</x>
        <y>200</y>
-       <width>53</width>
-       <height>16</height>
+       <width>25</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="text">
@@ -599,49 +511,23 @@
     <widget class="QLabel" name="label_29">
      <property name="geometry">
       <rect>
-       <x>130</x>
+       <x>20</x>
        <y>290</y>
-       <width>53</width>
-       <height>16</height>
+       <width>80</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="text">
-      <string>文字方向自动登陆:</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_30">
-     <property name="geometry">
-      <rect>
-       <x>260</x>
-       <y>290</y>
-       <width>53</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>说明</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_31">
-     <property name="geometry">
-      <rect>
-       <x>310</x>
-       <y>290</y>
-       <width>53</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>？</string>
+      <string>自动登陆:</string>
      </property>
     </widget>
     <widget class="QSlider" name="horizontalSlider_9">
      <property name="geometry">
       <rect>
-       <x>190</x>
+       <x>95</x>
        <y>290</y>
-       <width>61</width>
-       <height>16</height>
+       <width>65</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="orientation">
@@ -651,49 +537,23 @@
     <widget class="QLabel" name="label_32">
      <property name="geometry">
       <rect>
-       <x>130</x>
+       <x>20</x>
        <y>320</y>
-       <width>53</width>
-       <height>16</height>
+       <width>150</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="text">
       <string>原文自动复制到剪贴板:</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_33">
-     <property name="geometry">
-      <rect>
-       <x>260</x>
-       <y>320</y>
-       <width>53</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>说明</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_34">
-     <property name="geometry">
-      <rect>
-       <x>310</x>
-       <y>320</y>
-       <width>53</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>？</string>
-     </property>
-    </widget>
     <widget class="QSlider" name="horizontalSlider_10">
      <property name="geometry">
       <rect>
-       <x>190</x>
+       <x>180</x>
        <y>320</y>
-       <width>61</width>
-       <height>16</height>
+       <width>65</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="orientation">
@@ -703,10 +563,10 @@
     <widget class="QPushButton" name="pushButton">
      <property name="geometry">
       <rect>
-       <x>470</x>
-       <y>300</y>
-       <width>75</width>
-       <height>24</height>
+       <x>340</x>
+       <y>340</y>
+       <width>85</width>
+       <height>25</height>
       </rect>
      </property>
      <property name="text">
@@ -716,10 +576,10 @@
     <widget class="QPushButton" name="pushButton_2">
      <property name="geometry">
       <rect>
-       <x>560</x>
-       <y>300</y>
-       <width>81</width>
-       <height>24</height>
+       <x>430</x>
+       <y>340</y>
+       <width>85</width>
+       <height>25</height>
       </rect>
      </property>
      <property name="text">
@@ -729,10 +589,10 @@
     <widget class="QLabel" name="label_69">
      <property name="geometry">
       <rect>
-       <x>280</x>
-       <y>60</y>
-       <width>53</width>
-       <height>16</height>
+       <x>175</x>
+       <y>50</y>
+       <width>25</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="text">
@@ -742,10 +602,10 @@
     <widget class="QSlider" name="horizontalSlider_21">
      <property name="geometry">
       <rect>
-       <x>210</x>
-       <y>60</y>
-       <width>61</width>
-       <height>16</height>
+       <x>95</x>
+       <y>50</y>
+       <width>65</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="orientation">
@@ -755,10 +615,10 @@
     <widget class="QLabel" name="label_70">
      <property name="geometry">
       <rect>
-       <x>320</x>
-       <y>60</y>
-       <width>53</width>
-       <height>16</height>
+       <x>200</x>
+       <y>50</y>
+       <width>20</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="text">
@@ -768,10 +628,10 @@
     <widget class="QLabel" name="label_71">
      <property name="geometry">
       <rect>
-       <x>150</x>
-       <y>60</y>
-       <width>53</width>
-       <height>16</height>
+       <x>20</x>
+       <y>50</y>
+       <width>80</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="text">
@@ -781,10 +641,10 @@
     <widget class="QLabel" name="label_109">
      <property name="geometry">
       <rect>
-       <x>540</x>
-       <y>240</y>
-       <width>53</width>
-       <height>16</height>
+       <x>475</x>
+       <y>230</y>
+       <width>25</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="text">
@@ -794,10 +654,10 @@
     <widget class="QLabel" name="label_110">
      <property name="geometry">
       <rect>
-       <x>590</x>
-       <y>240</y>
-       <width>53</width>
-       <height>16</height>
+       <x>500</x>
+       <y>230</y>
+       <width>20</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="text">
@@ -807,10 +667,10 @@
     <widget class="QLabel" name="label_111">
      <property name="geometry">
       <rect>
-       <x>410</x>
-       <y>240</y>
-       <width>53</width>
-       <height>16</height>
+       <x>280</x>
+       <y>230</y>
+       <width>100</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="text">
@@ -820,10 +680,10 @@
     <widget class="QLabel" name="label_112">
      <property name="geometry">
       <rect>
-       <x>290</x>
-       <y>120</y>
-       <width>53</width>
-       <height>16</height>
+       <x>175</x>
+       <y>110</y>
+       <width>60</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="text">
@@ -833,10 +693,10 @@
     <widget class="QLabel" name="label_113">
      <property name="geometry">
       <rect>
-       <x>570</x>
-       <y>120</y>
-       <width>53</width>
-       <height>16</height>
+       <x>175</x>
+       <y>140</y>
+       <width>60</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="text">
@@ -846,44 +706,118 @@
     <widget class="QLabel" name="label_114">
      <property name="geometry">
       <rect>
-       <x>290</x>
-       <y>160</y>
-       <width>53</width>
-       <height>16</height>
+       <x>460</x>
+       <y>110</y>
+       <width>60</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="text">
       <string>CTRL+X</string>
      </property>
     </widget>
-    <widget class="QSpinBox" name="spinBox">
-     <property name="geometry">
-      <rect>
-       <x>480</x>
-       <y>200</y>
-       <width>42</width>
-       <height>22</height>
-      </rect>
-     </property>
-    </widget>
     <widget class="QSpinBox" name="spinBox_2">
      <property name="geometry">
       <rect>
-       <x>480</x>
-       <y>240</y>
-       <width>42</width>
-       <height>22</height>
+       <x>425</x>
+       <y>230</y>
+       <width>45</width>
+       <height>20</height>
       </rect>
+     </property>
+     <property name="value">
+      <number>80</number>
      </property>
     </widget>
     <widget class="QSpinBox" name="spinBox_3">
      <property name="geometry">
       <rect>
-       <x>190</x>
+       <x>125</x>
        <y>230</y>
-       <width>42</width>
-       <height>22</height>
+       <width>45</width>
+       <height>20</height>
       </rect>
+     </property>
+     <property name="value">
+      <number>80</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_35">
+     <property name="geometry">
+      <rect>
+       <x>280</x>
+       <y>50</y>
+       <width>100</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>全屏游戏下置顶:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_36">
+     <property name="geometry">
+      <rect>
+       <x>510</x>
+       <y>50</y>
+       <width>20</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>？</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_37">
+     <property name="geometry">
+      <rect>
+       <x>485</x>
+       <y>50</y>
+       <width>25</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>说明</string>
+     </property>
+    </widget>
+    <widget class="QSlider" name="horizontalSlider_11">
+     <property name="geometry">
+      <rect>
+       <x>405</x>
+       <y>50</y>
+       <width>65</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_20">
+     <property name="geometry">
+      <rect>
+       <x>230</x>
+       <y>200</y>
+       <width>20</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>？</string>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="doubleSpinBox">
+     <property name="geometry">
+      <rect>
+       <x>425</x>
+       <y>200</y>
+       <width>45</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="value">
+      <double>0.800000000000000</double>
      </property>
     </widget>
    </widget>
