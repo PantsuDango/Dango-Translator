@@ -16,6 +16,7 @@ import utils.port
 import utils.test
 import utils.http
 import ui.static.icon
+import ui.static.background
 
 from ui import image
 import ui.hotkey
@@ -496,13 +497,6 @@ class Settin(QMainWindow) :
                                  "QTabWidget::pane { border-image: none; }"
                                  %(35*self.rate, 150*self.rate))
 
-        # 分割线
-        label = QLabel(tab_widget)
-        self.customSetGeometry(label, 0, 0, 1, 400)
-        label.setFrameShadow(QFrame.Raised)
-        label.setFrameShape(QFrame.Box)
-        label.setStyleSheet("border-width: 1px; border-style: solid; border-color: rgba(62, 62, 62, 0.2);")
-
         # 公共翻译页签
         self.public_translater_tab = QWidget()
         tab_widget.addTab(self.public_translater_tab, "")
@@ -519,19 +513,26 @@ class Settin(QMainWindow) :
         icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
         tab_widget.setTabIcon(tab_widget.indexOf(self.public_translater_tab), icon)
 
+        # 分割线
+        label = QLabel(self.tab_2)
+        self.customSetGeometry(label, 0, 0, 1, 400)
+        label.setFrameShadow(QFrame.Raised)
+        label.setFrameShape(QFrame.Box)
+        label.setStyleSheet("border-width: 1px; border-style: solid; border-color: rgba(62, 62, 62, 0.1);")
+
         # 此Label用于雾化公共翻译页签的背景图
         imageLabel = QLabel(self.public_translater_tab)
-        imageLabel.setGeometry(QRect(0, -1, self.window_width + 5, self.window_height + 5))
+        imageLabel.setGeometry(QRect(0, 0, self.window_width+5, self.window_height+5))
         imageLabel.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
 
-        # # 横向分割线
+        # 横向分割线
         label = QLabel(self.public_translater_tab)
         self.customSetGeometry(label, 0, 0, self.window_width, 1)
         label.setFrameShadow(QFrame.Raised)
         label.setFrameShape(QFrame.Box)
         label.setStyleSheet("border-width: 1px; "
                             "border-style: solid; "
-                            "border-color: rgba(62, 62, 62, 0.2);")
+                            "border-color: rgba(62, 62, 62, 0.1);")
 
         # 公共翻译标签
         label = QLabel(self.public_translater_tab)
@@ -708,7 +709,7 @@ class Settin(QMainWindow) :
 
         # # 此Label用于雾化私人翻译页签的背景图
         imageLabel = QLabel(self.private_translater_tab)
-        imageLabel.setGeometry(QRect(0, -1, self.window_width+5, self.window_height+5))
+        imageLabel.setGeometry(QRect(0, 0, self.window_width+5, self.window_height+5))
         imageLabel.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
 
         # 私人翻译标签
