@@ -261,6 +261,36 @@ class Settin(QMainWindow) :
         label.setFrameShape(QFrame.Box)
         label.setStyleSheet("border-width: 1px; border-style: solid; border-color: rgba(62, 62, 62, 0.1);")
 
+        # 在线OCR页签
+        online_OCR_tab = QWidget()
+        tab_widget.addTab(online_OCR_tab, "")
+        tab_widget.setTabText(tab_widget.indexOf(online_OCR_tab), "在线OCR")
+
+        # 在线OCR页签图标
+        icon = QIcon()
+        pixmap = QPixmap()
+        pixmap.loadFromData(base64.b64decode(ui.static.icon.ONLINE_OCR))
+        pixmap = pixmap.scaled(int(20 * self.rate),
+                               int(20 * self.rate),
+                               Qt.KeepAspectRatio,
+                               Qt.SmoothTransformation)
+        icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
+        tab_widget.setTabIcon(tab_widget.indexOf(online_OCR_tab), icon)
+
+        # 横向分割线
+        label = QLabel(online_OCR_tab)
+        self.customSetGeometry(label, 0, 0, self.window_width, 1)
+        label.setFrameShadow(QFrame.Raised)
+        label.setFrameShape(QFrame.Box)
+        label.setStyleSheet("border-width: 1px; "
+                            "border-style: solid; "
+                            "border-color: rgba(62, 62, 62, 0.2);")
+
+        # 此Label用于雾化在线OCR页签的背景图
+        imageLabel = QLabel(online_OCR_tab)
+        imageLabel.setGeometry(QRect(0, 0, self.window_width + 5, self.window_height + 5))
+        imageLabel.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
+
         # 本地OCR页签
         offline_OCR_tab = QWidget()
         tab_widget.addTab(offline_OCR_tab, "")
@@ -290,36 +320,6 @@ class Settin(QMainWindow) :
         label = QLabel(offline_OCR_tab)
         label.setGeometry(QRect(0, 0, self.window_width+5, self.window_height+5))
         label.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
-
-        # 在线OCR页签
-        online_OCR_tab = QWidget()
-        tab_widget.addTab(online_OCR_tab, "")
-        tab_widget.setTabText(tab_widget.indexOf(online_OCR_tab), "在线OCR")
-
-        # 在线OCR页签图标
-        icon = QIcon()
-        pixmap = QPixmap()
-        pixmap.loadFromData(base64.b64decode(ui.static.icon.ONLINE_OCR))
-        pixmap = pixmap.scaled(int(20*self.rate),
-                               int(20*self.rate),
-                               Qt.KeepAspectRatio,
-                               Qt.SmoothTransformation)
-        icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
-        tab_widget.setTabIcon(tab_widget.indexOf(online_OCR_tab), icon)
-
-        # 横向分割线
-        label = QLabel(online_OCR_tab)
-        self.customSetGeometry(label, 0, 0, self.window_width, 1)
-        label.setFrameShadow(QFrame.Raised)
-        label.setFrameShape(QFrame.Box)
-        label.setStyleSheet("border-width: 1px; "
-                            "border-style: solid; "
-                            "border-color: rgba(62, 62, 62, 0.2);")
-
-        # 此Label用于雾化在线OCR页签的背景图
-        imageLabel = QLabel(online_OCR_tab)
-        imageLabel.setGeometry(QRect(0, 0, self.window_width+5, self.window_height+5))
-        imageLabel.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
 
         # 百度OCR页签
         baidu_OCR_tab = QWidget()
@@ -351,124 +351,141 @@ class Settin(QMainWindow) :
         imageLabel.setGeometry(QRect(0, 0, self.window_width + 5, self.window_height + 5))
         imageLabel.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
 
-        # 本地OCR标签
+        # OCR标签
         label = QLabel(self.tab_1)
         self.customSetGeometry(label, 380, 10, 300, 20)
-        label.setText("<span style='color: %s;'>请选择开启一种OCR开关, 否则将无法使用"%self.color_2)
+        label.setStyleSheet("color: %s"%self.color_2)
 
         # OCR说明
         button = QPushButton(self.tab_1)
-        self.customSetGeometry(button, 570,55, 100, 20)
+        self.customSetGeometry(button, 570, 55, 100, 20)
         button.setText("什么是OCR？")
         button.clicked.connect(lambda: self.showDesc("OCR"))
         button.setCursor(self.question_pixmap)
+
+        # 在线OCR标签
+        label = QLabel(online_OCR_tab)
+        self.customSetGeometry(label, 20, 20, 400, 20)
+        label.setText("需购买, 无限调用次数且识别精度高, 建议使用")
+        label.setStyleSheet("color: %s"%self.color_2)
+
+        # 在线OCR教程按钮
+        button = QPushButton(online_OCR_tab)
+        self.customSetGeometry(button, 320, 20, 100, 20)
+        button.setText("详细教程")
+        button.clicked.connect(self.openOnlineOCRTutorials)
+        button.setCursor(self.select_pixmap)
+
+        # 在线OCR状态开关
+        self.online_ocr_switch = ui.switch.SwitchOCR(online_OCR_tab, self.online_ocr_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.online_ocr_switch, 20, 70, 65, 20)
+        self.online_ocr_switch.checkedChanged.connect(self.changeOnlineSwitch)
+        self.online_ocr_switch.setCursor(self.select_pixmap)
+        # 在线OCR标签
+        label = QLabel(online_OCR_tab)
+        self.customSetGeometry(label, 105, 70, 400, 20)
+        label.setText("使用在线OCR, 使用前需先购买")
+
+        # 在线OCR购买按钮
+        button = QPushButton(online_OCR_tab)
+        self.customSetGeometry(button, 20, 120, 60, 20)
+        button.setText("购买")
+        button.clicked.connect(self.openDangoBuyPage)
+        button.setCursor(self.select_pixmap)
+        # 在线OCR测试按钮
+        button = QPushButton(online_OCR_tab)
+        self.customSetGeometry(button, 100, 120, 60, 20)
+        button.setText("测试")
+        button.clicked.connect(lambda: utils.test.testOnlineOCR(self.object))
+        button.setCursor(self.select_pixmap)
+        # 在线OCR标签
+        label = QLabel(online_OCR_tab)
+        self.customSetGeometry(label, 180, 120, 400, 20)
+        label.setText("购买在线OCR, 支持团子")
+
+        # 节点下拉框
+        self.node_info_comboBox = QComboBox(online_OCR_tab)
+        self.customSetGeometry(self.node_info_comboBox, 20, 170, 140, 20)
+        self.node_info_comboBox.setStyleSheet("QComboBox{color: %s}"%self.color_2)
+        self.node_info_comboBox.setCursor(self.select_pixmap)
+        # 获取节点信息
+        utils.thread.createThread(self.getNodeInfo)
+        # 百度OCR说明?号图标
+        button = QPushButton(qtawesome.icon("fa.refresh", color=self.color_2), "", online_OCR_tab)
+        self.customSetIconSize(button, 20, 20)
+        self.customSetGeometry(button, 170, 170, 20, 20)
+        button.setStyleSheet("QPushButton { background: transparent;}"
+                             "QPushButton:hover { background-color: #83AAF9; }"
+                             "QPushButton:pressed { background-color: #4480F9;"
+                             "padding-left: 3px;"
+                             "padding-top: 3px; }"
+                             )
+        button.clicked.connect(lambda: utils.thread.createThread(self.getNodeInfo))
+        button.setCursor(self.question_pixmap)
+        # 在线OCR标签
+        label = QLabel(online_OCR_tab)
+        self.customSetGeometry(label, 200, 170, 400, 20)
+        label.setText("翻译慢可以切换延迟低的节点")
 
         # 本地OCR标签
         label = QLabel(offline_OCR_tab)
         self.customSetGeometry(label, 20, 20, 400, 20)
         label.setText("免费使用, 识别精度一般, 依赖自身电脑性能")
-
-        # 本地OCR说明按钮
+        label.setStyleSheet("color: %s"%self.color_2)
+        # 本地OCR教程按钮
         button = QPushButton(offline_OCR_tab)
-        self.customSetGeometry(button, 330, 20, 100, 20)
-        button.setText("详细说明")
-        button.clicked.connect(lambda: self.showDesc("offlineOCR"))
-        button.setCursor(self.question_pixmap)
+        self.customSetGeometry(button, 320, 20, 100, 20)
+        button.setText("详细教程")
+        button.clicked.connect(self.openOfflineOCRTutorial)
+        button.setCursor(self.select_pixmap)
 
-        # 本地OCR备注
+        # 本地OCR标签
         label = QLabel(offline_OCR_tab)
-        self.customSetGeometry(label, 145, 225, 300, 20)
-        label.setText("如果安装失败建议直接使用在线OCR")
-        label.setStyleSheet("color: %s" % self.color_2)
-
+        self.customSetGeometry(label, 20, 70, 400, 20)
+        label.setText("使用本地OCR, 使用前需先运行")
         # 本地OCR状态开关
         self.offline_ocr_switch = ui.switch.OfflineSwitch(offline_OCR_tab, sign=self.offline_ocr_use, startX=(65-20)*self.rate, object=self.object)
-        self.customSetGeometry(self.offline_ocr_switch, 20, 260, 65, 20)
+        self.customSetGeometry(self.offline_ocr_switch, 215, 70, 65, 20)
         self.offline_ocr_switch.checkedChanged.connect(self.changeOfflineSwitch)
         self.offline_ocr_switch.setCursor(self.select_pixmap)
 
+        # 本地OCR备注
+        label = QLabel(offline_OCR_tab)
+        self.customSetGeometry(label, 20, 120, 400, 20)
+        label.setText("运行本地OCR, 使用过程中切勿关闭黑窗")
+
         # 本地OCR运行按钮
         button = QPushButton(offline_OCR_tab)
-        self.customSetGeometry(button, 105, 260, 60, 20)
+        self.customSetGeometry(button, 270, 120, 60, 20)
         button.setText("运行")
         button.clicked.connect(self.runOfflineOCR)
         button.setCursor(self.select_pixmap)
 
         # 本地OCR测试按钮
         button = QPushButton(offline_OCR_tab)
-        self.customSetGeometry(button, 185, 260, 60, 20)
+        self.customSetGeometry(button, 350, 120, 60, 20)
         button.setText("测试")
         button.clicked.connect(self.testOfflineOCR)
         button.setCursor(self.select_pixmap)
 
-        # 本地OCR教程按钮
+        # 本地OCR标签
+        label = QLabel(offline_OCR_tab)
+        self.customSetGeometry(label, 20, 170, 400, 20)
+        label.setText("首次使用请先安装, 不使用可卸载节省空间")
+
+        # 本地OCR安装按钮
         button = QPushButton(offline_OCR_tab)
-        self.customSetGeometry(button, 265, 260, 60, 20)
-        button.setText("教程")
-        button.clicked.connect(self.openOfflineOCRTutorial)
+        self.customSetGeometry(button, 295, 170, 60, 20)
+        button.setText("安装")
+        #button.clicked.connect(self.runOfflineOCR)
         button.setCursor(self.select_pixmap)
 
-        # 在线OCR标签
-        label = QLabel(online_OCR_tab)
-        self.customSetGeometry(label, 20, 120, 60, 20)
-        label.setText("在线OCR")
-
-        # 在线OCR说明按钮
-        button = QPushButton(online_OCR_tab)
-        self.customSetGeometry(button, 80, 120, 25, 20)
-        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;"%self.color_2)
-        button.setText("说明")
-        button.clicked.connect(lambda: self.showDesc("onlineOCR"))
-        button.setCursor(self.question_pixmap)
-
-        # 在线OCR说明?号图标
-        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", online_OCR_tab)
-        self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 105, 120, 20, 20)
-        button.setStyleSheet("background: transparent;")
-        button.clicked.connect(lambda: self.showDesc("onlineOCR"))
-        button.setCursor(self.question_pixmap)
-
-        # 在线OCR备注
-        label = QLabel(online_OCR_tab)
-        self.customSetGeometry(label, 145, 120, 300, 20)
-        label.setText("精度高, 无限调用次数, 建议使用")
-        label.setStyleSheet("color: %s" % self.color_2)
-
-        # 在线OCR状态开关
-        self.online_ocr_switch = ui.switch.SwitchOCR(online_OCR_tab, self.online_ocr_use, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.online_ocr_switch, 20, 155, 65, 20)
-        self.online_ocr_switch.checkedChanged.connect(self.changeOnlineSwitch)
-        self.online_ocr_switch.setCursor(self.select_pixmap)
-
-        # 在线OCR购买按钮
-        button = QPushButton(online_OCR_tab)
-        self.customSetGeometry(button, 105, 155, 60, 20)
-        button.setText("购买")
-        button.clicked.connect(self.openDangoBuyPage)
+        # 本地OCR卸载按钮
+        button = QPushButton(offline_OCR_tab)
+        self.customSetGeometry(button, 375, 170, 60, 20)
+        button.setText("卸载")
+        #button.clicked.connect(self.runOfflineOCR)
         button.setCursor(self.select_pixmap)
-
-        # 在线OCR测试按钮
-        button = QPushButton(online_OCR_tab)
-        self.customSetGeometry(button, 185, 155, 60, 20)
-        button.setText("测试")
-        button.clicked.connect(lambda: utils.test.testOnlineOCR(self.object))
-        button.setCursor(self.select_pixmap)
-
-        # 在线OCR教程按钮
-        button = QPushButton(online_OCR_tab)
-        self.customSetGeometry(button, 265, 155, 60, 20)
-        button.setText("教程")
-        button.clicked.connect(self.openOnlineOCRTutorials)
-        button.setCursor(self.select_pixmap)
-
-        # 节点下拉框
-        self.node_info_comboBox = QComboBox(online_OCR_tab)
-        self.customSetGeometry(self.node_info_comboBox, 345, 155, 150, 20)
-        self.node_info_comboBox.setStyleSheet("QComboBox{color: %s}"%self.color_2)
-        self.node_info_comboBox.setCursor(self.select_pixmap)
-        # 获取节点信息
-        utils.thread.createThread(self.getNodeInfo)
 
         # 百度OCR标签
         label = QLabel(baidu_OCR_tab)
@@ -524,14 +541,9 @@ class Settin(QMainWindow) :
         button.clicked.connect(self.openBaiduOCRTutorials)
         button.setCursor(self.select_pixmap)
 
-        # OCR识别语种标签
-        label = QLabel(self.tab_1)
-        self.customSetGeometry(label, 20, 310, 150, 20)
-        label.setText("选择要翻译的原语种:")
-
         # OCR识别语种comboBox
         self.language_comboBox = QComboBox(self.tab_1)
-        self.customSetGeometry(self.language_comboBox, 160, 310, 130, 20)
+        self.customSetGeometry(self.language_comboBox, 20, 310, 140, 20)
         self.language_comboBox.addItem("")
         self.language_comboBox.addItem("")
         self.language_comboBox.addItem("")
@@ -546,6 +558,11 @@ class Settin(QMainWindow) :
             self.language_comboBox.setCurrentIndex(2)
         else:
             self.language_comboBox.setCurrentIndex(0)
+
+        # OCR识别语种标签
+        label = QLabel(self.tab_1)
+        self.customSetGeometry(label, 180, 310, 150, 20)
+        label.setText("选择要翻译的原语种")
 
 
     # 翻译设定标签栏
@@ -1897,7 +1914,7 @@ class Settin(QMainWindow) :
         sign, time_diff = utils.http.getOCR(url)
         model = self.node_info_comboBox.model()
         if sign :
-            entry = QStandardItem("自动模式  {}ms".format(time_diff))
+            entry = QStandardItem("自动模式  {:.2f}s".format(time_diff/1000))
             entry.setForeground(QColor(Qt.green))
         else :
             entry = QStandardItem("自动模式  不可用")
@@ -1921,7 +1938,7 @@ class Settin(QMainWindow) :
             model = self.node_info_comboBox.model()
 
             if sign :
-                text = "{}  {}ms".format(node_name, time_diff)
+                text = "{}  {:.2f}ms".format(node_name, time_diff/1000)
                 entry = QStandardItem(text)
                 entry.setForeground(QColor(Qt.green))
             else :
