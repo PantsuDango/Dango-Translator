@@ -410,18 +410,16 @@ class Settin(QMainWindow) :
         self.node_info_comboBox.setCursor(self.select_pixmap)
         # 获取节点信息
         utils.thread.createThread(self.getNodeInfo)
-        # 百度OCR说明?号图标
+        # 在线OCR刷新按钮
         button = QPushButton(qtawesome.icon("fa.refresh", color=self.color_2), "", online_OCR_tab)
         self.customSetIconSize(button, 20, 20)
         self.customSetGeometry(button, 170, 170, 20, 20)
         button.setStyleSheet("QPushButton { background: transparent;}"
-                             "QPushButton:hover { background-color: #83AAF9; }"
-                             "QPushButton:pressed { background-color: #4480F9;"
-                             "padding-left: 3px;"
-                             "padding-top: 3px; }"
-                             )
+                             "QPushButton:hover { background-color: rgba(62, 62, 62, 0.2); }"
+                             "QPushButton:pressed { background-color: rgba(62, 62, 62, 0.4);"
+                             "padding-left: 3px; padding-top: 3px;}")
         button.clicked.connect(lambda: utils.thread.createThread(self.getNodeInfo))
-        button.setCursor(self.question_pixmap)
+        button.setCursor(self.select_pixmap)
         # 在线OCR标签
         label = QLabel(online_OCR_tab)
         self.customSetGeometry(label, 200, 170, 400, 20)
@@ -439,107 +437,102 @@ class Settin(QMainWindow) :
         button.clicked.connect(self.openOfflineOCRTutorial)
         button.setCursor(self.select_pixmap)
 
-        # 本地OCR标签
-        label = QLabel(offline_OCR_tab)
-        self.customSetGeometry(label, 20, 70, 400, 20)
-        label.setText("使用本地OCR, 使用前需先运行")
         # 本地OCR状态开关
         self.offline_ocr_switch = ui.switch.OfflineSwitch(offline_OCR_tab, sign=self.offline_ocr_use, startX=(65-20)*self.rate, object=self.object)
-        self.customSetGeometry(self.offline_ocr_switch, 215, 70, 65, 20)
+        self.customSetGeometry(self.offline_ocr_switch, 20, 70, 65, 20)
         self.offline_ocr_switch.checkedChanged.connect(self.changeOfflineSwitch)
         self.offline_ocr_switch.setCursor(self.select_pixmap)
-
-        # 本地OCR备注
+        # 本地OCR标签
         label = QLabel(offline_OCR_tab)
-        self.customSetGeometry(label, 20, 120, 400, 20)
-        label.setText("运行本地OCR, 使用过程中切勿关闭黑窗")
+        self.customSetGeometry(label, 105, 70, 400, 20)
+        label.setText("使用本地OCR, 使用前需先运行")
 
         # 本地OCR运行按钮
         button = QPushButton(offline_OCR_tab)
-        self.customSetGeometry(button, 270, 120, 60, 20)
+        self.customSetGeometry(button, 20, 120, 60, 20)
         button.setText("运行")
         button.clicked.connect(self.runOfflineOCR)
         button.setCursor(self.select_pixmap)
-
         # 本地OCR测试按钮
         button = QPushButton(offline_OCR_tab)
-        self.customSetGeometry(button, 350, 120, 60, 20)
+        self.customSetGeometry(button, 100, 120, 60, 20)
         button.setText("测试")
         button.clicked.connect(self.testOfflineOCR)
         button.setCursor(self.select_pixmap)
-
-        # 本地OCR标签
+        # 本地OCR备注
         label = QLabel(offline_OCR_tab)
-        self.customSetGeometry(label, 20, 170, 400, 20)
-        label.setText("首次使用请先安装, 不使用可卸载节省空间")
+        self.customSetGeometry(label, 180, 120, 400, 20)
+        label.setText("运行本地OCR, 使用过程中切勿关闭黑窗")
 
         # 本地OCR安装按钮
         button = QPushButton(offline_OCR_tab)
-        self.customSetGeometry(button, 295, 170, 60, 20)
+        self.customSetGeometry(button, 20, 170, 60, 20)
         button.setText("安装")
         #button.clicked.connect(self.runOfflineOCR)
         button.setCursor(self.select_pixmap)
-
         # 本地OCR卸载按钮
         button = QPushButton(offline_OCR_tab)
-        self.customSetGeometry(button, 375, 170, 60, 20)
+        self.customSetGeometry(button, 100, 170, 60, 20)
         button.setText("卸载")
         #button.clicked.connect(self.runOfflineOCR)
         button.setCursor(self.select_pixmap)
+        # 本地OCR标签
+        label = QLabel(offline_OCR_tab)
+        self.customSetGeometry(label, 180, 170, 400, 20)
+        label.setText("首次使用请先安装, 不使用可卸载节省空间")
+
+        # 本地OCR端口选择器
+        self.offline_ocr_port_spinBox = QDoubleSpinBox(offline_OCR_tab)
+        self.customSetGeometry(self.offline_ocr_port_spinBox, 20, 215, 60, 25)
+        self.offline_ocr_port_spinBox.setDecimals(0)
+        self.offline_ocr_port_spinBox.setMinimum(3000)
+        self.offline_ocr_port_spinBox.setMaximum(65535)
+        self.offline_ocr_port_spinBox.setSingleStep(1)
+        self.offline_ocr_port_spinBox.setValue(6666)
+        self.offline_ocr_port_spinBox.setCursor(self.select_pixmap)
+        # 本地OCR标签
+        label = QLabel(offline_OCR_tab)
+        self.customSetGeometry(label, 100, 220, 400, 20)
+        label.setText("本地OCR占用的端口, 冲突可切换, 切换后需重新运行本地OCR")
 
         # 百度OCR标签
         label = QLabel(baidu_OCR_tab)
-        self.customSetGeometry(label, 20, 215, 60, 20)
-        label.setText("百度OCR")
-
-        # 百度OCR说明标签
+        self.customSetGeometry(label, 20, 20, 400, 20)
+        label.setText("老用户专用, 精度虽高但价格昂贵, 新用户忽略")
+        label.setStyleSheet("color: %s"%self.color_2)
+        # 百度OCR教程按钮
         button = QPushButton(baidu_OCR_tab)
-        self.customSetGeometry(button, 80, 215, 25, 20)
-        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;"%self.color_2)
-        button.setText("说明")
-        button.clicked.connect(lambda: self.showDesc("baiduOCR"))
-        button.setCursor(self.question_pixmap)
-
-        # 百度OCR说明?号图标
-        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", baidu_OCR_tab)
-        self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 105, 215, 20, 20)
-        button.setStyleSheet("background: transparent;")
-        button.clicked.connect(lambda: self.showDesc("baiduOCR"))
-        button.setCursor(self.question_pixmap)
-
-        # 百度OCR备注
-        label = QLabel(baidu_OCR_tab)
-        self.customSetGeometry(label, 145, 215, 300, 20)
-        label.setText("老用户专用, 精度虽高但价格昂贵")
-        label.setStyleSheet("color: %s" % self.color_2)
+        self.customSetGeometry(button, 320, 20, 100, 20)
+        button.setText("详细教程")
+        button.clicked.connect(self.openBaiduOCRTutorials)
+        button.setCursor(self.select_pixmap)
 
         # 百度OCR状态开关
         self.baidu_ocr_switch = ui.switch.BaiduSwitchOCR(baidu_OCR_tab, self.baidu_ocr_use, startX=(65-20)*self.rate, object=self.object)
-        self.customSetGeometry(self.baidu_ocr_switch, 20, 250, 65, 20)
+        self.customSetGeometry(self.baidu_ocr_switch, 20, 70, 65, 20)
         self.baidu_ocr_switch.checkedChanged.connect(self.changeBaiduSwitch)
         self.baidu_ocr_switch.setCursor(self.select_pixmap)
+        # 百度OCR标签
+        label = QLabel(baidu_OCR_tab)
+        self.customSetGeometry(label, 105, 70, 400, 20)
+        label.setText("使用百度OCR, 使用前请确认是否有额度")
 
         # 百度OCR密钥按钮
         button = QPushButton(baidu_OCR_tab)
-        self.customSetGeometry(button, 105, 250, 60, 20)
+        self.customSetGeometry(button, 20, 120, 60, 20)
         button.setText("密钥")
         button.clicked.connect(lambda: self.showKey("baiduOCR"))
         button.setCursor(self.select_pixmap)
-
         # 百度OCR测试按钮
         button = QPushButton(baidu_OCR_tab)
-        self.customSetGeometry(button, 185, 250, 60, 20)
+        self.customSetGeometry(button, 100, 120, 60, 20)
         button.setText("测试")
         button.clicked.connect(lambda: utils.test.testBaiduOCR(self.object))
         button.setCursor(self.select_pixmap)
-
-        # 百度OCR教程按钮
-        button = QPushButton(baidu_OCR_tab)
-        self.customSetGeometry(button, 265, 250, 60, 20)
-        button.setText("教程")
-        button.clicked.connect(self.openBaiduOCRTutorials)
-        button.setCursor(self.select_pixmap)
+        # 百度OCR备注
+        label = QLabel(baidu_OCR_tab)
+        self.customSetGeometry(label, 180, 120, 400, 20)
+        label.setText("使用前请填入有额度的密钥")
 
         # OCR识别语种comboBox
         self.language_comboBox = QComboBox(self.tab_1)
