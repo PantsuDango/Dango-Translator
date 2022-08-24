@@ -250,9 +250,10 @@ class Settin(QMainWindow) :
         tab_widget.setTabPosition(QTabWidget.North)
         tab_widget.setStyleSheet("QTabBar:tab { min-height: %dpx; min-width: %dpx;"
                                  "background: rgba(255, 255, 255, 1);}"
-                                 "QTabBar:tab:selected { background: rgba(62, 62, 62, 0.07); }"
+                                 "QTabBar:tab:selected { background: rgba(62, 62, 62, 0.07); "
+                                                        "border-bottom: 2px solid %s; }"
                                  "QTabWidget::pane { border-image: none; }"
-                                 %(35*self.rate, 120*self.rate))
+                                 %(35*self.rate, 120*self.rate, self.color_2))
 
         # 竖向分割线
         label = QLabel(self.tab_1)
@@ -348,13 +349,47 @@ class Settin(QMainWindow) :
 
         # 此Label用于雾化百度OCR页签的背景图
         imageLabel = QLabel(baidu_OCR_tab)
-        imageLabel.setGeometry(QRect(0, 0, self.window_width + 5, self.window_height + 5))
+        imageLabel.setGeometry(QRect(0, 0, self.window_width+5, self.window_height+5))
         imageLabel.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
 
+        # OCR对号图标
+        pixmap = QPixmap()
+        pixmap.loadFromData(base64.b64decode(ui.static.icon.OCR_YES))
+        pixmap = pixmap.scaled(int(15 * self.rate),
+                               int(15 * self.rate),
+                               Qt.KeepAspectRatio,
+                               Qt.SmoothTransformation)
+        # 使用在线OCR对号标签
+        self.show_online_ocr_use_label = QLabel(self.tab_1)
+        self.customSetGeometry(self.show_online_ocr_use_label, 100, 10, 15, 15)
+        self.show_online_ocr_use_label.setPixmap(pixmap)
+        self.show_online_ocr_use_label.hide()
+        # 使用本地OCR对号标签
+        self.show_offline_ocr_use_label = QLabel(self.tab_1)
+        self.customSetGeometry(self.show_offline_ocr_use_label, 220, 10, 15, 15)
+        self.show_offline_ocr_use_label.setPixmap(pixmap)
+        self.show_offline_ocr_use_label.hide()
+        # 使用百度OCR对号标签
+        self.show_baidu_ocr_use_label = QLabel(self.tab_1)
+        self.customSetGeometry(self.show_baidu_ocr_use_label, 340, 10, 15, 15)
+        self.show_baidu_ocr_use_label.setPixmap(pixmap)
+        self.show_baidu_ocr_use_label.hide()
+
         # OCR标签
-        label = QLabel(self.tab_1)
-        self.customSetGeometry(label, 380, 10, 300, 20)
-        label.setStyleSheet("color: %s"%self.color_2)
+        self.ocr_label = QLabel(self.tab_1)
+        self.customSetGeometry(self.ocr_label, 370, 10, 300, 20)
+        if self.online_ocr_use :
+            self.ocr_label.setText("当前正在使用【在线OCR】")
+            self.show_online_ocr_use_label.show()
+        elif self.offline_ocr_use :
+            self.ocr_label.setText("当前正在使用【本地OCR】")
+            self.show_offline_ocr_use_label.show()
+        elif self.baidu_ocr_use :
+            self.ocr_label.setText("当前正在使用【百度OCR】")
+            self.show_baidu_ocr_use_label.show()
+        else :
+            self.ocr_label.setText("请选择开启一种OCR开关, 否则翻译将无法使用")
+        self.ocr_label.setStyleSheet("color: %s"%self.color_2)
 
         # OCR说明
         button = QPushButton(self.tab_1)
@@ -424,6 +459,17 @@ class Settin(QMainWindow) :
         label = QLabel(online_OCR_tab)
         self.customSetGeometry(label, 200, 170, 400, 20)
         label.setText("翻译慢可以切换延迟低的节点")
+
+        # 在线OCR查询额度按钮
+        button = QPushButton(online_OCR_tab)
+        self.customSetGeometry(button, 20, 220, 60, 20)
+        button.setText("查询额度")
+        button.clicked.connect(lambda: self.showDesc("onlineOCRQueryQuota"))
+        button.setCursor(self.select_pixmap)
+        # 在线OCR备注
+        label = QLabel(online_OCR_tab)
+        self.customSetGeometry(label, 100, 220, 400, 20)
+        label.setText("查询在线OCR有效期")
 
         # 本地OCR标签
         label = QLabel(offline_OCR_tab)
@@ -534,6 +580,27 @@ class Settin(QMainWindow) :
         self.customSetGeometry(label, 180, 120, 400, 20)
         label.setText("使用前请填入有额度的密钥")
 
+        # 百度OCR高精度模式开关
+        self.baidu_ocr_high_precision_switch = ui.switch.SwitchOCR(baidu_OCR_tab, self.baidu_ocr_high_precision_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.baidu_ocr_high_precision_switch, 20, 170, 65, 20)
+        self.baidu_ocr_high_precision_switch.checkedChanged.connect(self.changeBaiduOcrHighPrecisionSwitch)
+        self.baidu_ocr_high_precision_switch.setCursor(self.select_pixmap)
+        # 百度OCR高精度模式备注
+        label = QLabel(baidu_OCR_tab)
+        self.customSetGeometry(label, 105, 170, 300, 20)
+        label.setText("开启高精度模式, 开启前请确认额度")
+
+        # 百度OCR密查询额度按钮
+        button = QPushButton(baidu_OCR_tab)
+        self.customSetGeometry(button, 20, 220, 60, 20)
+        button.setText("查询额度")
+        button.clicked.connect(self.openBaiduOCRQueryQuota)
+        button.setCursor(self.select_pixmap)
+        # 百度OCR备注
+        label = QLabel(baidu_OCR_tab)
+        self.customSetGeometry(label, 100, 220, 400, 20)
+        label.setText("查询百度OCR密钥额度")
+
         # OCR识别语种comboBox
         self.language_comboBox = QComboBox(self.tab_1)
         self.customSetGeometry(self.language_comboBox, 20, 310, 140, 20)
@@ -551,7 +618,6 @@ class Settin(QMainWindow) :
             self.language_comboBox.setCurrentIndex(2)
         else:
             self.language_comboBox.setCurrentIndex(0)
-
         # OCR识别语种标签
         label = QLabel(self.tab_1)
         self.customSetGeometry(label, 180, 310, 150, 20)
@@ -1443,19 +1509,6 @@ class Settin(QMainWindow) :
         self.auto_login_switch.checkedChanged.connect(self.changeAutoLoginSwitch)
         self.auto_login_switch.setCursor(self.select_pixmap)
 
-        # 百度OCR高精度模式备注
-        label = QLabel(self.tab_4)
-        self.customSetGeometry(label, 275, 220, 150, 20)
-        label.setText("百度OCR高精度:")
-
-        # 百度OCR高精度模式开关
-        self.baidu_ocr_high_precision_switch = ui.switch.SwitchOCR(self.tab_4,
-                                                                   self.baidu_ocr_high_precision_use,
-                                                                   startX=(65-20)*self.rate)
-        self.customSetGeometry(self.baidu_ocr_high_precision_switch, 390, 220, 65, 20)
-        self.baidu_ocr_high_precision_switch.checkedChanged.connect(self.changeBaiduOcrHighPrecisionSwitch)
-        self.baidu_ocr_high_precision_switch.setCursor(self.select_pixmap)
-
         # 是否全屏下置顶
         label = QLabel(self.tab_4)
         self.customSetGeometry(label, 20, 270, 150, 20)
@@ -1988,8 +2041,12 @@ class Settin(QMainWindow) :
             if self.baidu_ocr_use == True :
                 self.resetSwitch("baiduOCR")
             self.offline_ocr_use = True
+            self.ocr_label.setText("当前正在使用【本地OCR】")
+            self.show_offline_ocr_use_label.show()
         else:
             self.offline_ocr_use = False
+            self.ocr_label.setText("请选择开启一种OCR开关, 否则翻译将无法使用")
+            self.show_offline_ocr_use_label.hide()
 
 
     # 改变在线OCR开关状态
@@ -2001,8 +2058,12 @@ class Settin(QMainWindow) :
             if self.baidu_ocr_use == True :
                 self.resetSwitch("baiduOCR")
             self.online_ocr_use = True
+            self.ocr_label.setText("当前正在使用【在线OCR】")
+            self.show_online_ocr_use_label.show()
         else:
             self.online_ocr_use = False
+            self.ocr_label.setText("请选择开启一种OCR开关, 否则翻译将无法使用")
+            self.show_online_ocr_use_label.hide()
 
 
     # 改变百度OCR开关状态
@@ -2014,8 +2075,12 @@ class Settin(QMainWindow) :
             if self.online_ocr_use == True :
                 self.resetSwitch("onlineOCR")
             self.baidu_ocr_use = True
+            self.ocr_label.setText("当前正在使用【百度OCR】")
+            self.show_baidu_ocr_use_label.show()
         else :
             self.baidu_ocr_use = False
+            self.ocr_label.setText("请选择开启一种OCR开关, 否则翻译将无法使用")
+            self.show_baidu_ocr_use_label.hide()
 
 
     # 改变百度OCR高精度开关状态
@@ -2445,6 +2510,16 @@ class Settin(QMainWindow) :
             self.logger.error(format_exc())
 
 
+    # 打开百度OCR额度查询地址
+    def openBaiduOCRQueryQuota(self):
+
+        try:
+            url = "https://console.bce.baidu.com/ai/?_=1661324005307#/ai/ocr/overview/index"
+            webbrowser.open(url, new=0, autoraise=True)
+        except Exception:
+            self.logger.error(format_exc())
+
+
     # 打开团子在线OCR购买
     def openDangoBuyPage(self):
 
@@ -2637,6 +2712,10 @@ class Settin(QMainWindow) :
         elif message_type == "setTop":
             self.desc_ui.setWindowTitle("全屏下置顶说明")
             self.desc_ui.desc_text.append("\n如果需要游玩全屏游戏, 则打开此开关, 否则平时请保持关闭")
+
+        elif message_type == "onlineOCRQueryQuota":
+            self.desc_ui.setWindowTitle("在线OCR额度查询")
+            self.desc_ui.desc_text.append(utils.http.onlineOCRQueryQuota(self.object))
 
         self.desc_ui.show()
 
