@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QMessageBox, QPushButton
 import sys
 import os
 import time
+import webbrowser
 
 import utils.check_font
 import utils.lock
@@ -41,6 +42,36 @@ def MessageBox(title, text, rate=1):
 
     message_box.exec_()
 
+# 检查chrome浏览器提示窗口
+def checkChromeMessageBox(title, text, rate=1):
+
+    message_box = QMessageBox()
+    message_box.setTextInteractionFlags(Qt.TextSelectableByMouse)
+    message_box.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowMaximizeButtonHint | Qt.MSWindowsFixedSizeDialogHint)
+
+    # 鼠标样式
+    pixmap = QPixmap(PIXMAP_ICON_PATH)
+    pixmap = pixmap.scaled(int(20*rate),
+                           int(20*rate),
+                           Qt.KeepAspectRatio,
+                           Qt.SmoothTransformation)
+    cursor = QCursor(pixmap, 0, 0)
+    message_box.setCursor(cursor)
+
+    icon = QIcon()
+    icon.addPixmap(QPixmap(LOGO_PATH), QIcon.Normal, QIcon.On)
+    message_box.setWindowIcon(icon)
+
+    message_box.setWindowTitle(title)
+    message_box.setText(text)
+
+    open_chrome_download_button = QPushButton("下载")
+    message_box.addButton(open_chrome_download_button, QMessageBox.YesRole)
+    open_chrome_download_button.clicked.connect(lambda: webbrowser.open("https://www.google.cn/chrome/index.html", new=0, autoraise=True))
+
+    message_box.addButton(QPushButton("取消"), QMessageBox.NoRole)
+
+    message_box.exec_()
 
 # 错误提示窗口-字体检查提示
 def checkFontMessageBox(title, text, logger, rate=1):

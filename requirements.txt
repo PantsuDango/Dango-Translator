@@ -12,3 +12,4 @@ Pillow==8.4.0
 PyQt5==5.15.6
 PyYAML==6.0
 skimage==0.0
+winreglib==0.1.0
