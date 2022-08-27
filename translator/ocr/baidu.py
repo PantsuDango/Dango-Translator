@@ -136,10 +136,13 @@ def baiduOCR(config, logger, test=False) :
                         if showTranslateRow == "True":
                             sentence = "百度OCR错误：竖排翻译模式每日额度已用光, 请取消竖排翻译模式"
                         else:
-                            sentence = "百度OCR错误: 无额度, 可使用本地OCR或在线OCR"
+                            sentence = "百度OCR错误: 百度ocr无额度或免费额度已用光, 可更换本地OCR或在线OCR"
+
+                    elif error_code == "18":
+                        sentence = "百度OCR错误: 您的翻译请求速度过快(1s内至多两次)，请调整自动翻译模式间隔(建议0.8s)或降低手动翻译频率"
 
                     elif error_code == 111 :
-                        sentence = "百度OCR错误: 密钥过期了, 请进入设置页面后保存一次设置, 以重新生成密钥"
+                        sentence = "百度OCR错误: 百度ocr缓存密钥已过期, 请进入设置页面后重新保存一次设置, 以重新生成缓存密钥"
 
                     elif error_code == 216202:
                         sentence = "百度OCR错误：范围截取过小无法识别，请重新框选一下你要翻译的区域"

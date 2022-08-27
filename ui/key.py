@@ -155,8 +155,10 @@ class Key(QWidget) :
 
         self.object.config["OCR"]["Key"] = self.filterNullWord(self.baidu_ocr_key_textEdit)
         self.object.config["OCR"]["Secret"] = self.filterNullWord(self.baidu_ocr_secret_textEdit)
-        self.object.config["tencentAPI"]["Key"] = self.filterNullWord(self.tencent_private_key_textEdit)
-        self.object.config["tencentAPI"]["Secret"] = self.filterNullWord(self.tencent_private_secret_textEdit)
+        self.object.config["tencentAPI"]["Key"] = self.filterNullWord(self.tencent_private_key_textEdit).replace(
+            "SecretId: ", "")
+        self.object.config["tencentAPI"]["Secret"] = self.filterNullWord(self.tencent_private_secret_textEdit).replace(
+            "SecretKey: ", "")
         self.object.config["baiduAPI"]["Key"] = self.filterNullWord(self.baidu_private_key_textEdit)
         self.object.config["baiduAPI"]["Secret"] = self.filterNullWord(self.baidu_private_secret_textEdit)
         self.object.config["caiyunAPI"] = self.filterNullWord(self.caiyun_private_key_textEdit)

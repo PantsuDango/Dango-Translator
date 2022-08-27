@@ -9,6 +9,7 @@ import utils.message
 import utils.http
 import utils.config
 import utils.lock
+import utils.enctry
 
 
 LOGO_PATH = "./config/icon/logo.ico"
@@ -217,7 +218,11 @@ class Login(QWidget) :
         # 用户名
         self.user = str(self.object.yaml["user"])
         # 密码
-        self.password = str(self.object.yaml["password"])
+        psw = str(self.object.yaml["password"])
+        if psw.find('%6?u!') != -1:
+            self.password = utils.enctry.dectry(psw)
+        else:
+            self.password = psw
 
 
     # 根据分辨率定义控件位置尺寸
@@ -324,7 +329,7 @@ class Login(QWidget) :
         elif result == "OK":
             # 保存配置
             self.object.yaml["user"] = self.user
-            self.object.yaml["password"] = self.password
+            self.object.yaml["password"] = utils.enctry.enctry(self.password)
             utils.config.saveConfig(self.object.yaml, self.logger)
             return True
 

@@ -1,0 +1,838 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>707</width>
+    <height>398</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <property name="layoutDirection">
+   <enum>Qt::LeftToRight</enum>
+  </property>
+  <property name="autoFillBackground">
+   <bool>false</bool>
+  </property>
+  <widget class="QTabWidget" name="tabWidget">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>400</height>
+    </rect>
+   </property>
+   <property name="currentIndex">
+    <number>3</number>
+   </property>
+   <widget class="QWidget" name="tab">
+    <attribute name="title">
+     <string>ocr设定</string>
+    </attribute>
+   </widget>
+   <widget class="QWidget" name="tab_2">
+    <attribute name="title">
+     <string>翻译设定</string>
+    </attribute>
+   </widget>
+   <widget class="QWidget" name="tab_3">
+    <attribute name="title">
+     <string>显示设定</string>
+    </attribute>
+   </widget>
+   <widget class="QWidget" name="tab_4">
+    <attribute name="title">
+     <string>功能设定</string>
+    </attribute>
+    <widget class="Line" name="line_8">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>270</y>
+       <width>60</width>
+       <height>15</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_5">
+     <property name="geometry">
+      <rect>
+       <x>460</x>
+       <y>20</y>
+       <width>25</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>说明</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_19">
+     <property name="geometry">
+      <rect>
+       <x>205</x>
+       <y>230</y>
+       <width>25</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>说明</string>
+     </property>
+    </widget>
+    <widget class="Line" name="line_6">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>180</y>
+       <width>60</width>
+       <height>15</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QSlider" name="horizontalSlider_3">
+     <property name="geometry">
+      <rect>
+       <x>95</x>
+       <y>110</y>
+       <width>65</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_6">
+     <property name="geometry">
+      <rect>
+       <x>485</x>
+       <y>20</y>
+       <width>20</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>？</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_23">
+     <property name="geometry">
+      <rect>
+       <x>280</x>
+       <y>200</y>
+       <width>140</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>自动模式刷新间隔(秒):</string>
+     </property>
+    </widget>
+    <widget class="Line" name="line_4">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>90</y>
+       <width>60</width>
+       <height>15</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="Line" name="line_3">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>90</y>
+       <width>60</width>
+       <height>15</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_18">
+     <property name="geometry">
+      <rect>
+       <x>230</x>
+       <y>230</y>
+       <width>20</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>？</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_26">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>230</y>
+       <width>100</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>文字相似度(%):</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>0</y>
+       <width>50</width>
+       <height>15</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>翻译模式</string>
+     </property>
+    </widget>
+    <widget class="Line" name="line">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>0</y>
+       <width>60</width>
+       <height>15</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_2">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>20</y>
+       <width>80</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>文字方向:</string>
+     </property>
+    </widget>
+    <widget class="QSlider" name="horizontalSlider_7">
+     <property name="geometry">
+      <rect>
+       <x>125</x>
+       <y>200</y>
+       <width>65</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QSlider" name="horizontalSlider_4">
+     <property name="geometry">
+      <rect>
+       <x>95</x>
+       <y>140</y>
+       <width>65</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QSlider" name="horizontalSlider_5">
+     <property name="geometry">
+      <rect>
+       <x>380</x>
+       <y>110</y>
+       <width>65</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_3">
+     <property name="geometry">
+      <rect>
+       <x>175</x>
+       <y>20</y>
+       <width>25</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>说明</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_11">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>110</y>
+       <width>80</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>范围热键:</string>
+     </property>
+    </widget>
+    <widget class="Line" name="line_7">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>270</y>
+       <width>60</width>
+       <height>15</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QSlider" name="horizontalSlider">
+     <property name="geometry">
+      <rect>
+       <x>95</x>
+       <y>20</y>
+       <width>65</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="Line" name="line_5">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>180</y>
+       <width>60</width>
+       <height>15</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_17">
+     <property name="geometry">
+      <rect>
+       <x>280</x>
+       <y>110</y>
+       <width>90</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>隐藏范围热键:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_28">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>270</y>
+       <width>50</width>
+       <height>15</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>杂项</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::PlainText</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_21">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>180</y>
+       <width>50</width>
+       <height>15</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>高级设置</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_4">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>20</y>
+       <width>20</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>？</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_8">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>90</y>
+       <width>50</width>
+       <height>15</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>快捷键</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_14">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>140</y>
+       <width>80</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>翻译热键:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_7">
+     <property name="geometry">
+      <rect>
+       <x>280</x>
+       <y>20</y>
+       <width>80</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>贴字翻译:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_25">
+     <property name="geometry">
+      <rect>
+       <x>475</x>
+       <y>200</y>
+       <width>25</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>说明</string>
+     </property>
+    </widget>
+    <widget class="QSlider" name="horizontalSlider_2">
+     <property name="geometry">
+      <rect>
+       <x>380</x>
+       <y>20</y>
+       <width>65</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_22">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>200</y>
+       <width>100</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>百度ocr高精度:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_27">
+     <property name="geometry">
+      <rect>
+       <x>500</x>
+       <y>200</y>
+       <width>20</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>？</string>
+     </property>
+    </widget>
+    <widget class="Line" name="line_2">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>0</y>
+       <width>60</width>
+       <height>15</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_24">
+     <property name="geometry">
+      <rect>
+       <x>205</x>
+       <y>200</y>
+       <width>25</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>说明</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_29">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>290</y>
+       <width>80</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>自动登陆:</string>
+     </property>
+    </widget>
+    <widget class="QSlider" name="horizontalSlider_9">
+     <property name="geometry">
+      <rect>
+       <x>95</x>
+       <y>290</y>
+       <width>65</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_32">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>320</y>
+       <width>150</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>原文自动复制到剪贴板:</string>
+     </property>
+    </widget>
+    <widget class="QSlider" name="horizontalSlider_10">
+     <property name="geometry">
+      <rect>
+       <x>180</x>
+       <y>320</y>
+       <width>65</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton">
+     <property name="geometry">
+      <rect>
+       <x>340</x>
+       <y>340</y>
+       <width>85</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>打开日志</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_2">
+     <property name="geometry">
+      <rect>
+       <x>430</x>
+       <y>340</y>
+       <width>85</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>打开翻译记录</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_69">
+     <property name="geometry">
+      <rect>
+       <x>175</x>
+       <y>50</y>
+       <width>25</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>说明</string>
+     </property>
+    </widget>
+    <widget class="QSlider" name="horizontalSlider_21">
+     <property name="geometry">
+      <rect>
+       <x>95</x>
+       <y>50</y>
+       <width>65</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_70">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>50</y>
+       <width>20</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>？</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_71">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>50</y>
+       <width>80</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>文字换行:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_109">
+     <property name="geometry">
+      <rect>
+       <x>475</x>
+       <y>230</y>
+       <width>25</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>说明</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_110">
+     <property name="geometry">
+      <rect>
+       <x>500</x>
+       <y>230</y>
+       <width>20</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>？</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_111">
+     <property name="geometry">
+      <rect>
+       <x>280</x>
+       <y>230</y>
+       <width>100</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>图像相似度(%):</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_112">
+     <property name="geometry">
+      <rect>
+       <x>175</x>
+       <y>110</y>
+       <width>60</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>CTRL+F</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_113">
+     <property name="geometry">
+      <rect>
+       <x>175</x>
+       <y>140</y>
+       <width>60</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>CTRL+D</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_114">
+     <property name="geometry">
+      <rect>
+       <x>460</x>
+       <y>110</y>
+       <width>60</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>CTRL+X</string>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="spinBox_2">
+     <property name="geometry">
+      <rect>
+       <x>425</x>
+       <y>230</y>
+       <width>45</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="value">
+      <number>80</number>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="spinBox_3">
+     <property name="geometry">
+      <rect>
+       <x>125</x>
+       <y>230</y>
+       <width>45</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="value">
+      <number>80</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_35">
+     <property name="geometry">
+      <rect>
+       <x>280</x>
+       <y>50</y>
+       <width>100</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>全屏游戏下置顶:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_36">
+     <property name="geometry">
+      <rect>
+       <x>510</x>
+       <y>50</y>
+       <width>20</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>？</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_37">
+     <property name="geometry">
+      <rect>
+       <x>485</x>
+       <y>50</y>
+       <width>25</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>说明</string>
+     </property>
+    </widget>
+    <widget class="QSlider" name="horizontalSlider_11">
+     <property name="geometry">
+      <rect>
+       <x>405</x>
+       <y>50</y>
+       <width>65</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_20">
+     <property name="geometry">
+      <rect>
+       <x>230</x>
+       <y>200</y>
+       <width>20</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>？</string>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="doubleSpinBox">
+     <property name="geometry">
+      <rect>
+       <x>425</x>
+       <y>200</y>
+       <width>45</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="value">
+      <double>0.800000000000000</double>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab_5">
+    <attribute name="title">
+     <string>关于</string>
+    </attribute>
+   </widget>
+   <widget class="QWidget" name="tab_6">
+    <attribute name="title">
+     <string>支持作者</string>
+    </attribute>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

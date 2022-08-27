@@ -86,7 +86,8 @@ def progressbar(url):
             os.remove("temp.exe")
         except Exception :
             pass
-        return "下载失败: %s\n\n请尝试手动复制下载链接下载, 然后将'temp.exe'文件名修改为'团子翻译器.exe', 再拿去替换app目录内的'团子翻译器.exe'即可"%err
+        return "下载失败: {}\n\n请尝试手动复制下载链接下载, 然后将'temp'文件名修改为'团子翻译器', 并复制替换{}/app目录内的'团子翻译器'即可".format(
+            err, os.path.abspath('.'))
 
 
 def main() :
@@ -111,6 +112,7 @@ def main() :
     if err :
         return print(err)
 
+# TODO(团子): 替换文件失败往往是因为安装目录受到保护，第三方程序无法进行写入，可以考虑重新编译更新程序，并同样加上uac管理员权限
     # 替换版本文件
     print("\n>>> 替换新版本文件...")
     try :
@@ -119,7 +121,9 @@ def main() :
         os.startfile("团子翻译器.exe")
         sys.exit()
     except Exception as err :
-        return print("替换新版本文件失败: %s"%err)
+        return print(
+            "替换新版本文件失败: {}\n\n请尝试手动进行替换, 新版本文件位于\n{}目录下，文件名为'temp'，请将其文件名修改为'团子翻译器', 并复制替换{}/app内的'团子翻译器'即可".format(
+                err, os.path.abspath('.'), os.path.abspath('.')))
 
 
 if __name__ == "__main__" :
