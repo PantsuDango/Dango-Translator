@@ -15,14 +15,16 @@ import utils.message
 import utils.port
 import utils.test
 import utils.http
-import ui.static.icon
-import ui.static.background
+import utils.offline_ocr
 
 from ui import image
+import ui.static.icon
+import ui.static.background
 import ui.hotkey
 import ui.switch
 import ui.desc
 import ui.key
+import ui.progress_bar
 
 import translator.ocr.baidu
 
@@ -513,8 +515,9 @@ class Settin(QMainWindow) :
         button = QPushButton(offline_OCR_tab)
         self.customSetGeometry(button, 20, 170, 60, 20)
         button.setText("安装")
-        #button.clicked.connect(self.runOfflineOCR)
+        button.clicked.connect(lambda: utils.offline_ocr.download_offline_ocr(self.object))
         button.setCursor(self.select_pixmap)
+        self.progress_bar = ui.progress_bar.ProgressBar(self.object.yaml["screen_scale_rate"])
         # 本地OCR卸载按钮
         button = QPushButton(offline_OCR_tab)
         self.customSetGeometry(button, 100, 170, 60, 20)
@@ -763,7 +766,7 @@ class Settin(QMainWindow) :
         label.setText("有道:")
 
         # 有道翻译开关
-        self.youdao_switch = ui.switch.PublictranslationSwitch(public_translater_tab, sign=self.youdao_use, startX=(65-20)*self.rate)
+        self.youdao_switch = ui.switch.PublicTranslationSwitch(public_translater_tab, sign=self.youdao_use, startX=(65 - 20) * self.rate)
         self.customSetGeometry(self.youdao_switch, 65, 70, 65, 20)
         self.youdao_switch.checkedChanged.connect(self.changeYoudaoSwitch)
         self.youdao_switch.setCursor(self.select_pixmap)
@@ -782,7 +785,7 @@ class Settin(QMainWindow) :
         label.setText("百度:")
 
         # 百度翻译开关
-        self.baidu_switch = ui.switch.PublictranslationSwitch(public_translater_tab, sign=self.baidu_web_use, startX=(65-20)*self.rate)
+        self.baidu_switch = ui.switch.PublicTranslationSwitch(public_translater_tab, sign=self.baidu_web_use, startX=(65 - 20) * self.rate)
         self.customSetGeometry(self.baidu_switch, 245, 70, 65, 20)
         self.baidu_switch.checkedChanged.connect(self.changeBaiduWebSwitch)
         self.baidu_switch.setCursor(self.select_pixmap)
@@ -801,7 +804,7 @@ class Settin(QMainWindow) :
         label.setText("腾讯:")
 
         # 腾讯翻译开关
-        self.tencent_switch = ui.switch.PublictranslationSwitch(public_translater_tab, sign=self.tencent_web_use, startX=(65-20)*self.rate)
+        self.tencent_switch = ui.switch.PublicTranslationSwitch(public_translater_tab, sign=self.tencent_web_use, startX=(65 - 20) * self.rate)
         self.customSetGeometry(self.tencent_switch, 425, 70, 65, 20)
         self.tencent_switch.checkedChanged.connect(self.changeTencentWebSwitch)
         self.tencent_switch.setCursor(self.select_pixmap)
@@ -820,7 +823,7 @@ class Settin(QMainWindow) :
         label.setText("DeepL:")
 
         # DeepL翻译开关
-        self.deepl_switch = ui.switch.PublictranslationSwitch(public_translater_tab, sign=self.deepl_use, startX=(65-20)*self.rate)
+        self.deepl_switch = ui.switch.PublicTranslationSwitch(public_translater_tab, sign=self.deepl_use, startX=(65 - 20) * self.rate)
         self.customSetGeometry(self.deepl_switch, 65, 120, 65, 20)
         self.deepl_switch.checkedChanged.connect(self.changeDeepLSwitch)
         self.deepl_switch.setCursor(self.select_pixmap)
@@ -839,7 +842,7 @@ class Settin(QMainWindow) :
         label.setText("谷歌:")
 
         # 谷歌翻译开关
-        self.google_switch = ui.switch.PublictranslationSwitch(public_translater_tab, sign=self.google_use, startX=(65-20)*self.rate)
+        self.google_switch = ui.switch.PublicTranslationSwitch(public_translater_tab, sign=self.google_use, startX=(65 - 20) * self.rate)
         self.customSetGeometry(self.google_switch, 245, 120, 65, 20)
         self.google_switch.checkedChanged.connect(self.changeGoogleSwitch)
         self.google_switch.setCursor(self.select_pixmap)
@@ -858,7 +861,7 @@ class Settin(QMainWindow) :
         label.setText("彩云:")
 
         # 彩云翻译开关
-        self.caiyun_switch = ui.switch.PublictranslationSwitch(public_translater_tab, sign=self.caiyun_web_use, startX=(65-20)*self.rate)
+        self.caiyun_switch = ui.switch.PublicTranslationSwitch(public_translater_tab, sign=self.caiyun_web_use, startX=(65 - 20) * self.rate)
         self.customSetGeometry(self.caiyun_switch, 425, 120, 65, 20)
         self.caiyun_switch.checkedChanged.connect(self.changeCaiyunWebSwitch)
         self.caiyun_switch.setCursor(self.select_pixmap)

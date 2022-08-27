@@ -814,7 +814,7 @@ class Translation(QMainWindow) :
         self.show()
 
 
-    # 关闭selenuim的driver引擎
+    # 关闭selenium的driver引擎
     def killDriVer(self) :
 
         utils.thread.createThreadDaemonFalse(os.popen, "taskkill /im chromedriver.exe /F")

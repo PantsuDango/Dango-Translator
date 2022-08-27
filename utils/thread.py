@@ -23,14 +23,14 @@ def createThreadDaemonFalse(func, *args) :
 
 
 # 运行QThread
-def runQThread(qthread) :
+def runQThread(qthread, mode=True) :
 
     def func() :
         qthread.start()
         qthread.wait()
 
     thread = threading.Thread(target=func)
-    thread.setDaemon(True)
+    thread.setDaemon(mode)
     thread.start()
 
 
