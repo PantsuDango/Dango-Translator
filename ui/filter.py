@@ -124,7 +124,9 @@ class Filter(QWidget) :
     # 根据分辨率定义控件位置尺寸
     def customSetGeometry(self, object, x, y, w, h):
 
-        object.setGeometry(QRect(x*self.rate, y*self.rate, w*self.rate, h*self.rate))
+        object.setGeometry(QRect(int(x * self.rate),
+                                 int(y * self.rate), int(w * self.rate),
+                                 int(h * self.rate)))
 
 
     # 添加一行
