@@ -65,8 +65,8 @@ class Desc(QWidget) :
                                                     "color: #5B8FF9;"
                                                     "background: rgba(255, 255, 255, 0.7); }")
         self.desc_text.setCursor(cursor)
-        self.document = self.desc_text.document()
-        self.document.contentsChanged.connect(self.textAreaChanged)
+        # self.document = self.desc_text.document()
+        # self.document.contentsChanged.connect(self.textAreaChanged)
 
         pix = QPixmap(QQ_GROUP_IMAGE_PATH)
         pix = pix.scaled(int(200 * self.rate),
@@ -85,6 +85,7 @@ class Desc(QWidget) :
         newHeight = self.document.size().height() + 20
         if newHeight != self.desc_text.height():
             self.setFixedHeight(newHeight)
+
 
     # 初始化配置
     def getInitConfig(self):

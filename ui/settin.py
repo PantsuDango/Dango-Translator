@@ -250,10 +250,9 @@ class Settin(QMainWindow) :
         tab_widget.setTabPosition(QTabWidget.North)
         tab_widget.setStyleSheet("QTabBar:tab { min-height: %dpx; min-width: %dpx;"
                                  "background: rgba(255, 255, 255, 1);}"
-                                 "QTabBar:tab:selected { background: rgba(62, 62, 62, 0.07); "
-                                                        "border-bottom: 2px solid %s; }"
+                                 "QTabBar:tab:selected { background: rgba(62, 62, 62, 0.07); }"
                                  "QTabWidget::pane { border-image: none; }"
-                                 %(35*self.rate, 120*self.rate, self.color_2))
+                                 %(35*self.rate, 120*self.rate))
 
         # 竖向分割线
         label = QLabel(self.tab_1)
@@ -406,7 +405,7 @@ class Settin(QMainWindow) :
 
         # 在线OCR教程按钮
         button = QPushButton(online_OCR_tab)
-        self.customSetGeometry(button, 320, 20, 100, 20)
+        self.customSetGeometry(button, 340, 20, 100, 20)
         button.setText("详细教程")
         button.clicked.connect(self.openOnlineOCRTutorials)
         button.setCursor(self.select_pixmap)
@@ -478,7 +477,7 @@ class Settin(QMainWindow) :
         label.setStyleSheet("color: %s"%self.color_2)
         # 本地OCR教程按钮
         button = QPushButton(offline_OCR_tab)
-        self.customSetGeometry(button, 320, 20, 100, 20)
+        self.customSetGeometry(button, 340, 20, 100, 20)
         button.setText("详细教程")
         button.clicked.connect(self.openOfflineOCRTutorial)
         button.setCursor(self.select_pixmap)
@@ -548,7 +547,7 @@ class Settin(QMainWindow) :
         label.setStyleSheet("color: %s"%self.color_2)
         # 百度OCR教程按钮
         button = QPushButton(baidu_OCR_tab)
-        self.customSetGeometry(button, 320, 20, 100, 20)
+        self.customSetGeometry(button, 340, 20, 100, 20)
         button.setText("详细教程")
         button.clicked.connect(self.openBaiduOCRTutorials)
         button.setCursor(self.select_pixmap)

@@ -546,10 +546,14 @@ class PublictranslationSwitch(QWidget):
 
 
     def mousePressEvent(self, event) :
-        if not utils.check_chrome.checkChrome():
-            self.timer.stop()
-            utils.check_chrome.openChromeDownloadMessageBox()
-            return
+
+        try :
+            if not utils.check_chrome.checkChrome() :
+                self.timer.stop()
+                utils.check_chrome.openChromeDownloadMessageBox()
+                return
+        except Exception :
+            pass
 
         self.checked = not self.checked
         # 发射信号
