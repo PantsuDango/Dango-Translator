@@ -515,14 +515,14 @@ class Settin(QMainWindow) :
         button = QPushButton(offline_OCR_tab)
         self.customSetGeometry(button, 20, 170, 60, 20)
         button.setText("安装")
-        button.clicked.connect(lambda: utils.offline_ocr.download_offline_ocr(self.object))
+        button.clicked.connect(lambda: utils.offline_ocr.install_offline_ocr(self.object))
         button.setCursor(self.select_pixmap)
         self.progress_bar = ui.progress_bar.ProgressBar(self.object.yaml["screen_scale_rate"])
         # 本地OCR卸载按钮
         button = QPushButton(offline_OCR_tab)
         self.customSetGeometry(button, 100, 170, 60, 20)
         button.setText("卸载")
-        #button.clicked.connect(self.runOfflineOCR)
+        button.clicked.connect(lambda: utils.offline_ocr.uninstall_offline_ocr(self.object))
         button.setCursor(self.select_pixmap)
         # 本地OCR标签
         label = QLabel(offline_OCR_tab)
