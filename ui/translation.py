@@ -260,7 +260,7 @@ class Translation(QMainWindow) :
         self.quit_button.setToolTip("<b>退出程序 Quit</b>")
         self.quit_button.setStyleSheet("background: transparent;")
         self.quit_button.setCursor(select_pixmap)
-        self.quit_button.clicked.connect(self.showAppquitMessageBox)
+        self.quit_button.clicked.connect(self.showAppQuitMessageBox)
         self.quit_button.hide()
 
         # 右下角用于拉伸界面的控件
@@ -823,7 +823,7 @@ class Translation(QMainWindow) :
 
 
     # 退出提示框
-    def showAppquitMessageBox(self) :
+    def showAppQuitMessageBox(self) :
 
         utils.message.quitAppMessageBox("退出程序", "真的要关闭团子吗?QAQ      ", self.object)
 

@@ -484,6 +484,7 @@ class SwitchOCR(QWidget):
         painter.restore()
 
 
+# 公共翻译开关
 class PublicTranslationSwitch(QWidget):
 
     checkedChanged = pyqtSignal(bool)

@@ -33,6 +33,8 @@ def runQThread(qthread, mode=True) :
     thread.setDaemon(mode)
     thread.start()
 
+    return thread
+
 
 # 检查绑定邮箱线程
 class createCheckBindEmailQThread(QThread) :

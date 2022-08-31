@@ -247,10 +247,10 @@ class Settin(QMainWindow) :
         self.tab_widget.setTabIcon(self.tab_widget.indexOf(self.tab_1), icon)
 
         # 顶部工具栏
-        tab_widget = QTabWidget(self.tab_1)
-        tab_widget.setGeometry(QRect(0, 0, self.window_width, self.window_height))
-        tab_widget.setTabPosition(QTabWidget.North)
-        tab_widget.setStyleSheet("QTabBar:tab { min-height: %dpx; min-width: %dpx;"
+        self.ocr_tab_widget = QTabWidget(self.tab_1)
+        self.ocr_tab_widget.setGeometry(QRect(0, 0, self.window_width, self.window_height))
+        self.ocr_tab_widget.setTabPosition(QTabWidget.North)
+        self.ocr_tab_widget.setStyleSheet("QTabBar:tab { min-height: %dpx; min-width: %dpx;"
                                  "background: rgba(255, 255, 255, 1);}"
                                  "QTabBar:tab:selected { background: rgba(62, 62, 62, 0.07); }"
                                  "QTabWidget::pane { border-image: none; }"
@@ -265,8 +265,8 @@ class Settin(QMainWindow) :
 
         # 在线OCR页签
         online_OCR_tab = QWidget()
-        tab_widget.addTab(online_OCR_tab, "")
-        tab_widget.setTabText(tab_widget.indexOf(online_OCR_tab), "在线OCR")
+        self.ocr_tab_widget.addTab(online_OCR_tab, "")
+        self.ocr_tab_widget.setTabText(self.ocr_tab_widget.indexOf(online_OCR_tab), "在线OCR")
 
         # 在线OCR页签图标
         icon = QIcon()
@@ -277,7 +277,7 @@ class Settin(QMainWindow) :
                                Qt.KeepAspectRatio,
                                Qt.SmoothTransformation)
         icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
-        tab_widget.setTabIcon(tab_widget.indexOf(online_OCR_tab), icon)
+        self.ocr_tab_widget.setTabIcon(self.ocr_tab_widget.indexOf(online_OCR_tab), icon)
 
         # 横向分割线
         label = QLabel(online_OCR_tab)
@@ -295,8 +295,8 @@ class Settin(QMainWindow) :
 
         # 本地OCR页签
         offline_OCR_tab = QWidget()
-        tab_widget.addTab(offline_OCR_tab, "")
-        tab_widget.setTabText(tab_widget.indexOf(offline_OCR_tab), "本地OCR")
+        self.ocr_tab_widget.addTab(offline_OCR_tab, "")
+        self.ocr_tab_widget.setTabText(self.ocr_tab_widget.indexOf(offline_OCR_tab), "本地OCR")
 
         # 本地OCR页签图标
         icon = QIcon()
@@ -307,7 +307,7 @@ class Settin(QMainWindow) :
                                Qt.KeepAspectRatio,
                                Qt.SmoothTransformation)
         icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
-        tab_widget.setTabIcon(tab_widget.indexOf(offline_OCR_tab), icon)
+        self.ocr_tab_widget.setTabIcon(self.ocr_tab_widget.indexOf(offline_OCR_tab), icon)
 
         # 横向分割线
         label = QLabel(offline_OCR_tab)
@@ -325,8 +325,8 @@ class Settin(QMainWindow) :
 
         # 百度OCR页签
         baidu_OCR_tab = QWidget()
-        tab_widget.addTab(baidu_OCR_tab, "")
-        tab_widget.setTabText(tab_widget.indexOf(baidu_OCR_tab), "百度OCR")
+        self.ocr_tab_widget.addTab(baidu_OCR_tab, "")
+        self.ocr_tab_widget.setTabText(self.ocr_tab_widget.indexOf(baidu_OCR_tab), "百度OCR")
 
         # 百度OCR页签图标
         icon = QIcon()
@@ -337,7 +337,7 @@ class Settin(QMainWindow) :
                                Qt.KeepAspectRatio,
                                Qt.SmoothTransformation)
         icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
-        tab_widget.setTabIcon(tab_widget.indexOf(baidu_OCR_tab), icon)
+        self.ocr_tab_widget.setTabIcon(self.ocr_tab_widget.indexOf(baidu_OCR_tab), icon)
 
         # 横向分割线
         label = QLabel(baidu_OCR_tab)
@@ -2334,18 +2334,24 @@ class Settin(QMainWindow) :
     # 运行本地OCR
     def runOfflineOCR(self) :
 
+        # 杀死本地可能在运行ocr进程
+        utils.offline_ocr.killOfflineOCR(self.object.yaml["port"])
+
         # 检查端口是否被占用
         if utils.port.detectPort(self.object.yaml["port"]) :
-            utils.message.MessageBox("运行失败",
+            utils.message.MessageBox("本地OCR运行失败",
                                      "本地OCR已启动, 请不要重复运行!     ")
         else :
             try :
                 # 启动本地OCR
                 os.startfile(self.object.yaml["ocr_cmd_path"])
+            except FileNotFoundError :
+                utils.message.MessageBox("本地OCR运行失败",
+                                         "本地OCR还未安装, 请先安装!     ")
             except Exception :
                 self.logger.error(format_exc())
-                utils.message.MessageBox("运行失败",
-                                         "本地OCR运行失败, 原因:\n%s     "%format_exc())
+                utils.message.MessageBox("本地OCR运行失败",
+                                         "原因: %s"%format_exc())
 
 
     # 测试本地OCR
@@ -2924,8 +2930,21 @@ class Settin(QMainWindow) :
         if node_name == "自动模式":
             node_url = self.object.yaml["dict_info"]["ocr_server"]
         else:
-            node_url = re.sub(r"//.+?/", "//%s/" % self.node_info[node_name], self.object.yaml["dict_info"]["ocr_server"])
+            node_url = re.sub(r"//.+?/", "//%s/"%self.node_info[node_name], self.object.yaml["dict_info"]["ocr_server"])
         self.object.config["nodeURL"] = node_url
+
+
+    # 消息弹窗
+    def showMessageBox(self, title, text) :
+
+        utils.message.MessageBox(title, text)
+
+
+    # 关闭进度条弹窗
+    def closeProcessBar(self, title, text) :
+
+        self.progress_bar.close()
+        utils.message.MessageBox(title, text)
 
 
     # 退出前保存设置
