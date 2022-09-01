@@ -25,6 +25,7 @@ import ui.switch
 import ui.desc
 import ui.key
 import ui.progress_bar
+import ui.static
 
 import translator.ocr.baidu
 
@@ -269,15 +270,7 @@ class Settin(QMainWindow) :
         self.ocr_tab_widget.setTabText(self.ocr_tab_widget.indexOf(online_OCR_tab), "在线OCR")
 
         # 在线OCR页签图标
-        icon = QIcon()
-        pixmap = QPixmap()
-        pixmap.loadFromData(base64.b64decode(ui.static.icon.ONLINE_OCR))
-        pixmap = pixmap.scaled(int(20 * self.rate),
-                               int(20 * self.rate),
-                               Qt.KeepAspectRatio,
-                               Qt.SmoothTransformation)
-        icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
-        self.ocr_tab_widget.setTabIcon(self.ocr_tab_widget.indexOf(online_OCR_tab), icon)
+        self.ocr_tab_widget.setTabIcon(self.ocr_tab_widget.indexOf(online_OCR_tab), ui.static.icon.ONLINE_OCR_ICON)
 
         # 横向分割线
         label = QLabel(online_OCR_tab)

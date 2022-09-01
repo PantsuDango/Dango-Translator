@@ -5,7 +5,6 @@ import tkinter.font
 from traceback import format_exc
 
 import utils.message
-import utils.lock
 
 
 FONT_PATH = os.path.join(os.getcwd(), "config", "other", "华康方圆体W7.TTC")

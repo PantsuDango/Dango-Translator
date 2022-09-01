@@ -8,7 +8,6 @@ import re
 import utils.message
 import utils.http
 import utils.config
-import utils.lock
 import utils.enctry
 
 

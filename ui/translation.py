@@ -16,7 +16,6 @@ import utils.translater
 import utils.http
 import utils.range
 import utils.message
-import utils.lock
 
 import translator.sound
 import translator.all
