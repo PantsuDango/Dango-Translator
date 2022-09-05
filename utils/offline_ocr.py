@@ -92,6 +92,7 @@ class InstallThread(QThread) :
         self.url = object.yaml["dict_info"]["ocr_install_url"]
         self.file_name = file_name
         self.unzip_path = unzip_path
+        self.object.settin_ui.progress_bar.stop_sign = False
 
 
     # 下载
@@ -117,6 +118,9 @@ class InstallThread(QThread) :
                     self.progress_bar_sign.emit(float(size / content_size * 100),
                                                 int(size / content_size * 100),
                                                 "%s/%s"%(now_size_content, file_size_content))
+                    # 如果收到停止信号
+                    if self.object.settin_ui.progress_bar.stop_sign :
+                        break
             response.close()
             return None
 
@@ -166,6 +170,9 @@ class InstallThread(QThread) :
                 self.progress_bar_sign.emit(float(now_size / all_size * 100),
                                             int(now_size / all_size * 100),
                                             "%s/%s"%(now_size_content, all_size_content))
+                # 如果收到停止信号
+                if self.object.settin_ui.progress_bar.stop_sign :
+                    break
             zip_file.close()
             # 删除压缩包
             os.remove(self.file_name)
@@ -183,12 +190,22 @@ class InstallThread(QThread) :
             utils.message.MessageBox("安装本地ocr失败", "原因: %s"%err)
             return
 
+        # 如果收到停止信号
+        if self.object.settin_ui.progress_bar.stop_sign :
+            os.remove(self.file_name)
+            return
+
         # 解压
         self.progress_bar_modify_title_sign.emit("解压本地OCR -- 解压中请勿关闭此窗口")
         err = self.unzip()
         if err :
             utils.message.MessageBox("安装本地ocr失败",
                                      "解压%s失败, 原因:\n%s"%(self.file_name, format_exc()))
+            return
+
+        # 如果收到停止信号
+        if self.object.settin_ui.progress_bar.stop_sign :
+            shutil.rmtree(OCR_INSTALL_PATH)
             return
 
         self.object.settin_ui.progress_bar.finish_sign = True

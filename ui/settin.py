@@ -522,20 +522,6 @@ class Settin(QMainWindow) :
         self.customSetGeometry(label, 180, 170, 400, 20)
         label.setText("首次使用请先安装, 不使用可卸载节省空间")
 
-        # 本地OCR端口选择器
-        self.offline_ocr_port_spinBox = QDoubleSpinBox(offline_OCR_tab)
-        self.customSetGeometry(self.offline_ocr_port_spinBox, 20, 215, 60, 25)
-        self.offline_ocr_port_spinBox.setDecimals(0)
-        self.offline_ocr_port_spinBox.setMinimum(3000)
-        self.offline_ocr_port_spinBox.setMaximum(65535)
-        self.offline_ocr_port_spinBox.setSingleStep(1)
-        self.offline_ocr_port_spinBox.setValue(6666)
-        self.offline_ocr_port_spinBox.setCursor(self.select_pixmap)
-        # 本地OCR标签
-        label = QLabel(offline_OCR_tab)
-        self.customSetGeometry(label, 100, 220, 400, 20)
-        label.setText("本地OCR占用的端口, 冲突可切换, 切换后需重新运行本地OCR")
-
         # 百度OCR标签
         label = QLabel(baidu_OCR_tab)
         self.customSetGeometry(label, 20, 20, 400, 20)

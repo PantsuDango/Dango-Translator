@@ -22,6 +22,7 @@ import ui.translation
 import ui.filter
 import ui.range
 import ui.settin
+import ui.static.icon
 
 import translator.update_chrome_driver
 import translator.update_edge_driver
@@ -185,6 +186,8 @@ class DangoTranslator() :
             utils.thread.runQThread(thread)
         # 初始化图片资源
         utils.thread.createThread(self.InitLoadFile)
+        # 加载静态资源
+        ui.static.icon.initIcon(self.yaml["screen_scale_rate"])
 
         # 登录界面
         self.login_ui = ui.login.Login(self)

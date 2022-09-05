@@ -212,36 +212,7 @@ def quitAppMessageBox(title, text, object, rate=1) :
     message_box.exec_()
 
 
-# 错误提示窗口-进度条用
-def closeProcessBarMessageBox(title, text, logger, rate=1):
 
-    message_box = QMessageBox()
-    message_box.setTextInteractionFlags(Qt.TextSelectableByMouse)
-    message_box.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowMaximizeButtonHint | Qt.MSWindowsFixedSizeDialogHint)
-
-    # 鼠标样式
-    pixmap = QPixmap(PIXMAP_ICON_PATH)
-    pixmap = pixmap.scaled(int(20*rate),
-                           int(20*rate),
-                           Qt.KeepAspectRatio,
-                           Qt.SmoothTransformation)
-    cursor = QCursor(pixmap, 0, 0)
-    message_box.setCursor(cursor)
-
-    icon = QIcon()
-    icon.addPixmap(QPixmap(LOGO_PATH), QIcon.Normal, QIcon.On)
-    message_box.setWindowIcon(icon)
-
-    message_box.setWindowTitle(title)
-    message_box.setText(text)
-
-    yes_button = QPushButton("停止")
-    yes_button.clicked.connect(lambda: utils.check_font.openFontFile(logger))
-
-    message_box.addButton(yes_button, QMessageBox.YesRole)
-    message_box.addButton(QPushButton("取消"), QMessageBox.NoRole)
-
-    message_box.exec_()
 
 
 # 服务连接失败提示

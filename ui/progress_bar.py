@@ -17,7 +17,6 @@ class ProgressBar(QWidget) :
 
         super().__init__()
         self.rate = rate
-
         self.getInitConfig()
         self.ui()
 
@@ -31,11 +30,7 @@ class ProgressBar(QWidget) :
         self.setMinimumSize(QSize(self.window_width, self.window_height))
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowCloseButtonHint)
         # 窗口图标
-        icon = QIcon()
-        pixmap = QPixmap()
-        pixmap.loadFromData(base64.b64decode(ui.static.icon.APP_LOGO))
-        icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
-        self.setWindowIcon(icon)
+        self.setWindowIcon(ui.static.icon.APP_LOGO_ICON)
         # 设置字体
         self.setStyleSheet("font: %spt '%s'; background-color: rgb(255, 255, 255);}"%(self.font_size, self.font_type))
 
@@ -80,8 +75,10 @@ class ProgressBar(QWidget) :
         # 界面尺寸
         self.window_width = int(300 * self.rate)
         self.window_height = int(50 * self.rate)
-        # 关闭信号
+        # 结束信号
         self.finish_sign = False
+        # 中止信号
+        self.stop_sign = False
 
 
     # 绘制进度信息
@@ -98,9 +95,19 @@ class ProgressBar(QWidget) :
         self.setWindowTitle(title)
 
 
+    # 停止任务
+    def stopProcess(self) :
+
+        self.stop_sign = True
+
+
     # 窗口关闭处理
     def closeEvent(self, event) :
 
         if not self.finish_sign :
-            utils.message.closeProcessBarMessageBox("停止安装",
-                                                    "本地OCR安装进行中\n确定要中止操作吗     ")
+            utils.message.closeProcessBarMessageBox(self,
+                                                    "停止安装",
+                                                    "本地OCR安装进行中\n确定要中止操作吗     ",
+                                                    self.rate)
+            if not self.stop_sign :
+                event.ignore()

@@ -17,10 +17,14 @@ PRIVATE_TRANSLATER = "iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACtWK6eAAAQ7ElEQVR4Xu
 
 
 from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 import utils.screen_rate
 import base64
 
-#
+RATE = 1.0
+ONLINE_OCR_ICON = None
+APP_LOGO_ICON = None
+
 def createPixmap(icon_base64_str, width, height) :
 
     pixmap = QPixmap()
@@ -29,20 +33,24 @@ def createPixmap(icon_base64_str, width, height) :
                            int(height*RATE),
                            Qt.KeepAspectRatio,
                            Qt.SmoothTransformation)
-
+    return pixmap
 
 def createIcon(pixmap) :
 
     icon = QIcon()
     icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
-
-
-RATE = None
-ONLINE_OCR_ICON = None
+    return icon
 
 
 # 初始化创建icon
-def initIcon() :
+def initIcon(rate) :
 
+    global RATE, \
+        ONLINE_OCR_ICON, \
+        APP_LOGO_ICON
+
+    RATE = rate
     # 在线OCR图标
     ONLINE_OCR_ICON = createIcon(createPixmap(ONLINE_OCR, 20, 20))
+    # 团子LOGO图标
+    APP_LOGO_ICON = createIcon(createPixmap(APP_LOGO, 20, 20))
