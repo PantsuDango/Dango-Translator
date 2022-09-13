@@ -31,7 +31,7 @@ import translator.ocr.baidu
 
 
 LOGO_ICON_PATH = "./config/icon/logo.ico"
-PIXMAP_ICON_PATH = "./config/icon/pixmap.png"
+PIXMAP_CURSOR = "./config/icon/pixmap.png"
 PIXMAP2_PATH = "./config/icon/pixmap2.png"
 QUESTION_PATH = "./config/icon/question.png"
 OCR_ICON_PATH = "./config/icon/ocr.png"
@@ -134,7 +134,7 @@ class Settin(QMainWindow) :
         self.setWindowIcon(icon)
 
         # 鼠标样式
-        pixmap = QPixmap(PIXMAP_ICON_PATH)
+        pixmap = QPixmap(PIXMAP_CURSOR)
         pixmap = pixmap.scaled(int(20*self.rate),
                                int(20*self.rate),
                                Qt.KeepAspectRatio,
