@@ -105,9 +105,8 @@ class ProgressBar(QWidget) :
     def closeEvent(self, event) :
 
         if not self.finish_sign :
-            utils.message.closeProcessBarMessageBox(self,
-                                                    "停止安装",
+            utils.message.closeProcessBarMessageBox("停止安装",
                                                     "本地OCR安装进行中\n确定要中止操作吗     ",
-                                                    self.rate)
+                                                    self)
             if not self.stop_sign :
                 event.ignore()

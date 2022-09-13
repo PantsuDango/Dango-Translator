@@ -53,8 +53,8 @@ def killOfflineOCR(port) :
         os.popen("taskkill /f /t /im %s"%pid)
 
 
-# 卸载本地ocr
-def uninstall_offline_ocr(object) :
+# 是否卸载本地ocr
+def whether_uninstall_offline_ocr(object) :
 
     # 判断本地ocr是否已安装
     if not os.path.exists(OCR_INSTALL_PATH):
@@ -62,19 +62,27 @@ def uninstall_offline_ocr(object) :
                                  "本地OCR未安装!     ")
         return
 
+    utils.message.uninstallOfflineOCRMessageBox("卸载本地OCR",
+                                                "卸载后将无法使用本地OCR\n是否真的要执行卸载        ",
+                                                object)
+
+
+# 卸载本地ocr
+def uninstall_offline_ocr(object) :
+
     # 杀死本地ocr进程解除占用
     killOfflineOCR(object.yaml["port"])
 
     # 删除本地ocr
-    try :
+    try:
         shutil.rmtree(OCR_INSTALL_PATH)
         object.logger.error(format_exc())
         utils.message.MessageBox("卸载本地OCR", "卸载完成!      ")
-    except PermissionError :
+    except PermissionError:
         utils.message.MessageBox("卸载本地OCR", "卸载失败了, 请先关闭本地ocr后再尝试卸载!        ")
-    except Exception :
+    except Exception:
         object.logger.error(format_exc())
-        utils.message.MessageBox("卸载本地OCR", "卸载失败了, 原因: %s"%format_exc())
+        utils.message.MessageBox("卸载本地OCR", "卸载失败了, 原因: %s" % format_exc())
 
 
 # 下载

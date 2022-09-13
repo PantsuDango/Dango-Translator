@@ -7,6 +7,7 @@ import time
 import webbrowser
 
 import utils.check_font
+import utils.offline_ocr
 
 
 LOGO_PATH = "./config/icon/logo.ico"
@@ -136,6 +137,68 @@ def checkEmailMessageBox(title, text, object) :
     message_box.exec_()
 
 
+# 错误提示窗口-进度条用
+def closeProcessBarMessageBox(title, text, object) :
+
+    message_box = QMessageBox()
+    message_box.setTextInteractionFlags(Qt.TextSelectableByMouse)
+    message_box.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowMaximizeButtonHint | Qt.MSWindowsFixedSizeDialogHint)
+
+    # 鼠标样式
+    pixmap = QPixmap(PIXMAP_ICON_PATH)
+    pixmap = pixmap.scaled(int(20*object.rate),
+                           int(20*object.rate),
+                           Qt.KeepAspectRatio,
+                           Qt.SmoothTransformation)
+    cursor = QCursor(pixmap, 0, 0)
+    message_box.setCursor(cursor)
+
+    icon = QIcon()
+    icon.addPixmap(QPixmap(LOGO_PATH), QIcon.Normal, QIcon.On)
+    message_box.setWindowIcon(icon)
+
+    message_box.setWindowTitle(title)
+    message_box.setText(text)
+
+    button = QPushButton("停止")
+    button.clicked.connect(object.stopProcess)
+    message_box.addButton(button, QMessageBox.YesRole)
+    message_box.addButton(QPushButton("取消"), QMessageBox.NoRole)
+
+    message_box.exec_()
+
+
+# 错误提示窗口-卸载本地OCR
+def uninstallOfflineOCRMessageBox(title, text, object) :
+
+    message_box = QMessageBox()
+    message_box.setTextInteractionFlags(Qt.TextSelectableByMouse)
+    message_box.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowMaximizeButtonHint | Qt.MSWindowsFixedSizeDialogHint)
+
+    # 鼠标样式
+    pixmap = QPixmap(PIXMAP_ICON_PATH)
+    pixmap = pixmap.scaled(int(20*object.yaml["screen_scale_rate"]),
+                           int(20*object.yaml["screen_scale_rate"]),
+                           Qt.KeepAspectRatio,
+                           Qt.SmoothTransformation)
+    cursor = QCursor(pixmap, 0, 0)
+    message_box.setCursor(cursor)
+
+    icon = QIcon()
+    icon.addPixmap(QPixmap(LOGO_PATH), QIcon.Normal, QIcon.On)
+    message_box.setWindowIcon(icon)
+
+    message_box.setWindowTitle(title)
+    message_box.setText(text)
+
+    button = QPushButton("卸载")
+    button.clicked.connect(lambda: utils.offline_ocr.uninstall_offline_ocr(object))
+    message_box.addButton(button, QMessageBox.YesRole)
+    message_box.addButton(QPushButton("取消"), QMessageBox.NoRole)
+
+    message_box.exec_()
+
+
 # 打开自动更新程序
 def updateVersion() :
 
@@ -210,9 +273,6 @@ def quitAppMessageBox(title, text, object, rate=1) :
     message_box.addButton(QPushButton("我点错了"), QMessageBox.NoRole)
 
     message_box.exec_()
-
-
-
 
 
 # 服务连接失败提示

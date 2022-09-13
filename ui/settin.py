@@ -515,7 +515,7 @@ class Settin(QMainWindow) :
         button = QPushButton(offline_OCR_tab)
         self.customSetGeometry(button, 100, 170, 60, 20)
         button.setText("卸载")
-        button.clicked.connect(lambda: utils.offline_ocr.uninstall_offline_ocr(self.object))
+        button.clicked.connect(lambda: utils.offline_ocr.whether_uninstall_offline_ocr(self.object))
         button.setCursor(self.select_pixmap)
         # 本地OCR标签
         label = QLabel(offline_OCR_tab)
