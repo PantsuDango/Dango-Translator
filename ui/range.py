@@ -4,10 +4,9 @@ from PyQt5.QtCore import *
 import re
 
 import utils.thread
+import ui.static.icon
 
 
-PIXMAP_PATH = "./config/icon/pixmap.png"
-PIXMAP2_PATH = "./config/icon/pixmap2.png"
 DRAW_PATH = "./config/draw.jpg"
 
 
@@ -148,27 +147,11 @@ class Range(QMainWindow) :
 
         # 窗口大小
         self.setGeometry(X1, Y1, X2-X1, Y2-Y1)
-
         # 窗口无标题栏、窗口置顶、窗口透明
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint | Qt.Tool)
         self.setAttribute(Qt.WA_TranslucentBackground)
-
         # 鼠标样式
-        pixmap = QPixmap(PIXMAP_PATH)
-        pixmap = pixmap.scaled(int(20 * self.rate),
-                               int(20 * self.rate),
-                               Qt.KeepAspectRatio,
-                               Qt.SmoothTransformation)
-        cursor = QCursor(pixmap, 0, 0)
-        self.setCursor(cursor)
-
-        # 鼠标选中状态图标
-        select_pixmap = QPixmap(PIXMAP2_PATH)
-        select_pixmap = select_pixmap.scaled(int(20 * self.rate),
-                                             int(20 * self.rate),
-                                             Qt.KeepAspectRatio,
-                                             Qt.SmoothTransformation)
-        select_pixmap = QCursor(select_pixmap, 0, 0)
+        self.setCursor(ui.static.icon.PIXMAP_CURSOR)
 
         self.label = QLabel(self)
         self.label.setGeometry(0, 0, X2 - X1, Y2 - Y1)
@@ -195,7 +178,7 @@ class Range(QMainWindow) :
                                        "color: %s;"%self.color)
         self.hide_button.setFont(self.font)
         self.hide_button.setText("隐藏")
-        self.hide_button.setCursor(select_pixmap)
+        self.hide_button.setCursor(ui.static.icon.SELECT_CURSOR)
         self.hide_button.clicked.connect(self.quit)
         self.hide_button.hide()
 

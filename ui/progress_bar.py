@@ -1,9 +1,6 @@
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-import base64
-import sys
-import os
 
 import ui.static.icon
 import utils.thread
@@ -15,7 +12,7 @@ class ProgressBar(QWidget) :
 
     def __init__(self, rate) :
 
-        super().__init__()
+        super(ProgressBar, self).__init__()
         self.rate = rate
         self.getInitConfig()
         self.ui()

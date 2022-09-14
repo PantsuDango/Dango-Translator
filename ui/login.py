@@ -86,7 +86,7 @@ class Login(QWidget) :
         label.setStyleSheet("color: %s;"
                             "background: transparent;"
                             "font: 20pt %s;"
-                            "font-weight:bold;" % (self.color, self.font_type))
+                            "font-weight:bold;"%(self.color, self.font_type))
 
         # 最小化按钮
         button = QPushButton(qtawesome.icon("fa.minus", color=self.color), "", self)
