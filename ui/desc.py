@@ -50,15 +50,15 @@ class Desc(QWidget) :
         # self.document.contentsChanged.connect(self.textAreaChanged)
 
         # QQ交流群图片
-        label = QLabel(self)
-        self.customSetGeometry(label, 0, 0, 200, 250)
-        qq_group_pixmap = QPixmap(self.object.yaml["dict_info"]["dango_qq_group"])
-        qq_group_pixmap = qq_group_pixmap.scaled(int(200 * self.rate),
-                                                 int(210 * self.rate),
-                                                 Qt.KeepAspectRatio,
-                                                 Qt.SmoothTransformation)
-        label.setPixmap(qq_group_pixmap)
-        label.hide()
+        self.qq_group_label = QLabel(self)
+        self.customSetGeometry(self.qq_group_label, 0, 0, 200, 250)
+        pixmap = QPixmap(self.object.yaml["dict_info"]["dango_qq_group"])
+        pixmap = pixmap.scaled(int(200 * self.rate),
+                               int(210 * self.rate),
+                               Qt.KeepAspectRatio,
+                               Qt.SmoothTransformation)
+        self.qq_group_label.setPixmap(pixmap)
+        self.qq_group_label.hide()
 
 
     # 文本变化时文本框自适应
