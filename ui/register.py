@@ -57,22 +57,16 @@ class Register(QWidget) :
                                        "font-weight: bold;"
                                        "border-bottom: 2px solid %s; }"
                            "QTextEdit:focus { border-bottom: 2px dashed %s; }"
-                           %(self.color, self.color, self.color))
+                           "QLabel { color: %s;}"
+                           %(self.color, self.color, self.color, self.color))
 
         # 背景图
         label = QLabel(self)
         label.setGeometry(QRect(0, 0, self.window_width, self.window_height))
-        # gif = QMovie(self.object.yaml["dict_info"]["register_image_url"])
-        # label.setMovie(gif)
-        # label.setScaledContents(False)
-        # gif.start()
-
-        register_image_pixmap = QPixmap(self.object.yaml["dict_info"]["settin_desc_image_url"])
-        register_image_pixmap = register_image_pixmap.scaled(int(self.window_width),
-                                                             int(self.window_height),
-                                                             Qt.KeepAspectRatio,
-                                                             Qt.SmoothTransformation)
-        label.setPixmap(register_image_pixmap)
+        gif = QMovie(BG_IMAGE_PATH)
+        label.setMovie(gif)
+        label.setScaledContents(True)
+        gif.start()
 
         # 此Label用于雾化工具栏1的背景图
         label = QLabel(self)
@@ -80,14 +74,20 @@ class Register(QWidget) :
         label.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
 
         # 账号输入框
+        label = QLabel(self)
+        self.customSetGeometry(label, 30, 10, 50, 30)
+        label.setText("账号:")
         self.user_text = QLineEdit(self)
-        self.customSetGeometry(self.user_text, 30, 10, 300, 30)
-        self.user_text.setPlaceholderText("请输入账号:")
+        self.customSetGeometry(self.user_text, 75, 10, 255, 30)
+        self.user_text.setPlaceholderText("请输入账号")
         self.user_text.setCursor(ui.static.icon.EDIT_CURSOR)
 
         # 密码输入框
+        label = QLabel(self)
+        self.customSetGeometry(label, 30, 50, 50, 30)
+        label.setText("密码:")
         self.password_text = QLineEdit(self)
-        self.customSetGeometry(self.password_text, 30, 50, 300, 30)
+        self.customSetGeometry(self.password_text, 75, 50, 255, 30)
         self.password_text.setEchoMode(QLineEdit.Password)
         self.password_text.setCursor(ui.static.icon.EDIT_CURSOR)
 
@@ -100,15 +100,21 @@ class Register(QWidget) :
         self.eye_button.clicked.connect(self.clickEyeButton)
 
         # 邮箱输入框
+        label = QLabel(self)
+        self.customSetGeometry(label, 30, 90, 50, 30)
+        label.setText("邮箱:")
         self.email_text = QLineEdit(self)
-        self.customSetGeometry(self.email_text, 30, 90, 300, 30)
-        self.email_text.setPlaceholderText("请输入绑定的邮箱:")
+        self.customSetGeometry(self.email_text, 75, 90, 255, 30)
+        self.email_text.setPlaceholderText("请输入绑定的邮箱")
         self.email_text.setCursor(ui.static.icon.EDIT_CURSOR)
 
         # 验证码输入框
+        label = QLabel(self)
+        self.customSetGeometry(label, 15, 130, 50, 30)
+        label.setText("验证码:")
         self.code_key_text = QLineEdit(self)
-        self.customSetGeometry(self.code_key_text, 30, 130, 300, 30)
-        self.code_key_text.setPlaceholderText("请输入邮箱验证码:")
+        self.customSetGeometry(self.code_key_text, 75, 130, 255, 30)
+        self.code_key_text.setPlaceholderText("请输入邮箱验证码")
         self.code_key_text.setCursor(ui.static.icon.EDIT_CURSOR)
 
         # 获取验证码按钮
@@ -185,7 +191,7 @@ class Register(QWidget) :
 
         self.window_type = "register"
         self.setWindowTitle("注册账号")
-        self.password_text.setPlaceholderText("请输入密码:")
+        self.password_text.setPlaceholderText("请输入密码")
 
         self.user_text.clear()
         self.user_text.setEnabled(True)
@@ -219,7 +225,7 @@ class Register(QWidget) :
         self.user_text.setText(user)
         self.user_text.setEnabled(False)
         self.password_text.clear()
-        self.password_text.setPlaceholderText("请输入新密码:")
+        self.password_text.setPlaceholderText("请输入新密码")
         self.email_text.setText(email)
         self.email_text.setEnabled(False)
         self.code_key_text.clear()
