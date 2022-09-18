@@ -62,10 +62,17 @@ class Register(QWidget) :
         # 背景图
         label = QLabel(self)
         label.setGeometry(QRect(0, 0, self.window_width, self.window_height))
-        gif = QMovie(BG_IMAGE_PATH)
-        label.setMovie(gif)
-        label.setScaledContents(True)
-        gif.start()
+        # gif = QMovie(self.object.yaml["dict_info"]["register_image_url"])
+        # label.setMovie(gif)
+        # label.setScaledContents(False)
+        # gif.start()
+
+        register_image_pixmap = QPixmap(self.object.yaml["dict_info"]["settin_desc_image_url"])
+        register_image_pixmap = register_image_pixmap.scaled(int(self.window_width),
+                                                             int(self.window_height),
+                                                             Qt.KeepAspectRatio,
+                                                             Qt.SmoothTransformation)
+        label.setPixmap(register_image_pixmap)
 
         # 此Label用于雾化工具栏1的背景图
         label = QLabel(self)
