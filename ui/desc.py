@@ -46,28 +46,6 @@ class Desc(QWidget) :
                                                     "color: #5B8FF9;"
                                                     "background: rgba(255, 255, 255, 0.7); }")
         self.desc_text.setCursor(ui.static.icon.PIXMAP_CURSOR)
-        # self.document = self.desc_text.document()
-        # self.document.contentsChanged.connect(self.textAreaChanged)
-
-        # QQ交流群图片
-        self.qq_group_label = QLabel(self)
-        self.customSetGeometry(self.qq_group_label, 0, 0, 200, 250)
-        pixmap = QPixmap(self.object.yaml["dict_info"]["dango_qq_group"])
-        pixmap = pixmap.scaled(int(200 * self.rate),
-                               int(210 * self.rate),
-                               Qt.KeepAspectRatio,
-                               Qt.SmoothTransformation)
-        self.qq_group_label.setPixmap(pixmap)
-        self.qq_group_label.hide()
-
-
-    # 文本变化时文本框自适应
-    def textAreaChanged(self) :
-
-        self.document.adjustSize()
-        newHeight = self.document.size().height() + 20
-        if newHeight != self.desc_text.height():
-            self.setFixedHeight(newHeight)
 
 
     # 初始化配置

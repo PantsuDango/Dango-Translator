@@ -28,18 +28,6 @@ import ui.progress_bar
 import translator.ocr.baidu
 
 BG_IMAGE_PATH = "./config/background/settin.jpg"
-QQ_GROUP_PATH = "./config/other/交流群.png"
-GITHUB_ICON_PATH = "./config/icon/github.png"
-TUTORIAL_ICON_PATH = "./config/icon/tutorial.png"
-BILIBILI_ICON_PATH = "./config/icon/bilibili.png"
-GROUP_PATH = "./config/icon/group.png"
-BILIBILI_VIDEO_PATH = "./config/icon/video.png"
-BLOG_PATH = "./config/icon/blog.png"
-HOME_ICON_PATH = "./config/icon/home.png"
-SLIDER_ICON_PATH = "./config/icon/slider.png"
-FUNCTION_ICON_PATH = "./config/icon/function.png"
-OPEN_STATUSBAR_IMG_PATH = "./config/other/显示消息栏.png"
-CLOSE_STATUSBAR_IMG_PATH = "./config/other/屏蔽消息栏.png"
 
 
 # 重构QTabWidget使其竖直选项卡文字水平
@@ -1206,14 +1194,7 @@ class Settin(QMainWindow) :
         label.setStyleSheet("border-width: 1px; border-style: solid; border-color: rgba(62, 62, 62, 0.2);")
 
         # 选项卡图标
-        icon = QIcon()
-        pixmap = QPixmap(FUNCTION_ICON_PATH)
-        pixmap = pixmap.scaled(int(20*self.rate),
-                               int(20*self.rate),
-                               Qt.KeepAspectRatio,
-                               Qt.SmoothTransformation)
-        icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
-        self.tab_widget.setTabIcon(self.tab_widget.indexOf(self.tab_4), icon)
+        self.tab_widget.setTabIcon(self.tab_widget.indexOf(self.tab_4), ui.static.icon.FUNCTION_ICON)
 
         # 此Label用于雾化工具栏1的背景图
         imageLabel = QLabel(self.tab_4)
@@ -1494,14 +1475,7 @@ class Settin(QMainWindow) :
         button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 项目地址图标
-        icon = QIcon()
-        pixmap = QPixmap(HOME_ICON_PATH)
-        pixmap = pixmap.scaled(int(20*self.rate),
-                               int(20*self.rate),
-                               Qt.KeepAspectRatio,
-                               Qt.SmoothTransformation)
-        icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
-        button.setIcon(icon)
+        button.setIcon(ui.static.icon.HOME_ICON)
 
         # 项目地址标签
         label = QLabel(self.tab_5)
@@ -1516,14 +1490,7 @@ class Settin(QMainWindow) :
         button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 项目地址图标
-        github_icon = QIcon()
-        pixmap = QPixmap(GITHUB_ICON_PATH)
-        pixmap = pixmap.scaled(int(20*self.rate),
-                               int(20*self.rate),
-                               Qt.KeepAspectRatio,
-                               Qt.SmoothTransformation)
-        github_icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
-        button.setIcon(github_icon)
+        button.setIcon(ui.static.icon.GITHUB_ICON)
 
         # 在线教程标签
         label = QLabel(self.tab_5)
@@ -1538,14 +1505,7 @@ class Settin(QMainWindow) :
         button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 在线教程图标
-        icon = QIcon()
-        pixmap = QPixmap(TUTORIAL_ICON_PATH)
-        pixmap = pixmap.scaled(int(20*self.rate),
-                               int(20*self.rate),
-                               Qt.KeepAspectRatio,
-                               Qt.SmoothTransformation)
-        icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
-        button.setIcon(icon)
+        button.setIcon(ui.static.icon.TUTORIAL_ICON)
 
         # 教程视频标签
         label = QLabel(self.tab_5)
@@ -1560,14 +1520,7 @@ class Settin(QMainWindow) :
         button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # b站教程视频图标
-        icon = QIcon()
-        pixmap = QPixmap(BILIBILI_VIDEO_PATH)
-        pixmap = pixmap.scaled(int(20*self.rate),
-                               int(20*self.rate),
-                               Qt.KeepAspectRatio,
-                               Qt.SmoothTransformation)
-        icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
-        button.setIcon(icon)
+        button.setIcon(ui.static.icon.BILIBILI_VIDEO_ICON)
 
         # 关注作者标签
         label = QLabel(self.tab_5)
@@ -1581,15 +1534,8 @@ class Settin(QMainWindow) :
         button.clicked.connect(self.openBilibili)
         button.setCursor(ui.static.icon.SELECT_CURSOR)
 
-        # QQ图标
-        icon = QIcon()
-        pixmap = QPixmap(BILIBILI_ICON_PATH)
-        pixmap = pixmap.scaled(int(20*self.rate),
-                               int(20*self.rate),
-                               Qt.KeepAspectRatio,
-                               Qt.SmoothTransformation)
-        icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
-        button.setIcon(icon)
+        # bilibili图标
+        button.setIcon(ui.static.icon.BILIBILI_ICON)
 
         # 添加交流群标签
         label = QLabel(self.tab_5)
@@ -1604,14 +1550,7 @@ class Settin(QMainWindow) :
         button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # QQ群图标
-        icon = QIcon()
-        pixmap = QPixmap(GROUP_PATH)
-        pixmap = pixmap.scaled(int(20*self.rate),
-                               int(20*self.rate),
-                               Qt.KeepAspectRatio,
-                               Qt.SmoothTransformation)
-        icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
-        button.setIcon(icon)
+        button.setIcon(ui.static.icon.GROUP_ICON)
 
         # 特别鸣谢标签
         label = QLabel(self.tab_5)
@@ -1623,7 +1562,7 @@ class Settin(QMainWindow) :
         self.customSetGeometry(button, 20, 330, 90, 20)
         button.setText("PaddleOCR‭")
         button.clicked.connect(self.openPaddleOCR)
-        button.setIcon(github_icon)
+        button.setIcon(ui.static.icon.GITHUB_ICON)
         button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # GT-Zhang主页按钮
@@ -1631,24 +1570,15 @@ class Settin(QMainWindow) :
         self.customSetGeometry(button, 130, 330, 90, 20)
         button.setText("GT-Zhang")
         button.clicked.connect(self.openGT)
-        button.setIcon(github_icon)
+        button.setIcon(ui.static.icon.GITHUB_ICON)
         button.setCursor(ui.static.icon.SELECT_CURSOR)
-
-        # 博客图标
-        icon = QIcon()
-        pixmap = QPixmap(BLOG_PATH)
-        pixmap = pixmap.scaled(int(20*self.rate),
-                               int(20*self.rate),
-                               Qt.KeepAspectRatio,
-                               Qt.SmoothTransformation)
-        icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
 
         # C4a15Wh主页按钮
         button = QPushButton(self.tab_5)
         self.customSetGeometry(button, 240, 330, 90, 20)
         button.setText("C4a15Wh")
         button.clicked.connect(self.openC44)
-        button.setIcon(icon)
+        button.setIcon(ui.static.icon.BLOG_ICON)
         button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # cypas‭主页按钮
@@ -1656,7 +1586,7 @@ class Settin(QMainWindow) :
         self.customSetGeometry(button, 350, 330, 90, 20)
         button.setText("Cypas‭")
         button.clicked.connect(self.openCy)
-        button.setIcon(icon)
+        button.setIcon(ui.static.icon.BLOG_ICON)
         button.setCursor(ui.static.icon.SELECT_CURSOR)
 
 
@@ -2590,12 +2520,15 @@ class Settin(QMainWindow) :
             self.desc_ui.desc_text.append("\n如果觉得频繁重复翻译, 翻译框出现了'闪烁'的话, 可以调低此参数.")
 
         # QQ交流群
-        elif message_type == "qqGroup":
-            qq_group_image = requests.get(self.object.yaml["dict_info"]["dango_qq_group"]).content
-            self.desc_ui.qq_group_label.show()
+        elif message_type == "qqGroup" :
+            try :
+                qq_group_image = requests.get(self.object.yaml["dict_info"]["dango_qq_group"]).content
+                qq_group_image = "data:image/png;base64,%s"%(str(base64.b64encode(qq_group_image))[2:])
+            except Exception :
+                qq_group_image = "./config/other/交流群.png"
             self.desc_ui.setWindowTitle("加入交流群")
-            # self.desc_ui.desc_text.insertHtml('<img src="{}" width="{}" height="{}">'.format(
-            #     base64.b64encode(qq_group_image), 245*self.rate, 295*self.rate))
+            self.desc_ui.desc_text.insertHtml('<img src="{}" width="{}" height="{}">'.format(
+                qq_group_image, 245*self.rate, 295*self.rate))
 
         # 文字换行
         elif message_type == "branchLine" :
@@ -2613,9 +2546,9 @@ class Settin(QMainWindow) :
             self.desc_ui.setWindowTitle("翻译时间说明")
             self.desc_ui.desc_text.append("控制翻译界面底部消息栏是否显示\n")
             self.desc_ui.desc_text.append("若显示\n")
-            self.desc_ui.desc_text.insertHtml('<img src={} width="{}" >'.format(OPEN_STATUSBAR_IMG_PATH, 245*self.rate))
+            self.desc_ui.desc_text.insertHtml('<img src={} width="{}" >'.format(ui.static.background.OPEN_STATUSBAR, 245*self.rate))
             self.desc_ui.desc_text.append("\n若屏蔽:\n")
-            self.desc_ui.desc_text.insertHtml('<img src="{}" width="{}" >'.format(CLOSE_STATUSBAR_IMG_PATH, 245*self.rate))
+            self.desc_ui.desc_text.insertHtml('<img src="{}" width="{}" >'.format(ui.static.background.CLOSE_STATUSBAR, 245*self.rate))
 
         # 贴字翻译
         elif message_type == "drawImage":
@@ -2687,6 +2620,7 @@ class Settin(QMainWindow) :
                                                                  font-weight: bold;\
                                                                  background-color:rgba(62, 62, 62, %s)"
                                                                 %(self.horizontal/100))
+
         self.object.translation_ui.temp_text.setStyleSheet("border-width:0;\
                                                             border-style:outset;\
                                                             border-top:0px solid #e8f3f9;\
