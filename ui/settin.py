@@ -638,153 +638,143 @@ class Settin(QMainWindow) :
         imageLabel.setGeometry(QRect(0, 0, self.window_width + 5, self.window_height + 5))
         imageLabel.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
 
-        # 公共翻译标签
-        label = QLabel(public_translater_tab)
-        self.customSetGeometry(label, 20, 25, 70, 20)
-        label.setText("公共翻译")
-
-        # 公共翻译说明按钮
-        button = QPushButton(public_translater_tab)
-        self.customSetGeometry(button, 90, 25, 25, 20)
-        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;"%self.color_2)
-        button.setText("说明")
-        button.clicked.connect(lambda: self.showDesc("publicTranslate"))
-        button.setCursor(ui.static.icon.QUESTION_CURSOR)
-
-        # 公共翻译说明?号图标
-        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", public_translater_tab)
-        self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 115, 25, 20, 20)
-        button.clicked.connect(lambda: self.showDesc("publicTranslate"))
-        button.setCursor(ui.static.icon.QUESTION_CURSOR)
-        button.setStyleSheet("background: transparent;")
-
         # 公共翻译备注
         label = QLabel(public_translater_tab)
-        self.customSetGeometry(label, 155, 25, 300, 20)
-        label.setText("可直接使用, 但不稳定可能会抽风")
+        self.customSetGeometry(label, 20, 20, 420, 20)
+        label.setText("若电脑安装有Chrome浏览器可直接使用, 不稳定翻译质量一般")
         label.setStyleSheet("color: %s"%self.color_2)
 
         # 公共翻译教程按钮
         button = QPushButton(public_translater_tab)
-        self.customSetGeometry(button, 380, 25, 60, 20)
-        button.setText("教程")
+        self.customSetGeometry(button, 400, 20, 100, 20)
+        button.setText("详细教程")
         button.clicked.connect(self.openPublicTransTutorial)
         button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 有道翻译标签
         label = QLabel(public_translater_tab)
-        self.customSetGeometry(label, 20, 70, 35, 20)
+        self.customSetGeometry(label, 20, 120, 35, 20)
         label.setText("有道:")
 
         # 有道翻译开关
         self.youdao_switch = ui.switch.PublicTranslationSwitch(public_translater_tab, sign=self.youdao_use, startX=(65 - 20) * self.rate)
-        self.customSetGeometry(self.youdao_switch, 65, 70, 65, 20)
+        self.customSetGeometry(self.youdao_switch, 65, 120, 65, 20)
         self.youdao_switch.checkedChanged.connect(self.changeYoudaoSwitch)
         self.youdao_switch.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 有道翻译颜色选择
         self.youdao_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.youdao_color), "", public_translater_tab)
         self.customSetIconSize(self.youdao_color_button, 20, 20)
-        self.customSetGeometry(self.youdao_color_button, 140, 70, 20, 20)
+        self.customSetGeometry(self.youdao_color_button, 140, 120, 20, 20)
         self.youdao_color_button.setStyleSheet("background: transparent;")
         self.youdao_color_button.clicked.connect(lambda: self.ChangeTranslateColor("youdao", self.youdao_color))
         self.youdao_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 百度翻译标签
         label = QLabel(public_translater_tab)
-        self.customSetGeometry(label, 200, 70, 35, 20)
+        self.customSetGeometry(label, 200, 120, 35, 20)
         label.setText("百度:")
 
         # 百度翻译开关
         self.baidu_switch = ui.switch.PublicTranslationSwitch(public_translater_tab, sign=self.baidu_web_use, startX=(65 - 20) * self.rate)
-        self.customSetGeometry(self.baidu_switch, 245, 70, 65, 20)
+        self.customSetGeometry(self.baidu_switch, 245, 120, 65, 20)
         self.baidu_switch.checkedChanged.connect(self.changeBaiduWebSwitch)
         self.baidu_switch.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 百度翻译颜色选择
         self.baidu_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.baidu_web_color), "", public_translater_tab)
         self.customSetIconSize(self.baidu_color_button, 20, 20)
-        self.customSetGeometry(self.baidu_color_button, 320, 70, 20, 20)
+        self.customSetGeometry(self.baidu_color_button, 320, 120, 20, 20)
         self.baidu_color_button.setStyleSheet("background: transparent;")
         self.baidu_color_button.clicked.connect(lambda: self.ChangeTranslateColor("baidu", self.baidu_web_color))
         self.baidu_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 腾讯翻译标签
         label = QLabel(public_translater_tab)
-        self.customSetGeometry(label, 380, 70, 35, 20)
+        self.customSetGeometry(label, 380, 120, 35, 20)
         label.setText("腾讯:")
 
         # 腾讯翻译开关
         self.tencent_switch = ui.switch.PublicTranslationSwitch(public_translater_tab, sign=self.tencent_web_use, startX=(65 - 20) * self.rate)
-        self.customSetGeometry(self.tencent_switch, 425, 70, 65, 20)
+        self.customSetGeometry(self.tencent_switch, 425, 120, 65, 20)
         self.tencent_switch.checkedChanged.connect(self.changeTencentWebSwitch)
         self.tencent_switch.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 腾讯翻译颜色选择
         self.tencent_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.tencent_web_color), "", public_translater_tab)
         self.customSetIconSize(self.tencent_color_button, 20, 20)
-        self.customSetGeometry(self.tencent_color_button, 500, 70, 20, 20)
+        self.customSetGeometry(self.tencent_color_button, 500, 120, 20, 20)
         self.tencent_color_button.setStyleSheet("background: transparent;")
         self.tencent_color_button.clicked.connect(lambda: self.ChangeTranslateColor("tencent", self.tencent_web_color))
         self.tencent_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # DeepL翻译标签
         label = QLabel(public_translater_tab)
-        self.customSetGeometry(label, 20, 120, 40, 20)
+        self.customSetGeometry(label, 20, 170, 40, 20)
         label.setText("DeepL:")
 
         # DeepL翻译开关
         self.deepl_switch = ui.switch.PublicTranslationSwitch(public_translater_tab, sign=self.deepl_use, startX=(65 - 20) * self.rate)
-        self.customSetGeometry(self.deepl_switch, 65, 120, 65, 20)
+        self.customSetGeometry(self.deepl_switch, 65, 170, 65, 20)
         self.deepl_switch.checkedChanged.connect(self.changeDeepLSwitch)
         self.deepl_switch.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # DeepL翻译颜色选择
         self.deepl_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.deepl_color), "", public_translater_tab)
         self.customSetIconSize(self.deepl_color_button, 20, 20)
-        self.customSetGeometry(self.deepl_color_button, 140, 120, 20, 20)
+        self.customSetGeometry(self.deepl_color_button, 140, 170, 20, 20)
         self.deepl_color_button.setStyleSheet("background: transparent;")
         self.deepl_color_button.clicked.connect(lambda: self.ChangeTranslateColor("deepl", self.deepl_color))
         self.deepl_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 谷歌翻译标签
         label = QLabel(public_translater_tab)
-        self.customSetGeometry(label, 200, 120, 35, 20)
+        self.customSetGeometry(label, 200, 170, 35, 20)
         label.setText("谷歌:")
 
         # 谷歌翻译开关
         self.google_switch = ui.switch.PublicTranslationSwitch(public_translater_tab, sign=self.google_use, startX=(65 - 20) * self.rate)
-        self.customSetGeometry(self.google_switch, 245, 120, 65, 20)
+        self.customSetGeometry(self.google_switch, 245, 170, 65, 20)
         self.google_switch.checkedChanged.connect(self.changeGoogleSwitch)
         self.google_switch.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 谷歌翻译颜色选择
         self.google_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.google_color), "", public_translater_tab)
         self.customSetIconSize(self.google_color_button, 20, 20)
-        self.customSetGeometry(self.google_color_button, 320, 120, 20, 20)
+        self.customSetGeometry(self.google_color_button, 320, 170, 20, 20)
         self.google_color_button.setStyleSheet("background: transparent;")
         self.google_color_button.clicked.connect(lambda: self.ChangeTranslateColor("google", self.google_color))
         self.google_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 彩云翻译标签
         label = QLabel(public_translater_tab)
-        self.customSetGeometry(label, 380, 120, 35, 20)
+        self.customSetGeometry(label, 380, 170, 35, 20)
         label.setText("彩云:")
 
         # 彩云翻译开关
         self.caiyun_switch = ui.switch.PublicTranslationSwitch(public_translater_tab, sign=self.caiyun_web_use, startX=(65 - 20) * self.rate)
-        self.customSetGeometry(self.caiyun_switch, 425, 120, 65, 20)
+        self.customSetGeometry(self.caiyun_switch, 425, 170, 65, 20)
         self.caiyun_switch.checkedChanged.connect(self.changeCaiyunWebSwitch)
         self.caiyun_switch.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 彩云翻译颜色选择
         self.caiyun_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.caiyun_web_color), "", public_translater_tab)
         self.customSetIconSize(self.caiyun_color_button, 20, 20)
-        self.customSetGeometry(self.caiyun_color_button, 500, 120, 20, 20)
+        self.customSetGeometry(self.caiyun_color_button, 500, 170, 20, 20)
         self.caiyun_color_button.setStyleSheet("background: transparent;")
         self.caiyun_color_button.clicked.connect(lambda: self.ChangeTranslateColor("caiyun", self.caiyun_web_color))
         self.caiyun_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
+
+        # 颜色说明
+        button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.color_2), "", public_translater_tab)
+        self.customSetIconSize(button, 20, 20)
+        self.customSetGeometry(button, 20, 220, 20, 20)
+        button.setStyleSheet("background: transparent;")
+        # 公共翻译备注
+        label = QLabel(public_translater_tab)
+        self.customSetGeometry(label, 50, 220, 420, 20)
+        label.setText("点击每种翻译源对应的画笔图标, 可以修改其翻译后显示的文字颜色")
+        label.setStyleSheet("color: %s" % self.color_2)
 
         # 私人翻译标签
         label = QLabel(private_translater_tab)
