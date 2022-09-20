@@ -765,15 +765,20 @@ class Settin(QMainWindow) :
         self.caiyun_color_button.clicked.connect(lambda: self.ChangeTranslateColor("caiyun", self.caiyun_web_color))
         self.caiyun_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
 
+        # 公共翻译备注
+        label = QLabel(public_translater_tab)
+        self.customSetGeometry(label, 20, 220, 250, 20)
+        label.setText("点击每种翻译源对应的")
+        label.setStyleSheet("color: %s" % self.color_2)
         # 颜色说明
         button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.color_2), "", public_translater_tab)
         self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 20, 220, 20, 20)
+        self.customSetGeometry(button, 170, 220, 20, 20)
         button.setStyleSheet("background: transparent;")
         # 公共翻译备注
         label = QLabel(public_translater_tab)
-        self.customSetGeometry(label, 50, 220, 420, 20)
-        label.setText("点击每种翻译源对应的画笔图标, 可以修改其翻译后显示的文字颜色")
+        self.customSetGeometry(label, 195, 220, 500, 20)
+        label.setText("图标, 可以修改其翻译后显示的文字颜色")
         label.setStyleSheet("color: %s" % self.color_2)
 
         # 私人翻译标签

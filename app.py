@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from traceback import format_exc
 import sys
 import os
@@ -141,9 +142,6 @@ class DangoTranslator() :
         # 更新ocr源码文件
         ocr_src_file = self.yaml["dict_info"]["ocr_src_file"]
         utils.update.updateOCRSrcFile(ocr_src_file, self.logger)
-        # 加载QQ群图片
-        qq_group_url = self.yaml["dict_info"]["dango_qq_group"]
-        utils.http.downloadFile(qq_group_url, "./config/other/交流群.png", self.logger)
         # 加载注册界面图片
         qq_group_url = self.yaml["dict_info"]["register_image_url"]
         utils.http.downloadFile(qq_group_url, "./config/background/register.gif", self.logger)
