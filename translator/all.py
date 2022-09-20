@@ -4,6 +4,67 @@ from traceback import format_exc
 import time
 
 
+# 校验谷歌浏览器是否可用
+def checkChrome() :
+
+    try :
+        option = webdriver.ChromeOptions()
+        option.add_argument("--headless")
+        browser = webdriver.Chrome(executable_path="./config/tools/chromedriver.exe",
+                                   service_log_path="nul",
+                                   options=option)
+        browser.close()
+        browser.quit()
+        return True
+
+    except Exception :
+        return False
+
+
+# 校验火狐浏览器是否可用
+def checkFirefox() :
+
+    try :
+        option = webdriver.FirefoxOptions()
+        option.add_argument("--headless")
+        browser = webdriver.Firefox(executable_path="./config/tools/geckodriver.exe",
+                                    service_log_path="nul",
+                                    options=option)
+        browser.close()
+        browser.quit()
+        return True
+
+    except Exception:
+        return False
+
+
+# 校验Edge浏览器是否可用
+def checkEdge() :
+
+    try :
+        EDGE = {
+            "browserName": "MicrosoftEdge",
+            "version": "",
+            "platform": "WINDOWS",
+            "ms:edgeOptions": {
+                'extensions': [],
+                'args': [
+                    '--headless',
+                    '--disable-gpu',
+                    '--remote-debugging-port=9222',
+                ]}
+        }
+        browser = webdriver.Edge(executable_path="./config/tools/msedgedriver.exe",
+                                 service_log_path="nul",
+                                 capabilities=EDGE)
+        browser.close()
+        browser.quit()
+        return True
+
+    except Exception :
+        return False
+
+
 # 翻译模块
 class Webdriver(QObject) :
 

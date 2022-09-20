@@ -1,6 +1,5 @@
-from PyQt5.QtGui import *
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QMessageBox, QPushButton
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
 import sys
 import os
 import time
