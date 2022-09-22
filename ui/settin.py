@@ -169,7 +169,7 @@ class Settin(QMainWindow) :
 
         # 背景图pixiv标签
         label = QLabel(self)
-        self.customSetGeometry(label, 630, 380, 200, 15)
+        self.customSetGeometry(label, 630, 400, 200, 15)
         label.setText("背景图 pixiv id: %s"%self.object.yaml["dict_info"]["bg_pixiv_id"])
         label.setStyleSheet("font-size: 9pt; color: %s"%self.color_2)
 
@@ -180,7 +180,7 @@ class Settin(QMainWindow) :
         # 选项卡界面
         self.tab_1 = QWidget()
         self.tab_widget.addTab(self.tab_1, "")
-        self.tab_widget.setTabText(self.tab_widget.indexOf(self.tab_1), "识别设定")
+        self.tab_widget.setTabText(self.tab_widget.indexOf(self.tab_1), " 识别设定")
 
         # 此Label用于雾化顶部工具栏的背景图
         label = QLabel(self.tab_1)
@@ -478,7 +478,7 @@ class Settin(QMainWindow) :
 
         # OCR识别语种comboBox
         self.language_comboBox = QComboBox(self.tab_1)
-        self.customSetGeometry(self.language_comboBox, 20, 310, 140, 20)
+        self.customSetGeometry(self.language_comboBox, 20, 310, 120, 20)
         self.language_comboBox.addItem("")
         self.language_comboBox.addItem("")
         self.language_comboBox.addItem("")
@@ -495,8 +495,45 @@ class Settin(QMainWindow) :
             self.language_comboBox.setCurrentIndex(0)
         # OCR识别语种标签
         label = QLabel(self.tab_1)
-        self.customSetGeometry(label, 180, 310, 150, 20)
-        label.setText("选择要翻译的原语种")
+        self.customSetGeometry(label, 160, 310, 150, 20)
+        label.setText("选择要翻译的原文语种")
+
+        # 显示原文标签开关
+        self.show_original_switch = ui.switch.ShowSwitch(self.tab_1, sign=self.show_original_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.show_original_switch, 340, 310, 65, 20)
+        self.show_original_switch.checkedChanged.connect(self.changeShowOriginalSwitch)
+        self.show_original_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 原文颜色选择
+        self.original_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.original_color), "", self.tab_1)
+        self.customSetIconSize(self.original_color_button, 20, 20)
+        self.customSetGeometry(self.original_color_button, 415, 310, 20, 20)
+        self.original_color_button.setStyleSheet("background: transparent;")
+        self.original_color_button.clicked.connect(lambda: self.ChangeTranslateColor("original", self.original_color))
+        self.original_color_button.setCursor(ui.static.icon.EDIT_CURSOR)
+        # 显示原文备注
+        label = QLabel(self.tab_1)
+        self.customSetGeometry(label, 450, 310, 300, 20)
+        label.setText("是否显示识别到的原文")
+
+        # 文字方向开关
+        self.text_direction_switch = ui.switch.SwitchDirection(self.tab_1, sign=self.text_direction_use, startX=(65-20)*self.rate, object=self.object)
+        self.customSetGeometry(self.text_direction_switch, 20, 360, 65, 20)
+        self.text_direction_switch.checkedChanged.connect(self.changeTextDirectionSwitch)
+        self.text_direction_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 文字方向标签
+        label = QLabel(self.tab_1)
+        self.customSetGeometry(label, 105, 360, 300, 20)
+        label.setText("识别的原文阅读方向")
+
+        # 文字换行开关
+        self.branch_line_switch = ui.switch.SwitchBranchLine(self.tab_1, sign=self.branch_line_use, startX=(65-20) * self.rate)
+        self.customSetGeometry(self.branch_line_switch, 340, 360, 65, 20)
+        self.branch_line_switch.checkedChanged.connect(self.changeBranchLineSwitch)
+        self.branch_line_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 文字换行标签
+        label = QLabel(self.tab_1)
+        self.customSetGeometry(label, 425, 360, 300, 20)
+        label.setText("开启会对原文换行后再翻译")
 
 
     # 翻译设定标签栏
@@ -870,15 +907,14 @@ class Settin(QMainWindow) :
         label = QLabel(self.tab_2)
         self.customSetGeometry(label, 20, 255, 250, 20)
         label.setText("点击每种翻译源对应的")
-        width = label.fontMetrics().boundingRect(label.text()).width()
         # 颜色说明
         button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.color_2), "", self.tab_2)
         self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, width, 255, 20, 20)
+        self.customSetGeometry(button, 170, 255, 20, 20)
         button.setStyleSheet("background: transparent;")
         # 公共翻译备注
         label = QLabel(self.tab_2)
-        self.customSetGeometry(label, width+40, 255, 500, 20)
+        self.customSetGeometry(label, 200, 255, 500, 20)
         label.setText("图标, 可以修改其翻译后显示的文字颜色")
 
 
@@ -960,7 +996,7 @@ class Settin(QMainWindow) :
 
         # 翻译框透明度设定
         self.horizontal_slider = QSlider(translation_frame_tab)
-        self.customSetGeometry(self.horizontal_slider, 20, 18, 320, 25)
+        self.customSetGeometry(self.horizontal_slider, 20, 28, 320, 25)
         self.horizontal_slider.setMaximum(100)
         self.horizontal_slider.setOrientation(Qt.Horizontal)
         self.horizontal_slider.setValue(0)
@@ -974,104 +1010,55 @@ class Settin(QMainWindow) :
         self.horizontal_slider_label.setText("{}%".format(self.horizontal))
         # 翻译框透明度设定标签
         label = QLabel(translation_frame_tab)
-        self.customSetGeometry(label, 400, 20, 200, 20)
+        self.customSetGeometry(label, 400, 30, 200, 20)
         label.setText("调整翻译框的透明度")
 
+        # 显示消息栏开关
+        self.show_statusbar_switch = ui.switch.ShowSwitch(translation_frame_tab, sign=self.show_statusbar_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.show_statusbar_switch, 20, 80, 65, 20)
+        self.show_statusbar_switch.checkedChanged.connect(self.changeShowStatusbarSwitch)
+        self.show_statusbar_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 显示消息栏标签
+        label = QLabel(translation_frame_tab)
+        self.customSetGeometry(label, 105, 80, 300, 20)
+        label.setText("是否在翻译框上显示翻译耗时")
 
+        # 翻译字体大小设定
+        self.fontSize_spinBox = QSpinBox(font_tab)
+        self.customSetGeometry(self.fontSize_spinBox, 30, 25, 40, 25)
+        self.fontSize_spinBox.setMinimum(10)
+        self.fontSize_spinBox.setMaximum(30)
+        self.fontSize_spinBox.setValue(self.fontSize)
+        self.fontSize_spinBox.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 翻译字体大小设定标签
+        label = QLabel(font_tab)
+        self.customSetGeometry(label, 90, 30, 300, 16)
+        label.setText("翻译框上显示的字体大小")
 
+        # 翻译字体类型设定
+        self.font_comboBox = QFontComboBox(font_tab)
+        self.customSetGeometry(self.font_comboBox, 20, 75, 185, 25)
+        self.font_comboBox.activated[str].connect(self.getFontType)
+        self.comboBox_font = QFont(self.font_type)
+        self.font_comboBox.setCurrentFont(self.comboBox_font)
+        self.font_comboBox.setCursor(ui.static.icon.SELECT_CURSOR)
+        self.font_comboBox.setStyleSheet("QComboBox{color: %s}"%self.color_2)
+        # 翻译字体类型设定标签
+        label = QLabel(font_tab)
+        self.customSetGeometry(label, 225, 80, 300, 20)
+        label.setText("翻译框上显示的字体类型")
 
-        # # 翻译字体大小设定标签
-        # label = QLabel(self.tab_3)
-        # self.customSetGeometry(label, 20, 70, 145, 16)
-        # label.setText("字体大小:")
-        #
-        # # 翻译字体大小设定
-        # self.fontSize_spinBox = QSpinBox(self.tab_3)
-        # self.customSetGeometry(self.fontSize_spinBox, 95, 65, 40, 25)
-        # self.fontSize_spinBox.setMinimum(10)
-        # self.fontSize_spinBox.setMaximum(30)
-        # self.fontSize_spinBox.setValue(self.fontSize)
-        # self.fontSize_spinBox.setCursor(ui.static.icon.SELECT_CURSOR)
-        #
-        # # 翻译字体类型设定标签
-        # label = QLabel(self.tab_3)
-        # self.customSetGeometry(label, 275, 70, 145, 20)
-        # label.setText("字体类型:")
-        #
-        # # 翻译字体类型设定
-        # self.font_comboBox = QFontComboBox(self.tab_3)
-        # self.customSetGeometry(self.font_comboBox, 350, 65, 185, 25)
-        # self.font_comboBox.activated[str].connect(self.getFontType)
-        # self.comboBox_font = QFont(self.font_type)
-        # self.font_comboBox.setCurrentFont(self.comboBox_font)
-        # self.font_comboBox.setCursor(ui.static.icon.SELECT_CURSOR)
-        # self.font_comboBox.setStyleSheet("QComboBox{color: %s}" % self.color_2)
-        #
-        # # 字体样式设定标签
-        # label = QLabel(self.tab_3)
-        # self.customSetGeometry(label, 20, 120, 60, 20)
-        # label.setText("字体样式:")
-        #
-        # # 字体样式设定开关
-        # self.font_type_switch = ui.switch.SwitchFontType(self.tab_3, sign=self.font_color_type, startX=(65-20)*self.rate)
-        # self.customSetGeometry(self.font_type_switch, 95, 120, 65, 20)
-        # self.font_type_switch.checkedChanged.connect(self.changeFontColorTypeSwitch)
-        # self.font_type_switch.setCursor(ui.static.icon.SELECT_CURSOR)
-        #
-        # # 字体样式设定说明标签
-        # button = QPushButton(self.tab_3)
-        # self.customSetGeometry(button, 175, 120, 25, 20)
-        # button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;" % self.color_2)
-        # button.setText("说明")
-        # button.clicked.connect(lambda: self.showDesc("fontType"))
-        # button.setCursor(ui.static.icon.QUESTION_CURSOR)
-        #
-        # # 字体样式设定说明?号图标
-        # button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_3)
-        # self.customSetIconSize(button, 20, 20)
-        # self.customSetGeometry(button, 200, 120, 20, 20)
-        # button.setStyleSheet("background: transparent;")
-        # button.clicked.connect(lambda: self.showDesc("fontType"))
-        # button.setCursor(ui.static.icon.QUESTION_CURSOR)
-        #
-        # # 显示原文标签
-        # label = QLabel(self.tab_3)
-        # self.customSetGeometry(label, 275, 120, 60, 20)
-        # label.setText("显示原文:")
-        #
-        # # 显示原文标签开关
-        # self.show_original_switch = ui.switch.ShowSwitch(self.tab_3, sign=self.show_original_use, startX=(65-20)*self.rate)
-        # self.customSetGeometry(self.show_original_switch, 350, 120, 65, 20)
-        # self.show_original_switch.checkedChanged.connect(self.changeShowOriginalSwitch)
-        # self.show_original_switch.setCursor(ui.static.icon.SELECT_CURSOR)
-        #
-        # # 显示原文说明标签
-        # button = QPushButton(self.tab_3)
-        # self.customSetGeometry(button, 430, 120, 25, 20)
-        # button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;"%self.color_2)
-        # button.setText("说明")
-        # button.clicked.connect(lambda: self.showDesc("showOriginal"))
-        # button.setCursor(ui.static.icon.QUESTION_CURSOR)
-        #
-        # # 显示原文说明?号图标
-        # button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_3)
-        # self.customSetIconSize(button, 20, 20)
-        # self.customSetGeometry(button, 455, 120, 20, 20)
-        # button.setStyleSheet("background: transparent;")
-        # button.clicked.connect(lambda: self.showDesc("showOriginal"))
-        # button.setCursor(ui.static.icon.QUESTION_CURSOR)
-        #
-        # # 显示消息栏标签
-        # label = QLabel(self.tab_3)
-        # self.customSetGeometry(label, 20, 170, 60, 20)
-        # label.setText("翻译时间:")
-        #
-        # # 显示消息栏开关
-        # self.show_statusbar_switch = ui.switch.ShowSwitch(self.tab_3, sign=self.show_statusbar_use, startX=(65-20)*self.rate)
-        # self.customSetGeometry(self.show_statusbar_switch, 95, 170, 65, 20)
-        # self.show_statusbar_switch.checkedChanged.connect(self.changeShowStatusbarSwitch)
-        # self.show_statusbar_switch.setCursor(ui.static.icon.SELECT_CURSOR)
-        #
+        # 字体样式设定标签
+        label = QLabel(self.tab_3)
+        self.customSetGeometry(label, 20, 120, 60, 20)
+        label.setText("字体样式:")
+
+        # 字体样式设定开关
+        self.font_type_switch = ui.switch.SwitchFontType(self.tab_3, sign=self.font_color_type, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.font_type_switch, 95, 120, 65, 20)
+        self.font_type_switch.checkedChanged.connect(self.changeFontColorTypeSwitch)
+        self.font_type_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+
         # # 显示消息栏说明标签
         # button = QPushButton(self.tab_3)
         # self.customSetGeometry(button, 175, 170, 25, 20)
@@ -1092,30 +1079,6 @@ class Settin(QMainWindow) :
         # label = QLabel(self.tab_3)
         # self.customSetGeometry(label, 275, 170, 60, 20)
         # label.setText("原文颜色:")
-        #
-        # # 原文颜色选择
-        # self.original_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.original_color), "", self.tab_3)
-        # self.customSetIconSize(self.original_color_button, 20, 20)
-        # self.customSetGeometry(self.original_color_button, 350, 170, 20, 20)
-        # self.original_color_button.setStyleSheet("background: transparent;")
-        # self.original_color_button.clicked.connect(lambda: self.ChangeTranslateColor("original", self.original_color))
-        # self.original_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
-        #
-        # # 原文颜色说明标签
-        # button = QPushButton(self.tab_3)
-        # self.customSetGeometry(button, 430, 170, 25, 20)
-        # button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;" % self.color_2)
-        # button.setText("说明")
-        # button.clicked.connect(lambda: self.showDesc("originalColor"))
-        # button.setCursor(ui.static.icon.QUESTION_CURSOR)
-        #
-        # # 原文颜色说明?号图标
-        # button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_3)
-        # self.customSetIconSize(button, 20, 20)
-        # self.customSetGeometry(button, 455, 170, 20, 20)
-        # button.setStyleSheet("background: transparent;")
-        # button.clicked.connect(lambda: self.showDesc("originalColor"))
-        # button.setCursor(ui.static.icon.QUESTION_CURSOR)
         #
         # # 贴字翻译标签
         # label = QLabel(self.tab_3)
@@ -1227,60 +1190,6 @@ class Settin(QMainWindow) :
         self.customSetGeometry(button, 515, 20, 20, 20)
         button.setStyleSheet("background: transparent;")
         button.clicked.connect(lambda: self.showDesc("autoSpeed"))
-        button.setCursor(ui.static.icon.QUESTION_CURSOR)
-
-        # 文字方向标签
-        label = QLabel(self.tab_4)
-        self.customSetGeometry(label, 20, 70, 80, 20)
-        label.setText("文字方向:")
-
-        # 文字方向开关
-        self.text_direction_switch = ui.switch.SwitchDirection(self.tab_4, sign=self.text_direction_use, startX=(65-20)*self.rate, object=self.object)
-        self.customSetGeometry(self.text_direction_switch, 95, 70, 65, 20)
-        self.text_direction_switch.checkedChanged.connect(self.changeTextDirectionSwitch)
-        self.text_direction_switch.setCursor(ui.static.icon.SELECT_CURSOR)
-
-        # 文字方向说明标签
-        button = QPushButton(self.tab_4)
-        self.customSetGeometry(button, 175, 70, 25, 20)
-        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;"%self.color_2)
-        button.setText("说明")
-        button.clicked.connect(lambda: self.showDesc("textDirection"))
-        button.setCursor(ui.static.icon.QUESTION_CURSOR)
-
-        # 文字方向说明?号图标
-        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_4)
-        self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 200, 70, 20, 20)
-        button.setStyleSheet("background: transparent;")
-        button.clicked.connect(lambda: self.showDesc("textDirection"))
-        button.setCursor(ui.static.icon.QUESTION_CURSOR)
-
-        # 文字换行标签
-        label = QLabel(self.tab_4)
-        self.customSetGeometry(label, 275, 70, 80, 20)
-        label.setText("文字换行:")
-
-        # 文字换行开关
-        self.branch_line_switch = ui.switch.SwitchBranchLine(self.tab_4, sign=self.branch_line_use, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.branch_line_switch, 350, 70, 65, 20)
-        self.branch_line_switch.checkedChanged.connect(self.changeBranchLineSwitch)
-        self.branch_line_switch.setCursor(ui.static.icon.SELECT_CURSOR)
-
-        # 文字换行说明标签
-        button = QPushButton(self.tab_4)
-        self.customSetGeometry(button, 430, 70, 25, 20)
-        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;"%self.color_2)
-        button.setText("说明")
-        button.clicked.connect(lambda: self.showDesc("branchLine"))
-        button.setCursor(ui.static.icon.QUESTION_CURSOR)
-
-        # 文字换行说明?号图标
-        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_4)
-        self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 455, 70, 20, 20)
-        button.setStyleSheet("background: transparent;")
-        button.clicked.connect(lambda: self.showDesc("branchLine"))
         button.setCursor(ui.static.icon.QUESTION_CURSOR)
 
         # 翻译快捷键标签
@@ -1639,7 +1548,7 @@ class Settin(QMainWindow) :
         self.rate = self.object.yaml["screen_scale_rate"]
         # 界面尺寸
         self.window_width = int(800*self.rate)
-        self.window_height = int(400*self.rate)
+        self.window_height = int(420*self.rate)
         # 所使用的颜色
         self.color_1 = "#595959"  # 灰色
         self.color_2 = "#5B8FF9"  # 蓝色
