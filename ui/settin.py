@@ -1296,6 +1296,24 @@ class Settin(QMainWindow) :
         self.customSetGeometry(label, 105, 180, 400, 20)
         label.setText("开启软件后自动登录账号")
 
+        # 同意收集翻译历史开关
+        self.agree_collect_switch = ui.switch.SwitchOCR(other_tab, sign=self.agree_collect_use, startX=(65-20) * self.rate)
+        self.customSetGeometry(self.agree_collect_switch, 20, 230, 65, 20)
+        self.agree_collect_switch.checkedChanged.connect(self.changeAgreeCollectSwitch)
+        self.agree_collect_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+
+        # 同意收集翻译历史标签
+        label = QLabel(other_tab)
+        self.customSetGeometry(label, 105, 230, 300, 20)
+        label.setText("加入用户体验改善计划")
+        # 同意收集翻译历史?号图标
+        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", other_tab)
+        self.customSetIconSize(button, 20, 20)
+        self.customSetGeometry(button, 270, 230, 20, 20)
+        button.setStyleSheet("background: transparent;")
+        button.clicked.connect(lambda: self.showDesc("agreeCollect"))
+        button.setCursor(ui.static.icon.QUESTION_CURSOR)
+
 
     # 关于标签页
     def setTabFive(self) :
@@ -1624,6 +1642,8 @@ class Settin(QMainWindow) :
         self.image_refresh_score = self.object.config["imageSimilarity"]
         # 自动翻译文字刷新相似度
         self.text_refresh_score = self.object.config["textSimilarity"]
+        # 同步翻译历史开关
+        self.agree_collect_use = self.object.config["agreeCollectUse"]
 
         # 团子翻译器开源地址
         self.dango_translator_url = "https://github.com/PantsuDango/Dango-Translator"
@@ -2023,6 +2043,15 @@ class Settin(QMainWindow) :
             self.auto_login_use = False
 
 
+    # 改变同步翻译历史开关状态
+    def changeAgreeCollectSwitch(self, checked):
+
+        if checked:
+            self.agree_collect_use = True
+        else:
+            self.agree_collect_use = False
+
+
     # 重置开关状态
     def resetSwitch(self, switch_type) :
 
@@ -2357,6 +2386,12 @@ class Settin(QMainWindow) :
         elif message_type == "onlineOCRQueryQuota" :
             self.desc_ui.setWindowTitle("在线OCR额度查询")
             self.desc_ui.desc_text.append(utils.http.onlineOCRQueryQuota(self.object))
+
+        elif message_type == "agreeCollect" :
+            self.desc_ui.setWindowTitle("用户体验改善说明")
+            self.desc_ui.desc_text.append("\n开启后将会上传个人翻译历史, 帮助团子用于开发公共词库功能, 以优化翻译器未来的使用体验\n\n"
+                                          "数据将会进行脱敏处理\n\n不会将数据用于任何非法用途")
+
 
         self.desc_ui.show()
 
@@ -2706,6 +2741,8 @@ class Settin(QMainWindow) :
         self.object.config["showHotKey3"] = str(self.hide_range_hotkey_use)
         # 是否全屏下置顶开关
         self.object.config["setTop"] = self.set_top_use
+        # 是否同步翻译历史开关
+        self.object.config["agreeCollectUse"] = self.agree_collect_use
 
 
     # 注册新快捷键
