@@ -638,20 +638,16 @@ class Settin(QMainWindow) :
         label.setText("腾讯:")
 
         # 私人腾讯翻译开关
-        self.tencent_private_switch = ui.switch.SwitchOCR(private_translater_tab, sign=self.tencent_use,
-                                                          startX=(65 - 20) * self.rate)
+        self.tencent_private_switch = ui.switch.SwitchOCR(private_translater_tab, sign=self.tencent_use, startX=(65-20) * self.rate)
         self.customSetGeometry(self.tencent_private_switch, 65, 70, 65, 20)
         self.tencent_private_switch.checkedChanged.connect(self.changeTencentSwitch)
         self.tencent_private_switch.setCursor(ui.static.icon.SELECT_CURSOR)
-
         # 私人腾讯翻译颜色选择
-        self.tencent_private_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.tencent_color),
-                                                        "", private_translater_tab)
+        self.tencent_private_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.tencent_color), "", private_translater_tab)
         self.customSetIconSize(self.tencent_private_color_button, 20, 20)
         self.customSetGeometry(self.tencent_private_color_button, 140, 70, 20, 20)
         self.tencent_private_color_button.setStyleSheet("background: transparent;")
-        self.tencent_private_color_button.clicked.connect(
-            lambda: self.ChangeTranslateColor("tencent_private", self.tencent_use))
+        self.tencent_private_color_button.clicked.connect(lambda: self.ChangeTranslateColor("tencent_private", self.tencent_use))
         self.tencent_private_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 私人腾讯翻译密钥按钮
@@ -675,26 +671,30 @@ class Settin(QMainWindow) :
         button.clicked.connect(self.openTencentTutorial)
         button.setCursor(ui.static.icon.SELECT_CURSOR)
 
+        # 私人腾讯查额度按钮
+        button = QPushButton(private_translater_tab)
+        self.customSetGeometry(button, 420, 70, 60, 20)
+        button.setText("查额度")
+        button.clicked.connect(self.openTencentQueryQuota)
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
+
         # 私人百度翻译标签
         label = QLabel(private_translater_tab)
         self.customSetGeometry(label, 20, 120, 35, 20)
         label.setText("百度:")
 
         # 私人百度翻译开关
-        self.baidu_private_switch = ui.switch.SwitchOCR(private_translater_tab, sign=self.baidu_use,
-                                                        startX=(65 - 20) * self.rate)
+        self.baidu_private_switch = ui.switch.SwitchOCR(private_translater_tab, sign=self.baidu_use, startX=(65-20) * self.rate)
         self.customSetGeometry(self.baidu_private_switch, 65, 120, 65, 20)
         self.baidu_private_switch.checkedChanged.connect(self.changeBaiduTranslaterSwitch)
         self.baidu_private_switch.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 私人百度翻译颜色选择
-        self.baidu_private_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.baidu_color), "",
-                                                      private_translater_tab)
+        self.baidu_private_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.baidu_color), "", private_translater_tab)
         self.customSetIconSize(self.baidu_private_color_button, 20, 20)
         self.customSetGeometry(self.baidu_private_color_button, 140, 120, 20, 20)
         self.baidu_private_color_button.setStyleSheet("background: transparent;")
-        self.baidu_private_color_button.clicked.connect(
-            lambda: self.ChangeTranslateColor("baidu_private", self.baidu_color))
+        self.baidu_private_color_button.clicked.connect(lambda: self.ChangeTranslateColor("baidu_private", self.baidu_color))
         self.baidu_private_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 私人百度翻译密钥按钮
@@ -716,6 +716,13 @@ class Settin(QMainWindow) :
         self.customSetGeometry(button, 340, 120, 60, 20)
         button.setText("教程")
         button.clicked.connect(self.openBaiduTutorial)
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
+
+        # 私人百度查额度按钮
+        button = QPushButton(private_translater_tab)
+        self.customSetGeometry(button, 420, 120, 60, 20)
+        button.setText("查额度")
+        button.clicked.connect(self.openBaiduQueryQuota)
         button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 私人彩云翻译标签
@@ -757,6 +764,13 @@ class Settin(QMainWindow) :
         self.customSetGeometry(button, 340, 170, 60, 20)
         button.setText("教程")
         button.clicked.connect(self.openCaiyunTutorial)
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
+
+        # 私人彩云查额度按钮
+        button = QPushButton(private_translater_tab)
+        self.customSetGeometry(button, 420, 170, 60, 20)
+        button.setText("查额度")
+        button.clicked.connect(self.openCaiyunQueryQuota)
         button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 公共翻译备注
@@ -1069,7 +1083,7 @@ class Settin(QMainWindow) :
 
         # 此Label用于雾化工具栏1的背景图
         label = QLabel(self.tab_4)
-        label.setGeometry(QRect(0, -1, self.window_width, 35*self.rate))
+        label.setGeometry(QRect(0, 0, self.window_width, 35*self.rate))
         label.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
 
         # 选项卡图标
@@ -1194,8 +1208,6 @@ class Settin(QMainWindow) :
         self.customSetGeometry(label, 85, 130, 500, 20)
         label.setText("自动模式下的文字相似度(80-100%), 数值越高越频繁刷新翻译结果, 建议90")
 
-
-
         # 翻译快捷键开关
         self.translate_hotkey_switch = ui.switch.SwitchOCR(shortcut_key_tab, sign=self.translate_hotkey_use, startX=(65-20)*self.rate)
         self.customSetGeometry(self.translate_hotkey_switch, 20, 30, 65, 20)
@@ -1212,124 +1224,77 @@ class Settin(QMainWindow) :
         self.customSetGeometry(label, 180, 30, 300, 20)
         label.setText("手动模式下刷新翻译的快捷键")
 
+        # 范围快捷键开关
+        self.range_hotkey_switch = ui.switch.SwitchOCR(shortcut_key_tab, sign=self.range_hotkey_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.range_hotkey_switch, 20, 80, 65, 20)
+        self.range_hotkey_switch.checkedChanged.connect(self.changeRangeHotkeySwitch)
+        self.range_hotkey_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 范围快捷键设定按钮
+        self.range_hotkey_button = QPushButton(shortcut_key_tab)
+        self.customSetGeometry(self.range_hotkey_button, 100, 80, 60, 20)
+        self.range_hotkey_button.setText(self.object.config["rangeHotkeyValue1"]+"+"+self.object.config["rangeHotkeyValue2"])
+        self.range_hotkey_button.clicked.connect(lambda: self.setHotKey("range"))
+        self.range_hotkey_button.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 范围快捷键标签
+        label = QLabel(shortcut_key_tab)
+        self.customSetGeometry(label, 180, 80, 80, 20)
+        label.setText("重新框选范围框的快捷键")
+
         # 隐藏快捷键开关
         self.hide_range_hotkey_switch = ui.switch.SwitchOCR(shortcut_key_tab, sign=self.hide_range_hotkey_use, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.hide_range_hotkey_switch, 20, 80, 65, 20)
+        self.customSetGeometry(self.hide_range_hotkey_switch, 20, 130, 65, 20)
         self.hide_range_hotkey_switch.checkedChanged.connect(self.changeHideRangeHotkeySwitch)
         self.hide_range_hotkey_switch.setCursor(ui.static.icon.SELECT_CURSOR)
         # 隐藏快捷键设定按钮
         self.hide_range_hotkey_button = QPushButton(shortcut_key_tab)
-        self.customSetGeometry(self.hide_range_hotkey_button, 100, 80, 60, 20)
+        self.customSetGeometry(self.hide_range_hotkey_button, 100, 130, 60, 20)
         self.hide_range_hotkey_button.setText(self.object.config["hideRangeHotkeyValue1"]+"+"+self.object.config["hideRangeHotkeyValue2"])
         self.hide_range_hotkey_button.clicked.connect(lambda: self.setHotKey("hideRange"))
         self.hide_range_hotkey_button.setCursor(ui.static.icon.SELECT_CURSOR)
         # 隐藏范围快捷键标签
         label = QLabel(shortcut_key_tab)
-        self.customSetGeometry(label, 180, 80, 300, 20)
+        self.customSetGeometry(label, 180, 130, 300, 20)
         label.setText("显示/隐藏范围框的快捷键")
 
-        # # 贴字翻译标签
-        # label = QLabel(self.tab_3)
-        # self.customSetGeometry(label, 20, 220, 60, 20)
-        # label.setText("贴字翻译:")
-        #
-        # # 贴字翻译开关
-        # self.draw_image_switch = ui.switch.DrawSwitchOCR(self.tab_3, sign=self.draw_image_use, startX=(65-20)*self.rate, object=self.object)
-        # self.customSetGeometry(self.draw_image_switch, 95, 220, 65, 20)
-        # self.draw_image_switch.checkedChanged.connect(self.changeDrawImageSwitch)
-        # self.draw_image_switch.setCursor(ui.static.icon.SELECT_CURSOR)
-        #
-        # # 贴字翻译说明标签
-        # button = QPushButton(self.tab_3)
-        # self.customSetGeometry(button, 175, 220, 25, 20)
-        # button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;" % self.color_2)
-        # button.setText("说明")
-        # button.clicked.connect(lambda: self.showDesc("drawImage"))
-        # button.setCursor(ui.static.icon.QUESTION_CURSOR)
-        #
-        # # 贴字翻译说明?号图标
-        # button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_3)
-        # self.customSetIconSize(button, 20, 20)
-        # self.customSetGeometry(button, 200, 220, 20, 20)
-        # button.setStyleSheet("background: transparent;")
-        # button.clicked.connect(lambda: self.showDesc("drawImage"))
-        # button.setCursor(ui.static.icon.QUESTION_CURSOR)
-        #
+        # 贴字翻译开关
+        self.draw_image_switch = ui.switch.DrawSwitchOCR(other_tab, sign=self.draw_image_use, startX=(65-20)*self.rate, object=self.object)
+        self.customSetGeometry(self.draw_image_switch, 20, 30, 65, 20)
+        self.draw_image_switch.checkedChanged.connect(self.changeDrawImageSwitch)
+        self.draw_image_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 贴字翻译标签
+        label = QLabel(other_tab)
+        self.customSetGeometry(label, 105, 30, 400, 20)
+        label.setText("将翻译的结果以贴图的形式覆盖至范围框内")
 
-        # # 原文自动复制到剪贴板标签
-        # label = QLabel(self.tab_4)
-        # self.customSetGeometry(label, 20, 20, 150, 20)
-        # label.setText("原文自动复制到剪贴板:")
-        #
-        # # 原文自动复制到剪贴板开关
-        # self.auto_copy_original_switch = ui.switch.SwitchOCR(self.tab_4, sign=self.auto_clipboard_use, startX=(65-20)*self.rate)
-        # self.customSetGeometry(self.auto_copy_original_switch, 430-255, 20, 65, 20)
-        # self.auto_copy_original_switch.checkedChanged.connect(self.changeAutoCopyOriginalSwitch)
-        # self.auto_copy_original_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 原文自动复制到剪贴板开关
+        self.auto_copy_original_switch = ui.switch.SwitchOCR(other_tab, sign=self.auto_clipboard_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.auto_copy_original_switch, 20, 80, 65, 20)
+        self.auto_copy_original_switch.checkedChanged.connect(self.changeAutoCopyOriginalSwitch)
+        self.auto_copy_original_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 原文自动复制到剪贴板标签
+        label = QLabel(other_tab)
+        self.customSetGeometry(label, 105, 80, 400, 20)
+        label.setText("每次识别到的原文自动复制到剪贴板")
 
-        #
-        # # 范围快捷键标签
-        # label = QLabel(self.tab_4)
-        # self.customSetGeometry(label, 275, 120, 80, 20)
-        # label.setText("范围热键:")
-        #
-        # # 范围快捷键开关
-        # self.range_hotkey_switch = ui.switch.SwitchOCR(self.tab_4, sign=self.range_hotkey_use, startX=(65-20)*self.rate)
-        # self.customSetGeometry(self.range_hotkey_switch, 350, 120, 65, 20)
-        # self.range_hotkey_switch.checkedChanged.connect(self.changeRangeHotkeySwitch)
-        # self.range_hotkey_switch.setCursor(ui.static.icon.SELECT_CURSOR)
-        #
-        # # 范围快捷键设定按钮
-        # self.range_hotkey_button = QPushButton(self.tab_4)
-        # self.customSetGeometry(self.range_hotkey_button, 430, 120, 60, 20)
-        # self.range_hotkey_button.setText(
-        #     self.object.config["rangeHotkeyValue1"]+"+"+self.object.config["rangeHotkeyValue2"])
-        # self.range_hotkey_button.clicked.connect(lambda: self.setHotKey("range"))
-        # self.range_hotkey_button.setCursor(ui.static.icon.SELECT_CURSOR)
-        #
+        # 是否全屏下置顶开关
+        self.set_top_switch = ui.switch.SwitchOCR(other_tab, self.set_top_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.set_top_switch, 20, 130, 65, 20)
+        self.set_top_switch.checkedChanged.connect(self.changeSetTopSwitch)
+        self.set_top_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 是否全屏下置顶
+        label = QLabel(other_tab)
+        self.customSetGeometry(label, 105, 130, 400, 20)
+        label.setText("在全屏模式的应用下置顶翻译器")
 
-        #
-        # # 自动登录标签
-        # label = QLabel(self.tab_4)
-        # self.customSetGeometry(label, 20, 220, 80, 20)
-        # label.setText("自动登录:")
-        #
-        # # 自动登录开关
-        # self.auto_login_switch = ui.switch.SwitchOCR(self.tab_4,
-        #                                              sign=self.auto_login_use,
-        #                                              startX=(65-20)*self.rate)
-        # self.customSetGeometry(self.auto_login_switch, 95, 220, 65, 20)
-        # self.auto_login_switch.checkedChanged.connect(self.changeAutoLoginSwitch)
-        # self.auto_login_switch.setCursor(ui.static.icon.SELECT_CURSOR)
-        #
-        # # 是否全屏下置顶
-        # label = QLabel(self.tab_4)
-        # self.customSetGeometry(label, 20, 270, 150, 20)
-        # label.setText("是否全屏下置顶:")
-        #
-        # # 是否全屏下置顶开关
-        # self.set_top_switch = ui.switch.SwitchOCR(self.tab_4,
-        #                                           self.set_top_use,
-        #                                           startX=(65-20)*self.rate)
-        # self.customSetGeometry(self.set_top_switch, 140, 270, 65, 20)
-        # self.set_top_switch.checkedChanged.connect(self.changeSetTopSwitch)
-        # self.set_top_switch.setCursor(ui.static.icon.SELECT_CURSOR)
-        #
-        # # 是否全屏下置顶说明标签
-        # button = QPushButton(self.tab_4)
-        # self.customSetGeometry(button, 220, 270, 25, 20)
-        # button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;"%self.color_2)
-        # button.setText("说明")
-        # button.clicked.connect(lambda: self.showDesc("setTop"))
-        # button.setCursor(ui.static.icon.QUESTION_CURSOR)
-        #
-        # # 是否全屏下置顶说明?号图标
-        # button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_4)
-        # self.customSetIconSize(button, 20, 20)
-        # self.customSetGeometry(button, 245, 270, 20, 20)
-        # button.setStyleSheet("background: transparent;")
-        # button.clicked.connect(lambda: self.showDesc("setTop"))
-        # button.setCursor(ui.static.icon.QUESTION_CURSOR)
+        # 自动登录开关
+        self.auto_login_switch = ui.switch.SwitchOCR(other_tab, sign=self.auto_login_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.auto_login_switch, 20, 180, 65, 20)
+        self.auto_login_switch.checkedChanged.connect(self.changeAutoLoginSwitch)
+        self.auto_login_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 自动登录标签
+        label = QLabel(other_tab)
+        self.customSetGeometry(label, 105, 180, 400, 20)
+        label.setText("开启软件后自动登录账号")
 
 
     # 关于标签页
@@ -1357,12 +1322,12 @@ class Settin(QMainWindow) :
 
         # 官方网站标签
         label = QLabel(self.tab_5)
-        self.customSetGeometry(label, 130, 20, 300, 20)
+        self.customSetGeometry(label, 130, 30, 300, 20)
         label.setText("团子翻译器的官网哦 (欢迎来玩)")
 
         # 官方网站按钮
         button = QPushButton(self.tab_5)
-        self.customSetGeometry(button, 20, 20, 90, 20)
+        self.customSetGeometry(button, 20, 30, 90, 20)
         button.setText("官方网站")
         button.clicked.connect(self.openHomePage)
         button.setCursor(ui.static.icon.SELECT_CURSOR)
@@ -1372,12 +1337,12 @@ class Settin(QMainWindow) :
 
         # 项目地址标签
         label = QLabel(self.tab_5)
-        self.customSetGeometry(label, 130, 65, 300, 20)
+        self.customSetGeometry(label, 130, 75, 300, 20)
         label.setText("本软件已在github开源 (欢迎来点小星星)")
 
         # 项目地址按钮
         button = QPushButton(self.tab_5)
-        self.customSetGeometry(button, 20, 65, 90, 20)
+        self.customSetGeometry(button, 20, 75, 90, 20)
         button.setText("项目地址")
         button.clicked.connect(self.openGithubProject)
         button.setCursor(ui.static.icon.SELECT_CURSOR)
@@ -1387,12 +1352,12 @@ class Settin(QMainWindow) :
 
         # 在线教程标签
         label = QLabel(self.tab_5)
-        self.customSetGeometry(label, 130, 110, 300, 20)
+        self.customSetGeometry(label, 130, 120, 300, 20)
         label.setText("软件完整使用教程 (要好好阅读哦)")
 
         # 在线教程按钮
         button = QPushButton(self.tab_5)
-        self.customSetGeometry(button, 20, 110, 90, 20)
+        self.customSetGeometry(button, 20, 120, 90, 20)
         button.setText("在线文档")
         button.clicked.connect(self.openTutorial)
         button.setCursor(ui.static.icon.SELECT_CURSOR)
@@ -1402,12 +1367,12 @@ class Settin(QMainWindow) :
 
         # 教程视频标签
         label = QLabel(self.tab_5)
-        self.customSetGeometry(label, 130, 150, 300, 20)
+        self.customSetGeometry(label, 130, 160, 300, 20)
         label.setText("软件b站教程视频 (不想看文档就看这个吧)")
 
         # 教程视频按钮
         button = QPushButton(self.tab_5)
-        self.customSetGeometry(button, 20, 150, 90, 20)
+        self.customSetGeometry(button, 20, 160, 90, 20)
         button.setText("教程视频")
         button.clicked.connect(self.openBilibiliVideo)
         button.setCursor(ui.static.icon.SELECT_CURSOR)
@@ -1417,12 +1382,12 @@ class Settin(QMainWindow) :
 
         # 关注作者标签
         label = QLabel(self.tab_5)
-        self.customSetGeometry(label, 130, 195, 300, 20)
+        self.customSetGeometry(label, 130, 205, 300, 20)
         label.setText("发布公告的地方 (不关注团子吗)")
 
         # 关注作者按钮
         button = QPushButton(self.tab_5)
-        self.customSetGeometry(button, 20, 195, 90, 20)
+        self.customSetGeometry(button, 20, 205, 90, 20)
         button.setText("关注团子")
         button.clicked.connect(self.openBilibili)
         button.setCursor(ui.static.icon.SELECT_CURSOR)
@@ -1432,12 +1397,12 @@ class Settin(QMainWindow) :
 
         # 添加交流群标签
         label = QLabel(self.tab_5)
-        self.customSetGeometry(label, 130, 240, 300, 20)
+        self.customSetGeometry(label, 130, 250, 300, 20)
         label.setText("加入交流群 (QQ群申请)")
 
         # 添加交流群按钮
         button = QPushButton(self.tab_5)
-        self.customSetGeometry(button, 20, 240, 90, 20)
+        self.customSetGeometry(button, 20, 250, 90, 20)
         button.setText("群聊交流")
         button.clicked.connect(lambda: self.showDesc("qqGroup"))
         button.setCursor(ui.static.icon.SELECT_CURSOR)
@@ -1447,12 +1412,12 @@ class Settin(QMainWindow) :
 
         # 特别鸣谢标签
         label = QLabel(self.tab_5)
-        self.customSetGeometry(label, 20, 290, 300, 20)
+        self.customSetGeometry(label, 20, 300, 300, 20)
         label.setText("特别鸣谢 (本软件受到以下人员和项目的帮助)")
 
         # PaddleOCR主页按钮
         button = QPushButton(self.tab_5)
-        self.customSetGeometry(button, 20, 330, 90, 20)
+        self.customSetGeometry(button, 20, 340, 90, 20)
         button.setText("PaddleOCR‭")
         button.clicked.connect(self.openPaddleOCR)
         button.setIcon(ui.static.icon.GITHUB_ICON)
@@ -1460,7 +1425,7 @@ class Settin(QMainWindow) :
 
         # GT-Zhang主页按钮
         button = QPushButton(self.tab_5)
-        self.customSetGeometry(button, 130, 330, 90, 20)
+        self.customSetGeometry(button, 130, 340, 90, 20)
         button.setText("GT-Zhang")
         button.clicked.connect(self.openGT)
         button.setIcon(ui.static.icon.GITHUB_ICON)
@@ -1468,7 +1433,7 @@ class Settin(QMainWindow) :
 
         # C4a15Wh主页按钮
         button = QPushButton(self.tab_5)
-        self.customSetGeometry(button, 240, 330, 90, 20)
+        self.customSetGeometry(button, 240, 340, 90, 20)
         button.setText("C4a15Wh")
         button.clicked.connect(self.openC44)
         button.setIcon(ui.static.icon.BLOG_ICON)
@@ -1476,7 +1441,7 @@ class Settin(QMainWindow) :
 
         # cypas‭主页按钮
         button = QPushButton(self.tab_5)
-        self.customSetGeometry(button, 350, 330, 90, 20)
+        self.customSetGeometry(button, 350, 340, 90, 20)
         button.setText("Cypas‭")
         button.clicked.connect(self.openCy)
         button.setIcon(ui.static.icon.BLOG_ICON)
@@ -2262,23 +2227,61 @@ class Settin(QMainWindow) :
     # 打开百度OCR额度查询地址
     def openBaiduOCRQueryQuota(self):
 
+        url = "https://console.bce.baidu.com/ai/?_=1661324005307#/ai/ocr/overview/index"
         try:
-            url = "https://console.bce.baidu.com/ai/?_=1661324005307#/ai/ocr/overview/index"
             webbrowser.open(url, new=0, autoraise=True)
         except Exception:
             self.logger.error(format_exc())
+            utils.message.MessageBox("百度OCR额度查询",
+                                     "打开地址失败, 请尝试手动打开此网页下载\n%s     "%url)
 
 
     # 打开安装谷歌浏览器地址
     def openInstallChrome(self):
 
+        url = "https://www.google.cn/intl/zh-CN/chrome/"
         try:
-            url = "https://www.google.cn/intl/zh-CN/chrome/"
             webbrowser.open(url, new=0, autoraise=True)
         except Exception:
             self.logger.error(format_exc())
             utils.message.MessageBox("安装谷歌浏览器",
-                                     "打开地址失败, 请尝试手动打开此网页下载\nhttps://www.google.cn/intl/zh-CN/chrome")
+                                     "打开地址失败, 请尝试手动打开此网页下载\n%s     "%url)
+
+
+    # 打开查询私人腾讯额度地址
+    def openTencentQueryQuota(self):
+
+        url = "https://console.cloud.tencent.com/tmt"
+        try:
+            webbrowser.open(url, new=0, autoraise=True)
+        except Exception:
+            self.logger.error(format_exc())
+            utils.message.MessageBox("私人腾讯额度查询",
+                                     "打开地址失败, 请尝试手动打开此网页下载\n%s     "%url)
+
+
+    # 打开查询私人彩云额度地址
+    def openCaiyunQueryQuota(self):
+
+        url = "https://dashboard.caiyunapp.com/v1/token/5e818320d4b84b00d29a9316/?type=2"
+        try:
+            webbrowser.open(url, new=0, autoraise=True)
+        except Exception:
+            self.logger.error(format_exc())
+            utils.message.MessageBox("私人腾讯额度查询",
+                                     "打开地址失败, 请尝试手动打开此网页下载\n%s     "%url)
+
+
+    # 打开查询私人百度额度地址
+    def openBaiduQueryQuota(self):
+
+        url = "https://fanyi-api.baidu.com/api/trans/product/desktop"
+        try:
+            webbrowser.open(url, new=0, autoraise=True)
+        except Exception:
+            self.logger.error(format_exc())
+            utils.message.MessageBox("私人腾讯额度查询",
+                                     "打开地址失败, 请尝试手动打开此网页下载\n%s     "%url)
 
 
     # 打开团子在线OCR购买
@@ -2339,108 +2342,8 @@ class Settin(QMainWindow) :
 
         self.desc_ui = ui.desc.Desc(self.object)
 
-        # OCR说明
-        if message_type == "OCR" :
-            self.desc_ui.setWindowTitle("OCR说明")
-            self.desc_ui.desc_text.append("\n首先区别OCR和翻译是两个模块。")
-            self.desc_ui.desc_text.append("\nOCR即为文字识别技术, 用于提取图片内要翻译的文字.")
-            self.desc_ui.desc_text.append("\n翻译器通过对所框选的范围进行截图, 然后利用OCR将截图内要翻译的文字识别出来, 再发送给翻译模块翻译。")
-
-        # 本地OCR说明
-        elif message_type == "offlineOCR" :
-            self.desc_ui.setWindowTitle("本地OCR说明")
-            self.desc_ui.desc_text.append("\n特性: \n依赖自身CPU性能, CPU性能越高，识别速度越快.")
-            self.desc_ui.desc_text.append("识别精度一般.")
-            self.desc_ui.desc_text.append("\n优点:\n1. 无额度限制, 完全免费, 可无限次使用;")
-            self.desc_ui.desc_text.append("\n缺点:\n1. 对电脑配置较低的用户不友好, 可能会导致电脑很卡;")
-            self.desc_ui.desc_text.append("2. 可能会因为环境配置问题导致安装失败, 不支持10年以前发行的CPU;")
-            self.desc_ui.desc_text.append("\n详细使用方式见教程.")
-
-        # 在线OCR说明
-        elif message_type == "onlineOCR":
-            self.desc_ui.setWindowTitle("在线OCR说明")
-            self.desc_ui.desc_text.append("\n特性: \n团子在大佬们的帮助下自行搭建的OCR在线服务.")
-            self.desc_ui.desc_text.append("识别精度较好.")
-            self.desc_ui.desc_text.append("\n优点:\n1. 不消耗电脑配置, 仅需联网;")
-            self.desc_ui.desc_text.append("2. 性价比高, 服务期内无使用次数限制;")
-            self.desc_ui.desc_text.append("\n缺点:\n1. 不免费, 需要氪点金金;")
-            self.desc_ui.desc_text.append("\n详细使用方式见教程.")
-
-        # 百度OCR说明
-        elif message_type == "baiduOCR":
-            self.desc_ui.setWindowTitle("百度OCR说明")
-            self.desc_ui.desc_text.append("\n特性: \n百度智能云的OCR服务.")
-            self.desc_ui.desc_text.append("识别精度优秀.")
-            self.desc_ui.desc_text.append("\n优点:\n1. 不消耗电脑配置, 仅需联网;")
-            self.desc_ui.desc_text.append("\n缺点:\n1. 使用次数有限制;")
-            self.desc_ui.desc_text.append("2. 不免费, 且价格较贵;")
-            self.desc_ui.desc_text.append("\n详细使用方式见教程.")
-
-        # 公共翻译说明
-        elif message_type == "publicTranslate" :
-            self.desc_ui.setWindowTitle("公共翻译说明")
-            self.desc_ui.desc_text.append("\n没有次数限制, 不需要注册, 可直接使用, 但不保证使用稳定性, 可能会抽风.")
-            self.desc_ui.desc_text.append('\n使用需要电脑装有"最新版本的" Chrome(谷歌)浏览器、Firefox(火狐)浏览器、Edge(微软)浏览器 至少一款.')
-            self.desc_ui.desc_text.append('\n翻译器原理上, 是通过后台启动相应的浏览器, 自动打开翻译网站去实现翻译.')
-            self.desc_ui.desc_text.append("\n详细使用方式见教程.")
-
-        # 私人翻译说明
-        elif message_type == "privateTranslate" :
-            self.desc_ui.setWindowTitle("私人翻译说明")
-            self.desc_ui.desc_text.append("\n有次数限制, 使用前需要注册, 但使用稳定性, 基本上不会抽风.")
-            self.desc_ui.desc_text.append("\n翻译器原理上, 是通过请求相应的云API接口去获取翻译结果")
-            self.desc_ui.desc_text.append("\n详细使用方式见教程.")
-
-        # 翻译框透明度说明
-        elif message_type == "horizontalSlider" :
-            self.desc_ui.setWindowTitle("翻译框透明度说明")
-            self.desc_ui.desc_text.append("\n用于调节显示翻译结果的翻译框透明度.")
-            self.desc_ui.desc_text.append("数值0为全透明")
-            self.desc_ui.desc_text.append("数值100为完全不透明")
-
-        # 字体样式设定说明
-        elif message_type == "fontType" :
-            self.desc_ui.setWindowTitle("字体样式设定说明")
-            self.desc_ui.desc_text.append("描边字体为字体中间镂空白底, 描边带颜色:\n")
-            self.desc_ui.desc_text.insertHtml('<img src={} width="{}" >'.format(ui.static.background.HOLLOW, 245*self.rate))
-            self.desc_ui.desc_text.append("\n实心字体为纯色字体:\n")
-            self.desc_ui.desc_text.insertHtml('<img src="{}" width="{}" >'.format(ui.static.background.SOLID, 245*self.rate))
-            self.desc_ui.desc_text.append("\n顺便一提团子喜欢描边字体~")
-
-        # 自动翻译设定说明
-        elif message_type == "autoSpeed" :
-            self.desc_ui.setWindowTitle("自动翻译设定说明")
-            self.desc_ui.desc_text.append("\n自动翻译模式下, 每隔该设定时间, 便会检测一次所框的范围内图像是否发生变化, 若发生变化则识别并刷新翻译")
-
-        # 显示原文说明
-        elif message_type == "showOriginal" :
-            self.desc_ui.setWindowTitle("显示原文说明")
-            self.desc_ui.desc_text.append("\n开启后, 会将OCR识别到的原文显示在翻译框.")
-
-        # 文字方向说明
-        elif message_type == "textDirection":
-            self.desc_ui.setWindowTitle("文字方向说明")
-            self.desc_ui.desc_text.append("\n正常都是横向的呢, 竖向多用于漫画翻译的情况.")
-
-        # 图像相似度说明
-        elif message_type == "imageRefresh":
-            self.desc_ui.setWindowTitle("图像相似度说明")
-            self.setTextColor(self.desc_ui.desc_text, "#FF0000", "如果看不懂请不要轻易修改此参数, 建议值为98.")
-            self.desc_ui.desc_text.append("\n自动翻译模式下, 每隔设定的时间间隔, 会重新检测范围区域的图像. "
-                                          "只有当当前图像, 与前一次图像比较的相似度小于该设定的值时, 才会重新调取OCR识别该图像.")
-            self.desc_ui.desc_text.append("\n如果觉得OCR频繁重复识别, 翻译框出现了'闪烁'的话, 可以调低此参数.")
-
-        # 文字相似度说明
-        elif message_type == "textRefresh":
-            self.desc_ui.setWindowTitle("文字相似度说明")
-            self.setTextColor(self.desc_ui.desc_text, "#FF0000", "如果看不懂请不要轻易修改此参数, 建议值为90.")
-            self.desc_ui.desc_text.append("\n自动翻译模式下, 每隔设定的时间间隔, OCR识别结果刷新后. "
-                                          "如果当前OCR识别出的原文, 与前一次识别的原文比较, 其相似度小于该设定的值时, "
-                                          "才会重新调取翻译并刷新至翻译界面.")
-            self.desc_ui.desc_text.append("\n如果觉得频繁重复翻译, 翻译框出现了'闪烁'的话, 可以调低此参数.")
-
         # QQ交流群
-        elif message_type == "qqGroup" :
+        if message_type == "qqGroup" :
             try :
                 qq_group_image = requests.get(self.object.yaml["dict_info"]["dango_qq_group"]).content
                 qq_group_image = "data:image/png;base64,%s"%(str(base64.b64encode(qq_group_image))[2:])
@@ -2450,37 +2353,8 @@ class Settin(QMainWindow) :
             self.desc_ui.desc_text.insertHtml('<img src="{}" width="{}" height="{}">'.format(
                 qq_group_image, 245*self.rate, 295*self.rate))
 
-        # 文字换行
-        elif message_type == "branchLine" :
-            self.desc_ui.setWindowTitle("文字换行说明")
-            self.setTextColor(self.desc_ui.desc_text, "#FF0000", "如果看不懂请不要打开此开关.")
-            self.desc_ui.desc_text.append("\n会将识别到的原文换行后再翻译, 可能会出现断句错误情况")
-
-        # 原文颜色
-        elif message_type == "originalColor" :
-            self.desc_ui.setWindowTitle("原文颜色说明")
-            self.desc_ui.desc_text.append("\n控制翻译界面显示的原文, 和一切错误说明, 通知信息的文字颜色")
-
-        # 显示消息栏说明
-        elif message_type == "showStatusbar" :
-            self.desc_ui.setWindowTitle("翻译时间说明")
-            self.desc_ui.desc_text.append("控制翻译界面底部消息栏是否显示\n")
-            self.desc_ui.desc_text.append("若显示\n")
-            self.desc_ui.desc_text.insertHtml('<img src={} width="{}" >'.format(ui.static.background.OPEN_STATUSBAR, 245*self.rate))
-            self.desc_ui.desc_text.append("\n若屏蔽:\n")
-            self.desc_ui.desc_text.insertHtml('<img src="{}" width="{}" >'.format(ui.static.background.CLOSE_STATUSBAR, 245*self.rate))
-
-        # 贴字翻译
-        elif message_type == "drawImage":
-            self.desc_ui.setWindowTitle("贴字翻译说明")
-            self.desc_ui.desc_text.append("\n开启后会将翻译结果直接贴在截图区域上, 目前仅支持于在线OCR")
-
-        # 贴字翻译
-        elif message_type == "setTop":
-            self.desc_ui.setWindowTitle("全屏下置顶说明")
-            self.desc_ui.desc_text.append("\n如果需要游玩全屏游戏, 则打开此开关, 否则平时请保持关闭")
-
-        elif message_type == "onlineOCRQueryQuota":
+        # 在线OCR查询额度
+        elif message_type == "onlineOCRQueryQuota" :
             self.desc_ui.setWindowTitle("在线OCR额度查询")
             self.desc_ui.desc_text.append(utils.http.onlineOCRQueryQuota(self.object))
 
