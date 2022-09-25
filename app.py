@@ -105,9 +105,9 @@ class DangoTranslator() :
     def clickSettin(self) :
 
         # 直接跳转到正在使用的ocr页签
-        if self.settin_ui.offline_ocr_use :
+        if self.settin_ui.online_ocr_use :
             self.settin_ui.ocr_tab_widget.setCurrentIndex(0)
-        elif self.settin_ui.online_ocr_use :
+        elif self.settin_ui.offline_ocr_use :
             self.settin_ui.ocr_tab_widget.setCurrentIndex(1)
         elif self.settin_ui.baidu_ocr_use :
             self.settin_ui.ocr_tab_widget.setCurrentIndex(2)

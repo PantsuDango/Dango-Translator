@@ -1309,7 +1309,7 @@ class Settin(QMainWindow) :
         # 同意收集翻译历史?号图标
         button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", other_tab)
         self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 270, 230, 20, 20)
+        self.customSetGeometry(button, 250, 230, 20, 20)
         button.setStyleSheet("background: transparent;")
         button.clicked.connect(lambda: self.showDesc("agreeCollect"))
         button.setCursor(ui.static.icon.QUESTION_CURSOR)
