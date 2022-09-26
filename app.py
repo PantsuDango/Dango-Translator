@@ -40,7 +40,7 @@ class DangoTranslator() :
         # 本地配置
         self.yaml = utils.config.openConfig(self.logger)
         # 版本号
-        self.yaml["version"] = "4.3.0-Beta"
+        self.yaml["version"] = "4.3.0"
         # 配置中心
         self.yaml["dict_info"] = utils.config.getDictInfo(self.yaml["dict_info_url"], self.logger)
         # 屏幕分辨率
@@ -92,7 +92,8 @@ class DangoTranslator() :
             self.hwndObj.run()
 
         # 同步翻译历史
-        utils.thread.createThread(translator.upload_trans_file.proccess(self))
+        if self.config["agreeCollectUse"]:
+            utils.thread.createThread(translator.upload_trans_file.proccess(self))
 
 
     # 按下充电键后做的事情

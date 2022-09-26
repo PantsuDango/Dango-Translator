@@ -231,7 +231,7 @@ def configConvert(object) :
     # 是否全屏下置顶开关
     object.config["setTop"] =  object.config.get("setTop", False)
     # 是否同步翻译历史开关
-    object.config["agreeCollectUse"] = object.config.get("agreeCollectUse", False)
+    object.config["agreeCollectUse"] = object.config.get("agreeCollectUse", True)
 
 
 # 保存配置至服务器

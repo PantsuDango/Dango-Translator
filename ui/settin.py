@@ -521,9 +521,11 @@ class Settin(QMainWindow) :
         self.text_direction_switch.checkedChanged.connect(self.changeTextDirectionSwitch)
         self.text_direction_switch.setCursor(ui.static.icon.SELECT_CURSOR)
         # 文字方向标签
-        label = QLabel(self.tab_1)
-        self.customSetGeometry(label, 105, 360, 300, 20)
-        label.setText("识别的原文阅读方向")
+        self.text_direction_label = QLabel(self.tab_1)
+        self.customSetGeometry(self.text_direction_label, 105, 360, 300, 20)
+        self.text_direction_label.setText("识别的原文阅读方向")
+        # 页签切换信号
+        self.ocr_tab_widget.currentChanged.connect(self.hideOrShowDirection)
 
         # 文字换行开关
         self.branch_line_switch = ui.switch.SwitchBranchLine(self.tab_1, sign=self.branch_line_use, startX=(65-20) * self.rate)
@@ -1709,7 +1711,7 @@ class Settin(QMainWindow) :
             model = self.node_info_comboBox.model()
 
             if sign :
-                text = "{}  {:.2f}ms".format(node_name, time_diff/1000)
+                text = "{}  {:.2f}s".format(node_name, time_diff/1000)
                 entry = QStandardItem(text)
                 entry.setForeground(QColor(Qt.green))
             else :
@@ -2409,25 +2411,25 @@ class Settin(QMainWindow) :
 
         # 百度OCR
         if key_type == "baiduOCR" :
-            self.key_ui.setWindowTitle("百度OCR - 密钥编辑")
+            self.key_ui.setWindowTitle("百度OCR - 密钥编辑 - 退出会自动保存")
             self.key_ui.baidu_ocr_key_textEdit.show()
             self.key_ui.baidu_ocr_secret_textEdit.show()
 
         # 私人腾讯翻译
         elif key_type == "tencentTranslate" :
-            self.key_ui.setWindowTitle("私人腾讯翻译 - 密钥编辑")
+            self.key_ui.setWindowTitle("私人腾讯翻译 - 密钥编辑 - 退出会自动保存")
             self.key_ui.tencent_private_key_textEdit.show()
             self.key_ui.tencent_private_secret_textEdit.show()
 
         # 私人腾讯翻译
         elif key_type == "baiduTranslate" :
-            self.key_ui.setWindowTitle("私人百度翻译 - 密钥编辑")
+            self.key_ui.setWindowTitle("私人百度翻译 - 密钥编辑 - 退出会自动保存")
             self.key_ui.baidu_private_key_textEdit.show()
             self.key_ui.baidu_private_secret_textEdit.show()
 
         # 私人彩云翻译
         elif key_type == "caiyunTranslate" :
-            self.key_ui.setWindowTitle("私人彩云翻译 - 密钥编辑")
+            self.key_ui.setWindowTitle("私人彩云翻译 - 密钥编辑 - 退出会自动保存")
             self.key_ui.caiyun_private_key_textEdit.show()
 
         self.key_ui.show()
@@ -2641,6 +2643,18 @@ class Settin(QMainWindow) :
             self.translate_list_label.setText("当前正在使用%s"%content)
         else :
             self.translate_list_label.setText("请选择开启至少一种翻译源开关, 否则翻译将无法使用")
+
+
+    # 改变文字方向控件显示/隐藏状态
+    def hideOrShowDirection(self) :
+
+        index = self.ocr_tab_widget.currentIndex()
+        if index == 0 or index == 2 :
+            self.text_direction_switch.show()
+            self.text_direction_label.show()
+        else :
+            self.text_direction_switch.hide()
+            self.text_direction_label.hide()
 
 
     # 退出前保存设置
