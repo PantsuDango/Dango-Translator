@@ -161,5 +161,5 @@ def checkIsTestVersion(object) :
         MessageBox("此版本已停止服务",
                    "目前您使用的是测试版本, 此版本已经停止更新      \n"
                    "请下载正式版本使用, 下载地址:\n%s      "
-                   %object.yaml["dict_info"]["update_version"], object.yaml["screen_scale_rate"])
+                   %object.yaml["dict_info"]["dango_home_page"], object.yaml["screen_scale_rate"])
         sys.exit()

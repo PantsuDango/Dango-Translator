@@ -40,7 +40,7 @@ class DangoTranslator() :
         # 本地配置
         self.yaml = utils.config.openConfig(self.logger)
         # 版本号
-        self.yaml["version"] = "4.2.7"
+        self.yaml["version"] = "4.3.0-Beta"
         # 配置中心
         self.yaml["dict_info"] = utils.config.getDictInfo(self.yaml["dict_info_url"], self.logger)
         # 屏幕分辨率
@@ -169,6 +169,8 @@ class DangoTranslator() :
         # 连接配置中心
         if not self.yaml["dict_info"] :
             utils.message.serverClientFailMessage(self)
+        # 加载静态资源
+        ui.static.icon.initIcon(self.yaml["screen_scale_rate"])
         # 检查是否为测试版本
         utils.message.checkIsTestVersion(self)
         # 检查字体
@@ -180,8 +182,6 @@ class DangoTranslator() :
             utils.thread.runQThread(thread)
         # 初始化图片资源
         utils.thread.createThread(self.InitLoadFile)
-        # 加载静态资源
-        ui.static.icon.initIcon(self.yaml["screen_scale_rate"])
 
         # 登录界面
         self.login_ui = ui.login.Login(self)
