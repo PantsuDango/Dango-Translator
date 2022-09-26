@@ -27,6 +27,7 @@ import ui.static.icon
 
 import translator.update_chrome_driver
 import translator.update_edge_driver
+import translator.upload_trans_file
 
 
 class DangoTranslator() :
@@ -89,6 +90,9 @@ class DangoTranslator() :
         self.hwndObj = utils.hwnd.WindowHwnd(self)
         if self.settin_ui.set_top_use :
             self.hwndObj.run()
+
+        # 同步翻译历史
+        utils.thread.createThread(translator.upload_trans_file.proccess(self))
 
 
     # 按下充电键后做的事情

@@ -23,6 +23,9 @@ def openConfig(logger) :
         # 2022.03.08 修改参数
         if "dict_info_url" in config.keys():
             config["dict_info_url"] = "https://dango.c4a15wh.cn/DangoTranslate/ShowDict"
+        # 2022.09.26 添加新参数
+        if "agree_collect_time" not in config.keys() :
+            config["agree_collect_time"] = "2022-09-25"
 
     except Exception :
         logger.error(format_exc())
