@@ -2,6 +2,7 @@ import requests
 import json
 import time
 from traceback import format_exc
+import utils.enctry
 
 
 # 发送http请求
@@ -42,9 +43,13 @@ def post(url, body, logger, headers=None, timeout=5) :
 def loginDangoOCR(object) :
 
     url = object.yaml["dict_info"]["ocr_login"]
+
+    psw = str(object.yaml["password"])
+    if psw.find('%6?u!') != -1:
+        psw = utils.enctry.dectry(psw)
     body = {
         "User": object.yaml["user"],
-        "Password": object.yaml["password"],
+        "Password": psw,
     }
 
     for x in range(3) :
