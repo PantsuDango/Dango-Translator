@@ -3,7 +3,6 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from traceback import format_exc
-from selenium import webdriver
 import qtawesome
 import webbrowser
 import base64
@@ -153,7 +152,7 @@ class Settin(QMainWindow) :
                                      "QSpinBox { background: rgba(255, 255, 255, 0.3); }"
                                      "QFontComboBox { background: rgba(255, 255, 255, 0.3); }"
                                      "QDoubleSpinBox { background: rgba(255, 255, 255, 0.3); }"
-                                      %(67*self.rate, BG_IMAGE_PATH, self.color_2, 6.66*self.rate, self.color_2,
+                                      %(70*self.rate, BG_IMAGE_PATH, self.color_2, 6.66*self.rate, self.color_2,
                                        self.color_2, 8.66*self.rate, 4*self.rate, 13.33*self.rate, 13.33*self.rate,
                                        33.33*self.rate, 33.33*self.rate, -13.33*self.rate, -13.33*self.rate,
                                        -13.33*self.rate, -13.33*self.rate, 8.66*self.rate, 4*self.rate,
@@ -202,7 +201,7 @@ class Settin(QMainWindow) :
 
         # 竖向分割线
         label = QLabel(self.tab_1)
-        self.customSetGeometry(label, 0, 0, 1, 400)
+        self.customSetGeometry(label, 0, 0, 1, 420)
         label.setFrameShadow(QFrame.Raised)
         label.setFrameShape(QFrame.Box)
         label.setStyleSheet("border-width: 1px; border-style: solid; border-color: rgba(62, 62, 62, 0.1);")
@@ -566,7 +565,7 @@ class Settin(QMainWindow) :
 
         # 竖向分割线
         label = QLabel(self.tab_2)
-        self.customSetGeometry(label, 0, 0, 1, 400)
+        self.customSetGeometry(label, 0, 0, 1, 420)
         label.setFrameShadow(QFrame.Raised)
         label.setFrameShape(QFrame.Box)
         label.setStyleSheet("border-width: 1px; border-style: solid; border-color: rgba(62, 62, 62, 0.1);")
@@ -962,7 +961,7 @@ class Settin(QMainWindow) :
 
         # 竖向分割线
         label = QLabel(self.tab_3)
-        self.customSetGeometry(label, 0, 0, 1, 400)
+        self.customSetGeometry(label, 0, 0, 1, 420)
         label.setFrameShadow(QFrame.Raised)
         label.setFrameShape(QFrame.Box)
         label.setStyleSheet("border-width: 1px; border-style: solid; border-color: rgba(62, 62, 62, 0.1);")
@@ -1103,7 +1102,7 @@ class Settin(QMainWindow) :
 
         # 竖向分割线
         label = QLabel(self.tab_4)
-        self.customSetGeometry(label, 0, 0, 1, 400)
+        self.customSetGeometry(label, 0, 0, 1, 420)
         label.setFrameShadow(QFrame.Raised)
         label.setFrameShape(QFrame.Box)
         label.setStyleSheet("border-width: 1px; border-style: solid; border-color: rgba(62, 62, 62, 0.1);")
@@ -1327,7 +1326,7 @@ class Settin(QMainWindow) :
 
         # 分割线
         label = QLabel(self.tab_5)
-        self.customSetGeometry(label, 0, 0, 1, 400)
+        self.customSetGeometry(label, 0, 0, 1, 420)
         label.setFrameShadow(QFrame.Raised)
         label.setFrameShape(QFrame.Box)
         label.setStyleSheet("border-width: 1px; border-style: solid; border-color: rgba(62, 62, 62, 0.2);")
@@ -1478,7 +1477,7 @@ class Settin(QMainWindow) :
 
         # 分割线
         label = QLabel(self.tab_6)
-        self.customSetGeometry(label, 0, 0, 1, 400)
+        self.customSetGeometry(label, 0, 0, 1, 420)
         label.setFrameShadow(QFrame.Raised)
         label.setFrameShape(QFrame.Box)
         label.setStyleSheet("border-width: 1px; border-style: solid; border-color: rgba(62, 62, 62, 0.2);")
