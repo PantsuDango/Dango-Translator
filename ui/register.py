@@ -13,13 +13,10 @@ import utils.email
 import utils.message
 import utils.http
 import utils.thread
+import ui.static.icon
 
 
-LOGO_PATH = "./config/icon/logo.ico"
-PIXMAP_PATH = "./config/icon/pixmap.png"
 BG_IMAGE_PATH = "./config/background/register.gif"
-PIXMAP2_PATH = "./config/icon/pixmap2.png"
-EDIT_PATH = "./config/icon/edit.png"
 
 
 # 注册界面
@@ -41,36 +38,10 @@ class Register(QWidget) :
         self.setMinimumSize(QSize(self.window_width, self.window_height))
         self.setMaximumSize(QSize(self.window_width, self.window_height))
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowCloseButtonHint)
-
         # 窗口图标
-        self.icon = QIcon()
-        self.icon.addPixmap(QPixmap(LOGO_PATH), QIcon.Normal, QIcon.On)
-        self.setWindowIcon(self.icon)
-
+        self.setWindowIcon(ui.static.icon.APP_LOGO_ICON)
         # 鼠标样式
-        pixmap = QPixmap(PIXMAP_PATH)
-        pixmap = pixmap.scaled(int(20*self.rate),
-                               int(20*self.rate),
-                               Qt.KeepAspectRatio,
-                               Qt.SmoothTransformation)
-        cursor = QCursor(pixmap, 0, 0)
-        self.setCursor(cursor)
-
-        # 鼠标选中状态图标
-        select_pixmap = QPixmap(PIXMAP2_PATH)
-        select_pixmap = select_pixmap.scaled(int(20 * self.rate),
-                                             int(20 * self.rate),
-                                             Qt.KeepAspectRatio,
-                                             Qt.SmoothTransformation)
-        select_pixmap = QCursor(select_pixmap, 0, 0)
-
-        # 鼠标编辑状态图标
-        edit_pixmap = QPixmap(EDIT_PATH)
-        edit_pixmap = edit_pixmap.scaled(int(20*self.rate),
-                                         int(25*self.rate),
-                                         Qt.KeepAspectRatio,
-                                         Qt.SmoothTransformation)
-        edit_pixmap = QCursor(edit_pixmap, 0, 0)
+        self.setCursor(ui.static.icon.PIXMAP_CURSOR)
 
         # 设置字体
         font = QFont()
@@ -86,7 +57,8 @@ class Register(QWidget) :
                                        "font-weight: bold;"
                                        "border-bottom: 2px solid %s; }"
                            "QTextEdit:focus { border-bottom: 2px dashed %s; }"
-                           %(self.color, self.color, self.color))
+                           "QLabel { color: %s;}"
+                           %(self.color, self.color, self.color, self.color))
 
         # 背景图
         label = QLabel(self)
@@ -102,41 +74,53 @@ class Register(QWidget) :
         label.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
 
         # 账号输入框
+        label = QLabel(self)
+        self.customSetGeometry(label, 30, 10, 50, 30)
+        label.setText("账号:")
         self.user_text = QLineEdit(self)
-        self.customSetGeometry(self.user_text, 30, 10, 300, 30)
-        self.user_text.setPlaceholderText("请输入账号:")
-        self.user_text.setCursor(edit_pixmap)
+        self.customSetGeometry(self.user_text, 75, 10, 255, 30)
+        self.user_text.setPlaceholderText("请输入账号")
+        self.user_text.setCursor(ui.static.icon.EDIT_CURSOR)
 
         # 密码输入框
+        label = QLabel(self)
+        self.customSetGeometry(label, 30, 50, 50, 30)
+        label.setText("密码:")
         self.password_text = QLineEdit(self)
-        self.customSetGeometry(self.password_text, 30, 50, 300, 30)
+        self.customSetGeometry(self.password_text, 75, 50, 255, 30)
         self.password_text.setEchoMode(QLineEdit.Password)
-        self.password_text.setCursor(edit_pixmap)
+        self.password_text.setCursor(ui.static.icon.EDIT_CURSOR)
 
         # 是否显示密码
         self.eye_button = QPushButton(qtawesome.icon("fa.eye-slash", color=self.color), "", self)
         self.customSetIconSize(self.eye_button, 25, 25)
         self.customSetGeometry(self.eye_button, 305, 50, 30, 30)
         self.eye_button.setStyleSheet("background: transparent;")
-        self.eye_button.setCursor(select_pixmap)
+        self.eye_button.setCursor(ui.static.icon.SELECT_CURSOR)
         self.eye_button.clicked.connect(self.clickEyeButton)
 
         # 邮箱输入框
+        label = QLabel(self)
+        self.customSetGeometry(label, 30, 90, 50, 30)
+        label.setText("邮箱:")
         self.email_text = QLineEdit(self)
-        self.customSetGeometry(self.email_text, 30, 90, 300, 30)
-        self.email_text.setPlaceholderText("请输入绑定的邮箱:")
-        self.email_text.setCursor(edit_pixmap)
+        self.customSetGeometry(self.email_text, 75, 90, 255, 30)
+        self.email_text.setPlaceholderText("请输入绑定的邮箱")
+        self.email_text.setCursor(ui.static.icon.EDIT_CURSOR)
 
         # 验证码输入框
+        label = QLabel(self)
+        self.customSetGeometry(label, 15, 130, 50, 30)
+        label.setText("验证码:")
         self.code_key_text = QLineEdit(self)
-        self.customSetGeometry(self.code_key_text, 30, 130, 300, 30)
-        self.code_key_text.setPlaceholderText("请输入邮箱验证码:")
-        self.code_key_text.setCursor(edit_pixmap)
+        self.customSetGeometry(self.code_key_text, 75, 130, 255, 30)
+        self.code_key_text.setPlaceholderText("请输入邮箱验证码")
+        self.code_key_text.setCursor(ui.static.icon.EDIT_CURSOR)
 
         # 获取验证码按钮
         self.send_email_button = QPushButton(self)
         self.customSetGeometry(self.send_email_button, 205, 125, 125, 25)
-        self.send_email_button.setCursor(select_pixmap)
+        self.send_email_button.setCursor(ui.static.icon.SELECT_CURSOR)
         self.send_email_button.setText("获取验证码")
         self.send_email_button.setStyleSheet("background: rgba(255, 255, 255, 0.5); color: %s"%(self.color))
         self.send_email_button.clicked.connect(self.sendEmail)
@@ -144,7 +128,7 @@ class Register(QWidget) :
         # 确定注册按钮
         self.sure_button = QPushButton(self)
         self.customSetGeometry(self.sure_button, 140, 175, 80, 35)
-        self.sure_button.setCursor(select_pixmap)
+        self.sure_button.setCursor(ui.static.icon.SELECT_CURSOR)
         self.sure_button.setText("确定")
         self.sure_button.setStyleSheet("background: rgba(255, 255, 255, 0.5);"
                                            "color: %s;"
@@ -207,7 +191,7 @@ class Register(QWidget) :
 
         self.window_type = "register"
         self.setWindowTitle("注册账号")
-        self.password_text.setPlaceholderText("请输入密码:")
+        self.password_text.setPlaceholderText("请输入密码")
 
         self.user_text.clear()
         self.user_text.setEnabled(True)
@@ -241,7 +225,7 @@ class Register(QWidget) :
         self.user_text.setText(user)
         self.user_text.setEnabled(False)
         self.password_text.clear()
-        self.password_text.setPlaceholderText("请输入新密码:")
+        self.password_text.setPlaceholderText("请输入新密码")
         self.email_text.setText(email)
         self.email_text.setEnabled(False)
         self.code_key_text.clear()

@@ -23,6 +23,9 @@ def openConfig(logger) :
         # 2022.03.08 修改参数
         if "dict_info_url" in config.keys():
             config["dict_info_url"] = "https://dango.c4a15wh.cn/DangoTranslate/ShowDict"
+        # 2022.09.26 添加新参数
+        if "agree_collect_time" not in config.keys() :
+            config["agree_collect_time"] = "2022-09-25"
 
     except Exception :
         logger.error(format_exc())
@@ -225,6 +228,10 @@ def configConvert(object) :
     object.config["hideRangeHotkeyValue2"] = object.config.get("hideRangeHotkeyValue2", "x")
     # 隐藏范围快捷键开关
     object.config["showHotKey3"] = object.config.get("showHotKey3", False)
+    # 是否全屏下置顶开关
+    object.config["setTop"] =  object.config.get("setTop", False)
+    # 是否同步翻译历史开关
+    object.config["agreeCollectUse"] = object.config.get("agreeCollectUse", True)
 
 
 # 保存配置至服务器

@@ -166,21 +166,21 @@ class TranslaterProcess(QThread) :
             if self.object.translation_ui.webdriver1.open_sign :
                 result = self.object.translation_ui.webdriver1.translater(self.object.translation_ui.original)
             else :
-                result = "%s翻译: 我抽风啦"%self.object.translation_ui.webdriver1.translater_map[self.object.translation_ui.webdriver1.web_type]
+                result = "%s翻译: 我抽风啦, 请尝试重新翻译! 如果频繁出现, 建议直接注册使用私人翻译"%self.object.translation_ui.webdriver1.translater_map[self.object.translation_ui.webdriver1.web_type]
 
         # 公共翻译二
         elif self.trans_type == "webdriver_2" :
             if self.object.translation_ui.webdriver2.open_sign :
                 result = self.object.translation_ui.webdriver2.translater(self.object.translation_ui.original)
             else :
-                result = "%s翻译: 我抽风啦"%self.object.translation_ui.webdriver2.translater_map[self.object.translation_ui.webdriver2.web_type]
+                result = "%s翻译: 我抽风啦, 请尝试重新翻译! 如果频繁出现, 建议直接注册使用私人翻译"%self.object.translation_ui.webdriver2.translater_map[self.object.translation_ui.webdriver2.web_type]
 
         # 公共翻译三
         elif self.trans_type == "webdriver_3":
             if self.object.translation_ui.webdriver3.open_sign :
                 result = self.object.translation_ui.webdriver3.translater(self.object.translation_ui.original)
             else:
-                result = "%s翻译: 我抽风啦" % self.object.translation_ui.webdriver3.translater_map[self.object.translation_ui.webdriver3.web_type]
+                result = "%s翻译: 我抽风啦, 请尝试重新翻译! 如果频繁出现, 建议直接注册使用私人翻译" % self.object.translation_ui.webdriver3.translater_map[self.object.translation_ui.webdriver3.web_type]
 
         # 私人百度
         elif self.trans_type == "baidu_private" :
@@ -204,7 +204,7 @@ class TranslaterProcess(QThread) :
 
         # 根据屏蔽词过滤
         for val in self.object.config["Filter"]:
-            if not val[0] :
+            if not val[0]:
                 continue
             result = result.replace(val[0], val[1])
 
@@ -224,7 +224,6 @@ class TranslaterProcess(QThread) :
                 else :
                     self.drawRectTD(ocr_result, result)
             except Exception :
-                print_exc()
                 self.logger.error(format_exc())
 
 
@@ -343,15 +342,23 @@ class Translater(QThread) :
         # 百度OCR
         if self.object.config["baiduOCR"] :
             ocr_sign, original = translator.ocr.baidu.baiduOCR(self.object.config, self.logger)
+            # 如果网络出错重试一次
+            if original == "百度OCR错误: 请打开[网络和Internet设置]的[代理]页面, 将其中的全部代理设置开关都关掉, 保证关闭后请重试" :
+                ocr_sign, original = translator.ocr.baidu.baiduOCR(self.object.config, self.logger)
+
         # 团子OCR
         elif self.object.config["onlineOCR"] :
             ocr_sign, original = translator.ocr.dango.dangoOCR(self.object)
+            # 如果网络出错重试一次
+            if original == "在线OCR错误: 网络超时, 请尝试在[设置]-[OCR设定]-[在线OCR]右侧切换延迟最低的节点, 切换后重试翻译":
+                ocr_sign, original = translator.ocr.dango.dangoOCR(self.object)
+
         # 本地OCR
         elif self.object.config["offlineOCR"] :
             ocr_sign, original = translator.ocr.dango.offlineOCR(self.object)
 
         else :
-            original = "OCR错误: 未开启任何OCR, 请在[设置]-[OCR设定]内开启一种OCR, 不同OCR的区别请点击每种OCR对应的说明按钮了解"
+            original = "OCR错误: 未开启任何OCR, 请在[设置]-[OCR设定]内开启一种OCR, 不同OCR的区别请点击每种OCR对应的说明按钮"
             ocr_sign = False
 
         # 记录OCR耗时
@@ -367,6 +374,12 @@ class Translater(QThread) :
         # 如果检测不到文字则跳过
         if not original :
             return
+
+        # 根据屏蔽词过滤
+        for val in self.object.config["Filter"]:
+            if not val[0]:
+                continue
+            original = original.replace(val[0], val[1])
 
         # 自动模式下文字和上一次一样则跳过
         if self.object.translation_ui.translate_mode and original == self.object.translation_ui.original :
@@ -421,7 +434,7 @@ class Translater(QThread) :
         # 显示原文
         if self.object.config["showOriginal"] == "True" or not nothing_sign :
             if not nothing_sign :
-                self.object.translation_ui.original += "\n\n未开启任何翻译源, 无法翻译, 请在[设置]-[翻译设定]内开启至少一种翻译源, 不同翻译源的区别请点击每种翻译源对应的说明按钮了解"
+                self.object.translation_ui.original += "\n\n未开启任何翻译源, 无法翻译, 请在[设置]-[翻译设定]内开启至少一种翻译源, 不同翻译源的区别请点击每种翻译源对应的说明按钮"
             utils.thread.createThread(self.creatTranslaterThread, "original")
 
 

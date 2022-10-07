@@ -8,14 +8,9 @@ import re
 import utils.message
 import utils.http
 import utils.config
-import utils.lock
-
-
-LOGO_PATH = "./config/icon/logo.ico"
-PIXMAP_PATH = "./config/icon/pixmap.png"
-BACKGROUND_PATH = "./config/background/login.png"
-PIXMAP2_PATH = "./config/icon/pixmap2.png"
-EDIT_PATH = "./config/icon/edit.png"
+import utils.enctry
+import ui.static.icon
+import ui.static.background
 
 
 # 登录界面
@@ -38,38 +33,10 @@ class Login(QWidget) :
         # 窗口无标题栏、窗口置顶、窗口透明
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
-
         # 窗口图标
-        icon = QIcon()
-        icon.addPixmap(QPixmap(LOGO_PATH), QIcon.Normal, QIcon.On)
-        self.setWindowIcon(icon)
-
-        # 鼠标样式, 光标长宽比1.133333
-        pixmap = QPixmap(PIXMAP_PATH)
-        pixmap = pixmap.scaled(int(20*self.rate),
-                               int(20*self.rate),
-                               Qt.KeepAspectRatio,
-                               Qt.SmoothTransformation)
-        cursor = QCursor(pixmap, 0, 0)
-        self.setCursor(cursor)
-
-        # 鼠标选中状态图标
-        select_pixmap = QPixmap(PIXMAP2_PATH)
-        select_pixmap = select_pixmap.scaled(int(20*self.rate),
-                                             int(20*self.rate),
-                                             Qt.KeepAspectRatio,
-                                             Qt.SmoothTransformation)
-        select_pixmap = QCursor(select_pixmap, 0, 0)
-
-        # 鼠标编辑状态图标
-        edit_pixmap = QPixmap(EDIT_PATH)
-        edit_pixmap = edit_pixmap.scaled(int(20*self.rate),
-                                         int(25*self.rate),
-                                         Qt.KeepAspectRatio,
-                                         Qt.SmoothTransformation)
-        edit_pixmap = QCursor(edit_pixmap, 0, 0)
-
-
+        self.setWindowIcon(ui.static.icon.APP_LOGO_ICON)
+        # 鼠标样式
+        self.setCursor(ui.static.icon.PIXMAP_CURSOR)
         # 设置字体
         font = QFont()
         font.setFamily(self.font_type)
@@ -89,7 +56,7 @@ class Login(QWidget) :
         # 背景图片, 长宽比: 1.39
         label = QLabel(self)
         self.customSetGeometry(label, 0, 0, 400, 566)
-        label.setStyleSheet("border-image: url(%s);"%BACKGROUND_PATH)
+        label.setPixmap(ui.static.icon.createPixmap(ui.static.background.LOGIN, 400, 566))
 
         # 版本号
         label = QLabel(self)
@@ -110,7 +77,7 @@ class Login(QWidget) :
         # Logo
         label = QLabel(self)
         self.customSetGeometry(label, 80, 365, 35, 35)
-        label.setStyleSheet("border-image: url(%s);"%LOGO_PATH)
+        label.setPixmap(ui.static.icon.createPixmap(ui.static.icon.APP_LOGO, 30, 30))
 
         # 标题
         label = QLabel(self)
@@ -119,14 +86,14 @@ class Login(QWidget) :
         label.setStyleSheet("color: %s;"
                             "background: transparent;"
                             "font: 20pt %s;"
-                            "font-weight:bold;" % (self.color, self.font_type))
+                            "font-weight:bold;"%(self.color, self.font_type))
 
         # 最小化按钮
         button = QPushButton(qtawesome.icon("fa.minus", color=self.color), "", self)
         self.customSetIconSize(button, 20, 20)
         self.customSetGeometry(button, 345, 360, 20, 20)
         button.setStyleSheet("background: transparent;")
-        button.setCursor(select_pixmap)
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
         button.clicked.connect(self.showMinimized)
 
         # 退出按钮
@@ -134,7 +101,7 @@ class Login(QWidget) :
         self.customSetIconSize(button, 20, 20)
         self.customSetGeometry(button, 370, 360, 20, 20)
         button.setStyleSheet("background: transparent;")
-        button.setCursor(select_pixmap)
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
         button.clicked.connect(self.quit)
 
         # 账号输入框
@@ -142,7 +109,7 @@ class Login(QWidget) :
         self.customSetGeometry(self.user_text, 40, 410, 315, 30)
         self.user_text.setPlaceholderText("请输入账号:")
         self.user_text.setText(self.user)
-        self.user_text.setCursor(edit_pixmap)
+        self.user_text.setCursor(ui.static.icon.EDIT_CURSOR)
 
         # 密码输入框
         self.password_text = QLineEdit(self)
@@ -150,20 +117,20 @@ class Login(QWidget) :
         self.password_text.setPlaceholderText("请输入密码:")
         self.password_text.setEchoMode(QLineEdit.Password)
         self.password_text.setText(self.password)
-        self.password_text.setCursor(edit_pixmap)
+        self.password_text.setCursor(ui.static.icon.EDIT_CURSOR)
 
         # 是否显示密码
         self.eye_button = QPushButton(qtawesome.icon("fa.eye-slash", color=self.color), "", self)
         self.customSetIconSize(self.eye_button, 25, 25)
         self.customSetGeometry(self.eye_button, 330, 455, 30, 30)
         self.eye_button.setStyleSheet("background: transparent;")
-        self.eye_button.setCursor(select_pixmap)
+        self.eye_button.setCursor(ui.static.icon.SELECT_CURSOR)
         self.eye_button.clicked.connect(self.clickEyeButton)
 
         # 登录按钮
         self.login_button = QPushButton(self)
         self.customSetGeometry(self.login_button, 130, 495, 50, 35)
-        self.login_button.setCursor(select_pixmap)
+        self.login_button.setCursor(ui.static.icon.SELECT_CURSOR)
         self.login_button.setText("登录")
         self.login_button.setStyleSheet("background: transparent;"
                                         "color: %s;"
@@ -173,27 +140,27 @@ class Login(QWidget) :
         # 注册按钮
         self.register_button = QPushButton(self)
         self.customSetGeometry(self.register_button, 220, 495, 50, 35)
-        self.register_button.setCursor(select_pixmap)
+        self.register_button.setCursor(ui.static.icon.SELECT_CURSOR)
         self.register_button.setText("注册")
         self.register_button.setStyleSheet("background: transparent;"
                                            "color: %s;"
                                            "font: 15pt %s;"
-                                           % (self.color, self.font_type))
+                                           %(self.color, self.font_type))
 
         # 忘记密码按钮
         self.forget_password_button = QPushButton(self)
         self.customSetGeometry(self.forget_password_button, 305, 490, 60, 15)
-        self.forget_password_button.setCursor(select_pixmap)
+        self.forget_password_button.setCursor(ui.static.icon.SELECT_CURSOR)
         self.forget_password_button.setText("忘记密码")
         self.forget_password_button.setStyleSheet("background: transparent;"
                                                   "color: %s;"
                                                   "font: 8pt %s;"
-                                                  % (self.color, self.font_type))
+                                                  %(self.color, self.font_type))
 
         # 版本号
         label = QLabel(self)
         self.customSetGeometry(label, 20, 540, 380, 15)
-        label.setText("版本号: %s  更新时间: 2022-05-01  By: 胖次团子"%self.object.yaml["version"])
+        label.setText("版本号: %s  更新时间: 2022-09-28  By: 胖次团子"%self.object.yaml["version"])
         label.setStyleSheet("color: %s;"
                             "background: transparent;"
                             "font-weight:bold;"
@@ -217,7 +184,11 @@ class Login(QWidget) :
         # 用户名
         self.user = str(self.object.yaml["user"])
         # 密码
-        self.password = str(self.object.yaml["password"])
+        psw = str(self.object.yaml["password"])
+        if psw.find('%6?u!') != -1:
+            self.password = utils.enctry.dectry(psw)
+        else:
+            self.password = psw
 
 
     # 根据分辨率定义控件位置尺寸
@@ -324,7 +295,7 @@ class Login(QWidget) :
         elif result == "OK":
             # 保存配置
             self.object.yaml["user"] = self.user
-            self.object.yaml["password"] = self.password
+            self.object.yaml["password"] = utils.enctry.enctry(self.password)
             utils.config.saveConfig(self.object.yaml, self.logger)
             return True
 

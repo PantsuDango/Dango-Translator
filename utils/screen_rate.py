@@ -25,14 +25,16 @@ def getScreenSize() :
     return w, h
 
 
-def getScreenRate(logger) :
+# 计算屏幕缩放比例
+def getScreenRate(logger=None) :
 
     try :
         real_resolution = getRealResolution()
         screen_size = getScreenSize()
         screen_scale_rate = round(real_resolution[0] / screen_size[0], 2)
     except Exception :
-        logger.error(format_exc())
+        if logger :
+            logger.error(format_exc())
         screen_scale_rate = 1.0
 
 

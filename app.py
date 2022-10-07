@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from traceback import format_exc
 import sys
 import os
@@ -14,6 +15,7 @@ import utils.email
 import utils.message
 import utils.port
 import utils.update
+import utils.hwnd
 
 import ui.login
 import ui.register
@@ -21,9 +23,11 @@ import ui.translation
 import ui.filter
 import ui.range
 import ui.settin
+import ui.static.icon
 
 import translator.update_chrome_driver
 import translator.update_edge_driver
+import translator.upload_trans_file
 
 
 class DangoTranslator() :
@@ -36,7 +40,7 @@ class DangoTranslator() :
         # 本地配置
         self.yaml = utils.config.openConfig(self.logger)
         # 版本号
-        self.yaml["version"] = "4.2.4"
+        self.yaml["version"] = "4.3.1"
         # 配置中心
         self.yaml["dict_info"] = utils.config.getDictInfo(self.yaml["dict_info_url"], self.logger)
         # 屏幕分辨率
@@ -82,6 +86,14 @@ class DangoTranslator() :
 
         # 自动启动本地OCR
         utils.thread.createThread(self.autoOpenOfflineOCR)
+        # 界面置顶
+        self.hwndObj = utils.hwnd.WindowHwnd(self)
+        if self.settin_ui.set_top_use :
+            self.hwndObj.run()
+
+        # 同步翻译历史
+        if self.config["agreeCollectUse"]:
+            utils.thread.createThread(translator.upload_trans_file.proccess(self))
 
 
     # 按下充电键后做的事情
@@ -96,6 +108,14 @@ class DangoTranslator() :
 
     # 按下设置键后做的事情
     def clickSettin(self) :
+
+        # 直接跳转到正在使用的ocr页签
+        if self.settin_ui.online_ocr_use :
+            self.settin_ui.ocr_tab_widget.setCurrentIndex(0)
+        elif self.settin_ui.offline_ocr_use :
+            self.settin_ui.ocr_tab_widget.setCurrentIndex(1)
+        elif self.settin_ui.baidu_ocr_use :
+            self.settin_ui.ocr_tab_widget.setCurrentIndex(2)
 
         self.translation_ui.unregisterHotKey()
         self.translation_ui.close()
@@ -124,26 +144,18 @@ class DangoTranslator() :
         # 更新Edge浏览器引擎文件
         utils.thread.createThread(translator.update_edge_driver.updateEdgeDriver, self.logger)
 
-        # 更新icon文件
-        utils.update.updateIcon(self.yaml, self.logger)
         # 更新ocr源码文件
         ocr_src_file = self.yaml["dict_info"]["ocr_src_file"]
         utils.update.updateOCRSrcFile(ocr_src_file, self.logger)
-        # 加载QQ群图片
-        qq_group_url = self.yaml["dict_info"]["dango_qq_group"]
-        utils.http.downloadFile(qq_group_url, "./config/other/交流群.png", self.logger)
         # 加载注册界面图片
         qq_group_url = self.yaml["dict_info"]["register_image_url"]
-        utils.http.downloadFile(qq_group_url, "./config/other/register.gif", self.logger)
-        # 加载登录界面图片
-        login_image_url = self.yaml["dict_info"]["login_image_url"]
-        utils.http.downloadFile(login_image_url, "./config/background/login.png", self.logger)
+        utils.http.downloadFile(qq_group_url, "./config/background/register.gif", self.logger)
         # 加载设置界面图片
         settin_image_url = self.yaml["dict_info"]["settin_image_url"]
         utils.http.downloadFile(settin_image_url, "./config/background/settin.jpg", self.logger)
-        # 加载屏蔽词界面图片
-        settin_image_url = self.yaml["dict_info"]["settin_desc_image_url"]
-        utils.http.downloadFile(settin_image_url, "./config/background/settin-desc.jpg", self.logger)
+        # 加载测试ocr图片
+        test_image_url = self.yaml["dict_info"]["test_image"]
+        utils.http.downloadFile(test_image_url, "./config/other/image.jpg", self.logger)
 
 
     # 主函数
@@ -158,6 +170,8 @@ class DangoTranslator() :
         # 连接配置中心
         if not self.yaml["dict_info"] :
             utils.message.serverClientFailMessage(self)
+        # 加载静态资源
+        ui.static.icon.initIcon(self.yaml["screen_scale_rate"])
         # 检查是否为测试版本
         utils.message.checkIsTestVersion(self)
         # 检查字体

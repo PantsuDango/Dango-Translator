@@ -1,9 +1,12 @@
+import requests
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from traceback import format_exc
+from selenium import webdriver
 import qtawesome
 import webbrowser
+import base64
 import os
 import re
 
@@ -13,40 +16,21 @@ import utils.message
 import utils.port
 import utils.test
 import utils.http
+import utils.offline_ocr
 
 from ui import image
+import ui.static.icon
+import ui.static.background
 import ui.hotkey
 import ui.switch
 import ui.desc
 import ui.key
-
+import ui.progress_bar
 import translator.ocr.baidu
+import translator.all
 
 
-LOGO_ICON_PATH = "./config/icon/logo.ico"
-PIXMAP_ICON_PATH = "./config/icon/pixmap.png"
-PIXMAP2_PATH = "./config/icon/pixmap2.png"
-QUESTION_PATH = "./config/icon/question.png"
-OCR_ICON_PATH = "./config/icon/ocr.png"
-ABOUT_ICON_PATH = "./config/icon/about.png"
-STYPE_ICON_PATH = "./config/icon/stype.png"
-TRANSLATE_ICON_PATH = "./config/icon/translate.png"
-GOOD_ICON_PATH = "./config/icon/good.png"
-HOLLOW_IMG_PATH = "./config/other/描边.png"
-SOLID_IMG_PATH = "./config/other/实心.png"
 BG_IMAGE_PATH = "./config/background/settin.jpg"
-QQ_GROUP_PATH = "./config/other/交流群.png"
-GITHUB_ICON_PATH = "./config/icon/github.png"
-TUTORIAL_ICON_PATH = "./config/icon/tutorial.png"
-BILIBILI_ICON_PATH = "./config/icon/bilibili.png"
-GROUP_PATH = "./config/icon/group.png"
-BILIBILI_VIDEO_PATH = "./config/icon/video.png"
-BLOG_PATH = "./config/icon/blog.png"
-HOME_ICON_PATH = "./config/icon/home.png"
-SLIDER_ICON_PATH = "./config/icon/slider.png"
-FUNCTION_ICON_PATH = "./config/icon/function.png"
-OPEN_STATUSBAR_IMG_PATH = "./config/other/显示消息栏.png"
-CLOSE_STATUSBAR_IMG_PATH = "./config/other/屏蔽消息栏.png"
 
 
 # 重构QTabWidget使其竖直选项卡文字水平
@@ -103,8 +87,10 @@ class Settin(QMainWindow) :
         self.getInitConfig()
         self.ui()
 
-        # 初始化密钥界面
+        # 初始化界面
         self.key_ui = ui.key.Key(self.object)
+        self.desc_ui = ui.desc.Desc(self.object)
+        self.hotkey_ui = ui.hotkey.HotKey(self.object)
 
 
     def ui(self):
@@ -115,39 +101,12 @@ class Settin(QMainWindow) :
         self.setMaximumSize(QSize(self.window_width, self.window_height))
         # 窗口置顶及关闭窗口最小化最大化
         self.setWindowFlags(Qt.WindowCloseButtonHint)
-
         # 窗口标题
         self.setWindowTitle("团子翻译器 Ver%s - 设置"%self.object.yaml["version"])
-
         # 窗口图标
-        icon = QIcon()
-        icon.addPixmap(QPixmap(LOGO_ICON_PATH), QIcon.Normal, QIcon.On)
-        self.setWindowIcon(icon)
-
+        self.setWindowIcon(ui.static.icon.APP_LOGO_ICON)
         # 鼠标样式
-        pixmap = QPixmap(PIXMAP_ICON_PATH)
-        pixmap = pixmap.scaled(int(20*self.rate),
-                               int(20*self.rate),
-                               Qt.KeepAspectRatio,
-                               Qt.SmoothTransformation)
-        cursor = QCursor(pixmap, 0, 0)
-        self.setCursor(cursor)
-
-        # 鼠标选中状态图标
-        self.select_pixmap = QPixmap(PIXMAP2_PATH)
-        self.select_pixmap = self.select_pixmap.scaled(int(20*self.rate),
-                                                       int(20*self.rate),
-                                                       Qt.KeepAspectRatio,
-                                                       Qt.SmoothTransformation)
-        self.select_pixmap = QCursor(self.select_pixmap, 0, 0)
-
-        # 鼠标问号图标
-        self.question_pixmap = QPixmap(QUESTION_PATH)
-        self.question_pixmap = self.question_pixmap.scaled(int(20 * self.rate),
-                                                       int(20 * self.rate),
-                                                       Qt.KeepAspectRatio,
-                                                       Qt.SmoothTransformation)
-        self.question_pixmap = QCursor(self.question_pixmap, 0, 0)
+        self.setCursor(ui.static.icon.PIXMAP_CURSOR)
 
         # 设置字体
         self.setStyleSheet("font: %spt '华康方圆体W7'; color: %s"
@@ -194,12 +153,11 @@ class Settin(QMainWindow) :
                                      "QSpinBox { background: rgba(255, 255, 255, 0.3); }"
                                      "QFontComboBox { background: rgba(255, 255, 255, 0.3); }"
                                      "QDoubleSpinBox { background: rgba(255, 255, 255, 0.3); }"
-                                      % (67*self.rate, BG_IMAGE_PATH, self.color_2, 6.66*self.rate, self.color_2,
+                                      %(67*self.rate, BG_IMAGE_PATH, self.color_2, 6.66*self.rate, self.color_2,
                                        self.color_2, 8.66*self.rate, 4*self.rate, 13.33*self.rate, 13.33*self.rate,
                                        33.33*self.rate, 33.33*self.rate, -13.33*self.rate, -13.33*self.rate,
                                        -13.33*self.rate, -13.33*self.rate, 8.66*self.rate, 4*self.rate,
-                                       10*self.rate, self.color_2
-                                       ))
+                                       10*self.rate, self.color_2))
 
         # 选项卡
         self.setTabOne()
@@ -211,7 +169,7 @@ class Settin(QMainWindow) :
 
         # 背景图pixiv标签
         label = QLabel(self)
-        self.customSetGeometry(label, 630, 380, 200, 15)
+        self.customSetGeometry(label, 630, 400, 200, 15)
         label.setText("背景图 pixiv id: %s"%self.object.yaml["dict_info"]["bg_pixiv_id"])
         label.setStyleSheet("font-size: 9pt; color: %s"%self.color_2)
 
@@ -221,229 +179,306 @@ class Settin(QMainWindow) :
 
         # 选项卡界面
         self.tab_1 = QWidget()
-        self.customSetGeometry(self.tab_1, 0, 0, self.window_width, self.window_height)
         self.tab_widget.addTab(self.tab_1, "")
-        self.tab_widget.setTabText(self.tab_widget.indexOf(self.tab_1), "OCR设定")
+        self.tab_widget.setTabText(self.tab_widget.indexOf(self.tab_1), " 识别设定")
 
-        # 分割线
+        # 此Label用于雾化顶部工具栏的背景图
+        label = QLabel(self.tab_1)
+        label.setGeometry(QRect(0, 0, self.window_width, 35*self.rate))
+        label.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
+
+        # 选项卡图标
+        self.tab_widget.setTabIcon(self.tab_widget.indexOf(self.tab_1), ui.static.icon.OCR_ICON)
+
+        # 顶部工具栏
+        self.ocr_tab_widget = QTabWidget(self.tab_1)
+        self.ocr_tab_widget.setGeometry(QRect(0, 0, self.window_width, self.window_height))
+        self.ocr_tab_widget.setTabPosition(QTabWidget.North)
+        self.ocr_tab_widget.setStyleSheet("QTabBar:tab { min-height: %dpx; min-width: %dpx;"
+                                                        "background: rgba(255, 255, 255, 1);}"
+                                                        "QTabBar:tab:selected { background: rgba(62, 62, 62, 0.07); }"
+                                                        "QTabWidget::pane { border-image: none; }"
+                                                        %(35*self.rate, 120*self.rate))
+
+        # 竖向分割线
         label = QLabel(self.tab_1)
         self.customSetGeometry(label, 0, 0, 1, 400)
+        label.setFrameShadow(QFrame.Raised)
+        label.setFrameShape(QFrame.Box)
+        label.setStyleSheet("border-width: 1px; border-style: solid; border-color: rgba(62, 62, 62, 0.1);")
+
+        # 在线OCR页签
+        online_OCR_tab = QWidget()
+        self.ocr_tab_widget.addTab(online_OCR_tab, "")
+        self.ocr_tab_widget.setTabText(self.ocr_tab_widget.indexOf(online_OCR_tab), "在线OCR")
+
+        # 在线OCR页签图标
+        self.ocr_tab_widget.setTabIcon(self.ocr_tab_widget.indexOf(online_OCR_tab), ui.static.icon.ONLINE_OCR_ICON)
+
+        # 横向分割线
+        label = QLabel(online_OCR_tab)
+        self.customSetGeometry(label, 0, 0, self.window_width, 1)
         label.setFrameShadow(QFrame.Raised)
         label.setFrameShape(QFrame.Box)
         label.setStyleSheet("border-width: 1px; "
                             "border-style: solid; "
                             "border-color: rgba(62, 62, 62, 0.2);")
 
-        # 选项卡图标
-        icon = QIcon()
-        pixmap = QPixmap(OCR_ICON_PATH)
-        pixmap = pixmap.scaled(int(15*self.rate),
-                               int(15*self.rate),
-                               Qt.KeepAspectRatio,
-                               Qt.SmoothTransformation)
-        icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
-        self.tab_widget.setTabIcon(self.tab_widget.indexOf(self.tab_1), icon)
-
-        # 此Label用于雾化工具栏1的背景图
-        label = QLabel(self.tab_1)
-        label.setGeometry(QRect(0, -1, self.window_width+5, self.window_height+5))
+        # 此Label用于雾化在线OCR页签的背景图
+        label = QLabel(online_OCR_tab)
+        label.setGeometry(QRect(0, 0, self.window_width+5, self.window_height+5))
         label.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
 
-        # OCR说明
-        button = QPushButton(self.tab_1)
-        self.customSetGeometry(button, 400, 25, 65, 20)
-        button.setStyleSheet("color: %s;"
-                             "background: transparent;"%self.color_2)
-        button.setText("什么是OCR")
-        button.clicked.connect(lambda: self.showDesc("OCR"))
-        button.setCursor(self.question_pixmap)
+        # 本地OCR页签
+        offline_OCR_tab = QWidget()
+        self.ocr_tab_widget.addTab(offline_OCR_tab, "")
+        self.ocr_tab_widget.setTabText(self.ocr_tab_widget.indexOf(offline_OCR_tab), "本地OCR")
 
-        # OCR说明?号
-        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_1)
-        self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 465, 25, 20, 20)
-        button.setStyleSheet("background: transparent;")
-        button.clicked.connect(lambda: self.showDesc("OCR"))
-        button.setCursor(self.question_pixmap)
+        # 本地OCR页签图标
+        self.ocr_tab_widget.setTabIcon(self.ocr_tab_widget.indexOf(offline_OCR_tab), ui.static.icon.OFFLINE_OCR_ICON)
 
-        # 本地OCR标签
-        label = QLabel(self.tab_1)
-        self.customSetGeometry(label, 20, 25, 60, 20)
-        label.setText("本地OCR")
+        # 横向分割线
+        label = QLabel(offline_OCR_tab)
+        self.customSetGeometry(label, 0, 0, self.window_width, 1)
+        label.setFrameShadow(QFrame.Raised)
+        label.setFrameShape(QFrame.Box)
+        label.setStyleSheet("border-width: 1px; "
+                            "border-style: solid; "
+                            "border-color: rgba(62, 62, 62, 0.2);")
 
-        # 本地OCR说明按钮
-        button = QPushButton(self.tab_1)
-        self.customSetGeometry(button, 80, 25, 25, 20)
-        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;"%self.color_2)
-        button.setText("说明")
-        button.clicked.connect(lambda: self.showDesc("offlineOCR"))
-        button.setCursor(self.question_pixmap)
+        # 此Label用于本地OCR页签的背景图
+        label = QLabel(offline_OCR_tab)
+        label.setGeometry(QRect(0, 0, self.window_width+5, self.window_height+5))
+        label.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
 
-        # 本地OCR说明?号图标
-        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_1)
-        self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 105, 25, 20, 20)
-        button.setStyleSheet("background: transparent;")
-        button.clicked.connect(lambda: self.showDesc("offlineOCR"))
-        button.setCursor(self.question_pixmap)
+        # 百度OCR页签
+        baidu_OCR_tab = QWidget()
+        self.ocr_tab_widget.addTab(baidu_OCR_tab, "")
+        self.ocr_tab_widget.setTabText(self.ocr_tab_widget.indexOf(baidu_OCR_tab), "百度OCR")
 
-        # 本地OCR备注
-        label = QLabel(self.tab_1)
-        self.customSetGeometry(label, 145, 25, 300, 20)
-        label.setText("如果安装失败建议直接使用在线OCR")
-        label.setStyleSheet("color: %s" % self.color_2)
+        # 百度OCR页签图标
+        self.ocr_tab_widget.setTabIcon(self.ocr_tab_widget.indexOf(baidu_OCR_tab), ui.static.icon.BAIDU_OCR_ICON)
 
-        # 本地OCR状态开关
-        self.offline_ocr_switch = ui.switch.OfflineSwitch(self.tab_1, sign=self.offline_ocr_use, startX=(65-20)*self.rate, object=self.object)
-        self.customSetGeometry(self.offline_ocr_switch, 20, 60, 65, 20)
-        self.offline_ocr_switch.checkedChanged.connect(self.changeOfflineSwitch)
-        self.offline_ocr_switch.setCursor(self.select_pixmap)
+        # 横向分割线
+        label = QLabel(baidu_OCR_tab)
+        self.customSetGeometry(label, 0, 0, self.window_width, 1)
+        label.setFrameShadow(QFrame.Raised)
+        label.setFrameShape(QFrame.Box)
+        label.setStyleSheet("border-width: 1px; "
+                            "border-style: solid; "
+                            "border-color: rgba(62, 62, 62, 0.2);")
 
-        # 本地OCR运行按钮
-        button = QPushButton(self.tab_1)
-        self.customSetGeometry(button, 105, 60, 60, 20)
-        button.setText("运行")
-        button.clicked.connect(self.runOfflineOCR)
-        button.setCursor(self.select_pixmap)
+        # 此Label用于雾化百度OCR页签的背景图
+        label = QLabel(baidu_OCR_tab)
+        label.setGeometry(QRect(0, 0, self.window_width+5, self.window_height+5))
+        label.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
 
-        # 本地OCR测试按钮
-        button = QPushButton(self.tab_1)
-        self.customSetGeometry(button, 185, 60, 60, 20)
-        button.setText("测试")
-        button.clicked.connect(self.testOfflineOCR)
-        button.setCursor(self.select_pixmap)
-
-        # 本地OCR教程按钮
-        button = QPushButton(self.tab_1)
-        self.customSetGeometry(button, 265, 60, 60, 20)
-        button.setText("教程")
-        button.clicked.connect(self.openOfflineOCRTutorial)
-        button.setCursor(self.select_pixmap)
+        # OCR标签
+        self.ocr_label = QLabel(self.tab_1)
+        self.customSetGeometry(self.ocr_label, 370, 10, 300, 20)
+        if self.online_ocr_use :
+            self.ocr_label.setText("当前正在使用【在线OCR】")
+        elif self.offline_ocr_use :
+            self.ocr_label.setText("当前正在使用【本地OCR】")
+        elif self.baidu_ocr_use :
+            self.ocr_label.setText("当前正在使用【百度OCR】")
+        else :
+            self.ocr_label.setText("请选择开启一种OCR开关, 否则翻译将无法使用")
+        self.ocr_label.setStyleSheet("color: %s"%self.color_2)
 
         # 在线OCR标签
-        label = QLabel(self.tab_1)
-        self.customSetGeometry(label, 20, 120, 60, 20)
-        label.setText("在线OCR")
-
-        # 在线OCR说明按钮
-        button = QPushButton(self.tab_1)
-        self.customSetGeometry(button, 80, 120, 25, 20)
-        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;"%self.color_2)
-        button.setText("说明")
-        button.clicked.connect(lambda: self.showDesc("onlineOCR"))
-        button.setCursor(self.question_pixmap)
-
-        # 在线OCR说明?号图标
-        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_1)
-        self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 105, 120, 20, 20)
-        button.setStyleSheet("background: transparent;")
-        button.clicked.connect(lambda: self.showDesc("onlineOCR"))
-        button.setCursor(self.question_pixmap)
-
-        # 在线OCR备注
-        label = QLabel(self.tab_1)
-        self.customSetGeometry(label, 145, 120, 300, 20)
-        label.setText("精度高, 无限调用次数, 建议使用")
-        label.setStyleSheet("color: %s" % self.color_2)
-
-        # 在线OCR状态开关
-        self.online_ocr_switch = ui.switch.SwitchOCR(self.tab_1, self.online_ocr_use, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.online_ocr_switch, 20, 155, 65, 20)
-        self.online_ocr_switch.checkedChanged.connect(self.changeOnlineSwitch)
-        self.online_ocr_switch.setCursor(self.select_pixmap)
-
-        # 在线OCR购买按钮
-        button = QPushButton(self.tab_1)
-        self.customSetGeometry(button, 105, 155, 60, 20)
-        button.setText("购买")
-        button.clicked.connect(self.openDangoBuyPage)
-        button.setCursor(self.select_pixmap)
-
-        # 在线OCR测试按钮
-        button = QPushButton(self.tab_1)
-        self.customSetGeometry(button, 185, 155, 60, 20)
-        button.setText("测试")
-        button.clicked.connect(lambda: utils.test.testOnlineOCR(self.object))
-        button.setCursor(self.select_pixmap)
+        label = QLabel(online_OCR_tab)
+        self.customSetGeometry(label, 20, 20, 400, 20)
+        label.setText("需购买, 无限调用次数且识别精度高, 建议使用")
+        label.setStyleSheet("color: %s"%self.color_2)
 
         # 在线OCR教程按钮
-        button = QPushButton(self.tab_1)
-        self.customSetGeometry(button, 265, 155, 60, 20)
-        button.setText("教程")
+        button = QPushButton(online_OCR_tab)
+        self.customSetGeometry(button, 550, 20, 100, 20)
+        button.setText("详细教程")
         button.clicked.connect(self.openOnlineOCRTutorials)
-        button.setCursor(self.select_pixmap)
+        button.setCursor(ui.static.icon.QUESTION_CURSOR)
+
+        # 在线OCR状态开关
+        self.online_ocr_switch = ui.switch.SwitchOCR(online_OCR_tab, self.online_ocr_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.online_ocr_switch, 20, 70, 65, 20)
+        self.online_ocr_switch.checkedChanged.connect(self.changeOnlineSwitch)
+        self.online_ocr_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 在线OCR标签
+        label = QLabel(online_OCR_tab)
+        self.customSetGeometry(label, 105, 70, 400, 20)
+        label.setText("使用在线OCR, 使用前需先购买")
+
+        # 在线OCR购买按钮
+        button = QPushButton(online_OCR_tab)
+        self.customSetGeometry(button, 20, 120, 60, 20)
+        button.setText("购买")
+        button.clicked.connect(self.openDangoBuyPage)
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 在线OCR测试按钮
+        button = QPushButton(online_OCR_tab)
+        self.customSetGeometry(button, 100, 120, 60, 20)
+        button.setText("测试")
+        button.clicked.connect(lambda: utils.test.testOnlineOCR(self.object))
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 在线OCR标签
+        label = QLabel(online_OCR_tab)
+        self.customSetGeometry(label, 180, 120, 400, 20)
+        label.setText("购买在线OCR, 支持团子")
 
         # 节点下拉框
-        self.node_info_comboBox = QComboBox(self.tab_1)
-        self.customSetGeometry(self.node_info_comboBox, 345, 155, 150, 20)
+        self.node_info_comboBox = QComboBox(online_OCR_tab)
+        self.customSetGeometry(self.node_info_comboBox, 20, 170, 140, 20)
         self.node_info_comboBox.setStyleSheet("QComboBox{color: %s}"%self.color_2)
-        self.node_info_comboBox.setCursor(self.select_pixmap)
+        self.node_info_comboBox.setCursor(ui.static.icon.SELECT_CURSOR)
         # 获取节点信息
         utils.thread.createThread(self.getNodeInfo)
+        # 在线OCR刷新按钮
+        button = QPushButton(qtawesome.icon("fa.refresh", color=self.color_2), "", online_OCR_tab)
+        self.customSetIconSize(button, 20, 20)
+        self.customSetGeometry(button, 170, 170, 20, 20)
+        button.setStyleSheet("QPushButton { background: transparent;}"
+                             "QPushButton:hover { background-color: rgba(62, 62, 62, 0.2); }"
+                             "QPushButton:pressed { background-color: rgba(62, 62, 62, 0.4);"
+                             "padding-left: 3px; padding-top: 3px;}")
+        button.clicked.connect(lambda: utils.thread.createThread(self.getNodeInfo))
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 在线OCR标签
+        label = QLabel(online_OCR_tab)
+        self.customSetGeometry(label, 200, 170, 400, 20)
+        label.setText("翻译慢可以切换延迟低的节点")
+
+        # 在线OCR查额度按钮
+        button = QPushButton(online_OCR_tab)
+        self.customSetGeometry(button, 20, 220, 60, 20)
+        button.setText("查额度")
+        button.clicked.connect(lambda: self.showDesc("onlineOCRQueryQuota"))
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 在线OCR备注
+        label = QLabel(online_OCR_tab)
+        self.customSetGeometry(label, 100, 220, 400, 20)
+        label.setText("查询在线OCR有效期")
+
+        # 本地OCR标签
+        label = QLabel(offline_OCR_tab)
+        self.customSetGeometry(label, 20, 20, 400, 20)
+        label.setText("免费使用, 识别精度一般, 依赖自身电脑性能")
+        label.setStyleSheet("color: %s"%self.color_2)
+        # 本地OCR教程按钮
+        button = QPushButton(offline_OCR_tab)
+        self.customSetGeometry(button, 550, 20, 100, 20)
+        button.setText("详细教程")
+        button.clicked.connect(self.openOfflineOCRTutorial)
+        button.setCursor(ui.static.icon.QUESTION_CURSOR)
+
+        # 本地OCR状态开关
+        self.offline_ocr_switch = ui.switch.OfflineSwitch(offline_OCR_tab, sign=self.offline_ocr_use, startX=(65-20)*self.rate, object=self.object)
+        self.customSetGeometry(self.offline_ocr_switch, 20, 70, 65, 20)
+        self.offline_ocr_switch.checkedChanged.connect(self.changeOfflineSwitch)
+        self.offline_ocr_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 本地OCR标签
+        label = QLabel(offline_OCR_tab)
+        self.customSetGeometry(label, 105, 70, 400, 20)
+        label.setText("使用本地OCR, 使用前需先运行")
+
+        # 本地OCR运行按钮
+        button = QPushButton(offline_OCR_tab)
+        self.customSetGeometry(button, 20, 120, 60, 20)
+        button.setText("运行")
+        button.clicked.connect(self.runOfflineOCR)
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 本地OCR测试按钮
+        button = QPushButton(offline_OCR_tab)
+        self.customSetGeometry(button, 100, 120, 60, 20)
+        button.setText("测试")
+        button.clicked.connect(self.testOfflineOCR)
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 本地OCR备注
+        label = QLabel(offline_OCR_tab)
+        self.customSetGeometry(label, 180, 120, 400, 20)
+        label.setText("运行本地OCR, 使用过程中切勿关闭黑窗")
+
+        # 本地OCR安装按钮
+        button = QPushButton(offline_OCR_tab)
+        self.customSetGeometry(button, 20, 170, 60, 20)
+        button.setText("安装")
+        button.clicked.connect(lambda: utils.offline_ocr.install_offline_ocr(self.object))
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
+        self.progress_bar = ui.progress_bar.ProgressBar(self.object.yaml["screen_scale_rate"])
+        # 本地OCR卸载按钮
+        button = QPushButton(offline_OCR_tab)
+        self.customSetGeometry(button, 100, 170, 60, 20)
+        button.setText("卸载")
+        button.clicked.connect(lambda: utils.offline_ocr.whether_uninstall_offline_ocr(self.object))
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 本地OCR标签
+        label = QLabel(offline_OCR_tab)
+        self.customSetGeometry(label, 180, 170, 400, 20)
+        label.setText("首次使用请先安装, 不使用可卸载节省空间")
 
         # 百度OCR标签
-        label = QLabel(self.tab_1)
-        self.customSetGeometry(label, 20, 215, 60, 20)
-        label.setText("百度OCR")
-
-        # 百度OCR说明标签
-        button = QPushButton(self.tab_1)
-        self.customSetGeometry(button, 80, 215, 25, 20)
-        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;"%self.color_2)
-        button.setText("说明")
-        button.clicked.connect(lambda: self.showDesc("baiduOCR"))
-        button.setCursor(self.question_pixmap)
-
-        # 百度OCR说明?号图标
-        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_1)
-        self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 105, 215, 20, 20)
-        button.setStyleSheet("background: transparent;")
-        button.clicked.connect(lambda: self.showDesc("baiduOCR"))
-        button.setCursor(self.question_pixmap)
-
-        # 百度OCR备注
-        label = QLabel(self.tab_1)
-        self.customSetGeometry(label, 145, 215, 300, 20)
-        label.setText("老用户专用, 精度虽高但价格昂贵")
-        label.setStyleSheet("color: %s" % self.color_2)
+        label = QLabel(baidu_OCR_tab)
+        self.customSetGeometry(label, 20, 20, 400, 20)
+        label.setText("老用户专用, 精度虽高但价格昂贵, 新用户忽略")
+        label.setStyleSheet("color: %s"%self.color_2)
+        # 百度OCR教程按钮
+        button = QPushButton(baidu_OCR_tab)
+        self.customSetGeometry(button, 550, 20, 100, 20)
+        button.setText("详细教程")
+        button.clicked.connect(self.openBaiduOCRTutorials)
+        button.setCursor(ui.static.icon.QUESTION_CURSOR)
 
         # 百度OCR状态开关
-        self.baidu_ocr_switch = ui.switch.BaiduSwitchOCR(self.tab_1, self.baidu_ocr_use, startX=(65-20)*self.rate, object=self.object)
-        self.customSetGeometry(self.baidu_ocr_switch, 20, 250, 65, 20)
+        self.baidu_ocr_switch = ui.switch.BaiduSwitchOCR(baidu_OCR_tab, self.baidu_ocr_use, startX=(65-20)*self.rate, object=self.object)
+        self.customSetGeometry(self.baidu_ocr_switch, 20, 70, 65, 20)
         self.baidu_ocr_switch.checkedChanged.connect(self.changeBaiduSwitch)
-        self.baidu_ocr_switch.setCursor(self.select_pixmap)
+        self.baidu_ocr_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 百度OCR标签
+        label = QLabel(baidu_OCR_tab)
+        self.customSetGeometry(label, 105, 70, 400, 20)
+        label.setText("使用百度OCR, 使用前请确认是否有额度")
 
         # 百度OCR密钥按钮
-        button = QPushButton(self.tab_1)
-        self.customSetGeometry(button, 105, 250, 60, 20)
+        button = QPushButton(baidu_OCR_tab)
+        self.customSetGeometry(button, 20, 120, 60, 20)
         button.setText("密钥")
         button.clicked.connect(lambda: self.showKey("baiduOCR"))
-        button.setCursor(self.select_pixmap)
-
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
         # 百度OCR测试按钮
-        button = QPushButton(self.tab_1)
-        self.customSetGeometry(button, 185, 250, 60, 20)
+        button = QPushButton(baidu_OCR_tab)
+        self.customSetGeometry(button, 100, 120, 60, 20)
         button.setText("测试")
         button.clicked.connect(lambda: utils.test.testBaiduOCR(self.object))
-        button.setCursor(self.select_pixmap)
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 百度OCR备注
+        label = QLabel(baidu_OCR_tab)
+        self.customSetGeometry(label, 180, 120, 400, 20)
+        label.setText("使用前请填入有额度的密钥")
 
-        # 百度OCR教程按钮
-        button = QPushButton(self.tab_1)
-        self.customSetGeometry(button, 265, 250, 60, 20)
-        button.setText("教程")
-        button.clicked.connect(self.openBaiduOCRTutorials)
-        button.setCursor(self.select_pixmap)
+        # 百度OCR高精度模式开关
+        self.baidu_ocr_high_precision_switch = ui.switch.SwitchOCR(baidu_OCR_tab, self.baidu_ocr_high_precision_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.baidu_ocr_high_precision_switch, 20, 170, 65, 20)
+        self.baidu_ocr_high_precision_switch.checkedChanged.connect(self.changeBaiduOcrHighPrecisionSwitch)
+        self.baidu_ocr_high_precision_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 百度OCR高精度模式备注
+        label = QLabel(baidu_OCR_tab)
+        self.customSetGeometry(label, 105, 170, 300, 20)
+        label.setText("开启高精度模式, 开启前请确认额度")
 
-        # OCR识别语种标签
-        label = QLabel(self.tab_1)
-        self.customSetGeometry(label, 20, 310, 150, 20)
-        label.setText("选择要翻译的原语种:")
+        # 百度OCR密查额度按钮
+        button = QPushButton(baidu_OCR_tab)
+        self.customSetGeometry(button, 20, 220, 60, 20)
+        button.setText("查额度")
+        button.clicked.connect(self.openBaiduOCRQueryQuota)
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 百度OCR备注
+        label = QLabel(baidu_OCR_tab)
+        self.customSetGeometry(label, 100, 220, 400, 20)
+        label.setText("查询百度OCR密钥额度")
 
         # OCR识别语种comboBox
         self.language_comboBox = QComboBox(self.tab_1)
-        self.customSetGeometry(self.language_comboBox, 160, 310, 130, 20)
+        self.customSetGeometry(self.language_comboBox, 20, 310, 120, 20)
         self.language_comboBox.addItem("")
         self.language_comboBox.addItem("")
         self.language_comboBox.addItem("")
@@ -451,13 +486,56 @@ class Settin(QMainWindow) :
         self.language_comboBox.setItemText(1, "英语（English）")
         self.language_comboBox.setItemText(2, "韩语（Korean）")
         self.language_comboBox.setStyleSheet("QComboBox{color: %s}"%self.color_2)
-        self.language_comboBox.setCursor(self.select_pixmap)
+        self.language_comboBox.setCursor(ui.static.icon.SELECT_CURSOR)
         if self.object.config["language"] == "ENG":
             self.language_comboBox.setCurrentIndex(1)
         elif self.object.config["language"] == "KOR":
             self.language_comboBox.setCurrentIndex(2)
         else:
             self.language_comboBox.setCurrentIndex(0)
+        # OCR识别语种标签
+        label = QLabel(self.tab_1)
+        self.customSetGeometry(label, 160, 310, 150, 20)
+        label.setText("选择要翻译的原文语种")
+
+        # 显示原文标签开关
+        self.show_original_switch = ui.switch.ShowSwitch(self.tab_1, sign=self.show_original_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.show_original_switch, 340, 310, 65, 20)
+        self.show_original_switch.checkedChanged.connect(self.changeShowOriginalSwitch)
+        self.show_original_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 原文颜色选择
+        self.original_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.original_color), "", self.tab_1)
+        self.customSetIconSize(self.original_color_button, 20, 20)
+        self.customSetGeometry(self.original_color_button, 415, 310, 20, 20)
+        self.original_color_button.setStyleSheet("background: transparent;")
+        self.original_color_button.clicked.connect(lambda: self.ChangeTranslateColor("original", self.original_color))
+        self.original_color_button.setCursor(ui.static.icon.EDIT_CURSOR)
+        # 显示原文备注
+        label = QLabel(self.tab_1)
+        self.customSetGeometry(label, 450, 310, 300, 20)
+        label.setText("是否显示识别到的原文")
+
+        # 文字方向开关
+        self.text_direction_switch = ui.switch.SwitchDirection(self.tab_1, sign=self.text_direction_use, startX=(65-20)*self.rate, object=self.object)
+        self.customSetGeometry(self.text_direction_switch, 20, 360, 65, 20)
+        self.text_direction_switch.checkedChanged.connect(self.changeTextDirectionSwitch)
+        self.text_direction_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 文字方向标签
+        self.text_direction_label = QLabel(self.tab_1)
+        self.customSetGeometry(self.text_direction_label, 105, 360, 300, 20)
+        self.text_direction_label.setText("识别的原文阅读方向")
+        # 页签切换信号
+        self.ocr_tab_widget.currentChanged.connect(self.hideOrShowDirection)
+
+        # 文字换行开关
+        self.branch_line_switch = ui.switch.SwitchBranchLine(self.tab_1, sign=self.branch_line_use, startX=(65-20) * self.rate)
+        self.customSetGeometry(self.branch_line_switch, 340, 360, 65, 20)
+        self.branch_line_switch.checkedChanged.connect(self.changeBranchLineSwitch)
+        self.branch_line_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 文字换行标签
+        label = QLabel(self.tab_1)
+        self.customSetGeometry(label, 425, 360, 300, 20)
+        label.setText("开启会对原文换行后再翻译")
 
 
     # 翻译设定标签栏
@@ -468,322 +546,392 @@ class Settin(QMainWindow) :
         self.tab_widget.addTab(self.tab_2, "")
         self.tab_widget.setTabText(self.tab_widget.indexOf(self.tab_2), " 翻译设定")
 
-        # 分割线
+        # 此Label用于雾化顶部工具栏的背景图
+        label = QLabel(self.tab_2)
+        label.setGeometry(QRect(0, 0, self.window_width, 35*self.rate))
+        label.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
+
+        # 选项卡图标
+        self.tab_widget.setTabIcon(self.tab_widget.indexOf(self.tab_2), ui.static.icon.TRANSLATE_ICON)
+
+        # 顶部工具栏
+        tab_widget = QTabWidget(self.tab_2)
+        tab_widget.setGeometry(QRect(0, 0, self.window_width, self.window_height))
+        tab_widget.setTabPosition(QTabWidget.North)
+        tab_widget.setStyleSheet("QTabBar:tab { min-height: %dpx; min-width: %dpx;"
+                                               "background: rgba(255, 255, 255, 1);}"
+                                 "QTabBar:tab:selected { background: rgba(62, 62, 62, 0.07); }"
+                                 "QTabWidget::pane { border-image: none; }"
+                                 %(35*self.rate, 120*self.rate))
+
+        # 竖向分割线
         label = QLabel(self.tab_2)
         self.customSetGeometry(label, 0, 0, 1, 400)
         label.setFrameShadow(QFrame.Raised)
         label.setFrameShape(QFrame.Box)
-        label.setStyleSheet("border-width: 1px; border-style: solid; border-color: rgba(62, 62, 62, 0.2);")
+        label.setStyleSheet("border-width: 1px; border-style: solid; border-color: rgba(62, 62, 62, 0.1);")
 
-        # 选项卡图标
-        icon = QIcon()
-        pixmap = QPixmap(TRANSLATE_ICON_PATH)
-        pixmap = pixmap.scaled(int(20*self.rate),
-                               int(20*self.rate),
-                               Qt.KeepAspectRatio,
-                               Qt.SmoothTransformation)
-        icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
-        self.tab_widget.setTabIcon(self.tab_widget.indexOf(self.tab_2), icon)
+        # 私人翻译页签
+        private_translater_tab = QWidget()
+        tab_widget.addTab(private_translater_tab, "")
+        tab_widget.setTabText(tab_widget.indexOf(private_translater_tab), "私人翻译")
 
-        # 此Label用于雾化工具栏2的背景图
-        imageLabel = QLabel(self.tab_2)
-        imageLabel.setGeometry(QRect(0, -1, self.window_width+5, self.window_height+5))
-        imageLabel.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
+        # 私人翻译页签图标
+        tab_widget.setTabIcon(tab_widget.indexOf(private_translater_tab), ui.static.icon.PRIVATE_TRANSLATER_ICON)
 
-        # 公共翻译标签
-        label = QLabel(self.tab_2)
-        self.customSetGeometry(label, 20, 25, 70, 20)
-        label.setText("公共翻译")
+        # 横向分割线
+        label = QLabel(private_translater_tab)
+        self.customSetGeometry(label, 0, 0, self.window_width, 1)
+        label.setFrameShadow(QFrame.Raised)
+        label.setFrameShape(QFrame.Box)
+        label.setStyleSheet("border-width: 1px; "
+                            "border-style: solid; "
+                            "border-color: rgba(62, 62, 62, 0.2);")
 
-        # 公共翻译说明按钮
-        button = QPushButton(self.tab_2)
-        self.customSetGeometry(button, 90, 25, 25, 20)
-        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;"%self.color_2)
-        button.setText("说明")
-        button.clicked.connect(lambda: self.showDesc("publicTranslate"))
-        button.setCursor(self.question_pixmap)
+        # 此Label用于雾化私人翻译页签的背景图
+        label = QLabel(private_translater_tab)
+        label.setGeometry(QRect(0, 0, self.window_width + 5, self.window_height + 5))
+        label.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
 
-        # 公共翻译说明?号图标
-        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_2)
-        self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 115, 25, 20, 20)
-        button.clicked.connect(lambda: self.showDesc("publicTranslate"))
-        button.setCursor(self.question_pixmap)
-        button.setStyleSheet("background: transparent;")
+        # 公共翻译页签
+        public_translater_tab = QWidget()
+        tab_widget.addTab(public_translater_tab, "")
+        tab_widget.setTabText(tab_widget.indexOf(public_translater_tab), "公共翻译")
+
+        # 公共翻译页签图标
+        tab_widget.setTabIcon(tab_widget.indexOf(public_translater_tab), ui.static.icon.PUBLIC_TRANSLATER_ICON)
+
+        # 横向分割线
+        label = QLabel(public_translater_tab)
+        self.customSetGeometry(label, 0, 0, self.window_width, 1)
+        label.setFrameShadow(QFrame.Raised)
+        label.setFrameShape(QFrame.Box)
+        label.setStyleSheet("border-width: 1px; "
+                            "border-style: solid; "
+                            "border-color: rgba(62, 62, 62, 0.2);")
+
+        # 此Label用于雾化公共翻译页签的背景图
+        label = QLabel(public_translater_tab)
+        label.setGeometry(QRect(0, 0, self.window_width + 5, self.window_height + 5))
+        label.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
+
+        # 显示正在使用的翻译源类型
+        self.translate_list_label = QLabel(self.tab_2)
+        self.customSetGeometry(self.translate_list_label, 250, 10, 400, 20)
+        self.translate_list_label.setStyleSheet("color: %s"%self.color_2)
+        self.setTransLabelMessage()
+
+        # 私人翻译备注
+        label = QLabel(private_translater_tab)
+        self.customSetGeometry(label, 20, 20, 300, 20)
+        label.setText("免费, 使用前需先注册, 稳定且效果好, 建议使用")
+        label.setStyleSheet("color: %s" % self.color_2)
+
+        # 私人翻译教程按钮
+        button = QPushButton(private_translater_tab)
+        self.customSetGeometry(button, 550, 20, 100, 20)
+        button.setText("详细教程")
+        button.clicked.connect(self.openPublicTransTutorial)
+        button.setCursor(ui.static.icon.QUESTION_CURSOR)
+
+        # 私人腾讯翻译标签
+        label = QLabel(private_translater_tab)
+        self.customSetGeometry(label, 20, 70, 35, 20)
+        label.setText("腾讯:")
+
+        # 私人腾讯翻译开关
+        self.tencent_private_switch = ui.switch.SwitchOCR(private_translater_tab, sign=self.tencent_use, startX=(65-20) * self.rate)
+        self.customSetGeometry(self.tencent_private_switch, 65, 70, 65, 20)
+        self.tencent_private_switch.checkedChanged.connect(self.changeTencentSwitch)
+        self.tencent_private_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 私人腾讯翻译颜色选择
+        self.tencent_private_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.tencent_color), "", private_translater_tab)
+        self.customSetIconSize(self.tencent_private_color_button, 20, 20)
+        self.customSetGeometry(self.tencent_private_color_button, 140, 70, 20, 20)
+        self.tencent_private_color_button.setStyleSheet("background: transparent;")
+        self.tencent_private_color_button.clicked.connect(lambda: self.ChangeTranslateColor("tencent_private", self.tencent_use))
+        self.tencent_private_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
+
+        # 私人腾讯翻译密钥按钮
+        button = QPushButton(private_translater_tab)
+        self.customSetGeometry(button, 180, 70, 60, 20)
+        button.setText("密钥")
+        button.clicked.connect(lambda: self.showKey("tencentTranslate"))
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
+
+        # 私人腾讯翻译测试按钮
+        button = QPushButton(private_translater_tab)
+        self.customSetGeometry(button, 260, 70, 60, 20)
+        button.setText("测试")
+        button.clicked.connect(lambda: utils.test.testTencent(self.object))
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
+
+        # 私人腾讯翻译教程按钮
+        button = QPushButton(private_translater_tab)
+        self.customSetGeometry(button, 340, 70, 60, 20)
+        button.setText("教程")
+        button.clicked.connect(self.openTencentTutorial)
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
+
+        # 私人腾讯查额度按钮
+        button = QPushButton(private_translater_tab)
+        self.customSetGeometry(button, 420, 70, 60, 20)
+        button.setText("查额度")
+        button.clicked.connect(self.openTencentQueryQuota)
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
+
+        # 私人百度翻译标签
+        label = QLabel(private_translater_tab)
+        self.customSetGeometry(label, 20, 120, 35, 20)
+        label.setText("百度:")
+
+        # 私人百度翻译开关
+        self.baidu_private_switch = ui.switch.SwitchOCR(private_translater_tab, sign=self.baidu_use, startX=(65-20) * self.rate)
+        self.customSetGeometry(self.baidu_private_switch, 65, 120, 65, 20)
+        self.baidu_private_switch.checkedChanged.connect(self.changeBaiduTranslaterSwitch)
+        self.baidu_private_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+
+        # 私人百度翻译颜色选择
+        self.baidu_private_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.baidu_color), "", private_translater_tab)
+        self.customSetIconSize(self.baidu_private_color_button, 20, 20)
+        self.customSetGeometry(self.baidu_private_color_button, 140, 120, 20, 20)
+        self.baidu_private_color_button.setStyleSheet("background: transparent;")
+        self.baidu_private_color_button.clicked.connect(lambda: self.ChangeTranslateColor("baidu_private", self.baidu_color))
+        self.baidu_private_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
+
+        # 私人百度翻译密钥按钮
+        button = QPushButton(private_translater_tab)
+        self.customSetGeometry(button, 180, 120, 60, 20)
+        button.setText("密钥")
+        button.clicked.connect(lambda: self.showKey("baiduTranslate"))
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
+
+        # 私人百度翻译测试按钮
+        button = QPushButton(private_translater_tab)
+        self.customSetGeometry(button, 260, 120, 60, 20)
+        button.setText("测试")
+        button.clicked.connect(lambda: utils.test.testBaidu(self.object))
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
+
+        # 私人百度翻译教程按钮
+        button = QPushButton(private_translater_tab)
+        self.customSetGeometry(button, 340, 120, 60, 20)
+        button.setText("教程")
+        button.clicked.connect(self.openBaiduTutorial)
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
+
+        # 私人百度查额度按钮
+        button = QPushButton(private_translater_tab)
+        self.customSetGeometry(button, 420, 120, 60, 20)
+        button.setText("查额度")
+        button.clicked.connect(self.openBaiduQueryQuota)
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
+
+        # 私人彩云翻译标签
+        label = QLabel(private_translater_tab)
+        self.customSetGeometry(label, 20, 170, 35, 20)
+        label.setText("彩云:")
+
+        # 私人彩云翻译开关
+        self.caiyun_private_switch = ui.switch.SwitchOCR(private_translater_tab, sign=self.caiyun_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.caiyun_private_switch, 65, 170, 65, 20)
+        self.caiyun_private_switch.checkedChanged.connect(self.changeCaiyunSwitch)
+        self.caiyun_private_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+
+        # 私人彩云翻译颜色选择
+        self.caiyun_private_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.caiyun_color), "", private_translater_tab)
+        self.customSetIconSize(self.caiyun_private_color_button, 20, 20)
+        self.customSetGeometry(self.caiyun_private_color_button, 140, 170, 20, 20)
+        self.caiyun_private_color_button.setStyleSheet("background: transparent;")
+        self.caiyun_private_color_button.clicked.connect(
+            lambda: self.ChangeTranslateColor("caiyun_private", self.caiyun_color))
+        self.caiyun_private_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
+
+        # 私人彩云翻译密钥按钮
+        button = QPushButton(private_translater_tab)
+        self.customSetGeometry(button, 180, 170, 60, 20)
+        button.setText("密钥")
+        button.clicked.connect(lambda: self.showKey("caiyunTranslate"))
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
+
+        # 私人彩云翻译测试按钮
+        button = QPushButton(private_translater_tab)
+        self.customSetGeometry(button, 260, 170, 60, 20)
+        button.setText("测试")
+        button.clicked.connect(lambda: utils.test.testCaiyun(self.object))
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
+
+        # 私人彩云翻译教程按钮
+        button = QPushButton(private_translater_tab)
+        self.customSetGeometry(button, 340, 170, 60, 20)
+        button.setText("教程")
+        button.clicked.connect(self.openCaiyunTutorial)
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
+
+        # 私人彩云查额度按钮
+        button = QPushButton(private_translater_tab)
+        self.customSetGeometry(button, 420, 170, 60, 20)
+        button.setText("查额度")
+        button.clicked.connect(self.openCaiyunQueryQuota)
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 公共翻译备注
-        label = QLabel(self.tab_2)
-        self.customSetGeometry(label, 155, 25, 300, 20)
-        label.setText("可直接使用, 但不稳定可能会抽风")
+        label = QLabel(public_translater_tab)
+        self.customSetGeometry(label, 20, 20, 420, 20)
+        label.setText("免费, 无需注册, 安装Chrome浏览器后可直接使用, 但不保证其稳定性")
         label.setStyleSheet("color: %s"%self.color_2)
 
         # 公共翻译教程按钮
-        button = QPushButton(self.tab_2)
-        self.customSetGeometry(button, 380, 25, 60, 20)
-        button.setText("教程")
+        button = QPushButton(public_translater_tab)
+        self.customSetGeometry(button, 550, 20, 100, 20)
+        button.setText("详细教程")
         button.clicked.connect(self.openPublicTransTutorial)
-        button.setCursor(self.select_pixmap)
+        button.setCursor(ui.static.icon.QUESTION_CURSOR)
 
         # 有道翻译标签
-        label = QLabel(self.tab_2)
+        label = QLabel(public_translater_tab)
         self.customSetGeometry(label, 20, 70, 35, 20)
         label.setText("有道:")
-
         # 有道翻译开关
-        self.youdao_switch = ui.switch.SwitchOCR(self.tab_2, sign=self.youdao_use, startX=(65-20)*self.rate)
+        self.youdao_switch = ui.switch.PublicTranslationSwitch(public_translater_tab, sign=self.youdao_use, startX=(65-20)*self.rate)
         self.customSetGeometry(self.youdao_switch, 65, 70, 65, 20)
         self.youdao_switch.checkedChanged.connect(self.changeYoudaoSwitch)
-        self.youdao_switch.setCursor(self.select_pixmap)
+        self.youdao_switch.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 有道翻译颜色选择
-        self.youdao_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.youdao_color), "", self.tab_2)
+        self.youdao_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.youdao_color), "", public_translater_tab)
         self.customSetIconSize(self.youdao_color_button, 20, 20)
         self.customSetGeometry(self.youdao_color_button, 140, 70, 20, 20)
         self.youdao_color_button.setStyleSheet("background: transparent;")
         self.youdao_color_button.clicked.connect(lambda: self.ChangeTranslateColor("youdao", self.youdao_color))
-        self.youdao_color_button.setCursor(self.select_pixmap)
+        self.youdao_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 百度翻译标签
-        label = QLabel(self.tab_2)
+        label = QLabel(public_translater_tab)
         self.customSetGeometry(label, 200, 70, 35, 20)
         label.setText("百度:")
 
         # 百度翻译开关
-        self.baidu_switch = ui.switch.SwitchOCR(self.tab_2, sign=self.baidu_web_use, startX=(65-20)*self.rate)
+        self.baidu_switch = ui.switch.PublicTranslationSwitch(public_translater_tab, sign=self.baidu_web_use, startX=(65-20)*self.rate)
         self.customSetGeometry(self.baidu_switch, 245, 70, 65, 20)
         self.baidu_switch.checkedChanged.connect(self.changeBaiduWebSwitch)
-        self.baidu_switch.setCursor(self.select_pixmap)
+        self.baidu_switch.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 百度翻译颜色选择
-        self.baidu_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.baidu_web_color), "", self.tab_2)
+        self.baidu_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.baidu_web_color), "", public_translater_tab)
         self.customSetIconSize(self.baidu_color_button, 20, 20)
         self.customSetGeometry(self.baidu_color_button, 320, 70, 20, 20)
         self.baidu_color_button.setStyleSheet("background: transparent;")
         self.baidu_color_button.clicked.connect(lambda: self.ChangeTranslateColor("baidu", self.baidu_web_color))
-        self.baidu_color_button.setCursor(self.select_pixmap)
+        self.baidu_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 腾讯翻译标签
-        label = QLabel(self.tab_2)
+        label = QLabel(public_translater_tab)
         self.customSetGeometry(label, 380, 70, 35, 20)
         label.setText("腾讯:")
 
         # 腾讯翻译开关
-        self.tencent_switch = ui.switch.SwitchOCR(self.tab_2, sign=self.tencent_web_use, startX=(65-20)*self.rate)
+        self.tencent_switch = ui.switch.PublicTranslationSwitch(public_translater_tab, sign=self.tencent_web_use, startX=(65-20)*self.rate)
         self.customSetGeometry(self.tencent_switch, 425, 70, 65, 20)
         self.tencent_switch.checkedChanged.connect(self.changeTencentWebSwitch)
-        self.tencent_switch.setCursor(self.select_pixmap)
+        self.tencent_switch.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 腾讯翻译颜色选择
-        self.tencent_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.tencent_web_color), "", self.tab_2)
+        self.tencent_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.tencent_web_color), "", public_translater_tab)
         self.customSetIconSize(self.tencent_color_button, 20, 20)
         self.customSetGeometry(self.tencent_color_button, 500, 70, 20, 20)
         self.tencent_color_button.setStyleSheet("background: transparent;")
         self.tencent_color_button.clicked.connect(lambda: self.ChangeTranslateColor("tencent", self.tencent_web_color))
-        self.tencent_color_button.setCursor(self.select_pixmap)
+        self.tencent_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # DeepL翻译标签
-        label = QLabel(self.tab_2)
+        label = QLabel(public_translater_tab)
         self.customSetGeometry(label, 20, 120, 40, 20)
         label.setText("DeepL:")
 
         # DeepL翻译开关
-        self.deepl_switch = ui.switch.SwitchOCR(self.tab_2, sign=self.deepl_use, startX=(65-20)*self.rate)
+        self.deepl_switch = ui.switch.PublicTranslationSwitch(public_translater_tab, sign=self.deepl_use, startX=(65-20)*self.rate)
         self.customSetGeometry(self.deepl_switch, 65, 120, 65, 20)
         self.deepl_switch.checkedChanged.connect(self.changeDeepLSwitch)
-        self.deepl_switch.setCursor(self.select_pixmap)
+        self.deepl_switch.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # DeepL翻译颜色选择
-        self.deepl_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.deepl_color), "", self.tab_2)
+        self.deepl_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.deepl_color), "", public_translater_tab)
         self.customSetIconSize(self.deepl_color_button, 20, 20)
         self.customSetGeometry(self.deepl_color_button, 140, 120, 20, 20)
         self.deepl_color_button.setStyleSheet("background: transparent;")
         self.deepl_color_button.clicked.connect(lambda: self.ChangeTranslateColor("deepl", self.deepl_color))
-        self.deepl_color_button.setCursor(self.select_pixmap)
+        self.deepl_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 谷歌翻译标签
-        label = QLabel(self.tab_2)
+        label = QLabel(public_translater_tab)
         self.customSetGeometry(label, 200, 120, 35, 20)
         label.setText("谷歌:")
 
         # 谷歌翻译开关
-        self.google_switch = ui.switch.SwitchOCR(self.tab_2, sign=self.google_use, startX=(65-20)*self.rate)
+        self.google_switch = ui.switch.PublicTranslationSwitch(public_translater_tab, sign=self.google_use, startX=(65-20)*self.rate)
         self.customSetGeometry(self.google_switch, 245, 120, 65, 20)
         self.google_switch.checkedChanged.connect(self.changeGoogleSwitch)
-        self.google_switch.setCursor(self.select_pixmap)
+        self.google_switch.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 谷歌翻译颜色选择
-        self.google_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.google_color), "", self.tab_2)
+        self.google_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.google_color), "", public_translater_tab)
         self.customSetIconSize(self.google_color_button, 20, 20)
         self.customSetGeometry(self.google_color_button, 320, 120, 20, 20)
         self.google_color_button.setStyleSheet("background: transparent;")
         self.google_color_button.clicked.connect(lambda: self.ChangeTranslateColor("google", self.google_color))
-        self.google_color_button.setCursor(self.select_pixmap)
+        self.google_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 彩云翻译标签
-        label = QLabel(self.tab_2)
+        label = QLabel(public_translater_tab)
         self.customSetGeometry(label, 380, 120, 35, 20)
         label.setText("彩云:")
 
         # 彩云翻译开关
-        self.caiyun_switch = ui.switch.SwitchOCR(self.tab_2, sign=self.caiyun_web_use, startX=(65-20)*self.rate)
+        self.caiyun_switch = ui.switch.PublicTranslationSwitch(public_translater_tab, sign=self.caiyun_web_use, startX=(65-20)*self.rate)
         self.customSetGeometry(self.caiyun_switch, 425, 120, 65, 20)
         self.caiyun_switch.checkedChanged.connect(self.changeCaiyunWebSwitch)
-        self.caiyun_switch.setCursor(self.select_pixmap)
+        self.caiyun_switch.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 彩云翻译颜色选择
-        self.caiyun_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.caiyun_web_color), "", self.tab_2)
+        self.caiyun_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.caiyun_web_color), "", public_translater_tab)
         self.customSetIconSize(self.caiyun_color_button, 20, 20)
         self.customSetGeometry(self.caiyun_color_button, 500, 120, 20, 20)
         self.caiyun_color_button.setStyleSheet("background: transparent;")
         self.caiyun_color_button.clicked.connect(lambda: self.ChangeTranslateColor("caiyun", self.caiyun_web_color))
-        self.caiyun_color_button.setCursor(self.select_pixmap)
+        self.caiyun_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
 
-        # 私人翻译标签
+        # 公共翻译测试可用性按钮
+        button = QPushButton(public_translater_tab)
+        self.customSetGeometry(button, 20, 170, 100, 20)
+        button.setText("测试可用性")
+        button.clicked.connect(self.testPublicTrans)
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
+
+        # 公共翻译安装谷歌浏览器按钮
+        button = QPushButton(public_translater_tab)
+        self.customSetGeometry(button, 140, 170, 100, 20)
+        button.setText("安装Chrome")
+        button.clicked.connect(self.openInstallChrome)
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
+
+        label = QLabel(public_translater_tab)
+        self.customSetGeometry(label, 260, 170, 300, 20)
+        label.setText("首次安装Chrome浏览器后需重启翻译器")
+
+        # 翻译备注
         label = QLabel(self.tab_2)
-        self.customSetGeometry(label, 20, 185, 70, 20)
-        label.setText("私人翻译")
-
-        # 私人翻译说明按钮
-        button = QPushButton(self.tab_2)
-        self.customSetGeometry(button, 90, 185, 25, 20)
-        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;"%self.color_2)
-        button.setText("说明")
-        button.clicked.connect(lambda: self.showDesc("privateTranslate"))
-        button.setCursor(self.question_pixmap)
-
-        # 私人翻译说明?号图标
-        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_2)
+        self.customSetGeometry(label, 20, 255, 250, 20)
+        label.setText("点击每种翻译源对应的")
+        # 颜色说明
+        button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.color_2), "", self.tab_2)
         self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 115, 185, 20, 20)
+        self.customSetGeometry(button, 170, 255, 20, 20)
         button.setStyleSheet("background: transparent;")
-        button.clicked.connect(lambda: self.showDesc("privateTranslate"))
-        button.setCursor(self.question_pixmap)
-
-        # 私人翻译备注
+        # 公共翻译备注
         label = QLabel(self.tab_2)
-        self.customSetGeometry(label, 155, 185, 300, 20)
-        label.setText("需注册, 但稳定效果好, 建议使用")
-        label.setStyleSheet("color: %s" % self.color_2)
-
-        # 私人腾讯翻译标签
-        label = QLabel(self.tab_2)
-        self.customSetGeometry(label, 20, 230, 35, 20)
-        label.setText("腾讯:")
-
-        # 私人腾讯翻译开关
-        self.tencent_private_switch = ui.switch.SwitchOCR(self.tab_2, sign=self.tencent_use, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.tencent_private_switch, 65, 230, 65, 20)
-        self.tencent_private_switch.checkedChanged.connect(self.changeTencentSwitch)
-        self.tencent_private_switch.setCursor(self.select_pixmap)
-
-        # 私人腾讯翻译颜色选择
-        self.tencent_private_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.tencent_color), "", self.tab_2)
-        self.customSetIconSize(self.tencent_private_color_button, 20, 20)
-        self.customSetGeometry(self.tencent_private_color_button, 140, 230, 20, 20)
-        self.tencent_private_color_button.setStyleSheet("background: transparent;")
-        self.tencent_private_color_button.clicked.connect(lambda: self.ChangeTranslateColor("tencent_private", self.tencent_use))
-        self.tencent_private_color_button.setCursor(self.select_pixmap)
-
-        # 私人腾讯翻译密钥按钮
-        button = QPushButton(self.tab_2)
-        self.customSetGeometry(button, 180, 230, 60, 20)
-        button.setText("密钥")
-        button.clicked.connect(lambda: self.showKey("tencentTranslate"))
-        button.setCursor(self.select_pixmap)
-
-        # 私人腾讯翻译测试按钮
-        button = QPushButton(self.tab_2)
-        self.customSetGeometry(button, 260, 230, 60, 20)
-        button.setText("测试")
-        button.clicked.connect(lambda: utils.test.testTencent(self.object))
-        button.setCursor(self.select_pixmap)
-
-        # 私人腾讯翻译教程按钮
-        button = QPushButton(self.tab_2)
-        self.customSetGeometry(button, 340, 230, 60, 20)
-        button.setText("教程")
-        button.clicked.connect(self.openTencentTutorial)
-        button.setCursor(self.select_pixmap)
-
-        # 私人百度翻译标签
-        label = QLabel(self.tab_2)
-        self.customSetGeometry(label, 20, 280, 35, 20)
-        label.setText("百度:")
-
-        # 私人百度翻译开关
-        self.baidu_private_switch = ui.switch.SwitchOCR(self.tab_2, sign=self.baidu_use, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.baidu_private_switch, 65, 280, 65, 20)
-        self.baidu_private_switch.checkedChanged.connect(self.changeBaiduTranslaterSwitch)
-        self.baidu_private_switch.setCursor(self.select_pixmap)
-
-        # 私人百度翻译颜色选择
-        self.baidu_private_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.baidu_color), "", self.tab_2)
-        self.customSetIconSize(self.baidu_private_color_button, 20, 20)
-        self.customSetGeometry(self.baidu_private_color_button, 140, 280, 20, 20)
-        self.baidu_private_color_button.setStyleSheet("background: transparent;")
-        self.baidu_private_color_button.clicked.connect(lambda: self.ChangeTranslateColor("baidu_private", self.baidu_color))
-        self.baidu_private_color_button.setCursor(self.select_pixmap)
-
-        # 私人百度翻译密钥按钮
-        button = QPushButton(self.tab_2)
-        self.customSetGeometry(button, 180, 280, 60, 20)
-        button.setText("密钥")
-        button.clicked.connect(lambda: self.showKey("baiduTranslate"))
-        button.setCursor(self.select_pixmap)
-
-        # 私人百度翻译测试按钮
-        button = QPushButton(self.tab_2)
-        self.customSetGeometry(button, 260, 280, 60, 20)
-        button.setText("测试")
-        button.clicked.connect(lambda: utils.test.testBaidu(self.object))
-        button.setCursor(self.select_pixmap)
-
-        # 私人百度翻译教程按钮
-        button = QPushButton(self.tab_2)
-        self.customSetGeometry(button, 340, 280, 60, 20)
-        button.setText("教程")
-        button.clicked.connect(self.openBaiduTutorial)
-        button.setCursor(self.select_pixmap)
-
-        # 私人彩云翻译标签
-        label = QLabel(self.tab_2)
-        self.customSetGeometry(label, 20, 330, 35, 20)
-        label.setText("彩云:")
-
-        # 私人彩云翻译开关
-        self.caiyun_private_switch = ui.switch.SwitchOCR(self.tab_2, sign=self.caiyun_use, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.caiyun_private_switch, 65, 330, 65, 20)
-        self.caiyun_private_switch.checkedChanged.connect(self.changeCaiyunSwitch)
-        self.caiyun_private_switch.setCursor(self.select_pixmap)
-
-        # 私人彩云翻译颜色选择
-        self.caiyun_private_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.caiyun_color), "", self.tab_2)
-        self.customSetIconSize(self.caiyun_private_color_button, 20, 20)
-        self.customSetGeometry(self.caiyun_private_color_button, 140, 330, 20, 20)
-        self.caiyun_private_color_button.setStyleSheet("background: transparent;")
-        self.caiyun_private_color_button.clicked.connect(lambda: self.ChangeTranslateColor("caiyun_private", self.caiyun_color))
-        self.caiyun_private_color_button.setCursor(self.select_pixmap)
-
-        # 私人彩云翻译密钥按钮
-        button = QPushButton(self.tab_2)
-        self.customSetGeometry(button, 180, 330, 60, 20)
-        button.setText("密钥")
-        button.clicked.connect(lambda: self.showKey("caiyunTranslate"))
-        button.setCursor(self.select_pixmap)
-
-        # 私人彩云翻译测试按钮
-        button = QPushButton(self.tab_2)
-        self.customSetGeometry(button, 260, 330, 60, 20)
-        button.setText("测试")
-        button.clicked.connect(lambda: utils.test.testCaiyun(self.object))
-        button.setCursor(self.select_pixmap)
-
-        # 私人彩云翻译教程按钮
-        button = QPushButton(self.tab_2)
-        self.customSetGeometry(button, 340, 330, 60, 20)
-        button.setText("教程")
-        button.clicked.connect(self.openCaiyunTutorial)
-        button.setCursor(self.select_pixmap)
+        self.customSetGeometry(label, 200, 255, 500, 20)
+        label.setText("图标, 可以修改其翻译后显示的文字颜色")
 
 
     # 显示设定标签页
@@ -794,247 +942,137 @@ class Settin(QMainWindow) :
         self.tab_widget.addTab(self.tab_3, "")
         self.tab_widget.setTabText(self.tab_widget.indexOf(self.tab_3), " 显示设定")
 
-        # 分割线
+        # 此Label用于雾化顶部工具栏的背景图
+        label = QLabel(self.tab_3)
+        label.setGeometry(QRect(0, 0, self.window_width, 35 * self.rate))
+        label.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
+
+        # 选项卡图标
+        self.tab_widget.setTabIcon(self.tab_widget.indexOf(self.tab_3), ui.static.icon.STYLE_ICON)
+
+        # 顶部工具栏
+        tab_widget = QTabWidget(self.tab_3)
+        tab_widget.setGeometry(QRect(0, 0, self.window_width, self.window_height))
+        tab_widget.setTabPosition(QTabWidget.North)
+        tab_widget.setStyleSheet("QTabBar:tab { min-height: %dpx; min-width: %dpx;"
+                                 "background: rgba(255, 255, 255, 1);}"
+                                 "QTabBar:tab:selected { background: rgba(62, 62, 62, 0.07); }"
+                                 "QTabWidget::pane { border-image: none; }"
+                                 % (35 * self.rate, 120 * self.rate))
+
+        # 竖向分割线
         label = QLabel(self.tab_3)
         self.customSetGeometry(label, 0, 0, 1, 400)
         label.setFrameShadow(QFrame.Raised)
         label.setFrameShape(QFrame.Box)
-        label.setStyleSheet("border-width: 1px; border-style: solid; border-color: rgba(62, 62, 62, 0.2);")
+        label.setStyleSheet("border-width: 1px; border-style: solid; border-color: rgba(62, 62, 62, 0.1);")
 
-        # 选项卡图标
-        icon = QIcon()
-        pixmap = QPixmap(STYPE_ICON_PATH)
-        pixmap = pixmap.scaled(int(20*self.rate),
-                               int(20*self.rate),
-                               Qt.KeepAspectRatio,
-                               Qt.SmoothTransformation)
-        icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
-        self.tab_widget.setTabIcon(self.tab_widget.indexOf(self.tab_3), icon)
+        # 翻译框页签
+        translation_frame_tab = QWidget()
+        tab_widget.addTab(translation_frame_tab, "")
+        tab_widget.setTabText(tab_widget.indexOf(translation_frame_tab), "翻译框")
+        # 翻译框页签图标
+        tab_widget.setTabIcon(tab_widget.indexOf(translation_frame_tab), ui.static.icon.TRANSLATION_FRAME_ICON)
 
-        # 此Label用于雾化工具栏1的背景图
-        imageLabel = QLabel(self.tab_3)
-        imageLabel.setGeometry(QRect(0, -1, self.window_width + 5, self.window_height + 5))
-        imageLabel.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
+        # 横向分割线
+        label = QLabel(translation_frame_tab)
+        self.customSetGeometry(label, 0, 0, self.window_width, 1)
+        label.setFrameShadow(QFrame.Raised)
+        label.setFrameShape(QFrame.Box)
+        label.setStyleSheet("border-width: 1px; "
+                            "border-style: solid; "
+                            "border-color: rgba(62, 62, 62, 0.2);")
 
-        # 翻译框透明度设定标签
-        label = QLabel(self.tab_3)
-        self.customSetGeometry(label, 20, 20, 90, 20)
-        label.setText("翻译框透明度:")
+        # 此Label用于雾化翻译框页签的背景图
+        label = QLabel(translation_frame_tab)
+        label.setGeometry(QRect(0, 0, self.window_width+5, self.window_height+5))
+        label.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
+
+        # 字体样式页签
+        font_tab = QWidget()
+        tab_widget.addTab(font_tab, "")
+        tab_widget.setTabText(tab_widget.indexOf(font_tab), "字体样式")
+
+        # 字体样式页签图标
+        tab_widget.setTabIcon(tab_widget.indexOf(font_tab), ui.static.icon.FONT_ICON)
+
+        # 横向分割线
+        label = QLabel(font_tab)
+        self.customSetGeometry(label, 0, 0, self.window_width, 1)
+        label.setFrameShadow(QFrame.Raised)
+        label.setFrameShape(QFrame.Box)
+        label.setStyleSheet("border-width: 1px; "
+                            "border-style: solid; "
+                            "border-color: rgba(62, 62, 62, 0.2);")
+
+        # 此Label用于雾化字体样式页签的背景图
+        label = QLabel(font_tab)
+        label.setGeometry(QRect(0, 0, self.window_width+5, self.window_height+5))
+        label.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
 
         # 翻译框透明度设定
-        self.horizontal_slider = QSlider(self.tab_3)
-        self.customSetGeometry(self.horizontal_slider, 120, 18, 320, 25)
+        self.horizontal_slider = QSlider(translation_frame_tab)
+        self.customSetGeometry(self.horizontal_slider, 20, 28, 320, 25)
         self.horizontal_slider.setMaximum(100)
         self.horizontal_slider.setOrientation(Qt.Horizontal)
         self.horizontal_slider.setValue(0)
         self.horizontal_slider.setValue(self.horizontal)
         self.horizontal_slider.valueChanged.connect(self.changeHorizontal)
         self.horizontal_slider.installEventFilter(self)
-        self.horizontal_slider.setCursor(self.select_pixmap)
-
+        self.horizontal_slider.setCursor(ui.static.icon.SELECT_CURSOR)
         # 翻译框透明度数值标签
-        self.horizontal_slider_label = QLabel(self.tab_3)
-        self.customSetGeometry(self.horizontal_slider_label, 450, 20, 30, 20)
+        self.horizontal_slider_label = QLabel(translation_frame_tab)
+        self.customSetGeometry(self.horizontal_slider_label, 350, 30, 30, 20)
         self.horizontal_slider_label.setText("{}%".format(self.horizontal))
+        # 翻译框透明度设定标签
+        label = QLabel(translation_frame_tab)
+        self.customSetGeometry(label, 400, 30, 200, 20)
+        label.setText("调整翻译框的透明度")
 
-        # 翻译框透明度说明标签
-        button = QPushButton(self.tab_3)
-        self.customSetGeometry(button, 490, 20, 25, 20)
-        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;" % self.color_2)
-        button.setText("说明")
-        button.clicked.connect(lambda: self.showDesc("horizontalSlider"))
-        button.setCursor(self.question_pixmap)
-
-        # 翻译框透明度说明?号图标
-        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_3)
-        self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 515, 20, 20, 20)
-        button.setStyleSheet("background: transparent;")
-        button.clicked.connect(lambda: self.showDesc("horizontalSlider"))
-        button.setCursor(self.question_pixmap)
-
-        # 翻译字体大小设定标签
-        label = QLabel(self.tab_3)
-        self.customSetGeometry(label, 20, 70, 145, 16)
-        label.setText("字体大小:")
+        # 显示翻译时间开关
+        self.show_statusbar_switch = ui.switch.ShowSwitch(translation_frame_tab, sign=self.show_statusbar_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.show_statusbar_switch, 20, 80, 65, 20)
+        self.show_statusbar_switch.checkedChanged.connect(self.changeShowStatusbarSwitch)
+        self.show_statusbar_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 显示翻译时间标签
+        label = QLabel(translation_frame_tab)
+        self.customSetGeometry(label, 105, 80, 300, 20)
+        label.setText("是否在翻译框上显示翻译耗时")
 
         # 翻译字体大小设定
-        self.fontSize_spinBox = QSpinBox(self.tab_3)
-        self.customSetGeometry(self.fontSize_spinBox, 95, 65, 40, 25)
+        self.fontSize_spinBox = QSpinBox(font_tab)
+        self.customSetGeometry(self.fontSize_spinBox, 30, 25, 40, 25)
         self.fontSize_spinBox.setMinimum(10)
         self.fontSize_spinBox.setMaximum(30)
         self.fontSize_spinBox.setValue(self.fontSize)
-        self.fontSize_spinBox.setCursor(self.select_pixmap)
-
-        # 翻译字体类型设定标签
-        label = QLabel(self.tab_3)
-        self.customSetGeometry(label, 275, 70, 145, 20)
-        label.setText("字体类型:")
+        self.fontSize_spinBox.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 翻译字体大小设定标签
+        label = QLabel(font_tab)
+        self.customSetGeometry(label, 90, 30, 300, 16)
+        label.setText("翻译框上显示的字体大小")
 
         # 翻译字体类型设定
-        self.font_comboBox = QFontComboBox(self.tab_3)
-        self.customSetGeometry(self.font_comboBox, 350, 65, 185, 25)
+        self.font_comboBox = QFontComboBox(font_tab)
+        self.customSetGeometry(self.font_comboBox, 20, 75, 185, 25)
         self.font_comboBox.activated[str].connect(self.getFontType)
         self.comboBox_font = QFont(self.font_type)
         self.font_comboBox.setCurrentFont(self.comboBox_font)
-        self.font_comboBox.setCursor(self.select_pixmap)
-        self.font_comboBox.setStyleSheet("QComboBox{color: %s}" % self.color_2)
-
-        # 字体样式设定标签
-        label = QLabel(self.tab_3)
-        self.customSetGeometry(label, 20, 120, 60, 20)
-        label.setText("字体样式:")
+        self.font_comboBox.setCursor(ui.static.icon.SELECT_CURSOR)
+        self.font_comboBox.setStyleSheet("QComboBox{color: %s}"%self.color_2)
+        # 翻译字体类型设定标签
+        label = QLabel(font_tab)
+        self.customSetGeometry(label, 225, 80, 300, 20)
+        label.setText("翻译框上显示的字体类型")
 
         # 字体样式设定开关
-        self.font_type_switch = ui.switch.SwitchFontType(self.tab_3, sign=self.font_color_type, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.font_type_switch, 95, 120, 65, 20)
+        self.font_type_switch = ui.switch.SwitchFontType(font_tab, sign=self.font_color_type, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.font_type_switch, 20, 130, 65, 20)
         self.font_type_switch.checkedChanged.connect(self.changeFontColorTypeSwitch)
-        self.font_type_switch.setCursor(self.select_pixmap)
-
-        # 字体样式设定说明标签
-        button = QPushButton(self.tab_3)
-        self.customSetGeometry(button, 175, 120, 25, 20)
-        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;" % self.color_2)
-        button.setText("说明")
-        button.clicked.connect(lambda: self.showDesc("fontType"))
-        button.setCursor(self.question_pixmap)
-
-        # 字体样式设定说明?号图标
-        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_3)
-        self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 200, 120, 20, 20)
-        button.setStyleSheet("background: transparent;")
-        button.clicked.connect(lambda: self.showDesc("fontType"))
-        button.setCursor(self.question_pixmap)
-
-        # 显示原文标签
-        label = QLabel(self.tab_3)
-        self.customSetGeometry(label, 275, 120, 60, 20)
-        label.setText("显示原文:")
-
-        # 显示原文标签开关
-        self.show_original_switch = ui.switch.ShowSwitch(self.tab_3, sign=self.show_original_use, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.show_original_switch, 350, 120, 65, 20)
-        self.show_original_switch.checkedChanged.connect(self.changeShowOriginalSwitch)
-        self.show_original_switch.setCursor(self.select_pixmap)
-
-        # 显示原文说明标签
-        button = QPushButton(self.tab_3)
-        self.customSetGeometry(button, 430, 120, 25, 20)
-        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;"%self.color_2)
-        button.setText("说明")
-        button.clicked.connect(lambda: self.showDesc("showOriginal"))
-        button.setCursor(self.question_pixmap)
-
-        # 显示原文说明?号图标
-        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_3)
-        self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 455, 120, 20, 20)
-        button.setStyleSheet("background: transparent;")
-        button.clicked.connect(lambda: self.showDesc("showOriginal"))
-        button.setCursor(self.question_pixmap)
-
-        # 显示消息栏标签
-        label = QLabel(self.tab_3)
-        self.customSetGeometry(label, 20, 170, 60, 20)
-        label.setText("翻译时间:")
-
-        # 显示消息栏开关
-        self.show_statusbar_switch = ui.switch.ShowSwitch(self.tab_3, sign=self.show_statusbar_use, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.show_statusbar_switch, 95, 170, 65, 20)
-        self.show_statusbar_switch.checkedChanged.connect(self.changeShowStatusbarSwitch)
-        self.show_statusbar_switch.setCursor(self.select_pixmap)
-
-        # 显示消息栏说明标签
-        button = QPushButton(self.tab_3)
-        self.customSetGeometry(button, 175, 170, 25, 20)
-        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;" % self.color_2)
-        button.setText("说明")
-        button.clicked.connect(lambda: self.showDesc("showStatusbar"))
-        button.setCursor(self.question_pixmap)
-
-        # 显示消息栏说明?号图标
-        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_3)
-        self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 200, 170, 20, 20)
-        button.setStyleSheet("background: transparent;")
-        button.clicked.connect(lambda: self.showDesc("showStatusbar"))
-        button.setCursor(self.question_pixmap)
-
-        # 原文颜色标签
-        label = QLabel(self.tab_3)
-        self.customSetGeometry(label, 275, 170, 60, 20)
-        label.setText("原文颜色:")
-
-        # 原文颜色选择
-        self.original_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.original_color), "", self.tab_3)
-        self.customSetIconSize(self.original_color_button, 20, 20)
-        self.customSetGeometry(self.original_color_button, 350, 170, 20, 20)
-        self.original_color_button.setStyleSheet("background: transparent;")
-        self.original_color_button.clicked.connect(lambda: self.ChangeTranslateColor("original", self.original_color))
-        self.original_color_button.setCursor(self.select_pixmap)
-
-        # 原文颜色说明标签
-        button = QPushButton(self.tab_3)
-        self.customSetGeometry(button, 430, 170, 25, 20)
-        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;" % self.color_2)
-        button.setText("说明")
-        button.clicked.connect(lambda: self.showDesc("originalColor"))
-        button.setCursor(self.question_pixmap)
-
-        # 原文颜色说明?号图标
-        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_3)
-        self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 455, 170, 20, 20)
-        button.setStyleSheet("background: transparent;")
-        button.clicked.connect(lambda: self.showDesc("originalColor"))
-        button.setCursor(self.question_pixmap)
-
-        # 贴字翻译标签
-        label = QLabel(self.tab_3)
-        self.customSetGeometry(label, 20, 220, 60, 20)
-        label.setText("贴字翻译:")
-
-        # 贴字翻译开关
-        self.draw_image_switch = ui.switch.DrawSwitchOCR(self.tab_3, sign=self.draw_image_use, startX=(65-20)*self.rate, object=self.object)
-        self.customSetGeometry(self.draw_image_switch, 95, 220, 65, 20)
-        self.draw_image_switch.checkedChanged.connect(self.changeDrawImageSwitch)
-        self.draw_image_switch.setCursor(self.select_pixmap)
-
-        # 贴字翻译说明标签
-        button = QPushButton(self.tab_3)
-        self.customSetGeometry(button, 175, 220, 25, 20)
-        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;" % self.color_2)
-        button.setText("说明")
-        button.clicked.connect(lambda: self.showDesc("drawImage"))
-        button.setCursor(self.question_pixmap)
-
-        # 贴字翻译说明?号图标
-        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_3)
-        self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 200, 220, 20, 20)
-        button.setStyleSheet("background: transparent;")
-        button.clicked.connect(lambda: self.showDesc("drawImage"))
-        button.setCursor(self.question_pixmap)
-
-        # 隐藏范围快捷键标签
-        label = QLabel(self.tab_3)
-        self.customSetGeometry(label, 275, 220, 100, 20)
-        label.setText("隐藏范围热键:")
-
-        # 隐藏快捷键开关
-        self.hide_range_hotkey_switch = ui.switch.SwitchOCR(self.tab_3, sign=self.hide_range_hotkey_use,
-                                                             startX=(65-20) * self.rate)
-        self.customSetGeometry(self.hide_range_hotkey_switch, 380, 220, 65, 20)
-        self.hide_range_hotkey_switch.checkedChanged.connect(self.changeHideRangeHotkeySwitch)
-        self.hide_range_hotkey_switch.setCursor(self.select_pixmap)
-
-        # 隐藏快捷键设定按钮
-        self.hide_range_hotkey_button = QPushButton(self.tab_3)
-        self.customSetGeometry(self.hide_range_hotkey_button, 460, 220, 60, 20)
-        self.hide_range_hotkey_button.setText(self.object.config["hideRangeHotkeyValue1"] + "+" + self.object.config["hideRangeHotkeyValue2"])
-        self.hide_range_hotkey_button.clicked.connect(lambda: self.setHotKey("hideRange"))
-        self.hide_range_hotkey_button.setCursor(self.select_pixmap)
+        self.font_type_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 字体样式设定标签
+        label = QLabel(font_tab)
+        self.customSetGeometry(label, 105, 130, 300, 20)
+        label.setText("翻译框上显示字体样式, 建议使用描边样式")
 
 
     # 功能设定标签页
@@ -1045,248 +1083,238 @@ class Settin(QMainWindow) :
         self.tab_widget.addTab(self.tab_4, "")
         self.tab_widget.setTabText(self.tab_widget.indexOf(self.tab_4), " 功能设定")
 
-        # 分割线
+        # 此Label用于雾化工具栏1的背景图
+        label = QLabel(self.tab_4)
+        label.setGeometry(QRect(0, 0, self.window_width, 35*self.rate))
+        label.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
+
+        # 选项卡图标
+        self.tab_widget.setTabIcon(self.tab_widget.indexOf(self.tab_4), ui.static.icon.FUNCTION_ICON)
+
+        # 顶部工具栏
+        tab_widget = QTabWidget(self.tab_4)
+        tab_widget.setGeometry(QRect(0, 0, self.window_width, self.window_height))
+        tab_widget.setTabPosition(QTabWidget.North)
+        tab_widget.setStyleSheet("QTabBar:tab { min-height: %dpx; min-width: %dpx;"
+                                 "background: rgba(255, 255, 255, 1);}"
+                                 "QTabBar:tab:selected { background: rgba(62, 62, 62, 0.07); }"
+                                 "QTabWidget::pane { border-image: none; }"
+                                 %(35*self.rate, 120*self.rate))
+
+        # 竖向分割线
         label = QLabel(self.tab_4)
         self.customSetGeometry(label, 0, 0, 1, 400)
         label.setFrameShadow(QFrame.Raised)
         label.setFrameShape(QFrame.Box)
-        label.setStyleSheet("border-width: 1px; border-style: solid; border-color: rgba(62, 62, 62, 0.2);")
+        label.setStyleSheet("border-width: 1px; border-style: solid; border-color: rgba(62, 62, 62, 0.1);")
 
-        # 选项卡图标
-        icon = QIcon()
-        pixmap = QPixmap(FUNCTION_ICON_PATH)
-        pixmap = pixmap.scaled(int(20 * self.rate),
-                               int(20 * self.rate),
-                               Qt.KeepAspectRatio,
-                               Qt.SmoothTransformation)
-        icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
-        self.tab_widget.setTabIcon(self.tab_widget.indexOf(self.tab_4), icon)
+        # 自动模式页签
+        auto_mode_tab = QWidget(self.tab_4)
+        tab_widget.addTab(auto_mode_tab, "")
+        tab_widget.setTabText(tab_widget.indexOf(auto_mode_tab), "自动模式")
+        tab_widget.setTabIcon(tab_widget.indexOf(auto_mode_tab), ui.static.icon.AUTO_MODE_ICON)
 
-        # 此Label用于雾化工具栏1的背景图
-        imageLabel = QLabel(self.tab_4)
-        imageLabel.setGeometry(QRect(0, -1, self.window_width + 5, self.window_height + 5))
-        imageLabel.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
+        # 横向分割线
+        label = QLabel(auto_mode_tab)
+        self.customSetGeometry(label, 0, 0, self.window_width, 1)
+        label.setFrameShadow(QFrame.Raised)
+        label.setFrameShape(QFrame.Box)
+        label.setStyleSheet("border-width: 1px; "
+                            "border-style: solid; "
+                            "border-color: rgba(62, 62, 62, 0.2);")
 
-        # 原文自动复制到剪贴板标签
-        label = QLabel(self.tab_4)
-        self.customSetGeometry(label, 20, 20, 150, 20)
-        label.setText("原文自动复制到剪贴板:")
+        # 雾化页签的背景图
+        label = QLabel(auto_mode_tab)
+        label.setGeometry(QRect(0, 0, self.window_width+5, self.window_height+5))
+        label.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
 
-        # 原文自动复制到剪贴板开关
-        self.auto_copy_original_switch = ui.switch.SwitchOCR(self.tab_4, sign=self.auto_clipboard_use, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.auto_copy_original_switch, 430-255, 20, 65, 20)
-        self.auto_copy_original_switch.checkedChanged.connect(self.changeAutoCopyOriginalSwitch)
-        self.auto_copy_original_switch.setCursor(self.select_pixmap)
+        # 快捷键页签
+        shortcut_key_tab = QWidget()
+        tab_widget.addTab(shortcut_key_tab, "")
+        tab_widget.setTabText(tab_widget.indexOf(shortcut_key_tab), "快捷键")
+        tab_widget.setTabIcon(tab_widget.indexOf(shortcut_key_tab), ui.static.icon.SHORTCUT_KEY_ICON)
 
-        # 自动翻译间隔标签
-        label = QLabel(self.tab_4)
-        self.customSetGeometry(label, 275, 20, 150, 20)
-        label.setText("自动模式刷新间隔(秒):")
+        # 横向分割线
+        label = QLabel(shortcut_key_tab)
+        self.customSetGeometry(label, 0, 0, self.window_width, 1)
+        label.setFrameShadow(QFrame.Raised)
+        label.setFrameShape(QFrame.Box)
+        label.setStyleSheet("border-width: 1px; "
+                            "border-style: solid; "
+                            "border-color: rgba(62, 62, 62, 0.2);")
+
+        # 雾化页签的背景图
+        label = QLabel(shortcut_key_tab)
+        label.setGeometry(QRect(0, 0, self.window_width+5, self.window_height+5))
+        label.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
+
+        # 其他页签
+        other_tab = QWidget()
+        tab_widget.addTab(other_tab, "")
+        tab_widget.setTabText(tab_widget.indexOf(other_tab), "其他")
+        tab_widget.setTabIcon(tab_widget.indexOf(other_tab), ui.static.icon.OTHER_ICON)
+
+        # 横向分割线
+        label = QLabel(other_tab)
+        self.customSetGeometry(label, 0, 0, self.window_width, 1)
+        label.setFrameShadow(QFrame.Raised)
+        label.setFrameShape(QFrame.Box)
+        label.setStyleSheet("border-width: 1px; "
+                            "border-style: solid; "
+                            "border-color: rgba(62, 62, 62, 0.2);")
+
+        # 雾化页签的背景图
+        label = QLabel(other_tab)
+        label.setGeometry(QRect(0, 0, self.window_width+5, self.window_height+5))
+        label.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
 
         # 自动模式速率设定
-        self.auto_speed_spinBox = QDoubleSpinBox(self.tab_4)
-        self.customSetGeometry(self.auto_speed_spinBox, 430, 15, 45, 25)
+        self.auto_speed_spinBox = QDoubleSpinBox(auto_mode_tab)
+        self.customSetGeometry(self.auto_speed_spinBox, 20, 30, 45, 25)
         self.auto_speed_spinBox.setDecimals(1)
         self.auto_speed_spinBox.setMinimum(0.5)
         self.auto_speed_spinBox.setMaximum(10.0)
         self.auto_speed_spinBox.setSingleStep(0.1)
         self.auto_speed_spinBox.setValue(self.translate_speed)
-        self.auto_speed_spinBox.setCursor(self.select_pixmap)
-
-        # 自动模式速率设定说明标签
-        button = QPushButton(self.tab_4)
-        self.customSetGeometry(button, 490, 20, 25, 20)
-        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;" % self.color_2)
-        button.setText("说明")
-        button.clicked.connect(lambda: self.showDesc("autoSpeed"))
-        button.setCursor(self.question_pixmap)
-
-        # 自动模式速率设定说明?号图标
-        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_4)
-        self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 515, 20, 20, 20)
-        button.setStyleSheet("background: transparent;")
-        button.clicked.connect(lambda: self.showDesc("autoSpeed"))
-        button.setCursor(self.question_pixmap)
-
-        # 文字方向标签
-        label = QLabel(self.tab_4)
-        self.customSetGeometry(label, 20, 70, 80, 20)
-        label.setText("文字方向:")
-
-        # 文字方向开关
-        self.text_direction_switch = ui.switch.SwitchDirection(self.tab_4, sign=self.text_direction_use, startX=(65-20)*self.rate, object=self.object)
-        self.customSetGeometry(self.text_direction_switch, 95, 70, 65, 20)
-        self.text_direction_switch.checkedChanged.connect(self.changeTextDirectionSwitch)
-        self.text_direction_switch.setCursor(self.select_pixmap)
-
-        # 文字方向说明标签
-        button = QPushButton(self.tab_4)
-        self.customSetGeometry(button, 175, 70, 25, 20)
-        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;"%self.color_2)
-        button.setText("说明")
-        button.clicked.connect(lambda: self.showDesc("textDirection"))
-        button.setCursor(self.question_pixmap)
-
-        # 文字方向说明?号图标
-        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_4)
-        self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 200, 70, 20, 20)
-        button.setStyleSheet("background: transparent;")
-        button.clicked.connect(lambda: self.showDesc("textDirection"))
-        button.setCursor(self.question_pixmap)
-
-        # 文字换行标签
-        label = QLabel(self.tab_4)
-        self.customSetGeometry(label, 275, 70, 80, 20)
-        label.setText("文字换行:")
-
-        # 文字换行开关
-        self.branch_line_switch = ui.switch.SwitchBranchLine(self.tab_4, sign=self.branch_line_use, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.branch_line_switch, 350, 70, 65, 20)
-        self.branch_line_switch.checkedChanged.connect(self.changeBranchLineSwitch)
-        self.branch_line_switch.setCursor(self.select_pixmap)
-
-        # 文字换行说明标签
-        button = QPushButton(self.tab_4)
-        self.customSetGeometry(button, 430, 70, 25, 20)
-        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;"%self.color_2)
-        button.setText("说明")
-        button.clicked.connect(lambda: self.showDesc("branchLine"))
-        button.setCursor(self.question_pixmap)
-
-        # 文字换行说明?号图标
-        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_4)
-        self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 455, 70, 20, 20)
-        button.setStyleSheet("background: transparent;")
-        button.clicked.connect(lambda: self.showDesc("branchLine"))
-        button.setCursor(self.question_pixmap)
-
-        # 翻译快捷键标签
-        label = QLabel(self.tab_4)
-        self.customSetGeometry(label, 20, 120, 80, 20)
-        label.setText("翻译热键:")
-
-        # 翻译快捷键开关
-        self.translate_hotkey_switch = ui.switch.SwitchOCR(self.tab_4, sign=self.translate_hotkey_use, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.translate_hotkey_switch, 95, 120, 65, 20)
-        self.translate_hotkey_switch.checkedChanged.connect(self.changeTranslateHotkeySwitch)
-        self.translate_hotkey_switch.setCursor(self.select_pixmap)
-
-        # 翻译快捷键设定按钮
-        self.translate_hotkey_button = QPushButton(self.tab_4)
-        self.customSetGeometry(self.translate_hotkey_button, 175, 120, 60, 20)
-        self.translate_hotkey_button.setText(self.object.config["translateHotkeyValue1"] + "+" + self.object.config["translateHotkeyValue2"])
-        self.translate_hotkey_button.clicked.connect(lambda: self.setHotKey("translate"))
-        self.translate_hotkey_button.setCursor(self.select_pixmap)
-
-        # 范围快捷键标签
-        label = QLabel(self.tab_4)
-        self.customSetGeometry(label, 275, 120, 80, 20)
-        label.setText("范围热键:")
-
-        # 范围快捷键开关
-        self.range_hotkey_switch = ui.switch.SwitchOCR(self.tab_4, sign=self.range_hotkey_use, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.range_hotkey_switch, 350, 120, 65, 20)
-        self.range_hotkey_switch.checkedChanged.connect(self.changeRangeHotkeySwitch)
-        self.range_hotkey_switch.setCursor(self.select_pixmap)
-
-        # 范围快捷键设定按钮
-        self.range_hotkey_button = QPushButton(self.tab_4)
-        self.customSetGeometry(self.range_hotkey_button, 430, 120, 60, 20)
-        self.range_hotkey_button.setText(
-            self.object.config["rangeHotkeyValue1"] + "+" + self.object.config["rangeHotkeyValue2"])
-        self.range_hotkey_button.clicked.connect(lambda: self.setHotKey("range"))
-        self.range_hotkey_button.setCursor(self.select_pixmap)
-
-        # 图像相似度标签
-        label = QLabel(self.tab_4)
-        self.customSetGeometry(label, 20, 170, 150, 20)
-        label.setText("图像相似度(%):")
+        self.auto_speed_spinBox.setCursor(ui.static.icon.EDIT_CURSOR)
+        # 自动翻译间隔标签
+        label = QLabel(auto_mode_tab)
+        self.customSetGeometry(label, 85, 35, 500, 20)
+        label.setText("自动模式下刷新翻译的时间间隔(0.5-10.0秒), 建议1")
 
         # 图像相似度设定
-        self.image_refresh_spinBox = QDoubleSpinBox(self.tab_4)
-        self.customSetGeometry(self.image_refresh_spinBox, 130, 167, 45, 25)
+        self.image_refresh_spinBox = QDoubleSpinBox(auto_mode_tab)
+        self.customSetGeometry(self.image_refresh_spinBox, 20, 80, 45, 25)
         self.image_refresh_spinBox.setDecimals(0)
         self.image_refresh_spinBox.setMinimum(80)
         self.image_refresh_spinBox.setMaximum(100)
         self.image_refresh_spinBox.setSingleStep(1)
         self.image_refresh_spinBox.setValue(self.image_refresh_score)
-        self.image_refresh_spinBox.setCursor(self.select_pixmap)
-
-        # 图像相似度说明标签
-        button = QPushButton(self.tab_4)
-        self.customSetGeometry(button, 190, 170, 25, 20)
-        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;" % self.color_2)
-        button.setText("说明")
-        button.clicked.connect(lambda: self.showDesc("imageRefresh"))
-        button.setCursor(self.question_pixmap)
-
-        # 图像相似度说明?号图标
-        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_4)
-        self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 215, 170, 20, 20)
-        button.setStyleSheet("background: transparent;")
-        button.clicked.connect(lambda: self.showDesc("imageRefresh"))
-        button.setCursor(self.question_pixmap)
-
-        # 文字相似度标签
-        label = QLabel(self.tab_4)
-        self.customSetGeometry(label, 275, 170, 150, 20)
-        label.setText("文字相似度(%):")
+        self.image_refresh_spinBox.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 图像相似度标签
+        label = QLabel(auto_mode_tab)
+        self.customSetGeometry(label, 85, 80, 500, 20)
+        label.setText("自动模式下的图像相似度(80-100%), 数值越高越频繁刷新OCR识别结果, 建议98")
 
         # 文字相似度设定
-        self.text_refresh_spinBox = QDoubleSpinBox(self.tab_4)
-        self.customSetGeometry(self.text_refresh_spinBox, 385, 167, 45, 25)
+        self.text_refresh_spinBox = QDoubleSpinBox(auto_mode_tab)
+        self.customSetGeometry(self.text_refresh_spinBox, 20, 130, 45, 25)
         self.text_refresh_spinBox.setDecimals(0)
         self.text_refresh_spinBox.setMinimum(80)
         self.text_refresh_spinBox.setMaximum(100)
         self.text_refresh_spinBox.setSingleStep(1)
         self.text_refresh_spinBox.setValue(self.text_refresh_score)
-        self.text_refresh_spinBox.setCursor(self.select_pixmap)
+        self.text_refresh_spinBox.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 文字相似度标签
+        label = QLabel(auto_mode_tab)
+        self.customSetGeometry(label, 85, 130, 500, 20)
+        label.setText("自动模式下的文字相似度(80-100%), 数值越高越频繁刷新翻译结果, 建议90")
 
-        # 文字相似度说明标签
-        button = QPushButton(self.tab_4)
-        self.customSetGeometry(button, 445, 170, 25, 20)
-        button.setStyleSheet("color: %s; font-size: 9pt; background: transparent;" % self.color_2)
-        button.setText("说明")
-        button.clicked.connect(lambda: self.showDesc("textRefresh"))
-        button.setCursor(self.question_pixmap)
+        # 翻译快捷键开关
+        self.translate_hotkey_switch = ui.switch.SwitchOCR(shortcut_key_tab, sign=self.translate_hotkey_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.translate_hotkey_switch, 20, 30, 65, 20)
+        self.translate_hotkey_switch.checkedChanged.connect(self.changeTranslateHotkeySwitch)
+        self.translate_hotkey_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 翻译快捷键设定按钮
+        self.translate_hotkey_button = QPushButton(shortcut_key_tab)
+        self.customSetGeometry(self.translate_hotkey_button, 100, 30, 60, 20)
+        self.translate_hotkey_button.setText(self.object.config["translateHotkeyValue1"]+"+"+self.object.config["translateHotkeyValue2"])
+        self.translate_hotkey_button.clicked.connect(lambda: self.setHotKey("translate"))
+        self.translate_hotkey_button.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 翻译快捷键标签
+        label = QLabel(shortcut_key_tab)
+        self.customSetGeometry(label, 180, 30, 300, 20)
+        label.setText("手动模式下刷新翻译的快捷键")
 
-        # 文字相似度说明?号图标
-        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self.tab_4)
-        self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 470, 170, 20, 20)
-        button.setStyleSheet("background: transparent;")
-        button.clicked.connect(lambda: self.showDesc("textRefresh"))
-        button.setCursor(self.question_pixmap)
+        # 范围快捷键开关
+        self.range_hotkey_switch = ui.switch.SwitchOCR(shortcut_key_tab, sign=self.range_hotkey_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.range_hotkey_switch, 20, 80, 65, 20)
+        self.range_hotkey_switch.checkedChanged.connect(self.changeRangeHotkeySwitch)
+        self.range_hotkey_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 范围快捷键设定按钮
+        self.range_hotkey_button = QPushButton(shortcut_key_tab)
+        self.customSetGeometry(self.range_hotkey_button, 100, 80, 60, 20)
+        self.range_hotkey_button.setText(self.object.config["rangeHotkeyValue1"]+"+"+self.object.config["rangeHotkeyValue2"])
+        self.range_hotkey_button.clicked.connect(lambda: self.setHotKey("range"))
+        self.range_hotkey_button.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 范围快捷键标签
+        label = QLabel(shortcut_key_tab)
+        self.customSetGeometry(label, 180, 80, 80, 20)
+        label.setText("重新框选范围框的快捷键")
 
-        # 自动登录标签
-        label = QLabel(self.tab_4)
-        self.customSetGeometry(label, 20, 220, 80, 20)
-        label.setText("自动登录:")
+        # 隐藏快捷键开关
+        self.hide_range_hotkey_switch = ui.switch.SwitchOCR(shortcut_key_tab, sign=self.hide_range_hotkey_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.hide_range_hotkey_switch, 20, 130, 65, 20)
+        self.hide_range_hotkey_switch.checkedChanged.connect(self.changeHideRangeHotkeySwitch)
+        self.hide_range_hotkey_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 隐藏快捷键设定按钮
+        self.hide_range_hotkey_button = QPushButton(shortcut_key_tab)
+        self.customSetGeometry(self.hide_range_hotkey_button, 100, 130, 60, 20)
+        self.hide_range_hotkey_button.setText(self.object.config["hideRangeHotkeyValue1"]+"+"+self.object.config["hideRangeHotkeyValue2"])
+        self.hide_range_hotkey_button.clicked.connect(lambda: self.setHotKey("hideRange"))
+        self.hide_range_hotkey_button.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 隐藏范围快捷键标签
+        label = QLabel(shortcut_key_tab)
+        self.customSetGeometry(label, 180, 130, 300, 20)
+        label.setText("显示/隐藏范围框的快捷键")
+
+        # 贴字翻译开关
+        self.draw_image_switch = ui.switch.DrawSwitchOCR(other_tab, sign=self.draw_image_use, startX=(65-20)*self.rate, object=self.object)
+        self.customSetGeometry(self.draw_image_switch, 20, 30, 65, 20)
+        self.draw_image_switch.checkedChanged.connect(self.changeDrawImageSwitch)
+        self.draw_image_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 贴字翻译标签
+        label = QLabel(other_tab)
+        self.customSetGeometry(label, 105, 30, 400, 20)
+        label.setText("将翻译的结果以贴图的形式覆盖至范围框内")
+
+        # 原文自动复制到剪贴板开关
+        self.auto_copy_original_switch = ui.switch.SwitchOCR(other_tab, sign=self.auto_clipboard_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.auto_copy_original_switch, 20, 80, 65, 20)
+        self.auto_copy_original_switch.checkedChanged.connect(self.changeAutoCopyOriginalSwitch)
+        self.auto_copy_original_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 原文自动复制到剪贴板标签
+        label = QLabel(other_tab)
+        self.customSetGeometry(label, 105, 80, 400, 20)
+        label.setText("每次识别到的原文自动复制到剪贴板")
+
+        # 是否全屏下置顶开关
+        self.set_top_switch = ui.switch.SwitchOCR(other_tab, self.set_top_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.set_top_switch, 20, 130, 65, 20)
+        self.set_top_switch.checkedChanged.connect(self.changeSetTopSwitch)
+        self.set_top_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 是否全屏下置顶
+        label = QLabel(other_tab)
+        self.customSetGeometry(label, 105, 130, 400, 20)
+        label.setText("在全屏模式的应用下置顶翻译器")
 
         # 自动登录开关
-        self.auto_login_switch = ui.switch.SwitchOCR(self.tab_4,
-                                                     sign=self.auto_login_use,
-                                                     startX=(65-20) * self.rate)
-        self.customSetGeometry(self.auto_login_switch, 95, 220, 65, 20)
+        self.auto_login_switch = ui.switch.SwitchOCR(other_tab, sign=self.auto_login_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.auto_login_switch, 20, 180, 65, 20)
         self.auto_login_switch.checkedChanged.connect(self.changeAutoLoginSwitch)
-        self.auto_login_switch.setCursor(self.select_pixmap)
+        self.auto_login_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 自动登录标签
+        label = QLabel(other_tab)
+        self.customSetGeometry(label, 105, 180, 400, 20)
+        label.setText("开启软件后自动登录账号")
 
-        # 百度OCR高精度模式备注
-        label = QLabel(self.tab_4)
-        self.customSetGeometry(label, 275, 220, 150, 20)
-        label.setText("百度OCR高精度:")
+        # 同意收集翻译历史开关
+        self.agree_collect_switch = ui.switch.SwitchOCR(other_tab, sign=self.agree_collect_use, startX=(65-20) * self.rate)
+        self.customSetGeometry(self.agree_collect_switch, 20, 230, 65, 20)
+        self.agree_collect_switch.checkedChanged.connect(self.changeAgreeCollectSwitch)
+        self.agree_collect_switch.setCursor(ui.static.icon.SELECT_CURSOR)
 
-        # 百度OCR高精度模式开关
-        self.baidu_ocr_high_precision_switch = ui.switch.SwitchOCR(self.tab_4,
-                                                                   self.baidu_ocr_high_precision_use,
-                                                                   startX=(65-20) * self.rate)
-        self.customSetGeometry(self.baidu_ocr_high_precision_switch, 390, 220, 65, 20)
-        self.baidu_ocr_high_precision_switch.checkedChanged.connect(self.changeBaiduOcrHighPrecisionSwitch)
-        self.baidu_ocr_high_precision_switch.setCursor(self.select_pixmap)
+        # 同意收集翻译历史标签
+        label = QLabel(other_tab)
+        self.customSetGeometry(label, 105, 230, 300, 20)
+        label.setText("加入用户体验改善计划")
+        # 同意收集翻译历史?号图标
+        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", other_tab)
+        self.customSetIconSize(button, 20, 20)
+        self.customSetGeometry(button, 250, 230, 20, 20)
+        button.setStyleSheet("background: transparent;")
+        button.clicked.connect(lambda: self.showDesc("agreeCollect"))
+        button.setCursor(ui.static.icon.QUESTION_CURSOR)
 
 
     # 关于标签页
@@ -1305,197 +1333,139 @@ class Settin(QMainWindow) :
         label.setStyleSheet("border-width: 1px; border-style: solid; border-color: rgba(62, 62, 62, 0.2);")
 
         # 选项卡图标
-        icon = QIcon()
-        pixmap = QPixmap(ABOUT_ICON_PATH)
-        pixmap = pixmap.scaled(int(20*self.rate),
-                               int(20*self.rate),
-                               Qt.KeepAspectRatio,
-                               Qt.SmoothTransformation)
-        icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
-        self.tab_widget.setTabIcon(self.tab_widget.indexOf(self.tab_5), icon)
+        self.tab_widget.setTabIcon(self.tab_widget.indexOf(self.tab_5), ui.static.icon.ABOUT_ICON)
 
         # 此Label用于雾化工具栏1的背景图
-        imageLabel = QLabel(self.tab_5)
-        imageLabel.setGeometry(QRect(0, -1, self.window_width + 5, self.window_height + 5))
-        imageLabel.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
+        label = QLabel(self.tab_5)
+        label.setGeometry(QRect(0, -1, self.window_width+5, self.window_height+5))
+        label.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
 
         # 官方网站标签
         label = QLabel(self.tab_5)
-        self.customSetGeometry(label, 130, 20, 300, 20)
+        self.customSetGeometry(label, 130, 30, 300, 20)
         label.setText("团子翻译器的官网哦 (欢迎来玩)")
 
         # 官方网站按钮
         button = QPushButton(self.tab_5)
-        self.customSetGeometry(button, 20, 20, 90, 20)
+        self.customSetGeometry(button, 20, 30, 90, 20)
         button.setText("官方网站")
         button.clicked.connect(self.openHomePage)
-        button.setCursor(self.select_pixmap)
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 项目地址图标
-        icon = QIcon()
-        pixmap = QPixmap(HOME_ICON_PATH)
-        pixmap = pixmap.scaled(int(20 * self.rate),
-                               int(20 * self.rate),
-                               Qt.KeepAspectRatio,
-                               Qt.SmoothTransformation)
-        icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
-        button.setIcon(icon)
+        button.setIcon(ui.static.icon.HOME_ICON)
 
         # 项目地址标签
         label = QLabel(self.tab_5)
-        self.customSetGeometry(label, 130, 65, 300, 20)
+        self.customSetGeometry(label, 130, 75, 300, 20)
         label.setText("本软件已在github开源 (欢迎来点小星星)")
 
         # 项目地址按钮
         button = QPushButton(self.tab_5)
-        self.customSetGeometry(button, 20, 65, 90, 20)
+        self.customSetGeometry(button, 20, 75, 90, 20)
         button.setText("项目地址")
-        button.clicked.connect(self.openGithubproject)
-        button.setCursor(self.select_pixmap)
+        button.clicked.connect(self.openGithubProject)
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 项目地址图标
-        github_icon = QIcon()
-        pixmap = QPixmap(GITHUB_ICON_PATH)
-        pixmap = pixmap.scaled(int(20 * self.rate),
-                               int(20 * self.rate),
-                               Qt.KeepAspectRatio,
-                               Qt.SmoothTransformation)
-        github_icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
-        button.setIcon(github_icon)
+        button.setIcon(ui.static.icon.GITHUB_ICON)
 
         # 在线教程标签
         label = QLabel(self.tab_5)
-        self.customSetGeometry(label, 130, 110, 300, 20)
+        self.customSetGeometry(label, 130, 120, 300, 20)
         label.setText("软件完整使用教程 (要好好阅读哦)")
 
         # 在线教程按钮
         button = QPushButton(self.tab_5)
-        self.customSetGeometry(button, 20, 110, 90, 20)
+        self.customSetGeometry(button, 20, 120, 90, 20)
         button.setText("在线文档")
         button.clicked.connect(self.openTutorial)
-        button.setCursor(self.select_pixmap)
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 在线教程图标
-        icon = QIcon()
-        pixmap = QPixmap(TUTORIAL_ICON_PATH)
-        pixmap = pixmap.scaled(int(20 * self.rate),
-                               int(20 * self.rate),
-                               Qt.KeepAspectRatio,
-                               Qt.SmoothTransformation)
-        icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
-        button.setIcon(icon)
+        button.setIcon(ui.static.icon.TUTORIAL_ICON)
 
         # 教程视频标签
         label = QLabel(self.tab_5)
-        self.customSetGeometry(label, 130, 150, 300, 20)
+        self.customSetGeometry(label, 130, 160, 300, 20)
         label.setText("软件b站教程视频 (不想看文档就看这个吧)")
 
         # 教程视频按钮
         button = QPushButton(self.tab_5)
-        self.customSetGeometry(button, 20, 150, 90, 20)
+        self.customSetGeometry(button, 20, 160, 90, 20)
         button.setText("教程视频")
         button.clicked.connect(self.openBilibiliVideo)
-        button.setCursor(self.select_pixmap)
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # b站教程视频图标
-        icon = QIcon()
-        pixmap = QPixmap(BILIBILI_VIDEO_PATH)
-        pixmap = pixmap.scaled(int(20 * self.rate),
-                               int(20 * self.rate),
-                               Qt.KeepAspectRatio,
-                               Qt.SmoothTransformation)
-        icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
-        button.setIcon(icon)
+        button.setIcon(ui.static.icon.BILIBILI_VIDEO_ICON)
 
         # 关注作者标签
         label = QLabel(self.tab_5)
-        self.customSetGeometry(label, 130, 195, 300, 20)
+        self.customSetGeometry(label, 130, 205, 300, 20)
         label.setText("发布公告的地方 (不关注团子吗)")
 
         # 关注作者按钮
         button = QPushButton(self.tab_5)
-        self.customSetGeometry(button, 20, 195, 90, 20)
+        self.customSetGeometry(button, 20, 205, 90, 20)
         button.setText("关注团子")
-        button.clicked.connect(self.oepnBilibili)
-        button.setCursor(self.select_pixmap)
+        button.clicked.connect(self.openBilibili)
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
 
-        # QQ图标
-        icon = QIcon()
-        pixmap = QPixmap(BILIBILI_ICON_PATH)
-        pixmap = pixmap.scaled(int(20 * self.rate),
-                               int(20 * self.rate),
-                               Qt.KeepAspectRatio,
-                               Qt.SmoothTransformation)
-        icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
-        button.setIcon(icon)
+        # bilibili图标
+        button.setIcon(ui.static.icon.BILIBILI_ICON)
 
         # 添加交流群标签
         label = QLabel(self.tab_5)
-        self.customSetGeometry(label, 130, 240, 300, 20)
+        self.customSetGeometry(label, 130, 250, 300, 20)
         label.setText("加入交流群 (QQ群申请)")
 
         # 添加交流群按钮
         button = QPushButton(self.tab_5)
-        self.customSetGeometry(button, 20, 240, 90, 20)
+        self.customSetGeometry(button, 20, 250, 90, 20)
         button.setText("群聊交流")
         button.clicked.connect(lambda: self.showDesc("qqGroup"))
-        button.setCursor(self.select_pixmap)
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # QQ群图标
-        icon = QIcon()
-        pixmap = QPixmap(GROUP_PATH)
-        pixmap = pixmap.scaled(int(20 * self.rate),
-                               int(20 * self.rate),
-                               Qt.KeepAspectRatio,
-                               Qt.SmoothTransformation)
-        icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
-        button.setIcon(icon)
+        button.setIcon(ui.static.icon.GROUP_ICON)
 
         # 特别鸣谢标签
         label = QLabel(self.tab_5)
-        self.customSetGeometry(label, 20, 290, 300, 20)
+        self.customSetGeometry(label, 20, 300, 300, 20)
         label.setText("特别鸣谢 (本软件受到以下人员和项目的帮助)")
 
         # PaddleOCR主页按钮
         button = QPushButton(self.tab_5)
-        self.customSetGeometry(button, 20, 330, 90, 20)
+        self.customSetGeometry(button, 20, 340, 90, 20)
         button.setText("PaddleOCR‭")
         button.clicked.connect(self.openPaddleOCR)
-        button.setIcon(github_icon)
-        button.setCursor(self.select_pixmap)
+        button.setIcon(ui.static.icon.GITHUB_ICON)
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # GT-Zhang主页按钮
         button = QPushButton(self.tab_5)
-        self.customSetGeometry(button, 130, 330, 90, 20)
+        self.customSetGeometry(button, 130, 340, 90, 20)
         button.setText("GT-Zhang")
         button.clicked.connect(self.openGT)
-        button.setIcon(github_icon)
-        button.setCursor(self.select_pixmap)
-
-        # 博客图标
-        icon = QIcon()
-        pixmap = QPixmap(BLOG_PATH)
-        pixmap = pixmap.scaled(int(20 * self.rate),
-                               int(20 * self.rate),
-                               Qt.KeepAspectRatio,
-                               Qt.SmoothTransformation)
-        icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
+        button.setIcon(ui.static.icon.GITHUB_ICON)
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # C4a15Wh主页按钮
         button = QPushButton(self.tab_5)
-        self.customSetGeometry(button, 240, 330, 90, 20)
+        self.customSetGeometry(button, 240, 340, 90, 20)
         button.setText("C4a15Wh")
         button.clicked.connect(self.openC44)
-        button.setIcon(icon)
-        button.setCursor(self.select_pixmap)
+        button.setIcon(ui.static.icon.BLOG_ICON)
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # cypas‭主页按钮
         button = QPushButton(self.tab_5)
-        self.customSetGeometry(button, 350, 330, 90, 20)
+        self.customSetGeometry(button, 350, 340, 90, 20)
         button.setText("Cypas‭")
         button.clicked.connect(self.openCy)
-        button.setIcon(icon)
-        button.setCursor(self.select_pixmap)
+        button.setIcon(ui.static.icon.BLOG_ICON)
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
 
 
     # 支持作者标签页
@@ -1514,19 +1484,12 @@ class Settin(QMainWindow) :
         label.setStyleSheet("border-width: 1px; border-style: solid; border-color: rgba(62, 62, 62, 0.2);")
 
         # 选项卡图标
-        icon = QIcon()
-        pixmap = QPixmap(GOOD_ICON_PATH)
-        pixmap = pixmap.scaled(int(20*self.rate),
-                               int(20*self.rate),
-                               Qt.KeepAspectRatio,
-                               Qt.SmoothTransformation)
-        icon.addPixmap(pixmap, QIcon.Normal, QIcon.On)
-        self.tab_widget.setTabIcon(self.tab_widget.indexOf(self.tab_6), icon)
+        self.tab_widget.setTabIcon(self.tab_widget.indexOf(self.tab_6), ui.static.icon.GOOD_ICON_ICON)
 
         # 此Label用于雾化工具栏1的背景图
-        imageLabel = QLabel(self.tab_6)
-        imageLabel.setGeometry(QRect(0, -1, self.window_width+5, self.window_height+5))
-        imageLabel.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
+        label = QLabel(self.tab_6)
+        label.setGeometry(QRect(0, -1, self.window_width+5, self.window_height+5))
+        label.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
 
         # 充电独白标签
         label = QLabel(self.tab_6)
@@ -1568,7 +1531,7 @@ class Settin(QMainWindow) :
         self.rate = self.object.yaml["screen_scale_rate"]
         # 界面尺寸
         self.window_width = int(800*self.rate)
-        self.window_height = int(400*self.rate)
+        self.window_height = int(420*self.rate)
         # 所使用的颜色
         self.color_1 = "#595959"  # 灰色
         self.color_2 = "#5B8FF9"  # 蓝色
@@ -1576,6 +1539,18 @@ class Settin(QMainWindow) :
         self.font_size = 10
         # 存被开启的翻译源
         self.translate_list = []
+        # 翻译源中文映射
+        self.translate_map = {
+            "youdao": "【公共有道】",
+            "baidu": "【公共百度】",
+            "tencent": "【公共腾讯】",
+            "deepl": "【公共DeepL】",
+            "google": "【公共Google】",
+            "caiyun": "【公共彩云】",
+            "tencent_private": "【私人腾讯】",
+            "baidu_private": "【私人百度】",
+            "caiyun_private": "【私人彩云】"
+        }
 
         # OCR各开关
         self.offline_ocr_use = self.object.config["offlineOCR"]
@@ -1669,6 +1644,8 @@ class Settin(QMainWindow) :
         self.image_refresh_score = self.object.config["imageSimilarity"]
         # 自动翻译文字刷新相似度
         self.text_refresh_score = self.object.config["textSimilarity"]
+        # 同步翻译历史开关
+        self.agree_collect_use = self.object.config["agreeCollectUse"]
 
         # 团子翻译器开源地址
         self.dango_translator_url = "https://github.com/PantsuDango/Dango-Translator"
@@ -1692,6 +1669,8 @@ class Settin(QMainWindow) :
         self.draw_image_use = self.object.config["drawImageUse"]
         # 隐藏范围快捷键开关
         self.hide_range_hotkey_use = self.object.config["showHotKey3"]
+        # 是否全屏下置顶开关
+        self.set_top_use = self.object.config["setTop"]
 
 
     # 获取节点信息
@@ -1708,7 +1687,7 @@ class Settin(QMainWindow) :
         sign, time_diff = utils.http.getOCR(url)
         model = self.node_info_comboBox.model()
         if sign :
-            entry = QStandardItem("自动模式  {}ms".format(time_diff))
+            entry = QStandardItem("自动模式  {:.2f}s".format(time_diff/1000))
             entry.setForeground(QColor(Qt.green))
         else :
             entry = QStandardItem("自动模式  不可用")
@@ -1732,7 +1711,7 @@ class Settin(QMainWindow) :
             model = self.node_info_comboBox.model()
 
             if sign :
-                text = "{}  {}ms".format(node_name, time_diff)
+                text = "{}  {:.2f}s".format(node_name, time_diff/1000)
                 entry = QStandardItem(text)
                 entry.setForeground(QColor(Qt.green))
             else :
@@ -1760,8 +1739,8 @@ class Settin(QMainWindow) :
     # 根据分辨率定义图标位置尺寸
     def customSetIconSize(self, object, w, h) :
 
-        object.setIconSize(QSize(int(w * self.rate),
-                                 int(h * self.rate)))
+        object.setIconSize(QSize(int(w*self.rate),
+                                 int(h*self.rate)))
 
 
     # 控件加入阴影
@@ -1789,8 +1768,10 @@ class Settin(QMainWindow) :
             if self.baidu_ocr_use == True :
                 self.resetSwitch("baiduOCR")
             self.offline_ocr_use = True
+            self.ocr_label.setText("当前正在使用【本地OCR】")
         else:
             self.offline_ocr_use = False
+            self.ocr_label.setText("请选择开启一种OCR开关, 否则翻译将无法使用")
 
 
     # 改变在线OCR开关状态
@@ -1802,8 +1783,10 @@ class Settin(QMainWindow) :
             if self.baidu_ocr_use == True :
                 self.resetSwitch("baiduOCR")
             self.online_ocr_use = True
+            self.ocr_label.setText("当前正在使用【在线OCR】")
         else:
             self.online_ocr_use = False
+            self.ocr_label.setText("请选择开启一种OCR开关, 否则翻译将无法使用")
 
 
     # 改变百度OCR开关状态
@@ -1815,8 +1798,10 @@ class Settin(QMainWindow) :
             if self.online_ocr_use == True :
                 self.resetSwitch("onlineOCR")
             self.baidu_ocr_use = True
+            self.ocr_label.setText("当前正在使用【百度OCR】")
         else :
             self.baidu_ocr_use = False
+            self.ocr_label.setText("请选择开启一种OCR开关, 否则翻译将无法使用")
 
 
     # 改变百度OCR高精度开关状态
@@ -1826,6 +1811,16 @@ class Settin(QMainWindow) :
             self.baidu_ocr_high_precision_use = True
         else:
             self.baidu_ocr_high_precision_use = False
+
+
+    # 改变是否全屏下置顶开关状态
+    def changeSetTopSwitch(self, checked):
+
+        if checked:
+            self.set_top_use = True
+            utils.thread.createThread(self.object.hwndObj.run)
+        else:
+            self.set_top_use = False
 
 
     # 改变公共有道翻译开关状态
@@ -1838,6 +1833,7 @@ class Settin(QMainWindow) :
         else:
             self.youdao_use = False
             self.translate_list.remove("youdao")
+        self.setTransLabelMessage()
 
 
     # 改变公共百度翻译开关状态
@@ -1850,6 +1846,7 @@ class Settin(QMainWindow) :
         else:
             self.baidu_web_use = False
             self.translate_list.remove("baidu")
+        self.setTransLabelMessage()
 
 
     # 改变公共腾讯翻译开关状态
@@ -1862,6 +1859,7 @@ class Settin(QMainWindow) :
         else:
             self.tencent_web_use = False
             self.translate_list.remove("tencent")
+        self.setTransLabelMessage()
 
 
     # 改变公共DeepL翻译开关状态
@@ -1874,6 +1872,7 @@ class Settin(QMainWindow) :
         else:
             self.deepl_use = False
             self.translate_list.remove("deepl")
+        self.setTransLabelMessage()
 
 
     # 改变公共Google翻译开关状态
@@ -1886,6 +1885,7 @@ class Settin(QMainWindow) :
         else:
             self.google_use = False
             self.translate_list.remove("google")
+        self.setTransLabelMessage()
 
 
     # 改变公共彩云翻译开关状态
@@ -1898,6 +1898,7 @@ class Settin(QMainWindow) :
         else:
             self.caiyun_web_use = False
             self.translate_list.remove("caiyun")
+        self.setTransLabelMessage()
 
 
     # 改变私人腾讯翻译开关状态
@@ -1910,6 +1911,7 @@ class Settin(QMainWindow) :
         else:
             self.tencent_use = False
             self.translate_list.remove("tencent_private")
+        self.setTransLabelMessage()
 
 
     # 改变私人百度翻译开关状态
@@ -1922,6 +1924,7 @@ class Settin(QMainWindow) :
         else:
             self.baidu_use = False
             self.translate_list.remove("baidu_private")
+        self.setTransLabelMessage()
 
 
     # 改变私人彩云翻译开关状态
@@ -1934,6 +1937,7 @@ class Settin(QMainWindow) :
         else:
             self.caiyun_use = False
             self.translate_list.remove("caiyun_private")
+        self.setTransLabelMessage()
 
 
     # 改变字体样式开关状态
@@ -2041,6 +2045,15 @@ class Settin(QMainWindow) :
             self.auto_login_use = False
 
 
+    # 改变同步翻译历史开关状态
+    def changeAgreeCollectSwitch(self, checked):
+
+        if checked:
+            self.agree_collect_use = True
+        else:
+            self.agree_collect_use = False
+
+
     # 重置开关状态
     def resetSwitch(self, switch_type) :
 
@@ -2058,18 +2071,24 @@ class Settin(QMainWindow) :
     # 运行本地OCR
     def runOfflineOCR(self) :
 
+        # 杀死本地可能在运行ocr进程
+        utils.offline_ocr.killOfflineOCR(self.object.yaml["port"])
+
         # 检查端口是否被占用
         if utils.port.detectPort(self.object.yaml["port"]) :
-            utils.message.MessageBox("运行失败",
+            utils.message.MessageBox("本地OCR运行失败",
                                      "本地OCR已启动, 请不要重复运行!     ")
         else :
             try :
                 # 启动本地OCR
                 os.startfile(self.object.yaml["ocr_cmd_path"])
+            except FileNotFoundError :
+                utils.message.MessageBox("本地OCR运行失败",
+                                         "本地OCR还未安装, 请先安装!     ")
             except Exception :
                 self.logger.error(format_exc())
-                utils.message.MessageBox("运行失败",
-                                         "本地OCR运行失败, 原因:\n%s     "%format_exc())
+                utils.message.MessageBox("本地OCR运行失败",
+                                         "原因: %s"%format_exc())
 
 
     # 测试本地OCR
@@ -2134,8 +2153,8 @@ class Settin(QMainWindow) :
             self.logger.error(format_exc())
 
 
-    # 打开guihub项目地址
-    def openGithubproject(self):
+    # 打开github项目地址
+    def openGithubProject(self):
 
         try :
             webbrowser.open(self.dango_translator_url, new=0, autoraise=True)
@@ -2147,7 +2166,7 @@ class Settin(QMainWindow) :
     def openHomePage(self):
 
         try :
-            url = self.object.yaml["dict_info"]["dange_home_page"]
+            url = self.object.yaml["dict_info"]["dango_home_page"]
             webbrowser.open(url, new=0, autoraise=True)
         except Exception :
             self.logger.error(format_exc())
@@ -2163,7 +2182,7 @@ class Settin(QMainWindow) :
 
 
     # 打开添加作者地址
-    def oepnBilibili(self):
+    def openBilibili(self):
 
         try :
             webbrowser.open(self.dango_bilibili_url, new=0, autoraise=True)
@@ -2236,6 +2255,66 @@ class Settin(QMainWindow) :
             self.logger.error(format_exc())
 
 
+    # 打开百度OCR额度查询地址
+    def openBaiduOCRQueryQuota(self):
+
+        url = "https://console.bce.baidu.com/ai/?_=1661324005307#/ai/ocr/overview/index"
+        try:
+            webbrowser.open(url, new=0, autoraise=True)
+        except Exception:
+            self.logger.error(format_exc())
+            utils.message.MessageBox("百度OCR额度查询",
+                                     "打开地址失败, 请尝试手动打开此网页下载\n%s     "%url)
+
+
+    # 打开安装谷歌浏览器地址
+    def openInstallChrome(self):
+
+        url = "https://www.google.cn/intl/zh-CN/chrome/"
+        try:
+            webbrowser.open(url, new=0, autoraise=True)
+        except Exception:
+            self.logger.error(format_exc())
+            utils.message.MessageBox("安装谷歌浏览器",
+                                     "打开地址失败, 请尝试手动打开此网页下载\n%s     "%url)
+
+
+    # 打开查询私人腾讯额度地址
+    def openTencentQueryQuota(self):
+
+        url = "https://console.cloud.tencent.com/tmt"
+        try:
+            webbrowser.open(url, new=0, autoraise=True)
+        except Exception:
+            self.logger.error(format_exc())
+            utils.message.MessageBox("私人腾讯额度查询",
+                                     "打开地址失败, 请尝试手动打开此网页下载\n%s     "%url)
+
+
+    # 打开查询私人彩云额度地址
+    def openCaiyunQueryQuota(self):
+
+        url = "https://dashboard.caiyunapp.com/v1/token/5e818320d4b84b00d29a9316/?type=2"
+        try:
+            webbrowser.open(url, new=0, autoraise=True)
+        except Exception:
+            self.logger.error(format_exc())
+            utils.message.MessageBox("私人腾讯额度查询",
+                                     "打开地址失败, 请尝试手动打开此网页下载\n%s     "%url)
+
+
+    # 打开查询私人百度额度地址
+    def openBaiduQueryQuota(self):
+
+        url = "https://fanyi-api.baidu.com/api/trans/product/desktop"
+        try:
+            webbrowser.open(url, new=0, autoraise=True)
+        except Exception:
+            self.logger.error(format_exc())
+            utils.message.MessageBox("私人腾讯额度查询",
+                                     "打开地址失败, 请尝试手动打开此网页下载\n%s     "%url)
+
+
     # 打开团子在线OCR购买
     def openDangoBuyPage(self):
 
@@ -2294,135 +2373,27 @@ class Settin(QMainWindow) :
 
         self.desc_ui = ui.desc.Desc(self.object)
 
-        # OCR说明
-        if message_type == "OCR" :
-            self.desc_ui.setWindowTitle("OCR说明")
-            self.desc_ui.desc_text.append("\n首先区别OCR和翻译是两个模块。")
-            self.desc_ui.desc_text.append("\nOCR即为文字识别技术, 用于提取图片内要翻译的文字.")
-            self.desc_ui.desc_text.append("\n翻译器通过对所框选的范围进行截图, 然后利用OCR将截图内要翻译的文字识别出来, 再发送给翻译模块翻译。")
-
-        # 本地OCR说明
-        elif message_type == "offlineOCR" :
-            self.desc_ui.setWindowTitle("本地OCR说明")
-            self.desc_ui.desc_text.append("\n特性: \n依赖自身CPU性能, CPU性能越高，识别速度越快.")
-            self.desc_ui.desc_text.append("识别精度一般.")
-            self.desc_ui.desc_text.append("\n优点:\n1. 无额度限制, 完全免费, 可无限次使用;")
-            self.desc_ui.desc_text.append("\n缺点:\n1. 对电脑配置较低的用户不友好, 可能会导致电脑很卡;")
-            self.desc_ui.desc_text.append("2. 可能会因为环境配置问题导致安装失败, 不支持10年以前发行的CPU;")
-            self.desc_ui.desc_text.append("\n详细使用方式见教程.")
-
-        # 在线OCR说明
-        elif message_type == "onlineOCR":
-            self.desc_ui.setWindowTitle("在线OCR说明")
-            self.desc_ui.desc_text.append("\n特性: \n团子在大佬们的帮助下自行搭建的OCR在线服务.")
-            self.desc_ui.desc_text.append("识别精度较好.")
-            self.desc_ui.desc_text.append("\n优点:\n1. 不消耗电脑配置, 仅需联网;")
-            self.desc_ui.desc_text.append("2. 性价比高, 服务期内无使用次数限制;")
-            self.desc_ui.desc_text.append("\n缺点:\n1. 不免费, 需要氪点金金;")
-            self.desc_ui.desc_text.append("\n详细使用方式见教程.")
-
-        # 百度OCR说明
-        elif message_type == "baiduOCR":
-            self.desc_ui.setWindowTitle("百度OCR说明")
-            self.desc_ui.desc_text.append("\n特性: \n百度智能云的OCR服务.")
-            self.desc_ui.desc_text.append("识别精度优秀.")
-            self.desc_ui.desc_text.append("\n优点:\n1. 不消耗电脑配置, 仅需联网;")
-            self.desc_ui.desc_text.append("\n缺点:\n1. 使用次数有限制;")
-            self.desc_ui.desc_text.append("2. 不免费, 且价格较贵;")
-            self.desc_ui.desc_text.append("\n详细使用方式见教程.")
-
-        # 公共翻译说明
-        elif message_type == "publicTranslate" :
-            self.desc_ui.setWindowTitle("公共翻译说明")
-            self.desc_ui.desc_text.append("\n没有次数限制, 不需要注册, 可直接使用, 但不保证使用稳定性, 可能会抽风.")
-            self.desc_ui.desc_text.append('\n使用需要电脑装有"最新版本的" Chorem(谷歌)浏览器、Firefox(火狐)浏览器、Edga(微软)浏览器 至少一款.')
-            self.desc_ui.desc_text.append('\n翻译器原理上, 是通过后台启动相应的浏览器, 自动打开翻译网站去实现翻译.')
-            self.desc_ui.desc_text.append("\n详细使用方式见教程.")
-
-        # 私人翻译说明
-        elif message_type == "privateTranslate" :
-            self.desc_ui.setWindowTitle("私人翻译说明")
-            self.desc_ui.desc_text.append("\n有次数限制, 使用前需要注册, 但使用稳定性, 基本上不会抽风.")
-            self.desc_ui.desc_text.append("\n翻译器原理上, 是通过请求相应的云API接口去获取翻译结果")
-            self.desc_ui.desc_text.append("\n详细使用方式见教程.")
-
-        # 翻译框透明度说明
-        elif message_type == "horizontalSlider" :
-            self.desc_ui.setWindowTitle("翻译框透明度说明")
-            self.desc_ui.desc_text.append("\n用于调节显示翻译结果的翻译框透明度.")
-            self.desc_ui.desc_text.append("数值0为全透明")
-            self.desc_ui.desc_text.append("数值100为完全不透明")
-
-        # 字体样式设定说明
-        elif message_type == "fontType" :
-            self.desc_ui.setWindowTitle("字体样式设定说明")
-            self.desc_ui.desc_text.append("描边字体为字体中间镂空白底, 描边带颜色:\n")
-            self.desc_ui.desc_text.insertHtml('<img src={} width="{}" >'.format(HOLLOW_IMG_PATH, 245*self.rate))
-            self.desc_ui.desc_text.append("\n实心字体为纯色字体:\n")
-            self.desc_ui.desc_text.insertHtml('<img src="{}" width="{}" >'.format(SOLID_IMG_PATH, 245*self.rate))
-            self.desc_ui.desc_text.append("\n顺便一提团子喜欢描边字体~")
-
-        # 自动翻译设定说明
-        elif message_type == "autoSpeed" :
-            self.desc_ui.setWindowTitle("自动翻译设定说明")
-            self.desc_ui.desc_text.append("\n自动翻译模式下, 每隔该设定时间, 便会检测一次所框的范围内图像是否发生变化, 若发生变化则识别并刷新翻译")
-
-        # 显示原文说明
-        elif message_type == "showOriginal" :
-            self.desc_ui.setWindowTitle("显示原文说明")
-            self.desc_ui.desc_text.append("\n开启后, 会将OCR识别到的原文显示在翻译框.")
-
-        # 文字方向说明
-        elif message_type == "textDirection":
-            self.desc_ui.setWindowTitle("文字方向说明")
-            self.desc_ui.desc_text.append("\n正常都是横向的呢, 竖向多用于漫画翻译的情况.")
-
-        # 图像相似度说明
-        elif message_type == "imageRefresh":
-            self.desc_ui.setWindowTitle("图像相似度说明")
-            self.setTextColor(self.desc_ui.desc_text, "#FF0000", "如果看不懂请不要轻易修改此参数, 建议值为98.")
-            self.desc_ui.desc_text.append("\n自动翻译模式下, 每隔设定的时间间隔, 会重新检测范围区域的图像. "
-                                          "只有当当前图像, 与前一次图像比较的相似度小于该设定的值时, 才会重新调取OCR识别该图像.")
-            self.desc_ui.desc_text.append("\n如果觉得OCR频繁重复识别, 翻译框出现了'闪烁'的话, 可以调低此参数.")
-
-        # 文字相似度说明
-        elif message_type == "textRefresh":
-            self.desc_ui.setWindowTitle("文字相似度说明")
-            self.setTextColor(self.desc_ui.desc_text, "#FF0000", "如果看不懂请不要轻易修改此参数, 建议值为90.")
-            self.desc_ui.desc_text.append("\n自动翻译模式下, 每隔设定的时间间隔, OCR识别结果刷新后. "
-                                          "如果当前OCR识别出的原文, 与前一次识别的原文比较, 其相似度小于该设定的值时, "
-                                          "才会重新调取翻译并刷新至翻译界面.")
-            self.desc_ui.desc_text.append("\n如果觉得频繁重复翻译, 翻译框出现了'闪烁'的话, 可以调低此参数.")
-
         # QQ交流群
-        elif message_type == "qqGroup":
+        if message_type == "qqGroup" :
+            try :
+                qq_group_image = requests.get(self.object.yaml["dict_info"]["dango_qq_group"]).content
+                qq_group_image = "data:image/png;base64,%s"%(str(base64.b64encode(qq_group_image))[2:])
+            except Exception :
+                qq_group_image = "./config/other/交流群.png"
             self.desc_ui.setWindowTitle("加入交流群")
-            self.desc_ui.desc_text.insertHtml('<img src="{}" width="{}" height="{}">'.format(QQ_GROUP_PATH, 245*self.rate, 295*self.rate))
+            self.desc_ui.desc_text.insertHtml('<img src="{}" width="{}" height="{}">'.format(
+                qq_group_image, 245*self.rate, 295*self.rate))
 
-        # 文字换行
-        elif message_type == "branchLine" :
-            self.desc_ui.setWindowTitle("文字换行说明")
-            self.setTextColor(self.desc_ui.desc_text, "#FF0000", "如果看不懂请打开此开关.")
-            self.desc_ui.desc_text.append("\n会将识别到的原文换行后再翻译, 可能会出现断句错误情况")
+        # 在线OCR查询额度
+        elif message_type == "onlineOCRQueryQuota" :
+            self.desc_ui.setWindowTitle("在线OCR额度查询")
+            self.desc_ui.desc_text.append(utils.http.onlineOCRQueryQuota(self.object))
 
-        # 原文颜色
-        elif message_type == "originalColor" :
-            self.desc_ui.setWindowTitle("原文颜色说明")
-            self.desc_ui.desc_text.append("\n控制翻译界面显示的原文, 和一切错误说明, 通知信息的文字颜色")
+        elif message_type == "agreeCollect" :
+            self.desc_ui.setWindowTitle("用户体验改善说明")
+            self.desc_ui.desc_text.append("\n开启后将会上传个人翻译历史, 帮助团子用于开发公共词库功能, 以优化翻译器未来的使用体验\n\n"
+                                          "数据将会进行脱敏处理\n\n不会将数据用于任何非法用途")
 
-        # 显示消息栏说明
-        elif message_type == "showStatusbar" :
-            self.desc_ui.setWindowTitle("翻译时间说明")
-            self.desc_ui.desc_text.append("控制翻译界面底部消息栏是否显示\n")
-            self.desc_ui.desc_text.append("若显示\n")
-            self.desc_ui.desc_text.insertHtml('<img src={} width="{}" >'.format(OPEN_STATUSBAR_IMG_PATH, 245*self.rate))
-            self.desc_ui.desc_text.append("\n若屏蔽:\n")
-            self.desc_ui.desc_text.insertHtml('<img src="{}" width="{}" >'.format(CLOSE_STATUSBAR_IMG_PATH, 245*self.rate))
-
-        # 贴字翻译
-        elif message_type == "drawImage":
-            self.desc_ui.setWindowTitle("贴字翻译说明")
-            self.desc_ui.desc_text.append("\n开启后会将翻译结果直接贴在截图区域上, 目前仅支持于在线OCR")
 
         self.desc_ui.show()
 
@@ -2440,25 +2411,25 @@ class Settin(QMainWindow) :
 
         # 百度OCR
         if key_type == "baiduOCR" :
-            self.key_ui.setWindowTitle("百度OCR - 密钥编辑")
+            self.key_ui.setWindowTitle("百度OCR - 密钥编辑 - 退出会自动保存")
             self.key_ui.baidu_ocr_key_textEdit.show()
             self.key_ui.baidu_ocr_secret_textEdit.show()
 
         # 私人腾讯翻译
         elif key_type == "tencentTranslate" :
-            self.key_ui.setWindowTitle("私人腾讯翻译 - 密钥编辑")
+            self.key_ui.setWindowTitle("私人腾讯翻译 - 密钥编辑 - 退出会自动保存")
             self.key_ui.tencent_private_key_textEdit.show()
             self.key_ui.tencent_private_secret_textEdit.show()
 
         # 私人腾讯翻译
         elif key_type == "baiduTranslate" :
-            self.key_ui.setWindowTitle("私人百度翻译 - 密钥编辑")
+            self.key_ui.setWindowTitle("私人百度翻译 - 密钥编辑 - 退出会自动保存")
             self.key_ui.baidu_private_key_textEdit.show()
             self.key_ui.baidu_private_secret_textEdit.show()
 
         # 私人彩云翻译
         elif key_type == "caiyunTranslate" :
-            self.key_ui.setWindowTitle("私人彩云翻译 - 密钥编辑")
+            self.key_ui.setWindowTitle("私人彩云翻译 - 密钥编辑 - 退出会自动保存")
             self.key_ui.caiyun_private_key_textEdit.show()
 
         self.key_ui.show()
@@ -2480,6 +2451,7 @@ class Settin(QMainWindow) :
                                                                  font-weight: bold;\
                                                                  background-color:rgba(62, 62, 62, %s)"
                                                                 %(self.horizontal/100))
+
         self.object.translation_ui.temp_text.setStyleSheet("border-width:0;\
                                                             border-style:outset;\
                                                             border-top:0px solid #e8f3f9;\
@@ -2629,8 +2601,60 @@ class Settin(QMainWindow) :
         if node_name == "自动模式":
             node_url = self.object.yaml["dict_info"]["ocr_server"]
         else:
-            node_url = re.sub(r"//.+?/", "//%s/" % self.node_info[node_name], self.object.yaml["dict_info"]["ocr_server"])
+            node_url = re.sub(r"//.+?/", "//%s/"%self.node_info[node_name], self.object.yaml["dict_info"]["ocr_server"])
         self.object.config["nodeURL"] = node_url
+
+
+    # 消息弹窗
+    def showMessageBox(self, title, text) :
+
+        utils.message.MessageBox(title, text)
+
+
+    # 关闭进度条弹窗
+    def closeProcessBar(self, title, text) :
+
+        self.progress_bar.close()
+        utils.message.MessageBox(title, text)
+
+
+    # 测试公共翻译
+    def testPublicTrans(self) :
+
+        self.setCursor(Qt.WaitCursor)
+        content = "无法使用公共翻译, 请先安装Chrome浏览器     \n若已安装, 请尝试重新启动翻译器\n若安装并重启后仍无法使用\n可直接通过交流群联系客服娘协助     "
+        if translator.all.checkChrome() :
+            content = "检测到已安装Chrome浏览器, 可以使用公共翻译     \n请直接打开想使用的翻译源开关"
+        elif translator.all.checkFirefox() :
+            content = "检测到已安装Firefox浏览器, 可以使用公共翻译     \n请直接打开想使用的翻译源开关"
+        elif translator.all.checkEdge() :
+            content = "检测到已安装Edge浏览器, 可以使用公共翻译     \n请直接打开想使用的翻译源开关"
+        utils.message.MessageBox("测试公共翻译可用性", content)
+        self.setCursor(ui.static.icon.PIXMAP_CURSOR)
+
+
+    # 设置翻译源消息提示
+    def setTransLabelMessage(self) :
+
+        if len(self.translate_list) > 0 :
+            content = ""
+            for val in self.translate_list :
+                content += self.translate_map[val]
+            self.translate_list_label.setText("当前正在使用%s"%content)
+        else :
+            self.translate_list_label.setText("请选择开启至少一种翻译源开关, 否则翻译将无法使用")
+
+
+    # 改变文字方向控件显示/隐藏状态
+    def hideOrShowDirection(self) :
+
+        index = self.ocr_tab_widget.currentIndex()
+        if index == 0 or index == 2 :
+            self.text_direction_switch.show()
+            self.text_direction_label.show()
+        else :
+            self.text_direction_switch.hide()
+            self.text_direction_label.hide()
 
 
     # 退出前保存设置
@@ -2729,6 +2753,10 @@ class Settin(QMainWindow) :
             self.object.range_ui.draw_label.hide()
         # 隐藏范围快捷键开关
         self.object.config["showHotKey3"] = str(self.hide_range_hotkey_use)
+        # 是否全屏下置顶开关
+        self.object.config["setTop"] = self.set_top_use
+        # 是否同步翻译历史开关
+        self.object.config["agreeCollectUse"] = self.agree_collect_use
 
 
     # 注册新快捷键

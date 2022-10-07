@@ -5,18 +5,16 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 import utils.message
-
-LOGO_PATH = "./config/icon/logo.ico"
-PIXMAP_PATH = "./config/icon/pixmap.png"
-PIXMAP2_PATH = "./config/icon/pixmap2.png"
+import utils.thread
+import ui.static.icon
 
 
+# 快捷键界面
 class HotKey(QWidget):
 
     def __init__(self, object):
 
         super(HotKey, self).__init__()
-
         self.object = object
         self.getInitConfig()
         self.ui()
@@ -28,30 +26,11 @@ class HotKey(QWidget):
         self.setMinimumSize(QSize(self.window_width, self.window_height))
         self.setMaximumSize(QSize(self.window_width, self.window_height))
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowCloseButtonHint)
-
         # 窗口图标
-        icon = QIcon()
-        icon.addPixmap(QPixmap(LOGO_PATH), QIcon.Normal, QIcon.On)
-        self.setWindowIcon(icon)
-
+        self.setWindowIcon(ui.static.icon.APP_LOGO_ICON)
         # 鼠标样式
-        pixmap = QPixmap(PIXMAP_PATH)
-        pixmap = pixmap.scaled(int(20 * self.rate),
-                               int(20 * self.rate),
-                               Qt.KeepAspectRatio,
-                               Qt.SmoothTransformation)
-        cursor = QCursor(pixmap, 0, 0)
-        self.setCursor(cursor)
-
-        # 鼠标选中状态图标
-        select_pixmap = QPixmap(PIXMAP2_PATH)
-        select_pixmap = select_pixmap.scaled(int(20 * self.rate),
-                                             int(20 * self.rate),
-                                             Qt.KeepAspectRatio,
-                                             Qt.SmoothTransformation)
-        select_pixmap = QCursor(select_pixmap, 0, 0)
-
-        # 设置字体
+        self.setCursor(ui.static.icon.PIXMAP_CURSOR)
+        # 界面样式
         self.setStyleSheet("QWidget { font: 12pt '华康方圆体W7'; "
                                      "background: rgb(255, 255, 255); "
                                      "color: #5B8FF9; }"
@@ -79,7 +58,7 @@ class HotKey(QWidget):
             self.comboBox_1.addItem("")
             self.comboBox_1.setItemText(index, val)
         self.comboBox_1.setStyleSheet("background: rgba(255, 255, 255, 1);")
-        self.comboBox_1.setCursor(select_pixmap)
+        self.comboBox_1.setCursor(ui.static.icon.EDIT_CURSOR)
 
         label = QLabel(self)
         self.customSetGeometry(label, 145, 80, 50, 20)
@@ -96,19 +75,19 @@ class HotKey(QWidget):
             self.comboBox_2.addItem("")
             self.comboBox_2.setItemText(index, val)
         self.comboBox_2.setStyleSheet("background: rgba(255, 255, 255, 1);")
-        self.comboBox_2.setCursor(select_pixmap)
+        self.comboBox_2.setCursor(ui.static.icon.EDIT_CURSOR)
 
         # 确定按钮
         self.sure_button = QPushButton(self)
         self.customSetGeometry(self.sure_button, 130, 160, 70, 25)
         self.sure_button.setText("确定")
-        self.sure_button.setCursor(select_pixmap)
+        self.sure_button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 取消按钮
         button = QPushButton(self)
         self.customSetGeometry(button, 210, 160, 70, 25)
         button.setText("取消")
-        button.setCursor(select_pixmap)
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
         button.clicked.connect(self.close)
 
     # 初始化配置

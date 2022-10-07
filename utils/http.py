@@ -2,6 +2,7 @@ import requests
 import json
 import time
 from traceback import format_exc
+import utils.enctry
 
 
 # 发送http请求
@@ -27,11 +28,13 @@ def post(url, body, logger, headers=None, timeout=5) :
         try :
             response.encoding = "utf-8"
             result = json.loads(response.text)
+            response.close()
         except Exception :
             response.encoding = "gb18030"
             result = json.loads(response.text)
     except Exception :
         logger.error(format_exc())
+
 
     return result
 
@@ -40,9 +43,13 @@ def post(url, body, logger, headers=None, timeout=5) :
 def loginDangoOCR(object) :
 
     url = object.yaml["dict_info"]["ocr_login"]
+
+    psw = str(object.yaml["password"])
+    if psw.find('%6?u!') != -1:
+        psw = utils.enctry.dectry(psw)
     body = {
         "User": object.yaml["user"],
-        "Password": object.yaml["password"],
+        "Password": psw,
     }
 
     for x in range(3) :
@@ -96,3 +103,25 @@ def getOCR(url) :
         return None, 0
 
     return True, int(time_diff*1000)
+
+
+# 查询在线OCR额度
+def onlineOCRQueryQuota(object) :
+
+    url = "%s?Token=%s"%(object.yaml["dict_info"]["ocr_query_quota"], object.config["DangoToken"])
+    try :
+        res = post(url, {}, object.logger)
+        if len(res["Result"]) == 0 :
+            return "您尚未购买过在线OCR, 请先购买后再查询有效期"
+        max_end_time = ""
+        for val in res["Result"] :
+            if val["EndTime"] > max_end_time :
+                max_end_time = val["EndTime"]
+        now_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        if now_time > max_end_time :
+            return "您的有效期截止至:\n\n%s\n\n在线OCR已不可使用, 若要继续使用请购买\n\n对额度如有任何疑问请联系客服娘"%max_end_time
+        else :
+            return "您的有效期截止至:\n\n%s\n\n在线OCR还可以继续使用~\n\n对额度如有任何疑问请联系客服娘" % max_end_time
+    except Exception :
+        logger.error(format_exc())
+        return "查询出错, 可联系客服娘, 或直接浏览器登录 https://cloud.stariver.org/auth/login.html 地址查看"

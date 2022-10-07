@@ -3,14 +3,11 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 import utils.thread
+import ui.static.icon
+import ui.static.background
 
 
-LOGO_PATH = "./config/icon/logo.ico"
-PIXMAP_PATH = "./config/icon/pixmap.png"
-BG_IMAGE_PATH = "./config/background/login.png"
-PIXMAP2_PATH = "./config/icon/pixmap2.png"
-
-
+# 屏蔽词界面
 class Filter(QWidget) :
 
     def __init__(self, object) :
@@ -29,39 +26,19 @@ class Filter(QWidget) :
         self.setMaximumSize(QSize(self.window_width, self.window_height))
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.setWindowTitle("屏蔽词设置")
-
         # 窗口图标
-        icon = QIcon()
-        icon.addPixmap(QPixmap(LOGO_PATH), QIcon.Normal, QIcon.On)
-        self.setWindowIcon(icon)
-
-        # 鼠标样式
-        pixmap = QPixmap(PIXMAP_PATH)
-        pixmap = pixmap.scaled(int(20 * self.rate),
-                               int(20 * self.rate),
-                               Qt.KeepAspectRatio,
-                               Qt.SmoothTransformation)
-        cursor = QCursor(pixmap, 0, 0)
-        self.setCursor(cursor)
-
-        # 鼠标选中状态图标
-        select_pixmap = QPixmap(PIXMAP2_PATH)
-        select_pixmap = select_pixmap.scaled(int(20 * self.rate),
-                                             int(20 * self.rate),
-                                             Qt.KeepAspectRatio,
-                                             Qt.SmoothTransformation)
-        select_pixmap = QCursor(select_pixmap, 0, 0)
-
+        self.setWindowIcon(ui.static.icon.APP_LOGO_ICON)
+        self.setCursor(ui.static.icon.PIXMAP_CURSOR)
         # 设置字体
         font = QFont()
         font.setFamily(self.font_type)
         font.setPointSize(self.font_size)
         self.setFont(font)
 
-        # 背景
-        image_label = QLabel(self)
-        self.customSetGeometry(image_label, 0, 0, 230, 300)
-        image_label.setStyleSheet("border-image: url(%s);"%BG_IMAGE_PATH)  # 长宽比1.424
+        # 背景, 长宽比1.424
+        label = QLabel(self)
+        self.customSetGeometry(label, 0, 0, 230, 300)
+        label.setPixmap(ui.static.icon.createPixmap(ui.static.background.LOGIN, 230, 300))
 
         # 表格
         self.table_widget = QTableWidget(self)
@@ -89,22 +66,23 @@ class Filter(QWidget) :
         self.table_widget.setStyleSheet("background-color:rgba(255, 255, 255, 0.3);")
         # 信号
         self.table_widget.itemChanged.connect(self.ifItemChanged)
+        self.table_widget.setCursor(ui.static.icon.EDIT_CURSOR)
 
-        # 添加屏蔽词
+        # 添加屏蔽词按钮
         self.add_button = QPushButton(self)
         self.customSetGeometry(self.add_button, 0, 270, 115, 30)
         self.add_button.setStyleSheet("background: rgba(255, 255, 255, 0.4);")
         self.add_button.setText("添加")
         self.add_button.clicked.connect(self.addFilter)
-        self.add_button.setCursor(select_pixmap)
+        self.add_button.setCursor(ui.static.icon.SELECT_CURSOR)
 
-        # 添加屏蔽词
+        # 删除屏蔽词按钮
         self.delete_button = QPushButton(self)
         self.customSetGeometry(self.delete_button, 115, 270, 115, 30)
         self.delete_button.setStyleSheet("background: rgba(255, 255, 255, 0.4);")
         self.delete_button.setText("删除")
         self.delete_button.clicked.connect(self.deleteFilter)
-        self.delete_button.setCursor(select_pixmap)
+        self.delete_button.setCursor(ui.static.icon.SELECT_CURSOR)
 
 
     # 初始化配置
@@ -124,7 +102,9 @@ class Filter(QWidget) :
     # 根据分辨率定义控件位置尺寸
     def customSetGeometry(self, object, x, y, w, h):
 
-        object.setGeometry(QRect(x*self.rate, y*self.rate, w*self.rate, h*self.rate))
+        object.setGeometry(QRect(int(x * self.rate),
+                                 int(y * self.rate), int(w * self.rate),
+                                 int(h * self.rate)))
 
 
     # 添加一行

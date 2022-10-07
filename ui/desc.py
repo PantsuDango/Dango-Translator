@@ -3,14 +3,10 @@
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+import ui.static.icon
 
 
-LOGO_PATH = "./config/icon/logo.ico"
-PIXMAP_PATH = "./config/icon/pixmap.png"
-QQ_GROUP_IMAGE_PATH = "./config/other/交流群.png"
-BG_IMAGE_PATH = "./config/background/settin-desc.jpg"
-
-
+# 说明界面
 class Desc(QWidget) :
 
     def __init__(self, object) :
@@ -19,7 +15,6 @@ class Desc(QWidget) :
 
         self.object = object
         self.getInitConfig()
-
         self.ui()
 
 
@@ -33,28 +28,12 @@ class Desc(QWidget) :
 
         # 窗口标题
         self.setWindowTitle("说明")
-
         # 窗口图标
-        self.icon = QIcon()
-        self.icon.addPixmap(QPixmap(LOGO_PATH), QIcon.Normal, QIcon.On)
-        self.setWindowIcon(self.icon)
-
+        self.setWindowIcon(ui.static.icon.APP_LOGO_ICON)
         # 鼠标样式
-        pixmap = QPixmap(PIXMAP_PATH)
-        pixmap = pixmap.scaled(int(20*self.rate),
-                               int(20*self.rate),
-                               Qt.KeepAspectRatio,
-                               Qt.SmoothTransformation)
-        cursor = QCursor(pixmap, 0, 0)
-        self.setCursor(cursor)
-
+        self.setCursor(ui.static.icon.PIXMAP_CURSOR)
         # 设置字体
         self.setStyleSheet("font: %spt '%s';"%(self.font_size, self.font_type))
-
-        # 背景图
-        image_label = QLabel(self)
-        image_label.setGeometry(QRect(0, 0, self.window_width, self.window_height))
-        image_label.setStyleSheet("border-image: url(%s);"%BG_IMAGE_PATH)
 
         # 说明框
         self.desc_text = QTextBrowser(self)
@@ -66,17 +45,7 @@ class Desc(QWidget) :
                                                     "border-top:0px solid #e8f3f9;"
                                                     "color: #5B8FF9;"
                                                     "background: rgba(255, 255, 255, 0.7); }")
-        self.desc_text.setCursor(cursor)
-
-        pix = QPixmap(QQ_GROUP_IMAGE_PATH)
-        pix = pix.scaled(int(200 * self.rate),
-                         int(210 * self.rate),
-                         Qt.KeepAspectRatio,
-                         Qt.SmoothTransformation)
-        qq_group_image = QLabel(self)
-        self.customSetGeometry(qq_group_image, 0, 0, 200, 250)
-        qq_group_image .setPixmap(pix)
-        qq_group_image.hide()
+        self.desc_text.setCursor(ui.static.icon.PIXMAP_CURSOR)
 
 
     # 初始化配置

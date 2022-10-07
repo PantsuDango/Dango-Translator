@@ -1,107 +1,90 @@
-from PyQt5.QtGui import *
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QMessageBox, QPushButton
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
 import sys
 import os
 import time
+import webbrowser
 
 import utils.check_font
-import utils.lock
+import utils.offline_ocr
+import ui.static.icon
 
 
-LOGO_PATH = "./config/icon/logo.ico"
-PIXMAP_ICON_PATH = "./config/icon/pixmap.png"
-PIXMAP2_PATH = "./config/icon/pixmap2.png"
-
-
-# 错误提示窗口-通用
-def MessageBox(title, text, rate=1):
+# 创建基础消息窗
+def createMessageBox(title, text, rate=1) :
 
     message_box = QMessageBox()
     message_box.setTextInteractionFlags(Qt.TextSelectableByMouse)
     message_box.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowMaximizeButtonHint | Qt.MSWindowsFixedSizeDialogHint)
-
-    # 鼠标样式
-    pixmap = QPixmap(PIXMAP_ICON_PATH)
-    pixmap = pixmap.scaled(int(20*rate),
-                           int(20*rate),
-                           Qt.KeepAspectRatio,
-                           Qt.SmoothTransformation)
-    cursor = QCursor(pixmap, 0, 0)
-    message_box.setCursor(cursor)
-
-    icon = QIcon()
-    icon.addPixmap(QPixmap(LOGO_PATH), QIcon.Normal, QIcon.On)
-    message_box.setWindowIcon(icon)
-
+    message_box.setCursor(ui.static.icon.PIXMAP_CURSOR)
+    message_box.setWindowIcon(ui.static.icon.APP_LOGO_ICON)
     message_box.setWindowTitle(title)
     message_box.setText(text)
 
-    message_box.addButton(QPushButton("好滴"), QMessageBox.YesRole)
+    return message_box
 
+
+# 消息提示窗口-通用
+def MessageBox(title, text, rate=1):
+
+    message_box = createMessageBox(title, text, rate)
+    message_box.addButton(QPushButton("好滴"), QMessageBox.YesRole)
+    message_box.exec_()
+
+
+# 检查chrome浏览器提示窗口
+def checkChromeMessageBox(title, text, rate=1):
+
+    message_box = createMessageBox(title, text, rate)
+    button = QPushButton("下载")
+    message_box.addButton(button, QMessageBox.YesRole)
+    button.clicked.connect(lambda: webbrowser.open("https://www.google.cn/chrome/index.html", new=0, autoraise=True))
+    message_box.addButton(QPushButton("取消"), QMessageBox.NoRole)
     message_box.exec_()
 
 
 # 错误提示窗口-字体检查提示
 def checkFontMessageBox(title, text, logger, rate=1):
 
-    message_box = QMessageBox()
-    message_box.setTextInteractionFlags(Qt.TextSelectableByMouse)
-    message_box.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowMaximizeButtonHint | Qt.MSWindowsFixedSizeDialogHint)
-
-    # 鼠标样式
-    pixmap = QPixmap(PIXMAP_ICON_PATH)
-    pixmap = pixmap.scaled(int(20*rate),
-                           int(20*rate),
-                           Qt.KeepAspectRatio,
-                           Qt.SmoothTransformation)
-    cursor = QCursor(pixmap, 0, 0)
-    message_box.setCursor(cursor)
-
-    icon = QIcon()
-    icon.addPixmap(QPixmap(LOGO_PATH), QIcon.Normal, QIcon.On)
-    message_box.setWindowIcon(icon)
-
-    message_box.setWindowTitle(title)
-    message_box.setText(text)
-
-    open_font_file_button = QPushButton("好滴")
-    open_font_file_button.clicked.connect(lambda: utils.check_font.openFontFile(logger))
-
-    message_box.addButton(open_font_file_button, QMessageBox.YesRole)
+    message_box = createMessageBox(title, text, rate)
+    button = QPushButton("好滴")
+    button.clicked.connect(lambda: utils.check_font.openFontFile(logger))
+    message_box.addButton(button, QMessageBox.YesRole)
     message_box.addButton(QPushButton("忽略"), QMessageBox.NoRole)
-
     message_box.exec_()
 
 
 # 错误提示窗口-绑定邮箱提示
 def checkEmailMessageBox(title, text, object) :
 
-    message_box = QMessageBox()
-    message_box.setTextInteractionFlags(Qt.TextSelectableByMouse)
-    message_box.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowMaximizeButtonHint | Qt.MSWindowsFixedSizeDialogHint)
-
-    # 鼠标样式
-    pixmap = QPixmap(PIXMAP_ICON_PATH)
-    pixmap = pixmap.scaled(int(20*object.yaml["screen_scale_rate"]),
-                           int(20*object.yaml["screen_scale_rate"]),
-                           Qt.KeepAspectRatio,
-                           Qt.SmoothTransformation)
-    cursor = QCursor(pixmap, 0, 0)
-    message_box.setCursor(cursor)
-
-    icon = QIcon()
-    icon.addPixmap(QPixmap(LOGO_PATH), QIcon.Normal, QIcon.On)
-    message_box.setWindowIcon(icon)
-
-    message_box.setWindowTitle(title)
-    message_box.setText(text)
-
-    bind_email_button = QPushButton("好滴")
-    bind_email_button.clicked.connect(object.register_ui.clickBindEmail)
-
-    message_box.addButton(bind_email_button, QMessageBox.YesRole)
+    message_box = createMessageBox(title, text, object.yaml["screen_scale_rate"])
+    button = QPushButton("好滴")
+    button.clicked.connect(object.register_ui.clickBindEmail)
+    message_box.addButton(button, QMessageBox.YesRole)
     message_box.addButton(QPushButton("忽略"), QMessageBox.NoRole)
+    message_box.exec_()
+
+
+# 消息提示窗口-停止进度条
+def closeProcessBarMessageBox(title, text, object) :
+
+    message_box = createMessageBox(title, text, object.rate)
+    button = QPushButton("停止")
+    button.clicked.connect(object.stopProcess)
+    message_box.addButton(button, QMessageBox.YesRole)
+    message_box.addButton(QPushButton("取消"), QMessageBox.NoRole)
+
+    message_box.exec_()
+
+
+# 错误提示窗口-卸载本地OCR
+def uninstallOfflineOCRMessageBox(title, text, object) :
+
+    message_box = createMessageBox(title, text, object.yaml["screen_scale_rate"])
+    button = QPushButton("卸载")
+    button.clicked.connect(lambda: utils.offline_ocr.uninstall_offline_ocr(object))
+    message_box.addButton(button, QMessageBox.YesRole)
+    message_box.addButton(QPushButton("取消"), QMessageBox.NoRole)
 
     message_box.exec_()
 
@@ -121,30 +104,10 @@ def updateVersion() :
 # 错误提示窗口-更新版本用
 def checkVersionMessageBox(title, text, rate=1) :
 
-    message_box = QMessageBox()
-    message_box.setTextInteractionFlags(Qt.TextSelectableByMouse)
-    message_box.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowMaximizeButtonHint | Qt.MSWindowsFixedSizeDialogHint)
-
-    # 鼠标样式
-    pixmap = QPixmap(PIXMAP_ICON_PATH)
-    pixmap = pixmap.scaled(int(20*rate),
-                           int(20*rate),
-                           Qt.KeepAspectRatio,
-                           Qt.SmoothTransformation)
-    cursor = QCursor(pixmap, 0, 0)
-    message_box.setCursor(cursor)
-
-    icon = QIcon()
-    icon.addPixmap(QPixmap(LOGO_PATH), QIcon.Normal, QIcon.On)
-    message_box.setWindowIcon(icon)
-
-    message_box.setWindowTitle(title)
-    message_box.setText(text)
-
-    check_version_button = QPushButton("好滴")
-    check_version_button.clicked.connect(updateVersion)
-
-    message_box.addButton(check_version_button, QMessageBox.YesRole)
+    message_box = createMessageBox(title, text, rate)
+    button = QPushButton("好滴")
+    button.clicked.connect(updateVersion)
+    message_box.addButton(button, QMessageBox.YesRole)
     message_box.addButton(QPushButton("忽略"), QMessageBox.NoRole)
 
     message_box.exec_()
@@ -153,30 +116,10 @@ def checkVersionMessageBox(title, text, rate=1) :
 # 错误提示窗口-关闭程序用
 def quitAppMessageBox(title, text, object, rate=1) :
 
-    message_box = QMessageBox()
-    message_box.setTextInteractionFlags(Qt.TextSelectableByMouse)
-    message_box.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowMaximizeButtonHint | Qt.MSWindowsFixedSizeDialogHint)
-
-    # 鼠标样式
-    pixmap = QPixmap(PIXMAP_ICON_PATH)
-    pixmap = pixmap.scaled(int(20*rate),
-                           int(20*rate),
-                           Qt.KeepAspectRatio,
-                           Qt.SmoothTransformation)
-    cursor = QCursor(pixmap, 0, 0)
-    message_box.setCursor(cursor)
-
-    icon = QIcon()
-    icon.addPixmap(QPixmap(LOGO_PATH), QIcon.Normal, QIcon.On)
-    message_box.setWindowIcon(icon)
-
-    message_box.setWindowTitle(title)
-    message_box.setText(text)
-
-    button1 = QPushButton("再见")
-    button1.clicked.connect(object.translation_ui.quit)
-    message_box.addButton(button1, QMessageBox.YesRole)
-
+    message_box = createMessageBox(title, text, rate)
+    button = QPushButton("再见")
+    button.clicked.connect(object.translation_ui.quit)
+    message_box.addButton(button, QMessageBox.YesRole)
     message_box.addButton(QPushButton("我点错了"), QMessageBox.NoRole)
 
     message_box.exec_()
@@ -211,17 +154,6 @@ def showCheckVersionMessage(object) :
                            "%s     "%text)
 
 
-# 唯一进程锁提示
-def checkLockMessage() :
-
-    MessageBox("启动失败",
-               "团子翻译器已在运行中\n"
-               "请不要重复运行, 如你并没有重复运行\n"
-               "请尝试删除以下文件后重试:\n"
-               "%s"%utils.lock.LOCK_FILE_PATH)
-    sys.exit()
-
-
 # 检查是否为测试版本
 def checkIsTestVersion(object) :
 
@@ -229,5 +161,5 @@ def checkIsTestVersion(object) :
         MessageBox("此版本已停止服务",
                    "目前您使用的是测试版本, 此版本已经停止更新      \n"
                    "请下载正式版本使用, 下载地址:\n%s      "
-                   %object.yaml["dict_info"]["update_version"], object.yaml["screen_scale_rate"])
+                   %object.yaml["dict_info"]["dango_home_page"], object.yaml["screen_scale_rate"])
         sys.exit()
