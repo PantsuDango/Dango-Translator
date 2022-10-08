@@ -2269,7 +2269,7 @@ class Settin(QMainWindow) :
     # 打开安装谷歌浏览器地址
     def openInstallChrome(self):
 
-        url = "https://www.google.cn/intl/zh-CN/chrome/"
+        url = "https://www.google.cn/chrome/browser/desktop/index.html?standalone=1&platform=win32"
         try:
             webbrowser.open(url, new=0, autoraise=True)
         except Exception:

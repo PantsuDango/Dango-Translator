@@ -4,10 +4,9 @@ import re
 import zipfile
 import os
 import utils.http
-import shutil
 
 EDGE_DRIVER_PATH = "./config/tools/msedgedriver.exe"
-CHROMEDRIVER_DIR_PATH = "./config/tools"
+DRIVER_DIR_PATH = "./config/tools"
 DRIVER_ZIP_NAME = "edgedriver_win64.zip"
 
 
@@ -16,14 +15,11 @@ def checkEdgeVersion() :
 
     EDGE = {
         "browserName": "MicrosoftEdge",
-        "version": "",
         "platform": "WINDOWS",
         "ms:edgeOptions": {
             'extensions': [],
             'args': [
                 '--headless',
-                '--disable-gpu',
-                '--remote-debugging-port=9222',
             ]}
     }
     try:
@@ -33,7 +29,7 @@ def checkEdgeVersion() :
         driver.close()
         driver.quit()
     except Exception as err :
-        regex = re.findall("[0-9.]{8,}", str(err))
+        regex = re.findall("\d+\.\d+\.\d+\.\d+", str(err))
         if regex :
             return regex[0]
 
@@ -50,11 +46,12 @@ def downloadDriver(driver_version, logger) :
         zip_file = zipfile.ZipFile(DRIVER_ZIP_NAME)
         zip_list = zip_file.namelist()
         for f in zip_list :
-            zip_file.extract(f, CHROMEDRIVER_DIR_PATH)
+            if f != "msedgedriver.exe" :
+                continue
+            zip_file.extract(f, DRIVER_DIR_PATH)
         zip_file.close()
         # 删除压缩包
         os.remove(DRIVER_ZIP_NAME)
-        os.remove(os.path.join(CHROMEDRIVER_DIR_PATH, "Driver_Notes"))
     except Exception :
         logger.error(format_exc())
 

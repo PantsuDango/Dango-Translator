@@ -44,14 +44,11 @@ def checkEdge() :
     try :
         EDGE = {
             "browserName": "MicrosoftEdge",
-            "version": "",
             "platform": "WINDOWS",
             "ms:edgeOptions": {
                 'extensions': [],
                 'args': [
                     '--headless',
-                    '--disable-gpu',
-                    '--remote-debugging-port=9222',
                 ]}
         }
         browser = webdriver.Edge(executable_path="./config/tools/msedgedriver.exe",
@@ -131,14 +128,11 @@ class Webdriver(QObject) :
                     # 使用Edge浏览器
                     EDGE = {
                         "browserName": "MicrosoftEdge",
-                        "version": "",
                         "platform": "WINDOWS",
                         "ms:edgeOptions": {
                             'extensions': [],
                             'args': [
                                 '--headless',
-                                '--disable-gpu',
-                                '--remote-debugging-port=9222',
                             ]}
                     }
                     self.browser = webdriver.Edge(executable_path="./config/tools/msedgedriver.exe",

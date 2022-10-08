@@ -27,6 +27,7 @@ import ui.static.icon
 
 import translator.update_chrome_driver
 import translator.update_edge_driver
+import translator.upload_firefox_driver
 import translator.upload_trans_file
 
 
@@ -143,6 +144,8 @@ class DangoTranslator() :
         utils.thread.createThread(translator.update_chrome_driver.updateChromeDriver, self.logger)
         # 更新Edge浏览器引擎文件
         utils.thread.createThread(translator.update_edge_driver.updateEdgeDriver, self.logger)
+        # 更新火狐浏览器引擎文件
+        utils.thread.createThread(translator.upload_firefox_driver.updateFirefoxDriver, self.logger)
 
         # 更新ocr源码文件
         ocr_src_file = self.yaml["dict_info"]["ocr_src_file"]

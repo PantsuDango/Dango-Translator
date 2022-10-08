@@ -7,7 +7,7 @@ import os
 import utils.http
 
 CHROMEDRIVER_PATH = "./config/tools/chromedriver.exe"
-CHROMEDRIVER_DIR_PATH = "./config/tools"
+DRIVER_DIR_PATH = "./config/tools"
 DRIVER_ZIP_NAME = "chromedriver_win32.zip"
 
 # 判断原文相似度
@@ -43,8 +43,8 @@ def getChromeVersionInfo(chrome_version, logger) :
         return
     try :
         res = eval(res)
-        res.reverse()
     except Exception :
+        logger.error(format_exc())
         return
 
     driver_version = ""
@@ -59,6 +59,9 @@ def getChromeVersionInfo(chrome_version, logger) :
         if score > max_score :
             max_score = score
             driver_version = regex[0]
+        elif score == max_score :
+            if regex[0] > driver_version :
+                driver_version = regex[0]
 
     if driver_version :
         return driver_version
@@ -76,7 +79,9 @@ def downloadDriver(driver_version, logger) :
         zip_file = zipfile.ZipFile(DRIVER_ZIP_NAME)
         zip_list = zip_file.namelist()
         for f in zip_list :
-            zip_file.extract(f, CHROMEDRIVER_DIR_PATH)
+            if f != "chromedriver.exe" :
+                continue
+            zip_file.extract(f, DRIVER_DIR_PATH)
         zip_file.close()
         # 删除压缩包
         os.remove(DRIVER_ZIP_NAME)
