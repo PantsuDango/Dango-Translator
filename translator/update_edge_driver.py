@@ -11,7 +11,7 @@ DRIVER_ZIP_NAME = "edgedriver_win64.zip"
 
 
 # 获取浏览器版本号
-def checkEdgeVersion() :
+def checkEdgeVersion(object) :
 
     EDGE = {
         "browserName": "MicrosoftEdge",
@@ -28,17 +28,21 @@ def checkEdgeVersion() :
                                 capabilities=EDGE)
         driver.close()
         driver.quit()
+        object.edge_driver_finish = 1
     except Exception as err :
         regex = re.findall("\d+\.\d+\.\d+\.\d+", str(err))
         if regex :
             return regex[0]
+        else :
+            object.edge_driver_finish = 2
 
 
 # 下载引擎文件
-def downloadDriver(driver_version, logger) :
+def downloadDriver(driver_version, object) :
 
     url = "https://msedgedriver.azureedge.net/{}/edgedriver_win64.zip".format(driver_version)
-    if not utils.http.downloadFile(url, DRIVER_ZIP_NAME, logger) :
+    if not utils.http.downloadFile(url, DRIVER_ZIP_NAME, object.logger) :
+        object.edge_driver_finish = 2
         return
 
     # 解压压缩包
@@ -52,17 +56,19 @@ def downloadDriver(driver_version, logger) :
         zip_file.close()
         # 删除压缩包
         os.remove(DRIVER_ZIP_NAME)
+        object.edge_driver_finish = 1
     except Exception :
-        logger.error(format_exc())
+        object.logger.error(format_exc())
+        object.edge_driver_finish = 2
 
 
 # 校验Edge浏览器引擎文件
-def updateEdgeDriver(logger) :
+def updateEdgeDriver(object) :
 
     # 获取浏览器版本
-    driver_version = checkEdgeVersion()
+    driver_version = checkEdgeVersion(object)
     if not driver_version :
         return
 
     # 下载引擎文件
-    downloadDriver(driver_version, logger)
+    downloadDriver(driver_version, object.logger)

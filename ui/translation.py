@@ -50,9 +50,6 @@ class Translation(QMainWindow) :
         self.getInitConfig()
         self.ui()
 
-        # 开启朗读模块
-        self.sound = translator.sound.Sound(self.object)
-        utils.thread.createThread(self.sound.openWebdriver)
         # 开启翻译模块
         self.createWebdriverThread()
         # 自动翻译信号
@@ -743,6 +740,17 @@ class Translation(QMainWindow) :
     def createWebdriverThread(self) :
 
         self.statusbar.showMessage("翻译模块启动中, 请等待完成后再操作...")
+        while True :
+            # 有任何一个引擎驱动加载成功
+            if self.object.chrome_driver_finish == 1 or self.object.firefox_driver_finish == 1 or self.object.edge_driver_finish == 1 :
+                break
+            # 所有引擎驱动都加载失败了
+            if self.object.chrome_driver_finish == 2 and self.object.firefox_driver_finish == 2 and self.object.edge_driver_finish == 2 :
+                break
+
+        # 开启朗读模块
+        self.sound = translator.sound.Sound(self.object)
+        utils.thread.createThread(self.sound.openWebdriver)
 
         # 筛选翻译源类型
         translater_list = ["youdaoUse", "baiduwebUse", "tencentwebUse", "deeplUse", "googleUse", "caiyunUse"]

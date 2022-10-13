@@ -11,7 +11,7 @@ DRIVER_ZIP_NAME = "geckodriver-win64.zip"
 
 
 # 获取浏览器版本号
-def checkFirefoxVersion() :
+def checkFirefoxVersion(object) :
 
     try:
         option = webdriver.FirefoxOptions()
@@ -21,9 +21,12 @@ def checkFirefoxVersion() :
                                    options=option)
         driver.close()
         driver.quit()
+        object.firefox_driver_finish = 1
     except Exception :
         if "newSession" in format_exc() :
             return True
+        else :
+            object.firefox_driver_finish = 2
 
 
 # 获取Firefox下载信息
@@ -31,7 +34,7 @@ def getFirefoxVersionInfo(logger) :
 
     url = "https://liushilive.github.io/github_selenium_drivers/search_plus_index.json"
     res = utils.http.get(url, logger)
-    if not res:
+    if not res :
         return
     try:
         res = eval(res)
@@ -47,11 +50,12 @@ def getFirefoxVersionInfo(logger) :
 
 
 # 下载浏览器引擎
-def downloadDriver(driver_version, logger) :
+def downloadDriver(driver_version, object) :
 
     # 下载引擎文件
     url = "https://npm.taobao.org/mirrors/geckodriver/v0.30.0/%s"%driver_version
-    if not utils.http.downloadFile(url, DRIVER_ZIP_NAME, logger):
+    if not utils.http.downloadFile(url, DRIVER_ZIP_NAME, object.logger) :
+        object.firefox_driver_finish = 2
         return
 
     # 解压压缩包
@@ -65,22 +69,26 @@ def downloadDriver(driver_version, logger) :
         zip_file.close()
         # 删除压缩包
         os.remove(DRIVER_ZIP_NAME)
-    except Exception:
-        logger.error(format_exc())
+        object.firefox_driver_finish = 1
+    except Exception :
+        object.logger.error(format_exc())
+        object.firefox_driver_finish = 2
 
 
 # 校验火狐浏览器引擎文件
-def updateFirefoxDriver(logger) :
+def updateFirefoxDriver(object) :
 
     # 校验浏览器版本
-    sign = checkFirefoxVersion()
+    sign = checkFirefoxVersion(object)
     if not sign :
         return
 
     # 获取Firefox引擎信息
-    driver_version = getFirefoxVersionInfo(logger)
+    driver_version = getFirefoxVersionInfo(object.logger)
     if not driver_version :
+        object.firefox_driver_finish = 2
         return
 
     # 下载浏览器引擎
-    downloadDriver(driver_version, logger)
+    downloadDriver(driver_version, object.logger)
+    object.selenium_driver_finish = True

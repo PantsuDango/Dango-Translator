@@ -17,7 +17,7 @@ def getEqualRate(str1, str2) :
 
 
 # 获取浏览器版本号
-def checkChromeVersion() :
+def checkChromeVersion(object) :
 
     option = webdriver.ChromeOptions()
     option.add_argument("--headless")
@@ -27,10 +27,13 @@ def checkChromeVersion() :
                          options=option)
         driver.close()
         driver.quit()
+        object.chrome_driver_finish = 1
     except Exception as err :
         regex = re.findall("Current browser version is (.+?) with binary", str(err))
         if regex :
             return regex[0]
+        else :
+            object.chrome_driver_finish = 2
 
 
 # 获取谷歌引擎文件下载信息
@@ -68,10 +71,11 @@ def getChromeVersionInfo(chrome_version, logger) :
 
 
 # 下载引擎文件
-def downloadDriver(driver_version, logger) :
+def downloadDriver(driver_version, object) :
 
     url = "https://registry.npmmirror.com/-/binary/chromedriver/{}/chromedriver_win32.zip".format(driver_version)
-    if not utils.http.downloadFile(url, DRIVER_ZIP_NAME, logger) :
+    if not utils.http.downloadFile(url, DRIVER_ZIP_NAME, object.logger) :
+        object.chrome_driver_finish = 2
         return
 
     # 解压压缩包
@@ -85,22 +89,25 @@ def downloadDriver(driver_version, logger) :
         zip_file.close()
         # 删除压缩包
         os.remove(DRIVER_ZIP_NAME)
+        object.chrome_driver_finish = 1
     except Exception :
-        logger.error(format_exc())
+        object.logger.error(format_exc())
+        object.chrome_driver_finish = 2
 
 
 # 校验谷歌浏览器引擎文件
-def updateChromeDriver(logger) :
+def updateChromeDriver(object) :
 
     # 获取浏览器版本
-    chrome_version = checkChromeVersion()
+    chrome_version = checkChromeVersion(object)
     if not chrome_version :
         return
 
     # 获取谷歌引擎文件下载信息
-    driver_version = getChromeVersionInfo(chrome_version, logger)
+    driver_version = getChromeVersionInfo(chrome_version, object.logger)
     if not driver_version :
+        object.chrome_driver_finish = 2
         return
 
     # 下载引擎文件
-    downloadDriver(driver_version, logger)
+    downloadDriver(driver_version, object)

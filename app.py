@@ -31,7 +31,7 @@ import translator.upload_firefox_driver
 import translator.upload_trans_file
 
 
-class DangoTranslator() :
+class DangoTranslator :
 
     # 配置初始化
     def __init__(self) :
@@ -48,6 +48,10 @@ class DangoTranslator() :
         self.yaml["screen_scale_rate"] = utils.screen_rate.getScreenRate(self.logger)
         # 保存配置
         utils.config.saveConfig(self.yaml, self.logger)
+        # selenium引擎加载完成信号: 0-进行中, 1-成功, 2-失败
+        self.chrome_driver_finish = 0
+        self.firefox_driver_finish = 0
+        self.edge_driver_finish = 0
 
 
     # 登录
@@ -141,11 +145,11 @@ class DangoTranslator() :
     def InitLoadFile(self) :
 
         # 更新谷歌浏览器引擎文件
-        utils.thread.createThread(translator.update_chrome_driver.updateChromeDriver, self.logger)
+        utils.thread.createThread(translator.update_chrome_driver.updateChromeDriver, self)
         # 更新Edge浏览器引擎文件
-        utils.thread.createThread(translator.update_edge_driver.updateEdgeDriver, self.logger)
+        utils.thread.createThread(translator.update_edge_driver.updateEdgeDriver, self)
         # 更新火狐浏览器引擎文件
-        utils.thread.createThread(translator.upload_firefox_driver.updateFirefoxDriver, self.logger)
+        utils.thread.createThread(translator.upload_firefox_driver.updateFirefoxDriver, self)
 
         # 更新ocr源码文件
         ocr_src_file = self.yaml["dict_info"]["ocr_src_file"]
@@ -165,7 +169,7 @@ class DangoTranslator() :
     def main(self) :
 
         # 更新贴字翻译所需的pil运行库
-        utils.update.updatePilFile(self.yaml, self.logger)
+        utils.update.updatePilFile(self)
         # 自适应高分辨率
         QCoreApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
         app = QApplication(sys.argv)
