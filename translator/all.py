@@ -1,5 +1,6 @@
 from PyQt5.QtCore import *
 from selenium import webdriver
+from selenium.webdriver.common.action_chains import ActionChains
 from traceback import format_exc
 import time
 
@@ -106,44 +107,39 @@ class Webdriver(QObject) :
 
         try:
             # 使用谷歌浏览器
-            option = webdriver.ChromeOptions()
-            option.add_argument("--headless")
-            self.browser = webdriver.Chrome(executable_path="./config/tools/chromedriver.exe",
-                                            service_log_path="nul",
-                                            options=option)
-        except Exception :
-            self.logger.error(format_exc())
-
-            try:
-                # 使用火狐浏览器
+            if self.object.chrome_driver_finish == 1:
+                option = webdriver.ChromeOptions()
+                #option.add_argument("--headless")
+                self.browser = webdriver.Chrome(executable_path="./config/tools/chromedriver.exe",
+                                                service_log_path="nul",
+                                                options=option)
+            # 使用火狐浏览器
+            elif self.object.firefox_driver_finish == 1:
                 option = webdriver.FirefoxOptions()
                 option.add_argument("--headless")
                 self.browser = webdriver.Firefox(executable_path="./config/tools/geckodriver.exe",
                                                  service_log_path="nul",
                                                  options=option)
-            except Exception:
-                self.logger.error(format_exc())
-
-                try:
-                    # 使用Edge浏览器
-                    EDGE = {
-                        "browserName": "MicrosoftEdge",
-                        "platform": "WINDOWS",
-                        "ms:edgeOptions": {
-                            'extensions': [],
-                            'args': [
-                                '--headless',
-                            ]}
-                    }
-                    self.browser = webdriver.Edge(executable_path="./config/tools/msedgedriver.exe",
-                                                  service_log_path="nul",
-                                                  capabilities=EDGE)
-                except Exception :
-                    self.browser_sign = 2
-                    self.logger.error(format_exc())
-                    self.close()
-                    self.message_sign.emit("公共翻译启动失败, 若需使用公共翻译请下载安装谷歌浏览器后重启翻译器, 若使用私人翻译请忽视此提示")
-                    return
+            # 使用Edge浏览器
+            elif self.object.edge_driver_finish == 1:
+                EDGE = {
+                    "browserName": "MicrosoftEdge",
+                    "platform": "WINDOWS",
+                    "ms:edgeOptions": {
+                        'extensions': [],
+                        'args': [
+                            '--headless',
+                        ]}
+                }
+                self.browser = webdriver.Edge(executable_path="./config/tools/msedgedriver.exe",
+                                              service_log_path="nul",
+                                              capabilities=EDGE)
+        except Exception :
+            self.browser_sign = 2
+            self.logger.error(format_exc())
+            self.close()
+            self.message_sign.emit("公共翻译启动失败, 若需使用公共翻译请下载安装谷歌浏览器后重启翻译器, 若使用私人翻译请忽视此提示")
+            return
 
         self.browser_sign = 1
         if self.object.translation_ui.webdriver1.browser_sign == 1 \
@@ -243,6 +239,7 @@ class Webdriver(QObject) :
 
         # 百度
         if web_type == "baidu" :
+            # 原文选择
             self.browserClickTimeout('//*[@id="main-outer"]/div/div/div[1]/div[1]/div[1]/a[1]/span/span')
             if language == "JAP" :
                 self.browserClickTimeout('//*[@id="lang-panel-container"]/div/div[5]/div[1]/div[16]/div/span[1]')
@@ -250,7 +247,10 @@ class Webdriver(QObject) :
                 self.browserClickTimeout('//*[@id="lang-panel-container"]/div/div[5]/div[1]/div[21]/div/span[1]')
             elif language == "KOR" :
                 self.browserClickTimeout('//*[@id="lang-panel-container"]/div/div[5]/div[1]/div[8]/div/span[1]')
-
+            # 译文选择
+            if self.browser.find_element_by_xpath('//*[@id="main-outer"]/div/div/div[1]/div[1]/div[1]/a[3]/span/span').text != "中文(简体)":
+                self.browserClickTimeout('//*[@id="main-outer"]/div/div/div[1]/div[1]/div[1]/a[3]/span/span')
+                self.browserClickTimeout('//*[@id="lang-panel-container"]/div/div[5]/div[1]/div[22]/div/span[1]')
 
         # 腾讯
         if web_type == "tencent" :
