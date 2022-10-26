@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from traceback import format_exc
+import base64
 import sys
 import os
 
@@ -177,8 +178,17 @@ class DangoTranslator :
         # 连接配置中心
         if not self.yaml["dict_info"] :
             utils.message.serverClientFailMessage(self)
+
         # 加载静态资源
         ui.static.icon.initIcon(self.yaml["screen_scale_rate"])
+
+        # 启动图标
+        splash = QSplashScreen(ui.static.icon.APP_LOGO_SPLASH, Qt.WindowStaysOnTopHint)
+        splash.resize(int(250*self.yaml["screen_scale_rate"]), int(50*self.yaml["screen_scale_rate"]))
+        splash.setStyleSheet("font: 15pt '华康方圆体W7';")
+        splash.showMessage("团子翻译器启动中...", Qt.AlignVCenter | Qt.AlignRight)
+        splash.show()
+
         # 检查是否为测试版本
         utils.message.checkIsTestVersion(self)
         # 检查字体
@@ -207,6 +217,7 @@ class DangoTranslator :
         if self.yaml["auto_login"] :
             self.login()
 
+        splash.close()
         app.exit(app.exec_())
 
 
