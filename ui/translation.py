@@ -741,6 +741,7 @@ class Translation(QMainWindow) :
 
         self.statusbar.showMessage("翻译模块启动中, 请等待完成后再操作...")
         while True :
+            time.sleep(0.1)
             # 有任何一个引擎驱动加载成功
             if self.object.chrome_driver_finish == 1 or self.object.firefox_driver_finish == 1 or self.object.edge_driver_finish == 1 :
                 break

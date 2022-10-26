@@ -76,10 +76,10 @@ class Webdriver(QObject) :
 
         self.url_map = {
             "youdao" : "https://fanyi.youdao.com/",
-            "baidu"  : "https://fanyi.baidu.com/?aldtype=16047#auto/zh",
+            "baidu"  : "https://fanyi.baidu.com/#auto/zh",
             "tencent": "https://fanyi.qq.com/",
             "caiyun" : "https://fanyi.caiyunapp.com/#/",
-            "google" : "https://translate.google.cn",
+            "google" : "https://translate.google.com/?tl=zh-CN&op=translate",
             "deepl"  : "https://www.deepl.com/translator",
             "xiaoniu": "https://niutrans.com/trans?type=text"
         }
@@ -168,10 +168,8 @@ class Webdriver(QObject) :
         self.message_sign.emit("%s翻译启动中, 请等待完成后再操作..."%content)
 
         try :
-            self.browser.get(self.url_map[web_type])
-            self.browser.maximize_window()
-            self.open_sign = True
             self.transInit(web_type)
+            self.open_sign = True
         except Exception :
             self.logger.error(format_exc())
 
@@ -220,15 +218,13 @@ class Webdriver(QObject) :
     # 翻译页面初始化
     def transInit(self, web_type) :
 
-        try :
-            # 去弹窗广告
-            self.browser.find_element_by_xpath(self.object.yaml["dict_info"]["%s_xpath"%web_type]).click()
-        except Exception:
-            pass
         language = self.object.config["language"]
-
         # 有道
         if web_type == "youdao" :
+            # 打开网页
+            self.browser.get(self.url_map[web_type])
+            self.browser.maximize_window()
+            # 原文选择
             self.browserClickTimeout('//*[@id="langSelect"]')
             if language == "JAP" :
                 self.browserClickTimeout('//*[@id="languageSelect"]/li[5]/a')
@@ -239,18 +235,29 @@ class Webdriver(QObject) :
 
         # 百度
         if web_type == "baidu" :
-            # 原文选择
-            self.browserClickTimeout('//*[@id="main-outer"]/div/div/div[1]/div[1]/div[1]/a[1]/span/span')
             if language == "JAP" :
-                self.browserClickTimeout('//*[@id="lang-panel-container"]/div/div[5]/div[1]/div[16]/div/span[1]')
+                self.browser.get(self.url_map[web_type].replace("auto", "jp"))
             elif language == "ENG" :
-                self.browserClickTimeout('//*[@id="lang-panel-container"]/div/div[5]/div[1]/div[21]/div/span[1]')
+                self.browser.get(self.url_map[web_type].replace("auto", "en"))
             elif language == "KOR" :
-                self.browserClickTimeout('//*[@id="lang-panel-container"]/div/div[5]/div[1]/div[8]/div/span[1]')
-            # 译文选择
-            if self.browser.find_element_by_xpath('//*[@id="main-outer"]/div/div/div[1]/div[1]/div[1]/a[3]/span/span').text != "中文(简体)":
-                self.browserClickTimeout('//*[@id="main-outer"]/div/div/div[1]/div[1]/div[1]/a[3]/span/span')
-                self.browserClickTimeout('//*[@id="lang-panel-container"]/div/div[5]/div[1]/div[22]/div/span[1]')
+                self.browser.get(self.url_map[web_type].replace("auto", "kor"))
+            # 去弹窗广告
+            self.browser.refresh()
+            self.browserClickTimeout(self.object.yaml["dict_info"]["%s_xpath" % web_type])
+            self.browser.maximize_window()
+
+            # # 原文选择
+            # self.browserClickTimeout('//*[@id="main-outer"]/div/div/div[1]/div[1]/div[1]/a[1]/span/span')
+            # if language == "JAP" :
+            #     self.browserClickTimeout('//*[@id="lang-panel-container"]/div/div[5]/div[1]/div[16]/div/span[1]')
+            # elif language == "ENG" :
+            #     self.browserClickTimeout('//*[@id="lang-panel-container"]/div/div[5]/div[1]/div[21]/div/span[1]')
+            # elif language == "KOR" :
+            #     self.browserClickTimeout('//*[@id="lang-panel-container"]/div/div[5]/div[1]/div[8]/div/span[1]')
+            # # 译文选择
+            # if self.browser.find_element_by_xpath('//*[@id="main-outer"]/div/div/div[1]/div[1]/div[1]/a[3]/span/span').text != "中文(简体)":
+            #     self.browserClickTimeout('//*[@id="main-outer"]/div/div/div[1]/div[1]/div[1]/a[3]/span/span')
+            #     self.browserClickTimeout('//*[@id="lang-panel-container"]/div/div[5]/div[1]/div[22]/div/span[1]')
 
         # 腾讯
         if web_type == "tencent" :
@@ -266,30 +273,31 @@ class Webdriver(QObject) :
 
         # DeepL
         if web_type == "deepl" :
-            self.browserClickTimeout('//*[@id="dl_translator"]/div[3]/div[3]/div[1]/div[1]/div/button/div')
+            self.browserClickTimeout('//*[@id="panelTranslateText"]/div[2]/div[2]/section[1]/div[1]/div[2]/button/span[1]')
             if language == "JAP" :
-                self.browserClickTimeout('//*[@id="dl_translator"]/div[3]/div[3]/div[1]/div[2]/div[4]/div/div[2]/button[7]/div')
+                self.browserClickTimeout('//*[@id="panelTranslateText"]/div[2]/div[2]/section[1]/div[7]/div[2]/div[2]/button[6]/span')
             elif language == "ENG" :
-                self.browserClickTimeout('//*[@id="dl_translator"]/div[3]/div[3]/div[1]/div[2]/div[4]/div/div[3]/button[6]/div')
+                self.browserClickTimeout('//*[@id="panelTranslateText"]/div[2]/div[2]/section[1]/div[7]/div[2]/div[3]/button[7]/span')
             elif language == "KOR" :
-                self.browserClickTimeout('//*[@id="dl_translator"]/div[3]/div[3]/div[1]/div[2]/div[4]/div/div[1]/button[1]/div[1]')
-            self.browserClickTimeout('//*[@id="dl_translator"]/div[3]/div[3]/div[3]/div[1]/div[2]/div[1]/button/div')
-            self.browserClickTimeout('//*[@id="dl_translator"]/div[3]/div[3]/div[3]/div[3]/div[7]/div/div[3]/button[8]/div[1]')
+                self.browserClickTimeout('//*[@id="panelTranslateText"]/div[2]/div[2]/section[1]/div[7]/div[2]/div[1]/button[1]')
+            self.browserClickTimeout('//*[@id="panelTranslateText"]/div[2]/div[2]/section[2]/div[1]/div[1]/div[2]/button/span[1]')
+            self.browserClickTimeout('//*[@id="panelTranslateText"]/div[2]/div[2]/section[2]/div[8]/div[2]/div[3]/button[9]/span')
 
         # google
         if web_type == "google" :
-            self.browserClickTimeout('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[1]/c-wiz/div[2]/button/div[2]')
+            self.browserClickTimeout('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[1]/c-wiz/div[1]/c-wiz/div[2]/button/div[3]')
             if language == "JAP" :
-                self.browserClickTimeout('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[3]/c-wiz/div[1]/div/div[3]/div/div[3]/div[67]/div[2]')
+                self.browserClickTimeout('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[1]/c-wiz/div[2]/c-wiz/div[1]/div/div[3]/div/div[3]/div[8]/div[2]')
             elif language == "ENG" :
-                self.browserClickTimeout('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[3]/c-wiz/div[1]/div/div[3]/div/div[3]/div[106]/div[2]')
+                self.browserClickTimeout('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[1]/c-wiz/div[2]/c-wiz/div[1]/div/div[3]/div/div[3]/div[67]/div[2]')
             elif language == "KOR" :
-                self.browserClickTimeout('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[3]/c-wiz/div[1]/div/div[3]/div/div[3]/div[30]/div[2]')
-            self.browserClickTimeout('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[1]/c-wiz/div[5]/button/div[2]')
-            self.browserClickTimeout('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[3]/c-wiz/div[2]/div/div[3]/div/div[2]/div[110]/div[2]')
+                self.browserClickTimeout('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[1]/c-wiz/div[2]/c-wiz/div[1]/div/div[3]/div/div[3]/div[130]/div[2]')
+            # self.browserClickTimeout('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[1]/c-wiz/div[5]/button/div[2]')
+            # self.browserClickTimeout('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[3]/c-wiz/div[2]/div/div[3]/div/div[2]/div[110]/div[2]')
 
         # 彩云
         if web_type == "caiyun" :
+            ActionChains(self.browser).move_by_offset(1, 1).click().perform()
             self.browserClickTimeout('//*[@id="app"]/div[2]/div[1]/div[2]/div/div[1]/div[1]/div/div/div[1]')
             if language == "JAP" :
                 self.browserClickTimeout('//*[@id="app"]/div[2]/div[1]/div[2]/div/div[1]/div[1]/div/div[2]/div[4]')
@@ -303,7 +311,6 @@ class Webdriver(QObject) :
 
     # 有道翻译
     def youdao(self, content) :
-
         try :
             # 清空文本框
             if self.content :
@@ -332,8 +339,9 @@ class Webdriver(QObject) :
 
     # 百度翻译
     def baidu(self, content):
-
         try :
+            if "中文" in self.browser.find_element_by_xpath('//*[@id="main-outer"]/div/div/div[1]/div[1]/div[1]/a[1]/span/span').text :
+                self.browserClickTimeout('//*[@id="main-outer"]/div/div/div[1]/div[1]/div[1]/a[2]/span')
             # 清空翻译框
             if self.content :
                 self.browserClickTimeout('//*[@id="main-outer"]/div/div/div[1]/div[2]/div[1]/div[1]/div/div[2]/a')
@@ -364,7 +372,6 @@ class Webdriver(QObject) :
 
     # 腾讯翻译
     def tencent(self, content) :
-
         try :
             # 清空翻译框
             if self.content :
@@ -396,11 +403,10 @@ class Webdriver(QObject) :
 
     # 彩云翻译
     def caiyun(self, content) :
-
         try :
             # 清空翻译框
             if self.content :
-                self.browserClickTimeout('//*[@id="app"]/div[2]/div[1]/div[2]/div/div[2]/div/a')
+                self.browser.find_element_by_xpath('//*[@id="textarea"]').clear()
             # 输入要翻译的文本
             self.browser.find_element_by_xpath('//*[@id="textarea"]').send_keys(content)
             self.browserClickTimeout('//*[@id="app"]/div[2]/div[1]/div[2]/div/div[1]/div[2]/div[2]')
@@ -429,7 +435,6 @@ class Webdriver(QObject) :
 
     # 谷歌翻译
     def google(self, content) :
-
         try :
             # 清空翻译框
             if self.content :
@@ -465,7 +470,6 @@ class Webdriver(QObject) :
 
     # deepl翻译
     def deepl(self, content) :
-
         try :
             # 清空翻译框
             if self.content:
@@ -500,7 +504,6 @@ class Webdriver(QObject) :
 
     # 小牛翻译
     def xiaoniu(self, content):
-
         try:
             try:
                 self.browser.find_element_by_xpath(self.object.yaml["dict_info"]["xiaoniu_xpath"]).click()
