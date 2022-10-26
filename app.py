@@ -166,6 +166,17 @@ class DangoTranslator :
         utils.http.downloadFile(test_image_url, "./config/other/image.jpg", self.logger)
 
 
+    # 启动图标
+    def showSplash(self) :
+
+        self.splash = QSplashScreen(ui.static.icon.APP_LOGO_SPLASH, Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
+        self.splash.resize(int(250*self.yaml["screen_scale_rate"]), int(50*self.yaml["screen_scale_rate"]))
+        self.splash.setStyleSheet("font: 15pt '华康方圆体W7';")
+        self.splash.showMessage("团子翻译器启动中...", Qt.AlignVCenter | Qt.AlignRight)
+        self.splash.show()
+        QCoreApplication.processEvents()
+
+
     # 主函数
     def main(self) :
 
@@ -174,22 +185,13 @@ class DangoTranslator :
         # 自适应高分辨率
         QCoreApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
         app = QApplication(sys.argv)
-
         # 连接配置中心
         if not self.yaml["dict_info"] :
             utils.message.serverClientFailMessage(self)
-
         # 加载静态资源
         ui.static.icon.initIcon(self.yaml["screen_scale_rate"])
-
         # 启动图标
-        splash = QSplashScreen(ui.static.icon.APP_LOGO_SPLASH, Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
-        splash.resize(int(250*self.yaml["screen_scale_rate"]), int(50*self.yaml["screen_scale_rate"]))
-        splash.setStyleSheet("font: 15pt '华康方圆体W7';")
-        splash.showMessage("团子翻译器启动中...", Qt.AlignVCenter | Qt.AlignRight)
-        splash.show()
-        app.processEvents()
-
+        self.showSplash()
         # 检查是否为测试版本
         utils.message.checkIsTestVersion(self)
         # 检查字体
@@ -219,7 +221,7 @@ class DangoTranslator :
         else :
             self.login_ui.show()
 
-        splash.close()
+        self.splash.close()
         app.exit(app.exec_())
 
 
