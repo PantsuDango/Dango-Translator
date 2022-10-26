@@ -183,11 +183,12 @@ class DangoTranslator :
         ui.static.icon.initIcon(self.yaml["screen_scale_rate"])
 
         # 启动图标
-        splash = QSplashScreen(ui.static.icon.APP_LOGO_SPLASH, Qt.WindowStaysOnTopHint)
+        splash = QSplashScreen(ui.static.icon.APP_LOGO_SPLASH, Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
         splash.resize(int(250*self.yaml["screen_scale_rate"]), int(50*self.yaml["screen_scale_rate"]))
         splash.setStyleSheet("font: 15pt '华康方圆体W7';")
         splash.showMessage("团子翻译器启动中...", Qt.AlignVCenter | Qt.AlignRight)
         splash.show()
+        app.processEvents()
 
         # 检查是否为测试版本
         utils.message.checkIsTestVersion(self)
@@ -203,7 +204,6 @@ class DangoTranslator :
 
         # 登录界面
         self.login_ui = ui.login.Login(self)
-        self.login_ui.show()
         self.login_ui.login_button.clicked.connect(self.login)
 
         # 注册页面
@@ -216,6 +216,8 @@ class DangoTranslator :
         # 自动登录
         if self.yaml["auto_login"] :
             self.login()
+        else :
+            self.login_ui.show()
 
         splash.close()
         app.exit(app.exec_())
