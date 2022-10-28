@@ -1,13 +1,13 @@
 # 团子翻译器 - 基于OCR的生肉翻译软件
 
 
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.2.7-ff69b4)](https://github.com/PantsuDango/Dango-Translator)
-[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2022--07--11-ff69b4)]()
+[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.3.1-ff69b4)](https://github.com/PantsuDango/Dango-Translator)
+[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2022--09--28-ff69b4)]()
 [![更新时间](https://img.shields.io/badge/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-win7--10-ff69b4)]()
 [![GitHubStars](https://img.shields.io/github/stars/PantsuDango/Dango-Translator)]()
 [![GitHubForks](https://img.shields.io/github/forks/PantsuDango/Dango-Translator)]()
 [![作者](https://img.shields.io/badge/QQ-%E8%83%96%E6%AC%A1%E5%9B%A2%E5%AD%90-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E4%BD%9C%E8%80%85.png)
-[![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-18%E7%BE%A4794893584-ff69b4)](https://l2.drive.c4a15wh.cn/api/v3/slave/source/0/dXBsb2Fkcy8yMDIyLzA3LzI5LzFZNThpbGVzX0dyb3VwMTgtSW1hZ2UuanBn/18%E7%BE%A4.jpg?sign=rzrePnnOXo1s54x5GPCjGEKGkdH6jYaIKwHUxRjA23Y%3D%3A0)
+[![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-16%E7%BE%A432523865-ff69b4)](https://l2.drive.c4a15wh.cn/api/v3/slave/source/0/dXBsb2Fkcy8yMDIyLzEwLzI4L0VkWWVtZUdKX-WbouWtkOe_u-ivkeWZqDE2576k576k6IGK5LqM57u056CBLnBuZw/%E5%9B%A2%E5%AD%90%E7%BF%BB%E8%AF%91%E5%99%A816%E7%BE%A4%E7%BE%A4%E8%81%8A%E4%BA%8C%E7%BB%B4%E7%A0%81.png?sign=bxQ3shRTcsdgTs91-5vEnrVMJI-ryZWEeZNAN7rzPC0%3D%3A0)
 
   
 ## 简介
@@ -26,7 +26,7 @@
   
 ## 安装版下载
 
-- 群文件下载：[![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-18%E7%BE%A4794893584-ff69b4)](https://l2.drive.c4a15wh.cn/api/v3/slave/source/0/dXBsb2Fkcy8yMDIyLzA3LzI5LzFZNThpbGVzX0dyb3VwMTgtSW1hZ2UuanBn/18%E7%BE%A4.jpg?sign=rzrePnnOXo1s54x5GPCjGEKGkdH6jYaIKwHUxRjA23Y%3D%3A0)  
+- 群文件下载：[![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-16%E7%BE%A432523865-ff69b4)](https://l2.drive.c4a15wh.cn/api/v3/slave/source/0/dXBsb2Fkcy8yMDIyLzEwLzI4L0VkWWVtZUdKX-WbouWtkOe_u-ivkeWZqDE2576k576k6IGK5LqM57u056CBLnBuZw/%E5%9B%A2%E5%AD%90%E7%BF%BB%E8%AF%91%E5%99%A816%E7%BE%A4%E7%BE%A4%E8%81%8A%E4%BA%8C%E7%BB%B4%E7%A0%81.png?sign=bxQ3shRTcsdgTs91-5vEnrVMJI-ryZWEeZNAN7rzPC0%3D%3A0)  
 - 官网下载：[下载地址](https://translator.dango.cloud)
 
   
@@ -34,11 +34,18 @@
 
 #### 翻译器相关 
 
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.2.7-ff69b4)]()
-[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2022--07--11-ff69b4)]()
+[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.3.1-ff69b4)]()
+[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2022--09--28-ff69b4)]()
 
-+ 修复串台, 出现其他人的翻译内容问题（大概）；
-+ 修改了翻译出错时"我抽风啦"的说法；
+发现新版本，版本号：4.3.1
+2022/09/27  更新内容:
+
++ 调整了设置页面的UI布局  
++ 本地OCR新增安装和卸载功能  
++ OCR和翻译新增相应的额度查询功能  
++ 公共翻译新增测试可用性功能  
++ 公共翻译新增安装Chrome浏览器功能  
++ 新增用户改善体验计划, 用户改善体验计划默认开启, 如不同意可自行在设置内关闭, 数据将用于后续自研翻译和共享词库的开发, 希望大家能加入以帮助团子    
 + 更多更新日志：[查看](https://docs1.ayano.top/#/4.0/develop/changelog)  
 
 #### OCR相关
