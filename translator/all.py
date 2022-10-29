@@ -4,6 +4,45 @@ from selenium.webdriver.common.action_chains import ActionChains
 from traceback import format_exc
 import pyperclip
 import time
+import urllib.request
+import urllib.parse
+
+
+# bing翻译
+def bing(language, content, logger) :
+
+    try :
+        from_lan = "auto"
+        if language == "JAP":
+            from_lan = "ja"
+        elif language == "ENG":
+            from_lan = "en"
+        elif language == "KOR":
+            from_lan = "ko"
+
+        url = "http://api.microsofttranslator.com/v2/ajax.svc/TranslateArray2?"
+        data = {}
+        data['from'] = '"' + from_lan + '"'
+        data['to'] = '"' + "zh" + '"'
+        data['texts'] = '["'
+        data['texts'] += content
+        data['texts'] += '"]'
+        data['options'] = "{}"
+        data['oncomplete'] = 'onComplete_3'
+        data['onerror'] = 'onError_3'
+        data['_'] = '1430745999189'
+        data = urllib.parse.urlencode(data).encode('utf-8')
+        strUrl = url + data.decode() + "&appId=%223DAEE5B978BA031557E739EE1E2A68CB1FAD5909%22"
+        response = urllib.request.urlopen(strUrl)
+        str_data = response.read().decode('utf-8')
+        tmp, str_data = str_data.split('"TranslatedText":')
+        translate_data = str_data[1:str_data.find('"', 1)]
+
+    except Exception:
+        logger.error(format_exc())
+        return "公共Bing: 我抽风啦, 请尝试重新翻译! 如果频繁出现, 建议直接注册使用私人翻译"
+
+    return translate_data
 
 
 # 校验谷歌浏览器是否可用
@@ -110,14 +149,16 @@ class Webdriver(QObject) :
             # 使用谷歌浏览器
             if self.object.chrome_driver_finish == 1:
                 option = webdriver.ChromeOptions()
-                option.add_argument("--headless")
+                if not self.object.yaml["selenium_debug"]:
+                    option.add_argument("--headless")
                 self.browser = webdriver.Chrome(executable_path="./config/tools/chromedriver.exe",
                                                 service_log_path="nul",
                                                 options=option)
             # 使用火狐浏览器
             elif self.object.firefox_driver_finish == 1:
                 option = webdriver.FirefoxOptions()
-                option.add_argument("--headless")
+                if not self.object.yaml["selenium_debug"]:
+                    option.add_argument("--headless")
                 self.browser = webdriver.Firefox(executable_path="./config/tools/geckodriver.exe",
                                                  service_log_path="nul",
                                                  options=option)
@@ -127,11 +168,11 @@ class Webdriver(QObject) :
                     "browserName": "MicrosoftEdge",
                     "platform": "WINDOWS",
                     "ms:edgeOptions": {
-                        'extensions': [],
-                        'args': [
-                            '--headless',
-                        ]}
+                        'extensions': []
+                    }
                 }
+                if not self.object.yaml["selenium_debug"]:
+                    EDGE["ms:edgeOptions"]["args"] = ['--headless']
                 self.browser = webdriver.Edge(executable_path="./config/tools/msedgedriver.exe",
                                               service_log_path="nul",
                                               capabilities=EDGE)
@@ -211,6 +252,7 @@ class Webdriver(QObject) :
                 self.browser.find_element_by_xpath(xpath).click()
                 break
             except Exception :
+                pass
                 if time.time()-start > timeout :
                     break
             time.sleep(0.1)
@@ -543,7 +585,7 @@ class Webdriver(QObject) :
         elif self.web_type == "caiyun" :
             result = self.caiyun(content)
         elif self.web_type == "bing" :
-            result = self.bing(content)
+            result = bing(self.object.config["language"], content, self.logger)
         elif self.web_type == "deepl" :
             result = self.deepl(content)
         else :

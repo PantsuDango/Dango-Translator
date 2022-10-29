@@ -26,6 +26,9 @@ def openConfig(logger) :
         # 2022.09.26 添加新参数
         if "agree_collect_time" not in config.keys() :
             config["agree_collect_time"] = "2022-09-25"
+        # 2022.10.30 添加新参数
+        if "selenium_debug" not in config.keys() :
+            config["selenium_debug"] = False
 
     except Exception :
         logger.error(format_exc())
