@@ -1,9 +1,6 @@
 from PyQt5.QtCore import *
 from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
 from traceback import format_exc
 import pyperclip
 import time
@@ -267,15 +264,13 @@ class Webdriver(QObject) :
 
         # DeepL
         if web_type == "deepl" :
-            self.browserClickTimeout('//*[@id="panelTranslateText"]/div[2]/div[2]/section[1]/div[1]/div[2]/button/span[1]')
             if language == "JAP" :
-                self.browserClickTimeout('//*[@id="panelTranslateText"]/div[2]/div[2]/section[1]/div[7]/div[2]/div[2]/button[6]/span')
+                self.browser.get(self.url_map[web_type]+"#ja/zh/")
             elif language == "ENG" :
-                self.browserClickTimeout('//*[@id="panelTranslateText"]/div[2]/div[2]/section[1]/div[7]/div[2]/div[3]/button[7]/span')
+                self.browser.get(self.url_map[web_type]+"#en/zh/")
             elif language == "KOR" :
-                self.browserClickTimeout('//*[@id="panelTranslateText"]/div[2]/div[2]/section[1]/div[7]/div[2]/div[1]/button[1]')
-            self.browserClickTimeout('//*[@id="panelTranslateText"]/div[2]/div[2]/section[2]/div[1]/div[1]/div[2]/button/span[1]')
-            self.browserClickTimeout('//*[@id="panelTranslateText"]/div[2]/div[2]/section[2]/div[8]/div[2]/div[3]/button[9]/span')
+                self.browser.get(self.url_map[web_type]+"#auto/zh/")
+            self.browser.maximize_window()
 
         # bing
         if web_type == "bing" :
@@ -402,6 +397,7 @@ class Webdriver(QObject) :
             # 清空翻译框
             if self.content :
                 self.browser.find_element_by_xpath('//*[@id="textarea"]').clear()
+                time.sleep(0.1)
             # 输入要翻译的文本
             self.browser.find_element_by_xpath('//*[@id="textarea"]').send_keys(content)
             self.browserClickTimeout('//*[@id="app"]/div[2]/div[1]/div[2]/div/div[1]/div[2]/div[2]')
@@ -463,12 +459,16 @@ class Webdriver(QObject) :
 
     # deepl翻译
     def deepl(self, content) :
+
         try :
-            # 清空翻译框
-            if self.content:
-                self.browserClickTimeout('//*[@id="dl_translator"]/div[3]/div[3]/div[1]/button/span')
-            # 输入要翻译的文本
-            self.browser.find_element_by_xpath('//*[@id="dl_translator"]/div[3]/div[3]/div[1]/div[2]/div[2]/textarea').send_keys(content)
+            language = self.object.config["language"]
+            web_type = "deepl"
+            if language == "JAP":
+                self.browser.get(self.url_map[web_type] + "#ja/zh/" + content)
+            elif language == "ENG":
+                self.browser.get(self.url_map[web_type] + "#en/zh/" + content)
+            elif language == "KOR":
+                self.browser.get(self.url_map[web_type] + "#auto/zh/" + content)
 
             start = time.time()
             while True :
