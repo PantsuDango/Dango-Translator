@@ -110,7 +110,7 @@ class Webdriver(QObject) :
             # 使用谷歌浏览器
             if self.object.chrome_driver_finish == 1:
                 option = webdriver.ChromeOptions()
-                #option.add_argument("--headless")
+                option.add_argument("--headless")
                 self.browser = webdriver.Chrome(executable_path="./config/tools/chromedriver.exe",
                                                 service_log_path="nul",
                                                 options=option)
@@ -287,6 +287,9 @@ class Webdriver(QObject) :
 
         # 彩云
         if web_type == "caiyun" :
+            # 打开网页
+            self.browser.get(self.url_map[web_type])
+            self.browser.maximize_window()
             ActionChains(self.browser).move_by_offset(1, 1).click().perform()
             self.browserClickTimeout('//*[@id="app"]/div[2]/div[1]/div[2]/div/div[1]/div[1]/div/div/div[1]')
             if language == "JAP" :
