@@ -152,9 +152,6 @@ class DangoTranslator :
         # 更新火狐浏览器引擎文件
         utils.thread.createThread(translator.upload_firefox_driver.updateFirefoxDriver, self)
 
-        # 更新ocr源码文件
-        ocr_src_file = self.yaml["dict_info"]["ocr_src_file"]
-        utils.update.updateOCRSrcFile(ocr_src_file, self.logger)
         # 加载注册界面图片
         qq_group_url = self.yaml["dict_info"]["register_image_url"]
         utils.http.downloadFile(qq_group_url, "./config/background/register.gif", self.logger)

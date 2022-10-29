@@ -523,8 +523,6 @@ class Settin(QMainWindow) :
         self.text_direction_label = QLabel(self.tab_1)
         self.customSetGeometry(self.text_direction_label, 105, 360, 300, 20)
         self.text_direction_label.setText("识别的原文阅读方向")
-        # 页签切换信号
-        self.ocr_tab_widget.currentChanged.connect(self.hideOrShowDirection)
 
         # 文字换行开关
         self.branch_line_switch = ui.switch.SwitchBranchLine(self.tab_1, sign=self.branch_line_use, startX=(65-20) * self.rate)
@@ -2642,18 +2640,6 @@ class Settin(QMainWindow) :
             self.translate_list_label.setText("当前正在使用%s"%content)
         else :
             self.translate_list_label.setText("请选择开启至少一种翻译源开关, 否则翻译将无法使用")
-
-
-    # 改变文字方向控件显示/隐藏状态
-    def hideOrShowDirection(self) :
-
-        index = self.ocr_tab_widget.currentIndex()
-        if index == 0 or index == 2 :
-            self.text_direction_switch.show()
-            self.text_direction_label.show()
-        else :
-            self.text_direction_switch.hide()
-            self.text_direction_label.hide()
 
 
     # 退出前保存设置
