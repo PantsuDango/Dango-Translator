@@ -42,7 +42,7 @@ class Translation(QMainWindow) :
             "baidu": "baiduweb",
             "tencent": "tencentweb",
             "caiyun": "caiyun",
-            "google": "google",
+            "bing": "bing",
             "deepl": "deepl"
         }
         self.object = object
@@ -754,7 +754,7 @@ class Translation(QMainWindow) :
         utils.thread.createThread(self.sound.openWebdriver)
 
         # 筛选翻译源类型
-        translater_list = ["youdaoUse", "baiduwebUse", "tencentwebUse", "deeplUse", "googleUse", "caiyunUse"]
+        translater_list = ["youdaoUse", "baiduwebUse", "tencentwebUse", "deeplUse", "bingUse", "caiyunUse"]
         for val in translater_list :
             if self.object.config[val] == "False" :
                 continue

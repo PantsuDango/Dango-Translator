@@ -4,7 +4,6 @@ from PyQt5.QtWidgets import *
 
 from utils.port import detectPort
 from utils.message import MessageBox
-import utils.check_chrome
 
 
 # 只有翻译界面用

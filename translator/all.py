@@ -1,7 +1,11 @@
 from PyQt5.QtCore import *
 from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
 from traceback import format_exc
+import pyperclip
 import time
 
 
@@ -79,17 +83,17 @@ class Webdriver(QObject) :
             "baidu"  : "https://fanyi.baidu.com/#auto/zh",
             "tencent": "https://fanyi.qq.com/",
             "caiyun" : "https://fanyi.caiyunapp.com/#/",
-            "google" : "https://translate.google.com/?tl=zh-CN&op=translate",
+            "bing"   : "https://cn.bing.com/translator?mkt=zh-CN",
             "deepl"  : "https://www.deepl.com/translator",
             "xiaoniu": "https://niutrans.com/trans?type=text"
         }
         self.translater_map = {
-            "youdao": "有道",
-            "baidu": "百度",
+            "youdao" : "有道",
+            "baidu"  : "百度",
             "tencent": "腾讯",
-            "caiyun": "彩云",
-            "google": "谷歌",
-            "deepl": "DeepL",
+            "caiyun" : "彩云",
+            "bing"   : "Bing",
+            "deepl"  : "DeepL",
             "xiaoniu": "小牛"
         }
         # 翻译引擎启动情况: 0-启动中, 1-启动成功, 2-启动失败
@@ -246,21 +250,11 @@ class Webdriver(QObject) :
             self.browserClickTimeout(self.object.yaml["dict_info"]["%s_xpath" % web_type])
             self.browser.maximize_window()
 
-            # # 原文选择
-            # self.browserClickTimeout('//*[@id="main-outer"]/div/div/div[1]/div[1]/div[1]/a[1]/span/span')
-            # if language == "JAP" :
-            #     self.browserClickTimeout('//*[@id="lang-panel-container"]/div/div[5]/div[1]/div[16]/div/span[1]')
-            # elif language == "ENG" :
-            #     self.browserClickTimeout('//*[@id="lang-panel-container"]/div/div[5]/div[1]/div[21]/div/span[1]')
-            # elif language == "KOR" :
-            #     self.browserClickTimeout('//*[@id="lang-panel-container"]/div/div[5]/div[1]/div[8]/div/span[1]')
-            # # 译文选择
-            # if self.browser.find_element_by_xpath('//*[@id="main-outer"]/div/div/div[1]/div[1]/div[1]/a[3]/span/span').text != "中文(简体)":
-            #     self.browserClickTimeout('//*[@id="main-outer"]/div/div/div[1]/div[1]/div[1]/a[3]/span/span')
-            #     self.browserClickTimeout('//*[@id="lang-panel-container"]/div/div[5]/div[1]/div[22]/div/span[1]')
-
         # 腾讯
         if web_type == "tencent" :
+            # 打开网页
+            self.browser.get(self.url_map[web_type])
+            self.browser.maximize_window()
             self.browserClickTimeout('//*[@id="language-button-group-source"]/div[1]')
             if language == "JAP" :
                 self.browserClickTimeout('//*[@id="language-button-group-source"]/div[2]/ul/li[4]/span')
@@ -283,17 +277,18 @@ class Webdriver(QObject) :
             self.browserClickTimeout('//*[@id="panelTranslateText"]/div[2]/div[2]/section[2]/div[1]/div[1]/div[2]/button/span[1]')
             self.browserClickTimeout('//*[@id="panelTranslateText"]/div[2]/div[2]/section[2]/div[8]/div[2]/div[3]/button[9]/span')
 
-        # google
-        if web_type == "google" :
-            self.browserClickTimeout('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[1]/c-wiz/div[1]/c-wiz/div[2]/button/div[3]')
+        # bing
+        if web_type == "bing" :
+            # 打开网页
+            self.browser.get(self.url_map[web_type])
+            self.browser.maximize_window()
             if language == "JAP" :
-                self.browserClickTimeout('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[1]/c-wiz/div[2]/c-wiz/div[1]/div/div[3]/div/div[3]/div[8]/div[2]')
+                self.browserClickTimeout('//*[@id="t_srcAllLang"]/option[60]')
             elif language == "ENG" :
-                self.browserClickTimeout('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[1]/c-wiz/div[2]/c-wiz/div[1]/div/div[3]/div/div[3]/div[67]/div[2]')
+                self.browserClickTimeout('//*[@id="t_srcAllLang"]/option[86]')
             elif language == "KOR" :
-                self.browserClickTimeout('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[1]/c-wiz/div[2]/c-wiz/div[1]/div/div[3]/div/div[3]/div[130]/div[2]')
-            # self.browserClickTimeout('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[1]/c-wiz/div[5]/button/div[2]')
-            # self.browserClickTimeout('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[3]/c-wiz/div[2]/div/div[3]/div/div[2]/div[110]/div[2]')
+                self.browserClickTimeout('//*[@id="t_srcAllLang"]/option[103]')
+            self.browserClickTimeout('//*[@id="t_tgtAllLang"]/option[13]')
 
         # 彩云
         if web_type == "caiyun" :
@@ -433,27 +428,25 @@ class Webdriver(QObject) :
             return "公共彩云: 我抽风啦, 请尝试重新翻译! 如果频繁出现, 建议直接注册使用私人翻译"
 
 
-    # 谷歌翻译
-    def google(self, content) :
+    # bing翻译
+    def bing(self, content) :
         try :
             # 清空翻译框
             if self.content :
-                self.browserClickTimeout('/html[1]/body[1]/c-wiz[1]/div[1]/div[2]/c-wiz[1]/div[2]/c-wiz[1]/div[1]/div[2]/div[2]/c-wiz[1]/div[1]/div[1]/div[1]/span[1]/button[1]/div[2]')
+                self.browserClickTimeout('//*[@id="tta_clear"]')
             # 输入要翻译的文本
-            self.browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[2]/div[3]/c-wiz[1]/span/span/div/textarea').send_keys(content)
+            self.browser.find_element_by_xpath('//*[@id="tta_input_ta"]').send_keys(content)
 
+            copy_clipboard = pyperclip.paste()
             start = time.time()
             while True :
                 time.sleep(0.1)
                 # 提取翻译信息
                 try :
-                    try :
-                        # 可能出出现重试按钮
-                        self.browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[2]/div[2]/c-wiz[2]/div[4]/div[2]/button/span').click()
-                    except Exception :
-                        pass
-                    text = self.browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[2]/div[3]/c-wiz[2]/div[6]/div/div[1]').text
-                    if text :
+                    self.browserClickTimeout('//*[@id="tta_copyIcon"]')
+                    text = pyperclip.paste()
+                    if text and text != copy_clipboard :
+                        pyperclip.copy(copy_clipboard)
                         self.content = text
                         return self.content
                 except Exception :
@@ -461,11 +454,11 @@ class Webdriver(QObject) :
                 # 判断超时
                 end = time.time()
                 if (end - start) > 10 :
-                    return "公共谷歌: 我超时啦!"
+                    return "公共Bing: 我超时啦!"
 
         except Exception :
             self.logger.error(format_exc())
-            return "公共谷歌: 我抽风啦, 请尝试重新翻译! 如果频繁出现, 建议直接注册使用私人翻译"
+            return "公共Bing: 我抽风啦, 请尝试重新翻译! 如果频繁出现, 建议直接注册使用私人翻译"
 
 
     # deepl翻译
@@ -546,8 +539,8 @@ class Webdriver(QObject) :
             result = self.tencent(content)
         elif self.web_type == "caiyun" :
             result = self.caiyun(content)
-        elif self.web_type == "google" :
-            result = self.google(content)
+        elif self.web_type == "bing" :
+            result = self.bing(content)
         elif self.web_type == "deepl" :
             result = self.deepl(content)
         else :
