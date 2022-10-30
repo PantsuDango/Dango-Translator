@@ -71,4 +71,4 @@ def updateEdgeDriver(object) :
         return
 
     # 下载引擎文件
-    downloadDriver(driver_version, object.logger)
+    downloadDriver(driver_version, object)
