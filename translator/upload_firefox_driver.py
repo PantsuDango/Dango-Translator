@@ -90,5 +90,4 @@ def updateFirefoxDriver(object) :
         return
 
     # 下载浏览器引擎
-    downloadDriver(driver_version, object.logger)
-    object.selenium_driver_finish = True
+    downloadDriver(driver_version, object)
