@@ -51,7 +51,7 @@ class Translation(QMainWindow) :
         self.ui()
 
         # 开启翻译模块
-        self.createWebdriverThread()
+        utils.thread.createThread(self.createWebdriverThread)
         # 自动翻译信号
         self.auto_open_sign.connect(lambda: utils.thread.createThread(self.startTranslater))
 

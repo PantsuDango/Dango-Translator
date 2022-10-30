@@ -42,7 +42,7 @@ class DangoTranslator :
         # 本地配置
         self.yaml = utils.config.openConfig(self.logger)
         # 版本号
-        self.yaml["version"] = "4.3.4"
+        self.yaml["version"] = "4.3.5"
         # 配置中心
         self.yaml["dict_info"] = utils.config.getDictInfo(self.yaml["dict_info_url"], self.logger)
         # 屏幕分辨率
