@@ -1,7 +1,48 @@
 from PyQt5.QtCore import *
 from selenium import webdriver
+from selenium.webdriver.common.action_chains import ActionChains
 from traceback import format_exc
+import pyperclip
 import time
+import urllib.request
+import urllib.parse
+
+
+# bing翻译
+def bing(language, content, logger) :
+
+    try :
+        from_lan = "auto"
+        if language == "JAP":
+            from_lan = "ja"
+        elif language == "ENG":
+            from_lan = "en"
+        elif language == "KOR":
+            from_lan = "ko"
+
+        url = "http://api.microsofttranslator.com/v2/ajax.svc/TranslateArray2?"
+        data = {}
+        data['from'] = '"' + from_lan + '"'
+        data['to'] = '"' + "zh" + '"'
+        data['texts'] = '["'
+        data['texts'] += content
+        data['texts'] += '"]'
+        data['options'] = "{}"
+        data['oncomplete'] = 'onComplete_3'
+        data['onerror'] = 'onError_3'
+        data['_'] = '1430745999189'
+        data = urllib.parse.urlencode(data).encode('utf-8')
+        strUrl = url + data.decode() + "&appId=%223DAEE5B978BA031557E739EE1E2A68CB1FAD5909%22"
+        response = urllib.request.urlopen(strUrl)
+        str_data = response.read().decode('utf-8')
+        tmp, str_data = str_data.split('"TranslatedText":')
+        translate_data = str_data[1:str_data.find('"', 1)]
+
+    except Exception:
+        logger.error(format_exc())
+        return "公共Bing: 我抽风啦, 请尝试重新翻译! 如果频繁出现, 建议直接注册使用私人翻译"
+
+    return translate_data
 
 
 # 校验谷歌浏览器是否可用
@@ -44,14 +85,11 @@ def checkEdge() :
     try :
         EDGE = {
             "browserName": "MicrosoftEdge",
-            "version": "",
             "platform": "WINDOWS",
             "ms:edgeOptions": {
                 'extensions': [],
                 'args': [
                     '--headless',
-                    '--disable-gpu',
-                    '--remote-debugging-port=9222',
                 ]}
         }
         browser = webdriver.Edge(executable_path="./config/tools/msedgedriver.exe",
@@ -78,20 +116,20 @@ class Webdriver(QObject) :
 
         self.url_map = {
             "youdao" : "https://fanyi.youdao.com/",
-            "baidu"  : "https://fanyi.baidu.com/?aldtype=16047#auto/zh",
+            "baidu"  : "https://fanyi.baidu.com/#auto/zh",
             "tencent": "https://fanyi.qq.com/",
             "caiyun" : "https://fanyi.caiyunapp.com/#/",
-            "google" : "https://translate.google.cn",
+            "bing"   : "https://cn.bing.com/translator?mkt=zh-CN",
             "deepl"  : "https://www.deepl.com/translator",
             "xiaoniu": "https://niutrans.com/trans?type=text"
         }
         self.translater_map = {
-            "youdao": "有道",
-            "baidu": "百度",
+            "youdao" : "有道",
+            "baidu"  : "百度",
             "tencent": "腾讯",
-            "caiyun": "彩云",
-            "google": "谷歌",
-            "deepl": "DeepL",
+            "caiyun" : "彩云",
+            "bing"   : "Bing",
+            "deepl"  : "DeepL",
             "xiaoniu": "小牛"
         }
         # 翻译引擎启动情况: 0-启动中, 1-启动成功, 2-启动失败
@@ -109,47 +147,41 @@ class Webdriver(QObject) :
 
         try:
             # 使用谷歌浏览器
-            option = webdriver.ChromeOptions()
-            option.add_argument("--headless")
-            self.browser = webdriver.Chrome(executable_path="./config/tools/chromedriver.exe",
-                                            service_log_path="nul",
-                                            options=option)
-        except Exception :
-            self.logger.error(format_exc())
-
-            try:
-                # 使用火狐浏览器
+            if self.object.chrome_driver_finish == 1:
+                option = webdriver.ChromeOptions()
+                if not self.object.yaml["selenium_debug"]:
+                    option.add_argument("--headless")
+                self.browser = webdriver.Chrome(executable_path="./config/tools/chromedriver.exe",
+                                                service_log_path="nul",
+                                                options=option)
+            # 使用火狐浏览器
+            elif self.object.firefox_driver_finish == 1:
                 option = webdriver.FirefoxOptions()
-                option.add_argument("--headless")
+                if not self.object.yaml["selenium_debug"]:
+                    option.add_argument("--headless")
                 self.browser = webdriver.Firefox(executable_path="./config/tools/geckodriver.exe",
                                                  service_log_path="nul",
                                                  options=option)
-            except Exception:
-                self.logger.error(format_exc())
-
-                try:
-                    # 使用Edge浏览器
-                    EDGE = {
-                        "browserName": "MicrosoftEdge",
-                        "version": "",
-                        "platform": "WINDOWS",
-                        "ms:edgeOptions": {
-                            'extensions': [],
-                            'args': [
-                                '--headless',
-                                '--disable-gpu',
-                                '--remote-debugging-port=9222',
-                            ]}
+            # 使用Edge浏览器
+            elif self.object.edge_driver_finish == 1:
+                EDGE = {
+                    "browserName": "MicrosoftEdge",
+                    "platform": "WINDOWS",
+                    "ms:edgeOptions": {
+                        'extensions': []
                     }
-                    self.browser = webdriver.Edge(executable_path="./config/tools/msedgedriver.exe",
-                                                  service_log_path="nul",
-                                                  capabilities=EDGE)
-                except Exception :
-                    self.browser_sign = 2
-                    self.logger.error(format_exc())
-                    self.close()
-                    self.message_sign.emit("公共翻译启动失败, 若需使用公共翻译请下载安装谷歌浏览器后重启翻译器, 若使用私人翻译请忽视此提示")
-                    return
+                }
+                if not self.object.yaml["selenium_debug"]:
+                    EDGE["ms:edgeOptions"]["args"] = ['--headless']
+                self.browser = webdriver.Edge(executable_path="./config/tools/msedgedriver.exe",
+                                              service_log_path="nul",
+                                              capabilities=EDGE)
+        except Exception :
+            self.browser_sign = 2
+            self.logger.error(format_exc())
+            self.close()
+            self.message_sign.emit("公共翻译启动失败, 若需使用公共翻译请下载安装谷歌浏览器后重启翻译器, 若使用私人翻译请忽视此提示")
+            return
 
         self.browser_sign = 1
         if self.object.translation_ui.webdriver1.browser_sign == 1 \
@@ -178,10 +210,8 @@ class Webdriver(QObject) :
         self.message_sign.emit("%s翻译启动中, 请等待完成后再操作..."%content)
 
         try :
-            self.browser.get(self.url_map[web_type])
-            self.browser.maximize_window()
-            self.open_sign = True
             self.transInit(web_type)
+            self.open_sign = True
         except Exception :
             self.logger.error(format_exc())
 
@@ -222,6 +252,7 @@ class Webdriver(QObject) :
                 self.browser.find_element_by_xpath(xpath).click()
                 break
             except Exception :
+                pass
                 if time.time()-start > timeout :
                     break
             time.sleep(0.1)
@@ -230,15 +261,13 @@ class Webdriver(QObject) :
     # 翻译页面初始化
     def transInit(self, web_type) :
 
-        try :
-            # 去弹窗广告
-            self.browser.find_element_by_xpath(self.object.yaml["dict_info"]["%s_xpath"%web_type]).click()
-        except Exception:
-            pass
         language = self.object.config["language"]
-
         # 有道
         if web_type == "youdao" :
+            # 打开网页
+            self.browser.get(self.url_map[web_type])
+            self.browser.maximize_window()
+            # 原文选择
             self.browserClickTimeout('//*[@id="langSelect"]')
             if language == "JAP" :
                 self.browserClickTimeout('//*[@id="languageSelect"]/li[5]/a')
@@ -249,17 +278,22 @@ class Webdriver(QObject) :
 
         # 百度
         if web_type == "baidu" :
-            self.browserClickTimeout('//*[@id="main-outer"]/div/div/div[1]/div[1]/div[1]/a[1]/span/span')
             if language == "JAP" :
-                self.browserClickTimeout('//*[@id="lang-panel-container"]/div/div[5]/div[1]/div[16]/div/span[1]')
+                self.browser.get(self.url_map[web_type].replace("auto", "jp"))
             elif language == "ENG" :
-                self.browserClickTimeout('//*[@id="lang-panel-container"]/div/div[5]/div[1]/div[21]/div/span[1]')
+                self.browser.get(self.url_map[web_type].replace("auto", "en"))
             elif language == "KOR" :
-                self.browserClickTimeout('//*[@id="lang-panel-container"]/div/div[5]/div[1]/div[8]/div/span[1]')
-
+                self.browser.get(self.url_map[web_type].replace("auto", "kor"))
+            # 去弹窗广告
+            self.browser.refresh()
+            self.browserClickTimeout(self.object.yaml["dict_info"]["%s_xpath" % web_type])
+            self.browser.maximize_window()
 
         # 腾讯
         if web_type == "tencent" :
+            # 打开网页
+            self.browser.get(self.url_map[web_type])
+            self.browser.maximize_window()
             self.browserClickTimeout('//*[@id="language-button-group-source"]/div[1]')
             if language == "JAP" :
                 self.browserClickTimeout('//*[@id="language-button-group-source"]/div[2]/ul/li[4]/span')
@@ -272,30 +306,33 @@ class Webdriver(QObject) :
 
         # DeepL
         if web_type == "deepl" :
-            self.browserClickTimeout('//*[@id="dl_translator"]/div[3]/div[3]/div[1]/div[1]/div/button/div')
             if language == "JAP" :
-                self.browserClickTimeout('//*[@id="dl_translator"]/div[3]/div[3]/div[1]/div[2]/div[4]/div/div[2]/button[7]/div')
+                self.browser.get(self.url_map[web_type]+"#ja/zh/")
             elif language == "ENG" :
-                self.browserClickTimeout('//*[@id="dl_translator"]/div[3]/div[3]/div[1]/div[2]/div[4]/div/div[3]/button[6]/div')
+                self.browser.get(self.url_map[web_type]+"#en/zh/")
             elif language == "KOR" :
-                self.browserClickTimeout('//*[@id="dl_translator"]/div[3]/div[3]/div[1]/div[2]/div[4]/div/div[1]/button[1]/div[1]')
-            self.browserClickTimeout('//*[@id="dl_translator"]/div[3]/div[3]/div[3]/div[1]/div[2]/div[1]/button/div')
-            self.browserClickTimeout('//*[@id="dl_translator"]/div[3]/div[3]/div[3]/div[3]/div[7]/div/div[3]/button[8]/div[1]')
+                self.browser.get(self.url_map[web_type]+"#auto/zh/")
+            self.browser.maximize_window()
 
-        # google
-        if web_type == "google" :
-            self.browserClickTimeout('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[1]/c-wiz/div[2]/button/div[2]')
+        # bing
+        if web_type == "bing" :
+            # 打开网页
+            self.browser.get(self.url_map[web_type])
+            self.browser.maximize_window()
             if language == "JAP" :
-                self.browserClickTimeout('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[3]/c-wiz/div[1]/div/div[3]/div/div[3]/div[67]/div[2]')
+                self.browserClickTimeout('//*[@id="t_srcAllLang"]/option[60]')
             elif language == "ENG" :
-                self.browserClickTimeout('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[3]/c-wiz/div[1]/div/div[3]/div/div[3]/div[106]/div[2]')
+                self.browserClickTimeout('//*[@id="t_srcAllLang"]/option[86]')
             elif language == "KOR" :
-                self.browserClickTimeout('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[3]/c-wiz/div[1]/div/div[3]/div/div[3]/div[30]/div[2]')
-            self.browserClickTimeout('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[1]/c-wiz/div[5]/button/div[2]')
-            self.browserClickTimeout('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[3]/c-wiz/div[2]/div/div[3]/div/div[2]/div[110]/div[2]')
+                self.browserClickTimeout('//*[@id="t_srcAllLang"]/option[103]')
+            self.browserClickTimeout('//*[@id="t_tgtAllLang"]/option[13]')
 
         # 彩云
         if web_type == "caiyun" :
+            # 打开网页
+            self.browser.get(self.url_map[web_type])
+            self.browser.maximize_window()
+            ActionChains(self.browser).move_by_offset(1, 1).click().perform()
             self.browserClickTimeout('//*[@id="app"]/div[2]/div[1]/div[2]/div/div[1]/div[1]/div/div/div[1]')
             if language == "JAP" :
                 self.browserClickTimeout('//*[@id="app"]/div[2]/div[1]/div[2]/div/div[1]/div[1]/div/div[2]/div[4]')
@@ -309,7 +346,6 @@ class Webdriver(QObject) :
 
     # 有道翻译
     def youdao(self, content) :
-
         try :
             # 清空文本框
             if self.content :
@@ -338,8 +374,9 @@ class Webdriver(QObject) :
 
     # 百度翻译
     def baidu(self, content):
-
         try :
+            if "中文" in self.browser.find_element_by_xpath('//*[@id="main-outer"]/div/div/div[1]/div[1]/div[1]/a[1]/span/span').text :
+                self.browserClickTimeout('//*[@id="main-outer"]/div/div/div[1]/div[1]/div[1]/a[2]/span')
             # 清空翻译框
             if self.content :
                 self.browserClickTimeout('//*[@id="main-outer"]/div/div/div[1]/div[2]/div[1]/div[1]/div/div[2]/a')
@@ -370,7 +407,6 @@ class Webdriver(QObject) :
 
     # 腾讯翻译
     def tencent(self, content) :
-
         try :
             # 清空翻译框
             if self.content :
@@ -402,11 +438,11 @@ class Webdriver(QObject) :
 
     # 彩云翻译
     def caiyun(self, content) :
-
         try :
             # 清空翻译框
             if self.content :
-                self.browserClickTimeout('//*[@id="app"]/div[2]/div[1]/div[2]/div/div[2]/div/a')
+                self.browser.find_element_by_xpath('//*[@id="textarea"]').clear()
+                time.sleep(0.1)
             # 输入要翻译的文本
             self.browser.find_element_by_xpath('//*[@id="textarea"]').send_keys(content)
             self.browserClickTimeout('//*[@id="app"]/div[2]/div[1]/div[2]/div/div[1]/div[2]/div[2]')
@@ -433,28 +469,25 @@ class Webdriver(QObject) :
             return "公共彩云: 我抽风啦, 请尝试重新翻译! 如果频繁出现, 建议直接注册使用私人翻译"
 
 
-    # 谷歌翻译
-    def google(self, content) :
-
+    # bing翻译
+    def bing(self, content) :
         try :
             # 清空翻译框
             if self.content :
-                self.browserClickTimeout('/html[1]/body[1]/c-wiz[1]/div[1]/div[2]/c-wiz[1]/div[2]/c-wiz[1]/div[1]/div[2]/div[2]/c-wiz[1]/div[1]/div[1]/div[1]/span[1]/button[1]/div[2]')
+                self.browserClickTimeout('//*[@id="tta_clear"]')
             # 输入要翻译的文本
-            self.browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[2]/div[3]/c-wiz[1]/span/span/div/textarea').send_keys(content)
+            self.browser.find_element_by_xpath('//*[@id="tta_input_ta"]').send_keys(content)
 
+            copy_clipboard = pyperclip.paste()
             start = time.time()
             while True :
                 time.sleep(0.1)
                 # 提取翻译信息
                 try :
-                    try :
-                        # 可能出出现重试按钮
-                        self.browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[2]/div[2]/c-wiz[2]/div[4]/div[2]/button/span').click()
-                    except Exception :
-                        pass
-                    text = self.browser.find_element_by_xpath('//*[@id="yDmH0d"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[2]/div[3]/c-wiz[2]/div[6]/div/div[1]').text
-                    if text :
+                    self.browserClickTimeout('//*[@id="tta_copyIcon"]')
+                    text = pyperclip.paste()
+                    if text and text != copy_clipboard :
+                        pyperclip.copy(copy_clipboard)
                         self.content = text
                         return self.content
                 except Exception :
@@ -462,22 +495,25 @@ class Webdriver(QObject) :
                 # 判断超时
                 end = time.time()
                 if (end - start) > 10 :
-                    return "公共谷歌: 我超时啦!"
+                    return "公共Bing: 我超时啦!"
 
         except Exception :
             self.logger.error(format_exc())
-            return "公共谷歌: 我抽风啦, 请尝试重新翻译! 如果频繁出现, 建议直接注册使用私人翻译"
+            return "公共Bing: 我抽风啦, 请尝试重新翻译! 如果频繁出现, 建议直接注册使用私人翻译"
 
 
     # deepl翻译
     def deepl(self, content) :
 
         try :
-            # 清空翻译框
-            if self.content:
-                self.browserClickTimeout('//*[@id="dl_translator"]/div[3]/div[3]/div[1]/button/span')
-            # 输入要翻译的文本
-            self.browser.find_element_by_xpath('//*[@id="dl_translator"]/div[3]/div[3]/div[1]/div[2]/div[2]/textarea').send_keys(content)
+            language = self.object.config["language"]
+            web_type = "deepl"
+            if language == "JAP":
+                self.browser.get(self.url_map[web_type] + "#ja/zh/" + content)
+            elif language == "ENG":
+                self.browser.get(self.url_map[web_type] + "#en/zh/" + content)
+            elif language == "KOR":
+                self.browser.get(self.url_map[web_type] + "#auto/zh/" + content)
 
             start = time.time()
             while True :
@@ -506,7 +542,6 @@ class Webdriver(QObject) :
 
     # 小牛翻译
     def xiaoniu(self, content):
-
         try:
             try:
                 self.browser.find_element_by_xpath(self.object.yaml["dict_info"]["xiaoniu_xpath"]).click()
@@ -549,8 +584,8 @@ class Webdriver(QObject) :
             result = self.tencent(content)
         elif self.web_type == "caiyun" :
             result = self.caiyun(content)
-        elif self.web_type == "google" :
-            result = self.google(content)
+        elif self.web_type == "bing" :
+            result = bing(self.object.config["language"], content, self.logger)
         elif self.web_type == "deepl" :
             result = self.deepl(content)
         else :

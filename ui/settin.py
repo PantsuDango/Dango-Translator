@@ -3,7 +3,6 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from traceback import format_exc
-from selenium import webdriver
 import qtawesome
 import webbrowser
 import base64
@@ -153,7 +152,7 @@ class Settin(QMainWindow) :
                                      "QSpinBox { background: rgba(255, 255, 255, 0.3); }"
                                      "QFontComboBox { background: rgba(255, 255, 255, 0.3); }"
                                      "QDoubleSpinBox { background: rgba(255, 255, 255, 0.3); }"
-                                      %(67*self.rate, BG_IMAGE_PATH, self.color_2, 6.66*self.rate, self.color_2,
+                                      %(70*self.rate, BG_IMAGE_PATH, self.color_2, 6.66*self.rate, self.color_2,
                                        self.color_2, 8.66*self.rate, 4*self.rate, 13.33*self.rate, 13.33*self.rate,
                                        33.33*self.rate, 33.33*self.rate, -13.33*self.rate, -13.33*self.rate,
                                        -13.33*self.rate, -13.33*self.rate, 8.66*self.rate, 4*self.rate,
@@ -202,7 +201,7 @@ class Settin(QMainWindow) :
 
         # 竖向分割线
         label = QLabel(self.tab_1)
-        self.customSetGeometry(label, 0, 0, 1, 400)
+        self.customSetGeometry(label, 0, 0, 1, 420)
         label.setFrameShadow(QFrame.Raised)
         label.setFrameShape(QFrame.Box)
         label.setStyleSheet("border-width: 1px; border-style: solid; border-color: rgba(62, 62, 62, 0.1);")
@@ -524,8 +523,6 @@ class Settin(QMainWindow) :
         self.text_direction_label = QLabel(self.tab_1)
         self.customSetGeometry(self.text_direction_label, 105, 360, 300, 20)
         self.text_direction_label.setText("识别的原文阅读方向")
-        # 页签切换信号
-        self.ocr_tab_widget.currentChanged.connect(self.hideOrShowDirection)
 
         # 文字换行开关
         self.branch_line_switch = ui.switch.SwitchBranchLine(self.tab_1, sign=self.branch_line_use, startX=(65-20) * self.rate)
@@ -566,7 +563,7 @@ class Settin(QMainWindow) :
 
         # 竖向分割线
         label = QLabel(self.tab_2)
-        self.customSetGeometry(label, 0, 0, 1, 400)
+        self.customSetGeometry(label, 0, 0, 1, 420)
         label.setFrameShadow(QFrame.Raised)
         label.setFrameShape(QFrame.Box)
         label.setStyleSheet("border-width: 1px; border-style: solid; border-color: rgba(62, 62, 62, 0.1);")
@@ -863,24 +860,24 @@ class Settin(QMainWindow) :
         self.deepl_color_button.clicked.connect(lambda: self.ChangeTranslateColor("deepl", self.deepl_color))
         self.deepl_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
 
-        # 谷歌翻译标签
+        # Bing翻译标签
         label = QLabel(public_translater_tab)
         self.customSetGeometry(label, 200, 120, 35, 20)
-        label.setText("谷歌:")
+        label.setText("Bing:")
 
-        # 谷歌翻译开关
-        self.google_switch = ui.switch.PublicTranslationSwitch(public_translater_tab, sign=self.google_use, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.google_switch, 245, 120, 65, 20)
-        self.google_switch.checkedChanged.connect(self.changeGoogleSwitch)
-        self.google_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # Bing翻译开关
+        self.bing_switch = ui.switch.PublicTranslationSwitch(public_translater_tab, sign=self.bing_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.bing_switch, 245, 120, 65, 20)
+        self.bing_switch.checkedChanged.connect(self.changeBingSwitch)
+        self.bing_switch.setCursor(ui.static.icon.SELECT_CURSOR)
 
-        # 谷歌翻译颜色选择
-        self.google_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.google_color), "", public_translater_tab)
-        self.customSetIconSize(self.google_color_button, 20, 20)
-        self.customSetGeometry(self.google_color_button, 320, 120, 20, 20)
-        self.google_color_button.setStyleSheet("background: transparent;")
-        self.google_color_button.clicked.connect(lambda: self.ChangeTranslateColor("google", self.google_color))
-        self.google_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
+        # Bing翻译颜色选择
+        self.bing_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.bing_color), "", public_translater_tab)
+        self.customSetIconSize(self.bing_color_button, 20, 20)
+        self.customSetGeometry(self.bing_color_button, 320, 120, 20, 20)
+        self.bing_color_button.setStyleSheet("background: transparent;")
+        self.bing_color_button.clicked.connect(lambda: self.ChangeTranslateColor("bing", self.bing_color))
+        self.bing_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 彩云翻译标签
         label = QLabel(public_translater_tab)
@@ -962,7 +959,7 @@ class Settin(QMainWindow) :
 
         # 竖向分割线
         label = QLabel(self.tab_3)
-        self.customSetGeometry(label, 0, 0, 1, 400)
+        self.customSetGeometry(label, 0, 0, 1, 420)
         label.setFrameShadow(QFrame.Raised)
         label.setFrameShape(QFrame.Box)
         label.setStyleSheet("border-width: 1px; border-style: solid; border-color: rgba(62, 62, 62, 0.1);")
@@ -1103,7 +1100,7 @@ class Settin(QMainWindow) :
 
         # 竖向分割线
         label = QLabel(self.tab_4)
-        self.customSetGeometry(label, 0, 0, 1, 400)
+        self.customSetGeometry(label, 0, 0, 1, 420)
         label.setFrameShadow(QFrame.Raised)
         label.setFrameShape(QFrame.Box)
         label.setStyleSheet("border-width: 1px; border-style: solid; border-color: rgba(62, 62, 62, 0.1);")
@@ -1327,7 +1324,7 @@ class Settin(QMainWindow) :
 
         # 分割线
         label = QLabel(self.tab_5)
-        self.customSetGeometry(label, 0, 0, 1, 400)
+        self.customSetGeometry(label, 0, 0, 1, 420)
         label.setFrameShadow(QFrame.Raised)
         label.setFrameShape(QFrame.Box)
         label.setStyleSheet("border-width: 1px; border-style: solid; border-color: rgba(62, 62, 62, 0.2);")
@@ -1478,7 +1475,7 @@ class Settin(QMainWindow) :
 
         # 分割线
         label = QLabel(self.tab_6)
-        self.customSetGeometry(label, 0, 0, 1, 400)
+        self.customSetGeometry(label, 0, 0, 1, 420)
         label.setFrameShadow(QFrame.Raised)
         label.setFrameShape(QFrame.Box)
         label.setStyleSheet("border-width: 1px; border-style: solid; border-color: rgba(62, 62, 62, 0.2);")
@@ -1545,7 +1542,7 @@ class Settin(QMainWindow) :
             "baidu": "【公共百度】",
             "tencent": "【公共腾讯】",
             "deepl": "【公共DeepL】",
-            "google": "【公共Google】",
+            "bing": "【公共Bing】",
             "caiyun": "【公共彩云】",
             "tencent_private": "【私人腾讯】",
             "baidu_private": "【私人百度】",
@@ -1574,10 +1571,10 @@ class Settin(QMainWindow) :
         self.deepl_use = eval(self.object.config["deeplUse"])
         if self.deepl_use :
             self.translate_list.append("deepl")
-        # 公共谷歌翻译开关
-        self.google_use = eval(self.object.config["googleUse"])
-        if self.google_use :
-            self.translate_list.append("google")
+        # 公共Bing翻译开关
+        self.bing_use = eval(self.object.config["bingUse"])
+        if self.bing_use :
+            self.translate_list.append("bing")
         # 公共彩云翻译开关
         self.caiyun_web_use = eval(self.object.config["caiyunUse"])
         if self.caiyun_web_use :
@@ -1603,8 +1600,8 @@ class Settin(QMainWindow) :
         self.tencent_web_color = self.object.config["fontColor"]["tencentweb"]
         # 字体颜色 公共DeepL
         self.deepl_color = self.object.config["fontColor"]["deepl"]
-        # 字体颜色 公共谷歌
-        self.google_color = self.object.config["fontColor"]["google"]
+        # 字体颜色 公共Bing
+        self.bing_color = self.object.config["fontColor"]["bing"]
         # 字体颜色 公共彩云
         self.caiyun_web_color = self.object.config["fontColor"]["caiyun"]
         # 字体颜色 私人腾讯
@@ -1875,16 +1872,16 @@ class Settin(QMainWindow) :
         self.setTransLabelMessage()
 
 
-    # 改变公共Google翻译开关状态
-    def changeGoogleSwitch(self, checked) :
+    # 改变公共Bing翻译开关状态
+    def changeBingSwitch(self, checked) :
 
         if checked :
-            self.google_use = True
-            self.translate_list.append("google")
+            self.bing_use = True
+            self.translate_list.append("bing")
             self.checkTranslaterUse()
         else:
-            self.google_use = False
-            self.translate_list.remove("google")
+            self.bing_use = False
+            self.translate_list.remove("bing")
         self.setTransLabelMessage()
 
 
@@ -2270,7 +2267,7 @@ class Settin(QMainWindow) :
     # 打开安装谷歌浏览器地址
     def openInstallChrome(self):
 
-        url = "https://www.google.cn/intl/zh-CN/chrome/"
+        url = "https://www.google.cn/chrome/browser/desktop/index.html?standalone=1&platform=win32"
         try:
             webbrowser.open(url, new=0, autoraise=True)
         except Exception:
@@ -2348,9 +2345,9 @@ class Settin(QMainWindow) :
         elif translate_type == "deepl" :
             self.deepl_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=color.name()))
             self.deepl_color = color.name()
-        elif translate_type == "google" :
-            self.google_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=color.name()))
-            self.google_color = color.name()
+        elif translate_type == "bing" :
+            self.bing_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=color.name()))
+            self.bing_color = color.name()
         elif translate_type == "caiyun" :
             self.caiyun_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=color.name()))
             self.caiyun_web_color = color.name()
@@ -2534,9 +2531,9 @@ class Settin(QMainWindow) :
                 self.deepl_switch.mousePressEvent(1)
                 self.deepl_switch.updateValue()
 
-            elif val == "google" :
-                self.google_switch.mousePressEvent(1)
-                self.google_switch.updateValue()
+            elif val == "bing" :
+                self.bing_switch.mousePressEvent(1)
+                self.bing_switch.updateValue()
 
             elif val == "youdao" :
                 self.youdao_switch.mousePressEvent(1)
@@ -2573,7 +2570,7 @@ class Settin(QMainWindow) :
         self.object.translation_ui.webdriver3.open_sign = False
 
         # 刷新翻译
-        translater_list = ["youdaoUse", "baiduwebUse", "tencentwebUse", "deeplUse", "googleUse", "caiyunUse"]
+        translater_list = ["youdaoUse", "baiduwebUse", "tencentwebUse", "deeplUse", "bingUse", "caiyunUse"]
         for val in translater_list :
             if self.object.config[val] == "False" :
                 continue
@@ -2645,18 +2642,6 @@ class Settin(QMainWindow) :
             self.translate_list_label.setText("请选择开启至少一种翻译源开关, 否则翻译将无法使用")
 
 
-    # 改变文字方向控件显示/隐藏状态
-    def hideOrShowDirection(self) :
-
-        index = self.ocr_tab_widget.currentIndex()
-        if index == 0 or index == 2 :
-            self.text_direction_switch.show()
-            self.text_direction_label.show()
-        else :
-            self.text_direction_switch.hide()
-            self.text_direction_label.hide()
-
-
     # 退出前保存设置
     def saveConfig(self) :
 
@@ -2681,8 +2666,8 @@ class Settin(QMainWindow) :
         self.object.config["tencentwebUse"] = str(self.tencent_web_use)
         # 公共DeepL翻译开关
         self.object.config["deeplUse"] = str(self.deepl_use)
-        # 公共谷歌翻译开关
-        self.object.config["googleUse"] = str(self.google_use)
+        # 公共Bing翻译开关
+        self.object.config["bingUse"] = str(self.bing_use)
         # 公共彩云翻译开关
         self.object.config["caiyunUse"] = str(self.caiyun_web_use)
         # 私人腾讯翻译开关
@@ -2700,8 +2685,8 @@ class Settin(QMainWindow) :
         self.object.config["fontColor"]["tencentweb"] = self.tencent_web_color
         # 字体颜色 公共DeepL
         self.object.config["fontColor"]["deepl"] = self.deepl_color
-        # 字体颜色 公共谷歌
-        self.object.config["fontColor"]["google"] = self.google_color
+        # 字体颜色 公共Bing
+        self.object.config["fontColor"]["bing"] = self.bing_color
         # 字体颜色 公共彩云
         self.object.config["fontColor"]["caiyun"] = self.caiyun_web_color
         # 字体颜色 私人腾讯

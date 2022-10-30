@@ -48,7 +48,6 @@ def killOfflineOCR(port) :
 
     popen_content = os.popen("netstat -ano |findstr %s"%port).read()
     if popen_content :
-        print(popen_content)
         pid = popen_content.split(" ")[-1]
         os.popen("taskkill /f /t /im %s"%pid)
 

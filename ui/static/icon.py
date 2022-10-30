@@ -61,6 +61,8 @@ OTHER = "iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACtWK6eAAAXl0lEQVR4Xu1dXXLcNhIGRpZ
 
 # 默认比例
 RATE = 1.0
+# 启动图标
+APP_LOGO_SPLASH = None
 # 在线ocr图标
 ONLINE_OCR_ICON = None
 # logo图标
@@ -178,12 +180,14 @@ def initIcon(rate):
         FONT_ICON, \
         AUTO_MODE_ICON, \
         SHORTCUT_KEY_ICON, \
-        OTHER_ICON
+        OTHER_ICON, \
+        APP_LOGO_SPLASH
 
     RATE = rate
 
     ONLINE_OCR_ICON = createIcon(createPixmap(ONLINE_OCR, 20, 20))
     APP_LOGO_ICON = createIcon(createPixmap(APP_LOGO, 20, 20))
+    APP_LOGO_SPLASH = createPixmap(APP_LOGO, 50, 50)
     OCR_ICON = createIcon(createPixmap(OCR, 20, 20))
     ABOUT_ICON = createIcon(createPixmap(ABOUT, 20, 20))
     STYLE_ICON = createIcon(createPixmap(STYLE, 20, 20))

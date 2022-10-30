@@ -26,6 +26,9 @@ def openConfig(logger) :
         # 2022.09.26 添加新参数
         if "agree_collect_time" not in config.keys() :
             config["agree_collect_time"] = "2022-09-25"
+        # 2022.10.30 添加新参数
+        if "selenium_debug" not in config.keys() :
+            config["selenium_debug"] = False
 
     except Exception :
         logger.error(format_exc())
@@ -125,8 +128,8 @@ def configConvert(object) :
     object.config["fontColor"]["tencentweb"] = object.config["fontColor"].get("tencentweb", "#5B8FF9")
     # 字体颜色 公共DeepL
     object.config["fontColor"]["deepl"] = object.config["fontColor"].get("deepl", "#5B8FF9")
-    # 字体颜色 公共谷歌
-    object.config["fontColor"]["google"] = object.config["fontColor"].get("google", "#5B8FF9")
+    # 字体颜色 公共Bing
+    object.config["fontColor"]["bing"] = object.config["fontColor"].get("bing", "#5B8FF9")
     # 字体颜色 公共彩云
     object.config["fontColor"]["caiyun"] = object.config["fontColor"].get("caiyun", "#5B8FF9")
     # 字体颜色 私人腾讯
@@ -146,8 +149,8 @@ def configConvert(object) :
     object.config["tencentwebUse"] = object.config.get("tencentwebUse", "False")
     # 公共DeepL翻译开关
     object.config["deeplUse"] = object.config.get("deeplUse", "False")
-    # 公共谷歌翻译开关
-    object.config["googleUse"] = object.config.get("googleUse", "False")
+    # 公共bing翻译开关
+    object.config["bingUse"] = object.config.get("bingUse", "False")
     # 公共彩云翻译开关
     object.config["caiyunUse"] = object.config.get("caiyunUse", "False")
     # 私人腾讯翻译开关
@@ -159,7 +162,7 @@ def configConvert(object) :
 
     # 确保版本转换后至多只有2个翻译源能被同时开始
     tmp = []
-    for val in ["youdaoUse", "baiduwebUse", "tencentwebUse", "deeplUse", "googleUse",
+    for val in ["youdaoUse", "baiduwebUse", "tencentwebUse", "deeplUse", "bingUse",
                 "caiyunUse", "tencentUse", "baiduUse", "caiyunPrivateUse"] :
         if object.config[val] == "True" :
             tmp.append(val)
@@ -269,16 +272,14 @@ def saveTransHisTory(text, translate_type) :
         content = "[公共百度]\n%s\n"%text
     elif translate_type == "tencent" :
         content = "[公共腾讯]\n%s\n"%text
-    elif translate_type == "google" :
-        content = "[公共谷歌]\n%s\n"%text
+    elif translate_type == "bing" :
+        content = "[公共Bing]\n%s\n"%text
     elif translate_type == "baidu_private" :
         content = "[私人百度]\n%s\n"%text
     elif translate_type == "tencent_private" :
         content = "[私人腾讯]\n%s\n"%text
     elif translate_type == "caiyun_private" :
         content = "[私人彩云]\n%s\n"%text
-    elif translate_type == "xiaoniu" :
-        content = "[公共小牛]\n%s\n"%text
     else:
         return
 

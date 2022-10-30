@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from traceback import format_exc
+import base64
 import sys
 import os
 
@@ -27,10 +28,11 @@ import ui.static.icon
 
 import translator.update_chrome_driver
 import translator.update_edge_driver
+import translator.upload_firefox_driver
 import translator.upload_trans_file
 
 
-class DangoTranslator() :
+class DangoTranslator :
 
     # 配置初始化
     def __init__(self) :
@@ -40,13 +42,17 @@ class DangoTranslator() :
         # 本地配置
         self.yaml = utils.config.openConfig(self.logger)
         # 版本号
-        self.yaml["version"] = "4.3.1"
+        self.yaml["version"] = "4.3.5"
         # 配置中心
         self.yaml["dict_info"] = utils.config.getDictInfo(self.yaml["dict_info_url"], self.logger)
         # 屏幕分辨率
         self.yaml["screen_scale_rate"] = utils.screen_rate.getScreenRate(self.logger)
         # 保存配置
         utils.config.saveConfig(self.yaml, self.logger)
+        # selenium引擎加载完成信号: 0-进行中, 1-成功, 2-失败
+        self.chrome_driver_finish = 0
+        self.firefox_driver_finish = 0
+        self.edge_driver_finish = 0
 
 
     # 登录
@@ -140,13 +146,12 @@ class DangoTranslator() :
     def InitLoadFile(self) :
 
         # 更新谷歌浏览器引擎文件
-        utils.thread.createThread(translator.update_chrome_driver.updateChromeDriver, self.logger)
+        utils.thread.createThread(translator.update_chrome_driver.updateChromeDriver, self)
         # 更新Edge浏览器引擎文件
-        utils.thread.createThread(translator.update_edge_driver.updateEdgeDriver, self.logger)
+        utils.thread.createThread(translator.update_edge_driver.updateEdgeDriver, self)
+        # 更新火狐浏览器引擎文件
+        utils.thread.createThread(translator.upload_firefox_driver.updateFirefoxDriver, self)
 
-        # 更新ocr源码文件
-        ocr_src_file = self.yaml["dict_info"]["ocr_src_file"]
-        utils.update.updateOCRSrcFile(ocr_src_file, self.logger)
         # 加载注册界面图片
         qq_group_url = self.yaml["dict_info"]["register_image_url"]
         utils.http.downloadFile(qq_group_url, "./config/background/register.gif", self.logger)
@@ -158,20 +163,32 @@ class DangoTranslator() :
         utils.http.downloadFile(test_image_url, "./config/other/image.jpg", self.logger)
 
 
+    # 启动图标
+    def showSplash(self) :
+
+        self.splash = QSplashScreen(ui.static.icon.APP_LOGO_SPLASH, Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
+        self.splash.resize(int(250*self.yaml["screen_scale_rate"]), int(50*self.yaml["screen_scale_rate"]))
+        self.splash.setStyleSheet("font: 15pt '华康方圆体W7';")
+        self.splash.showMessage("团子翻译器启动中...", Qt.AlignVCenter | Qt.AlignRight)
+        self.splash.show()
+        QCoreApplication.processEvents()
+
+
     # 主函数
     def main(self) :
 
         # 更新贴字翻译所需的pil运行库
-        utils.update.updatePilFile(self.yaml, self.logger)
+        utils.update.updatePilFile(self)
         # 自适应高分辨率
         QCoreApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
         app = QApplication(sys.argv)
-
         # 连接配置中心
         if not self.yaml["dict_info"] :
             utils.message.serverClientFailMessage(self)
         # 加载静态资源
         ui.static.icon.initIcon(self.yaml["screen_scale_rate"])
+        # 启动图标
+        self.showSplash()
         # 检查是否为测试版本
         utils.message.checkIsTestVersion(self)
         # 检查字体
@@ -186,7 +203,6 @@ class DangoTranslator() :
 
         # 登录界面
         self.login_ui = ui.login.Login(self)
-        self.login_ui.show()
         self.login_ui.login_button.clicked.connect(self.login)
 
         # 注册页面
@@ -199,7 +215,10 @@ class DangoTranslator() :
         # 自动登录
         if self.yaml["auto_login"] :
             self.login()
+        else :
+            self.login_ui.show()
 
+        self.splash.close()
         app.exit(app.exec_())
 
 
