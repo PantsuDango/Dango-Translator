@@ -23,6 +23,10 @@
 + 账号系统，能够自动云端保存配置
 
 
+## 使用教程
+
+[翻译器使用文档教程](https://docs.dango.c4a15wh.cn/#/4.0/basic/start)
+
   
 ## 安装版下载
 
@@ -58,12 +62,7 @@
 
 + 更多更新日志：[查看](https://docs1.ayano.top/#/4.0/develop/changelog)  
 
-  
-## 使用教程
 
-[翻译器使用文档教程](https://docs1.ayano.top)
-
-  
 ## 原理说明
 
 ![](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E6%B5%81%E7%A8%8B%E5%9B%BE.png)
