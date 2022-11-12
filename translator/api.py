@@ -201,7 +201,10 @@ def caiyun(sentence, token, logger) :
             if word != result[-1]:
                 text += "\n"
     except Exception:
-        logger.error(format_exc())
-        text = "私人彩云: 我抽风啦, 请尝试重新翻译!"
+        try:
+            text = str(json.loads(response.text))
+        except Exception:
+            logger.error(format_exc())
+            text = "私人彩云: 我抽风啦, 请尝试重新翻译!"
 
     return text
