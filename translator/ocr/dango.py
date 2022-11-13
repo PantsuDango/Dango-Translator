@@ -351,9 +351,7 @@ def offlineOCR(object) :
     }
     if language == "RU" and os.path.exists("./ocr/resources/app.py"):
         with open("./ocr/resources/app.py", "r", encoding="utf-8") as file:
-            fileStr = file.read()
-            if "ruOcr" not in fileStr:
-                print(fileStr)
+            if "ruOcr" not in file.read():
                 return False, "本地OCR错误: 当前本地OCR版本尚未支持俄语, 请通过本地OCR的卸载和安装功能, 更新最新版本的本地OCR"
 
     res = utils.http.post(url, body, object.logger)
