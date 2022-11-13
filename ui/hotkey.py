@@ -64,6 +64,11 @@ class HotKey(QWidget):
         self.customSetGeometry(label, 145, 80, 50, 20)
         label.setText("+")
 
+        self.choice_range_label = QLabel(self)
+        self.customSetGeometry(self.choice_range_label, 170, 80, 100, 20)
+        self.choice_range_label.setText("F1-F4")
+        self.choice_range_label.hide()
+
         # 键位二
         comboBox_list_2 = ["ctrl", "win", "alt", "shift"]
         comboBox_list_2 += [chr(ch) for ch in range(97, 123)]
@@ -114,10 +119,11 @@ class HotKey(QWidget):
     # 按下确定键
     def sure(self, key_type) :
 
-        if self.comboBox_1.currentText() == self.comboBox_2.currentText() :
-            utils.message.MessageBox("这是来自团子的警告~",
-                                     "键位一和键位二不可重复ヽ(･ω･´ﾒ)     ")
-            return
+        if key_type != "choiceRange" :
+            if self.comboBox_1.currentText() == self.comboBox_2.currentText() :
+                utils.message.MessageBox("这是来自团子的警告~",
+                                         "键位一和键位二不可重复ヽ(･ω･´ﾒ)     ")
+                return
 
         content = self.comboBox_1.currentText() + "+" + self.comboBox_2.currentText()
 
@@ -135,5 +141,9 @@ class HotKey(QWidget):
             self.object.settin_ui.hide_range_hotkey_button.setText(content)
             self.object.config["hideRangeHotkeyValue1"] = self.comboBox_1.currentText()
             self.object.config["hideRangeHotkeyValue2"] = self.comboBox_2.currentText()
+
+        elif key_type == "choiceRange" :
+            self.object.multi_range_ui.choice_range_hotkey_button.setText(self.comboBox_1.currentText() + " + " + "F1-F4")
+            self.object.config["choiceRangeHotkeyValue"] = self.comboBox_1.currentText()
 
         self.close()

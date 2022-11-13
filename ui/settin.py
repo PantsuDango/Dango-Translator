@@ -1236,7 +1236,7 @@ class Settin(QMainWindow) :
         self.range_hotkey_button.setCursor(ui.static.icon.SELECT_CURSOR)
         # 范围快捷键标签
         label = QLabel(shortcut_key_tab)
-        self.customSetGeometry(label, 180, 80, 80, 20)
+        self.customSetGeometry(label, 180, 80, 300, 20)
         label.setText("重新框选范围框的快捷键")
 
         # 隐藏快捷键开关
@@ -2503,6 +2503,13 @@ class Settin(QMainWindow) :
             self.hotkey_ui.setWindowTitle("设定隐藏范围快捷键")
             self.hotkey_ui.comboBox_1.setCurrentText(self.object.config["hideRangeHotkeyValue1"])
             self.hotkey_ui.comboBox_2.setCurrentText(self.object.config["hideRangeHotkeyValue2"])
+            self.hotkey_ui.sure_button.clicked.connect(lambda: self.hotkey_ui.sure(key_type))
+
+        if key_type == "choiceRange" :
+            self.hotkey_ui.setWindowTitle("切换范围区域快捷键")
+            self.hotkey_ui.comboBox_1.setCurrentText(self.object.config["choiceRangeHotkeyValue"])
+            self.hotkey_ui.comboBox_2.hide()
+            self.hotkey_ui.choice_range_label.show()
             self.hotkey_ui.sure_button.clicked.connect(lambda: self.hotkey_ui.sure(key_type))
 
         self.hotkey_ui.show()

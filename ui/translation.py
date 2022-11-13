@@ -158,14 +158,13 @@ class Translation(QMainWindow) :
         self.range_button.hide()
 
         # 复制按钮
-        self.copy_button = QPushButton(qtawesome.icon("fa.copy", color=self.icon_color), "", self)
-        self.customSetIconSize(self.copy_button, 20, 20)
-        self.customSetGeometry(self.copy_button, 293, 5, 20, 20)
-        self.copy_button.setToolTip("<b>复制 Copy</b><br>将当前识别到的文本<br>复制至剪贴板")
-        self.copy_button.setStyleSheet("background: transparent;")
-        self.copy_button.setCursor(ui.static.icon.SELECT_CURSOR)
-        self.copy_button.clicked.connect(lambda: pyperclip.copy(self.original))
-        self.copy_button.hide()
+        self.multi_range_button = QPushButton(qtawesome.icon("fa5s.layer-group", color=self.icon_color), "", self)
+        self.customSetIconSize(self.multi_range_button, 20, 20)
+        self.customSetGeometry(self.multi_range_button, 293, 5, 20, 20)
+        self.multi_range_button.setToolTip("<b>多区域 multi-range</b><br>设置多识别区域<br>同步识别不同区域的文字")
+        self.multi_range_button.setStyleSheet("background: transparent;")
+        self.multi_range_button.setCursor(ui.static.icon.SELECT_CURSOR)
+        self.multi_range_button.hide()
 
         # 屏蔽词按钮
         self.filter_word_button = QPushButton(qtawesome.icon("fa.ban", color=self.icon_color), "", self)
@@ -427,7 +426,7 @@ class Translation(QMainWindow) :
         self.start_button.show()
         self.settin_button.show()
         self.range_button.show()
-        self.copy_button.show()
+        self.multi_range_button.show()
         self.quit_button.show()
         self.minimize_button.show()
         self.battery_button.show()
@@ -452,7 +451,7 @@ class Translation(QMainWindow) :
         self.start_button.setGeometry(QRect(width, 5 * self.rate, 20 * self.rate, 20 * self.rate))
         self.settin_button.setGeometry(QRect(width + 40 * self.rate, 5 * self.rate, 20 * self.rate, 20 * self.rate))
         self.range_button.setGeometry(QRect(width + 80 * self.rate, 5 * self.rate, 20 * self.rate, 20 * self.rate))
-        self.copy_button.setGeometry(QRect(width + 120 * self.rate, 5 * self.rate, 20 * self.rate, 20 * self.rate))
+        self.multi_range_button.setGeometry(QRect(width + 120 * self.rate, 5 * self.rate, 20 * self.rate, 20 * self.rate))
         self.filter_word_button.setGeometry(QRect(width + 160 * self.rate, 5 * self.rate, 20 * self.rate, 20 * self.rate))
         self.switch_button.setGeometry(QRect(width + 200 * self.rate, 5 * self.rate, 50 * self.rate, 20 * self.rate))
         self.play_voice_button.setGeometry(QRect(width + 270 * self.rate, 5 * self.rate, 20 * self.rate, 20 * self.rate))
@@ -467,7 +466,7 @@ class Translation(QMainWindow) :
         self.start_button.hide()
         self.settin_button.hide()
         self.range_button.hide()
-        self.copy_button.hide()
+        self.multi_range_button.hide()
         self.quit_button.hide()
         self.minimize_button.hide()
         self.battery_button.hide()
@@ -828,5 +827,7 @@ class Translation(QMainWindow) :
         self.killDriVer()
         # 退出程序前保存设置
         utils.thread.createThreadDaemonFalse(utils.config.postSaveSettin, self.object)
+        # 保存本地配置
+        utils.config.saveConfig(self.object.yaml, self.logger)
 
         self.close()

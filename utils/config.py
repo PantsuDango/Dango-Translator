@@ -29,6 +29,17 @@ def openConfig(logger) :
         # 2022.10.30 添加新参数
         if "selenium_debug" not in config.keys() :
             config["selenium_debug"] = False
+        # 2022.11.13 添加新参数
+        if "range" not in config.keys() :
+            config["range"] = {"X1": 0, "Y1": 0, "X2": 0, "Y2": 0}
+        if "range1" not in config.keys() :
+            config["range1"] = {"X1": 0, "Y1": 0, "X2": 0, "Y2": 0}
+        if "range2" not in config.keys() :
+            config["range2"] = {"X1": 0, "Y1": 0, "X2": 0, "Y2": 0}
+        if "range3" not in config.keys() :
+            config["range3"] = {"X1": 0, "Y1": 0, "X2": 0, "Y2": 0}
+        if "range4" not in config.keys() :
+            config["range4"] = {"X1": 0, "Y1": 0, "X2": 0, "Y2": 0}
 
     except Exception :
         logger.error(format_exc())
@@ -220,8 +231,6 @@ def configConvert(object) :
     object.config["imageSimilarity"] = object.config.get("imageSimilarity", 98)
     # 文字相似度
     object.config["textSimilarity"] = object.config.get("textSimilarity", 90)
-    # 范围坐标
-    object.yaml["range"] = {"X1": 0, "Y1": 0, "X2": 0, "Y2": 0}
     # 显示消息栏
     object.config["showStatusbarUse"] = object.config.get("showStatusbarUse", True)
     # 贴字翻译开关
@@ -235,6 +244,16 @@ def configConvert(object) :
     object.config["setTop"] =  object.config.get("setTop", False)
     # 是否同步翻译历史开关
     object.config["agreeCollectUse"] = object.config.get("agreeCollectUse", True)
+
+    # 范围状态开关
+    object.config["switch1Use"] = object.config.get("switch1Use", True)
+    object.config["switch2Use"] = object.config.get("switch2Use", False)
+    object.config["switch3Use"] = object.config.get("switch3Use", False)
+    object.config["switch4Use"] = object.config.get("switch4Use", False)
+    # 切换范围快捷键
+    object.config["choiceRangeHotkeyValue"] = object.config.get("choiceRangeHotkeyValue", "ctrl")
+    # 切换范围快捷键开关
+    object.config["choiceRangeHotKey"] = object.config.get("choiceRangeHotKey", False)
 
 
 # 保存配置至服务器

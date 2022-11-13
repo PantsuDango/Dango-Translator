@@ -5,6 +5,8 @@ import re
 
 import utils.thread
 import ui.static.icon
+import ui.switch
+import utils.message
 
 
 DRAW_PATH = "./config/draw.jpg"
@@ -165,7 +167,7 @@ class Range(QMainWindow) :
         self.setCursor(ui.static.icon.PIXMAP_CURSOR)
 
         self.label = QLabel(self)
-        self.label.setGeometry(0, 0, X2 - X1, Y2 - Y1)
+        self.label.setGeometry(0, 0, X2-X1, Y2-Y1)
         self.label.setStyleSheet("border-width:1;\
                                   border:2px dashed #1E90FF;\
                                   background-color:rgba(62, 62, 62, 0.01)")
@@ -319,3 +321,283 @@ class Range(QMainWindow) :
 
         self.show_sign = False
         self.close()
+
+
+# 多范围参数页面
+class MultiRange(QWidget):
+
+    def __init__(self, object):
+
+        super(MultiRange, self).__init__()
+        self.object = object
+
+        # 界面缩放比例
+        self.rate = self.object.yaml["screen_scale_rate"]
+        # 界面字体
+        self.font_type = "华康方圆体W7"
+        # 界面字体大小
+        self.font_size = 9
+        # 所使用的颜色
+        self.color_1 = "#595959"  # 灰色
+        self.color_2 = "#5B8FF9"  # 蓝色
+        # 界面尺寸
+        self.window_width = int(250*self.rate)
+        self.window_height = int(320*self.rate)
+        # 范围状态开关
+        self.switch_1_use = self.object.config["switch1Use"]
+        self.switch_2_use = self.object.config["switch2Use"]
+        self.switch_3_use = self.object.config["switch3Use"]
+        self.switch_4_use = self.object.config["switch4Use"]
+        # 切换范围快捷键开关
+        self.choice_range_hotkey_use = object.config["choiceRangeHotKey"]
+
+        self.ui()
+
+
+    def ui(self):
+
+        # 窗口尺寸及不可拉伸
+        self.resize(self.window_width, self.window_height)
+        self.setMinimumSize(QSize(self.window_width, self.window_height))
+        self.setMaximumSize(QSize(self.window_width, self.window_height))
+        self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowCloseButtonHint)
+        # 窗口标题
+        self.setWindowTitle("多识别范围设置")
+        # 窗口图标
+        self.setWindowIcon(ui.static.icon.APP_LOGO_ICON)
+        # 鼠标样式
+        self.setCursor(ui.static.icon.PIXMAP_CURSOR)
+        # 设置字体
+        self.setStyleSheet("QLabel { font: %spt '华康方圆体W7'; color: %s;}"
+                           "QPushButton { background: %s;"
+                                         "border-radius: %spx;"
+                                         "color: rgb(255, 255, 255); "
+                                         "font: %spt '华康方圆体W7';}"
+                           "QPushButton:hover { background-color: #83AAF9; }"
+                           "QPushButton:pressed { background-color: #4480F9;"
+                                                "padding-left: 3px;"
+                                                "padding-top: 3px; }"
+                           %(self.font_size, self.color_2, self.color_2, 6.66*self.rate, self.font_size))
+
+        # 背景, 长宽比1.424
+        label = QLabel(self)
+        label.setGeometry(QRect(0, 0, self.window_width, self.window_height))
+        label.setStyleSheet("background: rgb(255, 255, 255);")
+
+        # 范围一
+        self.label_1 = QLabel(self)
+        self.customSetGeometry(self.label_1, 15, 10, self.window_width, 20)
+        self.label_1.setText("区域一 (X1:{} Y1:{} X2:{} Y2:{})".format(
+            self.object.yaml["range1"]["X1"],
+            self.object.yaml["range1"]["Y1"],
+            self.object.yaml["range1"]["X2"],
+            self.object.yaml["range1"]["Y2"],
+        ))
+
+        self.switch_1 = ui.switch.SwitchOCR(self, sign=self.switch_1_use, startX=(60-20)*self.rate)
+        self.customSetGeometry(self.switch_1, 15, 35, 60, 20)
+        self.switch_1.checkedChanged.connect(self.changeRangeSwitch1)
+        self.switch_1.setCursor(ui.static.icon.SELECT_CURSOR)
+
+        self.show_button_1 = QPushButton(self)
+        self.customSetGeometry(self.show_button_1, 90, 35, 60, 20)
+        self.show_button_1.setText("查看范围")
+
+        self.choice_button_1 = QPushButton(self)
+        self.customSetGeometry(self.choice_button_1, 165, 35, 60, 20)
+        self.choice_button_1.setText("框选范围")
+
+        # 范围二
+        self.label_2 = QLabel(self)
+        self.customSetGeometry(self.label_2, 15, 70, self.window_width, 20)
+        self.label_2.setText("区域二 (X1:{} Y1:{} X2:{} Y2:{})".format(
+            self.object.yaml["range2"]["X1"],
+            self.object.yaml["range2"]["Y1"],
+            self.object.yaml["range2"]["X2"],
+            self.object.yaml["range2"]["Y2"],
+        ))
+
+        self.switch_2 = ui.switch.SwitchOCR(self, sign=self.switch_2_use, startX=(60-20)*self.rate)
+        self.customSetGeometry(self.switch_2, 15, 95, 60, 20)
+        self.switch_2.checkedChanged.connect(self.changeRangeSwitch2)
+        self.switch_2.setCursor(ui.static.icon.SELECT_CURSOR)
+
+        self.show_button_2 = QPushButton(self)
+        self.customSetGeometry(self.show_button_2, 90, 95, 60, 20)
+        self.show_button_2.setText("查看范围")
+
+        self.choice_button_2 = QPushButton(self)
+        self.customSetGeometry(self.choice_button_2, 165, 95, 60, 20)
+        self.choice_button_2.setText("框选范围")
+
+        # 范围三
+        self.label_3 = QLabel(self)
+        self.customSetGeometry(self.label_3, 15, 130, self.window_width, 20)
+        self.label_3.setText("区域三 (X1:{} Y1:{} X2:{} Y2:{})".format(
+            self.object.yaml["range3"]["X1"],
+            self.object.yaml["range3"]["Y1"],
+            self.object.yaml["range3"]["X2"],
+            self.object.yaml["range3"]["Y2"],
+        ))
+
+        self.switch_3 = ui.switch.SwitchOCR(self, sign=self.switch_3_use, startX=(60-20)*self.rate)
+        self.customSetGeometry(self.switch_3, 15, 155, 60, 20)
+        self.switch_3.checkedChanged.connect(self.changeRangeSwitch3)
+        self.switch_3.setCursor(ui.static.icon.SELECT_CURSOR)
+
+        self.show_button_3 = QPushButton(self)
+        self.customSetGeometry(self.show_button_3, 90, 155, 60, 20)
+        self.show_button_3.setText("查看范围")
+
+        self.choice_button_3 = QPushButton(self)
+        self.customSetGeometry(self.choice_button_3, 165, 155, 60, 20)
+        self.choice_button_3.setText("框选范围")
+
+        # 范围四
+        self.label_4 = QLabel(self)
+        self.customSetGeometry(self.label_4, 15, 190, self.window_width, 20)
+        self.label_4.setText("区域四 (X1:{} Y1:{} X2:{} Y2:{})".format(
+            self.object.yaml["range4"]["X1"],
+            self.object.yaml["range4"]["Y1"],
+            self.object.yaml["range4"]["X2"],
+            self.object.yaml["range4"]["Y2"],
+        ))
+
+        self.switch_4 = ui.switch.SwitchOCR(self, sign=self.switch_4_use, startX=(60-20)*self.rate)
+        self.customSetGeometry(self.switch_4, 15, 215, 60, 20)
+        self.switch_4.checkedChanged.connect(self.changeRangeSwitch4)
+        self.switch_4.setCursor(ui.static.icon.SELECT_CURSOR)
+
+        self.show_button_4 = QPushButton(self)
+        self.customSetGeometry(self.show_button_4, 90, 215, 60, 20)
+        self.show_button_4.setText("查看范围")
+
+        self.choice_button_4 = QPushButton(self)
+        self.customSetGeometry(self.choice_button_4, 165, 215, 60, 20)
+        self.choice_button_4.setText("框选范围")
+
+        # 切换范围快捷键开关
+        label = QLabel(self)
+        self.customSetGeometry(label, 15, 250, self.window_width, 20)
+        label.setText("切换范围1-4区域的快捷键")
+
+        self.choice_range_hotkey_switch = ui.switch.SwitchOCR(self, sign=self.choice_range_hotkey_use, startX=(60-20)*self.rate)
+        self.customSetGeometry(self.choice_range_hotkey_switch, 15, 275, 60, 20)
+        self.choice_range_hotkey_switch.checkedChanged.connect(self.changeChoiceRangeHotkeySwitch)
+        self.choice_range_hotkey_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+
+        # 切换范围快捷键设定按钮
+        self.choice_range_hotkey_button = QPushButton(self)
+        self.customSetGeometry(self.choice_range_hotkey_button, 100, 275, 100, 20)
+        self.choice_range_hotkey_button.setText(
+            self.object.config["choiceRangeHotkeyValue"] + " + " + "F1-F4")
+        self.choice_range_hotkey_button.clicked.connect(lambda: self.object.settin_ui.setHotKey("choiceRange"))
+        self.choice_range_hotkey_button.setCursor(ui.static.icon.SELECT_CURSOR)
+
+
+    # 根据分辨率定义控件位置尺寸
+    def customSetGeometry(self, object, x, y, w, h):
+
+        object.setGeometry(QRect(int(x * self.rate),
+                                 int(y * self.rate), int(w * self.rate),
+                                 int(h * self.rate)))
+
+
+    # 改变范围一开关状态
+    def changeRangeSwitch1(self, checked):
+
+        if checked:
+            if self.switch_2_use :
+                self.switch_2.mousePressEvent(1)
+                self.switch_2.updateValue()
+            if self.switch_3_use :
+                self.switch_3.mousePressEvent(1)
+                self.switch_3.updateValue()
+            if self.switch_4_use :
+                self.switch_4.mousePressEvent(1)
+                self.switch_4.updateValue()
+            self.switch_1_use = True
+        else:
+            self.switch_1_use = False
+
+
+    # 改变范围二开关状态
+    def changeRangeSwitch2(self, checked):
+
+        if checked:
+            if self.switch_1_use:
+                self.switch_1.mousePressEvent(1)
+                self.switch_1.updateValue()
+            if self.switch_3_use:
+                self.switch_3.mousePressEvent(1)
+                self.switch_3.updateValue()
+            if self.switch_4_use:
+                self.switch_4.mousePressEvent(1)
+                self.switch_4.updateValue()
+            self.switch_2_use = True
+        else:
+            self.switch_2_use = False
+
+
+    # 改变范围三开关状态
+    def changeRangeSwitch3(self, checked):
+
+        if checked:
+            if self.switch_1_use:
+                self.switch_1.mousePressEvent(1)
+                self.switch_1.updateValue()
+            if self.switch_2_use:
+                self.switch_2.mousePressEvent(1)
+                self.switch_2.updateValue()
+            if self.switch_4_use:
+                self.switch_4.mousePressEvent(1)
+                self.switch_4.updateValue()
+            self.switch_3_use = True
+        else:
+            self.switch_3_use = False
+
+
+    # 改变范围四开关状态
+    def changeRangeSwitch4(self, checked):
+
+        if checked:
+            if self.switch_1_use:
+                self.switch_1.mousePressEvent(1)
+                self.switch_1.updateValue()
+            if self.switch_2_use:
+                self.switch_2.mousePressEvent(1)
+                self.switch_2.updateValue()
+            if self.switch_3_use:
+                self.switch_3.mousePressEvent(1)
+                self.switch_3.updateValue()
+            self.switch_4_use = True
+        else:
+            self.switch_4_use = False
+
+
+    # 改变切换范围快键键开关状态
+    def changeChoiceRangeHotkeySwitch(self, checked):
+
+        if checked:
+            self.choice_range_hotkey_use = True
+            self.object.config["choiceRangeHotKey"] = True
+        else:
+            self.choice_range_hotkey_use = False
+            self.object.config["choiceRangeHotKey"] = False
+
+
+    # 窗口关闭处理
+    def closeEvent(self, event):
+
+        if not self.switch_1_use and not self.switch_2_use and not self.switch_3_use and not self.switch_4_use :
+            utils.message.MessageBox("这是来自团子的警告", "未使用任一范围\n必须要开启一处范围才可使用      ",
+                                     self.object.yaml["screen_scale_rate"])
+            event.ignore()
+            return
+
+        # 范围状态开关
+        self.object.config["switch1Use"] = self.switch_1_use
+        self.object.config["switch2Use"] = self.switch_2_use
+        self.object.config["switch3Use"] = self.switch_3_use
+        self.object.config["switch4Use"] = self.switch_4_use
+        self.object.translation_ui.show()

@@ -84,6 +84,10 @@ class DangoTranslator :
         # 范围框界面
         self.range_ui = ui.range.Range(self)
         self.translation_ui.hide_range_sign.connect(self.range_ui.hideRangeUI)
+        # 多范围参数页面
+        self.multi_range_ui = ui.range.MultiRange(self)
+        self.translation_ui.multi_range_button.clicked.connect(self.translation_ui.hide)
+        self.translation_ui.multi_range_button.clicked.connect(self.multi_range_ui.show)
 
         # 检查邮箱
         thread = utils.thread.createCheckBindEmailQThread(self)
