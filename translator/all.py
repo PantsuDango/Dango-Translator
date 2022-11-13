@@ -19,6 +19,8 @@ def bing(language, content, logger) :
             from_lan = "en"
         elif language == "KOR":
             from_lan = "ko"
+        elif language == "RU":
+            from_lan = "ru"
 
         url = "http://api.microsofttranslator.com/v2/ajax.svc/TranslateArray2?"
         data = {}
@@ -275,6 +277,10 @@ class Webdriver(QObject) :
                 self.browserClickTimeout('//*[@id="languageSelect"]/li[3]/a')
             elif language == "KOR" :
                 self.browserClickTimeout('//*[@id="languageSelect"]/li[7]/a')
+            elif language == "RU" :
+                self.browserClickTimeout('//*[@id="languageSelect"]/li[13]/a')
+            # 点击去掉 我知道了 广告弹窗
+            self.browserClickTimeout('/html/body/div[1]/div/ul/li[4]/div/a[2]')
 
         # 百度
         if web_type == "baidu" :
@@ -284,9 +290,11 @@ class Webdriver(QObject) :
                 self.browser.get(self.url_map[web_type].replace("auto", "en"))
             elif language == "KOR" :
                 self.browser.get(self.url_map[web_type].replace("auto", "kor"))
+            elif language == "RU" :
+                self.browser.get(self.url_map[web_type].replace("auto", "ru"))
             # 去弹窗广告
-            self.browser.refresh()
-            self.browserClickTimeout(self.object.yaml["dict_info"]["%s_xpath" % web_type])
+            #self.browser.refresh()
+            self.browserClickTimeout(self.object.yaml["dict_info"]["%s_xpath"%web_type])
             self.browser.maximize_window()
 
         # 腾讯
@@ -301,6 +309,8 @@ class Webdriver(QObject) :
                 self.browserClickTimeout('//*[@id="language-button-group-source"]/div[2]/ul/li[3]/span')
             elif language == "KOR" :
                 self.browserClickTimeout('//*[@id="language-button-group-source"]/div[2]/ul/li[5]/span')
+            elif language == "RU" :
+                self.browserClickTimeout('//*[@id="language-button-group-source"]/div[2]/ul/li[11]/span')
             self.browserClickTimeout('//*[@id="language-button-group-target"]/div[1]')
             self.browserClickTimeout('//*[@id="language-button-group-target"]/div[2]/ul/li[1]/span')
 
@@ -340,6 +350,8 @@ class Webdriver(QObject) :
                 self.browserClickTimeout('//*[@id="app"]/div[2]/div[1]/div[2]/div/div[1]/div[1]/div/div[2]/div[3]')
             elif language == "KOR" :
                 self.browserClickTimeout('//*[@id="app"]/div[2]/div[1]/div[2]/div/div[1]/div[1]/div/div[2]/div[1]')
+            elif language == "RU" :
+                self.browserClickTimeout('//*[@id="app"]/div[2]/div[1]/div[2]/div/div[1]/div[1]/div/div[2]/div[8]')
             self.browserClickTimeout('//*[@id="app"]/div[2]/div[1]/div[2]/div/div[1]/div[1]/div/div/div[3]')
             self.browserClickTimeout('//*[@id="app"]/div[2]/div[1]/div[2]/div/div[1]/div[1]/div/div[2]/div[2]')
 
@@ -514,6 +526,8 @@ class Webdriver(QObject) :
                 self.browser.get(self.url_map[web_type] + "#en/zh/" + content)
             elif language == "KOR":
                 self.browser.get(self.url_map[web_type] + "#auto/zh/" + content)
+            elif language == "RU":
+                self.browser.get(self.url_map[web_type] + "#ru/zh/" + content)
 
             start = time.time()
             while True :

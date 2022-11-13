@@ -478,18 +478,18 @@ class Settin(QMainWindow) :
         # OCR识别语种comboBox
         self.language_comboBox = QComboBox(self.tab_1)
         self.customSetGeometry(self.language_comboBox, 20, 310, 120, 20)
-        self.language_comboBox.addItem("")
-        self.language_comboBox.addItem("")
-        self.language_comboBox.addItem("")
-        self.language_comboBox.setItemText(0, "日语（Japanese）")
-        self.language_comboBox.setItemText(1, "英语（English）")
-        self.language_comboBox.setItemText(2, "韩语（Korean）")
+        language_list = ["日语(Japanese)", "英语(English)", "韩语(Korean)", "俄语(Russian)"]
+        for index, language in enumerate(language_list) :
+            self.language_comboBox.addItem("")
+            self.language_comboBox.setItemText(index, language)
         self.language_comboBox.setStyleSheet("QComboBox{color: %s}"%self.color_2)
         self.language_comboBox.setCursor(ui.static.icon.SELECT_CURSOR)
         if self.object.config["language"] == "ENG":
             self.language_comboBox.setCurrentIndex(1)
         elif self.object.config["language"] == "KOR":
             self.language_comboBox.setCurrentIndex(2)
+        elif self.object.config["language"] == "RU":
+            self.language_comboBox.setCurrentIndex(3)
         else:
             self.language_comboBox.setCurrentIndex(0)
         # OCR识别语种标签
@@ -620,7 +620,7 @@ class Settin(QMainWindow) :
 
         # 私人翻译备注
         label = QLabel(private_translater_tab)
-        self.customSetGeometry(label, 20, 20, 300, 20)
+        self.customSetGeometry(label, 20, 20, 400, 20)
         label.setText("免费, 使用前需先注册, 稳定且效果好, 建议使用")
         label.setStyleSheet("color: %s" % self.color_2)
 
@@ -2560,7 +2560,6 @@ class Settin(QMainWindow) :
 
         # 重置语音模块
         utils.thread.createThread(self.object.translation_ui.sound.refreshWeb)
-
         # 重置开关
         self.object.translation_ui.webdriver1.web_type = ""
         self.object.translation_ui.webdriver2.web_type = ""
@@ -2570,24 +2569,12 @@ class Settin(QMainWindow) :
         self.object.translation_ui.webdriver3.open_sign = False
 
         # 刷新翻译
-        translater_list = ["youdaoUse", "baiduwebUse", "tencentwebUse", "deeplUse", "bingUse", "caiyunUse"]
-        for val in translater_list :
-            if self.object.config[val] == "False" :
-                continue
-            web_type = val.replace("Use", "").replace("web", "")
-            # 刷新翻译引擎1
-            if not self.object.translation_ui.webdriver1.web_type :
-                self.object.translation_ui.webdriver1.web_type = web_type
+        for index, web_type in enumerate(self.translate_list) :
+            if index == 0 :
                 utils.thread.createThread(self.object.translation_ui.webdriver1.openWeb, web_type)
-
-            # 刷新翻译引擎2
-            elif not self.object.translation_ui.webdriver2.web_type :
-                self.object.translation_ui.webdriver2.web_type = web_type
+            elif index == 1 :
                 utils.thread.createThread(self.object.translation_ui.webdriver2.openWeb, web_type)
-
-            # 刷新翻译引擎3
-            elif not self.object.translation_ui.webdriver3.web_type :
-                self.object.translation_ui.webdriver3.web_type = web_type
+            elif index == 2 :
                 utils.thread.createThread(self.object.translation_ui.webdriver3.openWeb, web_type)
 
 
@@ -2655,6 +2642,8 @@ class Settin(QMainWindow) :
             self.object.config["language"] = "ENG"
         elif self.language_comboBox.currentIndex() == 2 :
             self.object.config["language"] = "KOR"
+        elif self.language_comboBox.currentIndex() == 3 :
+            self.object.config["language"] = "RU"
         else:
             self.object.config["language"] = "JAP"
 

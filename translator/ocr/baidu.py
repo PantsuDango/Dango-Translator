@@ -76,6 +76,8 @@ def getAccessToken(object) :
 def baiduOCR(config, logger, test=False) :
 
     language = config["language"]
+    if language == "RU" :
+        language = "RUS"
     access_token = config["AccessToken"]
     showTranslateRow = config["showTranslateRow"]
     highPrecision = config["OCR"]["highPrecision"]
