@@ -2569,12 +2569,24 @@ class Settin(QMainWindow) :
         self.object.translation_ui.webdriver3.open_sign = False
 
         # 刷新翻译
-        for index, web_type in enumerate(self.translate_list) :
-            if index == 0 :
+        translater_list = ["youdaoUse", "baiduwebUse", "tencentwebUse", "deeplUse", "bingUse", "caiyunUse"]
+        for val in translater_list:
+            if self.object.config[val] == "False":
+                continue
+            web_type = val.replace("Use", "").replace("web", "")
+            # 刷新翻译引擎1
+            if not self.object.translation_ui.webdriver1.web_type:
+                self.object.translation_ui.webdriver1.web_type = web_type
                 utils.thread.createThread(self.object.translation_ui.webdriver1.openWeb, web_type)
-            elif index == 1 :
+
+            # 刷新翻译引擎2
+            elif not self.object.translation_ui.webdriver2.web_type:
+                self.object.translation_ui.webdriver2.web_type = web_type
                 utils.thread.createThread(self.object.translation_ui.webdriver2.openWeb, web_type)
-            elif index == 2 :
+
+            # 刷新翻译引擎3
+            elif not self.object.translation_ui.webdriver3.web_type:
+                self.object.translation_ui.webdriver3.web_type = web_type
                 utils.thread.createThread(self.object.translation_ui.webdriver3.openWeb, web_type)
 
 
