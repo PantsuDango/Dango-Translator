@@ -22,16 +22,16 @@ class WScreenShot(QWidget) :
         self.setStyleSheet("background-color:black;")
         self.setWindowOpacity(0.6)
 
+        desktop_rect = QDesktopWidget().screenGeometry()
         desktop_widget = QDesktopWidget()
         screen_count = desktop_widget.screenCount()
         max_width, max_height = 0, 0
         for i in range(screen_count):
             temp_screen = desktop_widget.screenGeometry(i)
-            if temp_screen.width() > max_width:
-                max_width = temp_screen.width()
-            if temp_screen.height() > max_height:
+            max_width += temp_screen.width()
+            if temp_screen.height() > max_height :
                 max_height = temp_screen.height()
-        desktop_rect = QRect(0, 0, max_width*screen_count, max_height*screen_count)
+        desktop_rect = QRect(0, 0, max_width, max_height)
 
         self.setGeometry(0, 0, desktop_rect.width()-1, desktop_rect.height()-1)
         self.setCursor(Qt.CrossCursor)
