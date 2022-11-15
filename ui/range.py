@@ -1,8 +1,9 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-import re
+from system_hotkey import SystemHotkey
 
+import re
 import utils.thread
 import ui.static.icon
 import ui.switch
@@ -326,6 +327,12 @@ class Range(QMainWindow) :
 # 多范围参数页面
 class MultiRange(QWidget):
 
+    # 切换范围快捷键信号
+    choice_range_hotkey_sign_1 = pyqtSignal(int)
+    choice_range_hotkey_sign_2 = pyqtSignal(int)
+    choice_range_hotkey_sign_3 = pyqtSignal(int)
+    choice_range_hotkey_sign_4 = pyqtSignal(int)
+
     def __init__(self, object):
 
         super(MultiRange, self).__init__()
@@ -350,6 +357,16 @@ class MultiRange(QWidget):
         self.switch_4_use = self.object.config["switch4Use"]
         # 切换范围快捷键开关
         self.choice_range_hotkey_use = object.config["choiceRangeHotKey"]
+        # 快捷键映射关系
+        self.hotkey_map = {
+            "ctrl": "control",
+            "win": "super"
+        }
+        # 范围快捷键
+        self.choice_range_hotkey_1 = SystemHotkey()
+        self.choice_range_hotkey_2 = SystemHotkey()
+        self.choice_range_hotkey_3 = SystemHotkey()
+        self.choice_range_hotkey_4 = SystemHotkey()
 
         self.ui()
 
@@ -494,6 +511,60 @@ class MultiRange(QWidget):
         self.choice_range_hotkey_button.clicked.connect(lambda: self.object.settin_ui.setHotKey("choiceRange"))
         self.choice_range_hotkey_button.setCursor(ui.static.icon.SELECT_CURSOR)
 
+        # 注册切换范围快捷键
+        if self.choice_range_hotkey_use:
+            self.choiceRangeHotkeyRegister()
+        self.choice_range_hotkey_sign_1.connect(self.choiceRangeHotkeyFunc)
+        self.choice_range_hotkey_sign_2.connect(self.choiceRangeHotkeyFunc)
+        self.choice_range_hotkey_sign_3.connect(self.choiceRangeHotkeyFunc)
+        self.choice_range_hotkey_sign_4.connect(self.choiceRangeHotkeyFunc)
+
+
+    # 切换范围快捷键信号槽
+    def choiceRangeHotkeyFunc(self, sign):
+        if sign == 1 and not self.switch_1_use:
+            self.switch_1.mousePressEvent(1)
+            self.switch_1.updateValue()
+        if sign == 2 and not self.switch_2_use:
+            self.switch_2.mousePressEvent(1)
+            self.switch_2.updateValue()
+        if sign == 3 and not self.switch_3_use:
+            self.switch_3.mousePressEvent(1)
+            self.switch_3.updateValue()
+        if sign == 4 and not self.switch_4_use:
+            self.switch_4.mousePressEvent(1)
+            self.switch_4.updateValue()
+
+
+    # 注册切换范围快捷键
+    def choiceRangeHotkeyRegister(self):
+
+        hotkey = self.object.config["choiceRangeHotkeyValue"]
+        if hotkey in self.hotkey_map:
+            hotkey = self.hotkey_map[hotkey]
+
+        self.choice_range_hotkey_1.register((hotkey, "f1"),
+                                            callback=lambda x: self.choice_range_hotkey_sign_1.emit(1))
+        self.choice_range_hotkey_2.register((hotkey, "f2"),
+                                            callback=lambda x: self.choice_range_hotkey_sign_2.emit(2))
+        self.choice_range_hotkey_3.register((hotkey, "f3"),
+                                            callback=lambda x: self.choice_range_hotkey_sign_3.emit(3))
+        self.choice_range_hotkey_4.register((hotkey, "f4"),
+                                            callback=lambda x: self.choice_range_hotkey_sign_4.emit(4))
+
+
+    # 注销切换范围快捷键
+    def choiceRangeHotkeyUnRegister(self):
+
+        hotkey = self.object.config["choiceRangeHotkeyValue"]
+        if hotkey in self.hotkey_map:
+            hotkey = self.hotkey_map[hotkey]
+
+        self.choice_range_hotkey_1.unregister((hotkey, "f1"))
+        self.choice_range_hotkey_2.unregister((hotkey, "f2"))
+        self.choice_range_hotkey_3.unregister((hotkey, "f3"))
+        self.choice_range_hotkey_4.unregister((hotkey, "f4"))
+
 
     # 根据分辨率定义控件位置尺寸
     def customSetGeometry(self, object, x, y, w, h):
@@ -505,7 +576,6 @@ class MultiRange(QWidget):
 
     # 改变范围一开关状态
     def changeRangeSwitch1(self, checked):
-
         if checked:
             if self.switch_2_use :
                 self.switch_2.mousePressEvent(1)
@@ -523,7 +593,6 @@ class MultiRange(QWidget):
 
     # 改变范围二开关状态
     def changeRangeSwitch2(self, checked):
-
         if checked:
             if self.switch_1_use:
                 self.switch_1.mousePressEvent(1)
@@ -541,7 +610,6 @@ class MultiRange(QWidget):
 
     # 改变范围三开关状态
     def changeRangeSwitch3(self, checked):
-
         if checked:
             if self.switch_1_use:
                 self.switch_1.mousePressEvent(1)
@@ -559,7 +627,6 @@ class MultiRange(QWidget):
 
     # 改变范围四开关状态
     def changeRangeSwitch4(self, checked):
-
         if checked:
             if self.switch_1_use:
                 self.switch_1.mousePressEvent(1)
@@ -581,9 +648,11 @@ class MultiRange(QWidget):
         if checked:
             self.choice_range_hotkey_use = True
             self.object.config["choiceRangeHotKey"] = True
+            self.choiceRangeHotkeyRegister()
         else:
             self.choice_range_hotkey_use = False
             self.object.config["choiceRangeHotKey"] = False
+            self.choiceRangeHotkeyUnRegister()
 
 
     # 窗口关闭处理
