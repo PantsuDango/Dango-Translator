@@ -665,7 +665,7 @@ class Translation(QMainWindow) :
             self.ocr_time = 0
 
 
-    # 检测范围区域和翻译区域是否有重叠
+    # 检测范围区域和翻译区域是否有重叠。
     def checkOverlap(self) :
 
         # 翻译框坐标

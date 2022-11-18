@@ -103,10 +103,13 @@ class WScreenShot(QWidget) :
             Y1 = Y2
             Y2 = tmp
 
-        self.object.yaml["range"]["X1"] = X1
-        self.object.yaml["range"]["Y1"] = Y1
-        self.object.yaml["range"]["X2"] = X2
-        self.object.yaml["range"]["Y2"] = Y2
+        # 选择使用的范围
+        for index in range(1, 5):
+            if self.object.config["switch{}Use".format(index)]:
+                self.object.yaml["range{}".format(index)]["x"] = X1
+                self.object.yaml["range{}".format(index)]["y"] = Y1
+                self.object.yaml["range{}".format(index)]["w"] = X2 - X1
+                self.object.yaml["range{}".format(index)]["h"] = Y2 - Y1
 
         # 显示范围框
         self.object.range_ui.setGeometry(X1, Y1, X2-X1, Y2-Y1)
@@ -153,13 +156,17 @@ class Range(QMainWindow) :
 
     def ui(self) :
 
-        X1 = self.object.yaml["range"]["X1"]
-        Y1 = self.object.yaml["range"]["Y1"]
-        X2 = self.object.yaml["range"]["X2"]
-        Y2 = self.object.yaml["range"]["Y2"]
+        x, y, w, h = 0, 0, 0, 0
+        # 选择使用的范围
+        for index in range(1, 5):
+            if self.object.config["switch{}Use".format(index)]:
+                x = self.object.yaml["range{}".format(index)]["x"]
+                y = self.object.yaml["range{}".format(index)]["y"]
+                w = self.object.yaml["range{}".format(index)]["w"]
+                h = self.object.yaml["range{}".format(index)]["h"]
 
         # 窗口大小
-        self.setGeometry(X1, Y1, X2-X1, Y2-Y1)
+        self.setGeometry(x, y, w, h)
         # 窗口无标题栏、窗口置顶、窗口透明
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint | Qt.Tool)
         self.setAttribute(Qt.WA_TranslucentBackground)
@@ -167,7 +174,7 @@ class Range(QMainWindow) :
         self.setCursor(ui.static.icon.PIXMAP_CURSOR)
 
         self.label = QLabel(self)
-        self.label.setGeometry(0, 0, X2-X1, Y2-Y1)
+        self.label.setGeometry(0, 0, w, h)
         self.label.setStyleSheet("border-width:1;\
                                   border:2px dashed #1E90FF;\
                                   background-color:rgba(62, 62, 62, 0.01)")
@@ -186,7 +193,7 @@ class Range(QMainWindow) :
 
         # 隐藏按钮
         self.hide_button = QPushButton(self)
-        self.hide_button.setGeometry(QRect(int(X2-X1-40*self.rate), 0, int(40*self.rate), int(30*self.rate)))
+        self.hide_button.setGeometry(QRect(int(w-40*self.rate), 0, int(40*self.rate), int(30*self.rate)))
         self.hide_button.setStyleSheet("background-color:rgba(62, 62, 62, 0.3);"
                                        "color: %s;"%self.color)
         self.hide_button.setFont(self.font)
@@ -239,10 +246,7 @@ class Range(QMainWindow) :
     # 鼠标进入控件事件
     def enterEvent(self, QEvent) :
 
-        rect = self.geometry()
-        X1 = rect.left()
-        X2 = rect.left() + rect.width()
-        self.hide_button.setGeometry(QRect(int(X2-X1-40*self.rate), 0, int(40*self.rate), int(30*self.rate)))
+        self.hide_button.setGeometry(QRect(int(self.width()-40*self.rate), 0, int(40*self.rate), int(30*self.rate)))
         self.hide_button.show()
         self.drag_label.setStyleSheet("background-color:rgba(62, 62, 62, 0.1)")
 
@@ -258,16 +262,13 @@ class Range(QMainWindow) :
         self.label.setGeometry(0, 0, self.width(), self.height())
         self.hide_button.hide()
 
-        rect = self.geometry()
-        X1 = rect.left()
-        Y1 = rect.top()
-        X2 = rect.left() + rect.width()
-        Y2 = rect.top() + rect.height()
-
-        self.object.yaml["range"]["X1"] = X1
-        self.object.yaml["range"]["Y1"] = Y1
-        self.object.yaml["range"]["X2"] = X2
-        self.object.yaml["range"]["Y2"] = Y2
+        # 选择使用的范围
+        for index in range(1, 5):
+            if self.object.config["switch{}Use".format(index)]:
+                self.object.yaml["range{}".format(index)]["x"] = self.x()
+                self.object.yaml["range{}".format(index)]["y"] = self.y()
+                self.object.yaml["range{}".format(index)]["w"] = self.width()
+                self.object.yaml["range{}".format(index)]["h"] = self.height()
 
         # 如果是自动模式下, 则解除暂停
         if self.object.translation_ui.translate_mode :
@@ -403,93 +404,53 @@ class MultiRange(QWidget):
         # 范围一
         self.label_1 = QLabel(self)
         self.customSetGeometry(self.label_1, 15, 10, self.window_width, 20)
-        self.label_1.setText("区域一 (X1:{} Y1:{} X2:{} Y2:{})".format(
-            self.object.yaml["range1"]["X1"],
-            self.object.yaml["range1"]["Y1"],
-            self.object.yaml["range1"]["X2"],
-            self.object.yaml["range1"]["Y2"],
-        ))
 
         self.switch_1 = ui.switch.SwitchOCR(self, sign=self.switch_1_use, startX=(60-20)*self.rate)
         self.customSetGeometry(self.switch_1, 15, 35, 60, 20)
         self.switch_1.checkedChanged.connect(self.changeRangeSwitch1)
         self.switch_1.setCursor(ui.static.icon.SELECT_CURSOR)
 
-        self.show_button_1 = QPushButton(self)
-        self.customSetGeometry(self.show_button_1, 90, 35, 60, 20)
-        self.show_button_1.setText("查看范围")
-
         self.choice_button_1 = QPushButton(self)
-        self.customSetGeometry(self.choice_button_1, 165, 35, 60, 20)
+        self.customSetGeometry(self.choice_button_1, 100, 35, 60, 20)
         self.choice_button_1.setText("框选范围")
 
         # 范围二
         self.label_2 = QLabel(self)
         self.customSetGeometry(self.label_2, 15, 70, self.window_width, 20)
-        self.label_2.setText("区域二 (X1:{} Y1:{} X2:{} Y2:{})".format(
-            self.object.yaml["range2"]["X1"],
-            self.object.yaml["range2"]["Y1"],
-            self.object.yaml["range2"]["X2"],
-            self.object.yaml["range2"]["Y2"],
-        ))
 
         self.switch_2 = ui.switch.SwitchOCR(self, sign=self.switch_2_use, startX=(60-20)*self.rate)
         self.customSetGeometry(self.switch_2, 15, 95, 60, 20)
         self.switch_2.checkedChanged.connect(self.changeRangeSwitch2)
         self.switch_2.setCursor(ui.static.icon.SELECT_CURSOR)
 
-        self.show_button_2 = QPushButton(self)
-        self.customSetGeometry(self.show_button_2, 90, 95, 60, 20)
-        self.show_button_2.setText("查看范围")
-
         self.choice_button_2 = QPushButton(self)
-        self.customSetGeometry(self.choice_button_2, 165, 95, 60, 20)
+        self.customSetGeometry(self.choice_button_2, 100, 95, 60, 20)
         self.choice_button_2.setText("框选范围")
 
         # 范围三
         self.label_3 = QLabel(self)
         self.customSetGeometry(self.label_3, 15, 130, self.window_width, 20)
-        self.label_3.setText("区域三 (X1:{} Y1:{} X2:{} Y2:{})".format(
-            self.object.yaml["range3"]["X1"],
-            self.object.yaml["range3"]["Y1"],
-            self.object.yaml["range3"]["X2"],
-            self.object.yaml["range3"]["Y2"],
-        ))
 
         self.switch_3 = ui.switch.SwitchOCR(self, sign=self.switch_3_use, startX=(60-20)*self.rate)
         self.customSetGeometry(self.switch_3, 15, 155, 60, 20)
         self.switch_3.checkedChanged.connect(self.changeRangeSwitch3)
         self.switch_3.setCursor(ui.static.icon.SELECT_CURSOR)
 
-        self.show_button_3 = QPushButton(self)
-        self.customSetGeometry(self.show_button_3, 90, 155, 60, 20)
-        self.show_button_3.setText("查看范围")
-
         self.choice_button_3 = QPushButton(self)
-        self.customSetGeometry(self.choice_button_3, 165, 155, 60, 20)
+        self.customSetGeometry(self.choice_button_3, 100, 155, 60, 20)
         self.choice_button_3.setText("框选范围")
 
         # 范围四
         self.label_4 = QLabel(self)
         self.customSetGeometry(self.label_4, 15, 190, self.window_width, 20)
-        self.label_4.setText("区域四 (X1:{} Y1:{} X2:{} Y2:{})".format(
-            self.object.yaml["range4"]["X1"],
-            self.object.yaml["range4"]["Y1"],
-            self.object.yaml["range4"]["X2"],
-            self.object.yaml["range4"]["Y2"],
-        ))
 
         self.switch_4 = ui.switch.SwitchOCR(self, sign=self.switch_4_use, startX=(60-20)*self.rate)
         self.customSetGeometry(self.switch_4, 15, 215, 60, 20)
         self.switch_4.checkedChanged.connect(self.changeRangeSwitch4)
         self.switch_4.setCursor(ui.static.icon.SELECT_CURSOR)
 
-        self.show_button_4 = QPushButton(self)
-        self.customSetGeometry(self.show_button_4, 90, 215, 60, 20)
-        self.show_button_4.setText("查看范围")
-
         self.choice_button_4 = QPushButton(self)
-        self.customSetGeometry(self.choice_button_4, 165, 215, 60, 20)
+        self.customSetGeometry(self.choice_button_4, 100, 215, 60, 20)
         self.choice_button_4.setText("框选范围")
 
         # 切换范围快捷键开关
@@ -586,8 +547,12 @@ class MultiRange(QWidget):
                 self.switch_4.mousePressEvent(1)
                 self.switch_4.updateValue()
             self.switch_1_use = True
+            # 改变范围框的坐标
+            self.updateRangeUIRect(1)
         else:
             self.switch_1_use = False
+            self.object.range_ui.hide()
+
 
 
     # 改变范围二开关状态
@@ -603,8 +568,11 @@ class MultiRange(QWidget):
                 self.switch_4.mousePressEvent(1)
                 self.switch_4.updateValue()
             self.switch_2_use = True
+            # 改变范围框的坐标
+            self.updateRangeUIRect(2)
         else:
             self.switch_2_use = False
+            self.object.range_ui.hide()
 
 
     # 改变范围三开关状态
@@ -620,8 +588,11 @@ class MultiRange(QWidget):
                 self.switch_4.mousePressEvent(1)
                 self.switch_4.updateValue()
             self.switch_3_use = True
+            # 改变范围框的坐标
+            self.updateRangeUIRect(3)
         else:
             self.switch_3_use = False
+            self.object.range_ui.hide()
 
 
     # 改变范围四开关状态
@@ -637,8 +608,24 @@ class MultiRange(QWidget):
                 self.switch_3.mousePressEvent(1)
                 self.switch_3.updateValue()
             self.switch_4_use = True
+            # 改变范围框的坐标
+            self.updateRangeUIRect(4)
         else:
             self.switch_4_use = False
+            self.object.range_ui.hide()
+
+
+    # 改变范围框的坐标
+    def updateRangeUIRect(self, index):
+        self.object.range_ui.setGeometry(self.object.yaml["range{}".format(index)]["x"],
+                                         self.object.yaml["range{}".format(index)]["y"],
+                                         self.object.yaml["range{}".format(index)]["w"],
+                                         self.object.yaml["range{}".format(index)]["h"])
+        self.object.range_ui.label.setGeometry(0,
+                                               0,
+                                               self.object.yaml["range{}".format(index)]["w"],
+                                               self.object.yaml["range{}".format(index)]["h"])
+        self.object.range_ui.show()
 
 
     # 改变切换范围快键键开关状态
@@ -652,6 +639,44 @@ class MultiRange(QWidget):
             self.choice_range_hotkey_use = False
             self.object.config["choiceRangeHotKey"] = False
             self.choiceRangeHotkeyUnRegister()
+
+
+    # 更新显示的坐标文本
+    def updateLabelRectText(self) :
+        self.label_1.setText("区域一 (x:{} y:{} w:{} h:{})".format(
+            self.object.yaml["range1"]["x"],
+            self.object.yaml["range1"]["y"],
+            self.object.yaml["range1"]["w"],
+            self.object.yaml["range1"]["h"],
+        ))
+        self.label_2.setText("区域二 (x:{} y:{} w:{} h:{})".format(
+            self.object.yaml["range2"]["x"],
+            self.object.yaml["range2"]["y"],
+            self.object.yaml["range2"]["w"],
+            self.object.yaml["range2"]["h"],
+        ))
+        self.label_3.setText("区域三 (x:{} y:{} w:{} h:{})".format(
+            self.object.yaml["range3"]["x"],
+            self.object.yaml["range3"]["y"],
+            self.object.yaml["range3"]["w"],
+            self.object.yaml["range3"]["h"],
+        ))
+        self.label_4.setText("区域四 (x:{} y:{} w:{} h:{})".format(
+            self.object.yaml["range4"]["x"],
+            self.object.yaml["range4"]["y"],
+            self.object.yaml["range4"]["w"],
+            self.object.yaml["range4"]["h"],
+        ))
+
+
+    # 窗口显示信号
+    def showEvent(self, e):
+
+        # 如果处于自动模式下则暂停
+        if self.object.translation_ui.translate_mode:
+            self.object.translation_ui.stop_sign = True
+        # 更新显示的坐标文本
+        self.updateLabelRectText()
 
 
     # 窗口关闭处理
@@ -669,3 +694,10 @@ class MultiRange(QWidget):
         self.object.config["switch3Use"] = self.switch_3_use
         self.object.config["switch4Use"] = self.switch_4_use
         self.object.translation_ui.show()
+
+        if not self.object.range_ui.show_sign :
+            self.object.range_ui.hide()
+
+        # 如果处于自动模式下则开始
+        if self.object.translation_ui.translate_mode:
+            self.object.translation_ui.stop_sign = False

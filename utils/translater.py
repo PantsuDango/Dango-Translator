@@ -6,7 +6,8 @@ from difflib import SequenceMatcher
 from traceback import format_exc, print_exc
 import time
 import pyperclip
-from PIL import Image, ImageDraw, ImageFont
+import win32gui
+from PIL import Image, ImageDraw, ImageFont, ImageGrab
 
 import utils.thread
 import utils.config
@@ -244,10 +245,11 @@ class Translater(QThread) :
     # 截图
     def imageCut(self):
 
-        x1 = self.object.yaml["range"]["X1"]
-        y1 = self.object.yaml["range"]["Y1"]
-        x2 = self.object.yaml["range"]["X2"]
-        y2 = self.object.yaml["range"]["Y2"]
+        # 范围框坐标
+        x = self.object.range_ui.x()
+        y = self.object.range_ui.y()
+        w = self.object.range_ui.width()
+        h = self.object.range_ui.height()
 
         # 隐藏范围框信号
         if self.object.config["drawImageUse"] \
@@ -259,12 +261,15 @@ class Translater(QThread) :
                     break
 
         screen = QApplication.primaryScreen()
-        pix = screen.grabWindow(QApplication.desktop().winId(), x1, y1, x2-x1, y2-y1)
+        image = screen.grabWindow(QApplication.desktop().winId(), x, y, w, h)
+
         if self.object.config["drawImageUse"] \
             and not self.object.config["baiduOCR"] \
             and self.object.translation_ui.translate_mode :
             self.hide_range_ui_sign.emit(True)
-        pix.save(IMAGE_PATH)
+
+        print(x, y, w, h)
+        image.save(IMAGE_PATH)
 
 
     # 判断图片相似度
@@ -309,7 +314,7 @@ class Translater(QThread) :
     def translate(self) :
 
         # 如果还未选取范围就操作翻译
-        if self.object.yaml["range"]["X2"] == 0 :
+        if self.object.range_ui.x() == 0 and self.object.range_ui.y() == 0:
             self.clear_text_sign.emit(True)
             self.object.translation_ui.original = "还未选取翻译范围, 请先使用范围键框选要翻译的屏幕区域"
             utils.thread.createThread(self.creatTranslaterThread, "original")

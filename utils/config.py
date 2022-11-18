@@ -30,16 +30,16 @@ def openConfig(logger) :
         if "selenium_debug" not in config.keys() :
             config["selenium_debug"] = False
         # 2022.11.13 添加新参数
-        if "range" not in config.keys() :
-            config["range"] = {"X1": 0, "Y1": 0, "X2": 0, "Y2": 0}
+        if "range" in config.keys() :
+            del config["range"]
         if "range1" not in config.keys() :
-            config["range1"] = {"X1": 0, "Y1": 0, "X2": 0, "Y2": 0}
+            config["range1"] = {"x": 0, "y": 0, "w": 0, "h": 0}
         if "range2" not in config.keys() :
-            config["range2"] = {"X1": 0, "Y1": 0, "X2": 0, "Y2": 0}
+            config["range2"] = {"x": 0, "y": 0, "w": 0, "h": 0}
         if "range3" not in config.keys() :
-            config["range3"] = {"X1": 0, "Y1": 0, "X2": 0, "Y2": 0}
+            config["range3"] = {"x": 0, "y": 0, "w": 0, "h": 0}
         if "range4" not in config.keys() :
-            config["range4"] = {"X1": 0, "Y1": 0, "X2": 0, "Y2": 0}
+            config["range4"] = {"x": 0, "y": 0, "w": 0, "h": 0}
 
     except Exception :
         logger.error(format_exc())

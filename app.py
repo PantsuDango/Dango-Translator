@@ -86,8 +86,7 @@ class DangoTranslator :
         self.translation_ui.hide_range_sign.connect(self.range_ui.hideRangeUI)
         # 多范围参数页面
         self.multi_range_ui = ui.range.MultiRange(self)
-        self.translation_ui.multi_range_button.clicked.connect(self.translation_ui.hide)
-        self.translation_ui.multi_range_button.clicked.connect(self.multi_range_ui.show)
+        self.translation_ui.multi_range_button.clicked.connect(self.clickMultiRange)
 
         # 检查邮箱
         thread = utils.thread.createCheckBindEmailQThread(self)
@@ -104,6 +103,14 @@ class DangoTranslator :
         # 同步翻译历史
         if self.config["agreeCollectUse"]:
             utils.thread.createThread(translator.upload_trans_file.proccess(self))
+
+
+    # 按下多范围键后做的事情
+    def clickMultiRange(self) :
+
+        self.translation_ui.hide()
+        self.multi_range_ui.show()
+        self.range_ui.show()
 
 
     # 按下充电键后做的事情
