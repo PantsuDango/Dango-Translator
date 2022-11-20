@@ -8,6 +8,7 @@ import utils.http
 
 YAML_PATH = "./config/config.yaml"
 HISTORY_FILE_PATH = "../翻译历史.txt"
+CLOUD_CONFIG_PATH = "./config/cloud_config.json"
 
 
 # 打开本地配置文件
@@ -318,3 +319,27 @@ def getVersionMessage(object) :
         url = "https://trans.dango.cloud/DangoTranslate/Getinform"
         res = utils.http.post(url, body, object.logger)
     return res.get("Result", "")
+
+
+
+# 从本地获取配置信息
+def readCloudConfigFormLocal(logger) :
+
+    config = None
+    try :
+        with open(CLOUD_CONFIG_PATH, "r", encoding="utf-8") as file:
+            config = json.loads(file.read())
+    except Exception :
+        logger.error(format_exc())
+
+    return config
+
+
+# 保存云端配置文件至本地
+def saveCloudConfigToLocal(object) :
+
+    try :
+        with open(CLOUD_CONFIG_PATH, "w", encoding="utf-8") as file:
+            json.dump(object.config, file, indent=4, ensure_ascii=False)
+    except Exception :
+        object.logger.error(format_exc())

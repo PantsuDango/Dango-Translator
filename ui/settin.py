@@ -2808,6 +2808,8 @@ class Settin(QMainWindow) :
             translator.ocr.baidu.getAccessToken(self.object)
         # 设置上传云端
         utils.thread.createThread(utils.config.postSaveSettin, self.object)
+        # 保存云本地配置
+        utils.config.saveCloudConfigToLocal(self.object)
 
         self.hide()
         self.object.translation_ui.show()

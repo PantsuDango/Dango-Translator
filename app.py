@@ -61,8 +61,12 @@ class DangoTranslator :
         if not self.login_ui.login() :
             return
 
-        # 从云端获取配置信息
-        self.config = utils.config.getDangoSettin(self)
+        # 从本地获取配置信息
+        self.config = utils.config.readCloudConfigFormLocal(self.logger)
+        if not self.config :
+            # 从云端获取配置信息
+            self.config = utils.config.getDangoSettin(self)
+
         utils.config.configConvert(self)
         # 登录OCR服务获取token
         utils.thread.createThread(utils.http.loginDangoOCR, self)

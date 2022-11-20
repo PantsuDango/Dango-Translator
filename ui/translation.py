@@ -829,5 +829,7 @@ class Translation(QMainWindow) :
         utils.thread.createThreadDaemonFalse(utils.config.postSaveSettin, self.object)
         # 保存本地配置
         utils.config.saveConfig(self.object.yaml, self.logger)
+        # 保存云本地配置
+        utils.config.saveCloudConfigToLocal(self.object)
 
         self.close()
