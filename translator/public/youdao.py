@@ -4,7 +4,7 @@ import time
 import random
 
 # 有道翻译
-class YDDict(object):
+class YDDict():
 
     # 获取加密参数
     @staticmethod
@@ -37,7 +37,6 @@ class YDDict(object):
             "salt": salt,
             "sign": sign,
             "lts": lts,
-            # 这里bv是对UA加密得到的，所以也写成了定值
             "bv": "1744f6d1b31aab2b4895998c6078a934",
             "doctype": "json",
             "version": "2.1",
@@ -45,21 +44,27 @@ class YDDict(object):
             "action": "FY_BY_REALTlME",
         }
 
-        content = ""
+        content = "公共有道: 我抽风啦, 请尝试重新翻译! 如果频繁出现, 建议直接注册使用私人翻译"
         try :
-            response = requests.post(url, headers=headers, data=data)
-            trans = response.json()["translateResult"][0]
-            for val in trans :
-                content += val["tgt"]
-        except Exception :
-            content = "我抽风啦, 请尝试重新翻译! 如果频繁出现, 建议直接注册使用私人翻译"
+            resp = requests.post(url, headers=headers, data=data).json()
+            error_code = resp["errorCode"]
+            if error_code == 0 :
+                trans = resp["translateResult"][0]
+                content = ""
+                for val in trans :
+                    content += val["tgt"]
 
-        return  content
+        except Exception :
+            pass
+
+        return content
 
 if __name__ == "__main__" :
 
     jap = "に傍にいてくれるものではありません。ちょっとしたきっかけで、いなくなってしまうものです。"
     eng = "Time goes by so fast, people go in and out of your life. You must never miss the opportunity to tell these people how much they mean to you"
+    kor = "어느 날 임금님께서 신하들 과 나라의 이곳저곳 을 시찰하게 됐습니다. 그러던 중 어느 시골의 넓은 들판에 이르렀는데, 그곳에는 많은 염소 떼가 있었습니다."
+    rus = "Я понял, что и я получил подаяние от моего брата."
     youdao = YDDict()
-    content = youdao.translate(jap)
+    content = youdao.translate(eng)
     print(content)
