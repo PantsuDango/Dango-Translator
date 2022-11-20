@@ -18,30 +18,6 @@ def openConfig(logger) :
         with open(YAML_PATH, "r", encoding="utf-8") as file :
             config = yaml.load(file.read(), Loader=yaml.FullLoader)
 
-        # 2022.02.19 添加新参数
-        if "auto_login" not in config.keys() :
-            config["auto_login"] = False
-        # 2022.03.08 修改参数
-        if "dict_info_url" in config.keys():
-            config["dict_info_url"] = "https://dango.c4a15wh.cn/DangoTranslate/ShowDict"
-        # 2022.09.26 添加新参数
-        if "agree_collect_time" not in config.keys() :
-            config["agree_collect_time"] = "2022-09-25"
-        # 2022.10.30 添加新参数
-        if "selenium_debug" not in config.keys() :
-            config["selenium_debug"] = False
-        # 2022.11.13 添加新参数
-        if "range" in config.keys() :
-            del config["range"]
-        if "range1" not in config.keys() :
-            config["range1"] = {"x": 0, "y": 0, "w": 0, "h": 0}
-        if "range2" not in config.keys() :
-            config["range2"] = {"x": 0, "y": 0, "w": 0, "h": 0}
-        if "range3" not in config.keys() :
-            config["range3"] = {"x": 0, "y": 0, "w": 0, "h": 0}
-        if "range4" not in config.keys() :
-            config["range4"] = {"x": 0, "y": 0, "w": 0, "h": 0}
-
     except Exception :
         logger.error(format_exc())
         config = {
@@ -50,8 +26,31 @@ def openConfig(logger) :
             "dict_info_url": "https://dango.c4a15wh.cn/DangoTranslate/ShowDict",
             "ocr_cmd_path": ".\ocr\startOCR.cmd",
             "port": 6666,
-            "auto_login": False
         }
+
+    # 2022.02.19 添加新参数
+    if "auto_login" not in config.keys():
+        config["auto_login"] = False
+    # 2022.03.08 修改参数
+    if "dict_info_url" in config.keys():
+        config["dict_info_url"] = "https://dango.c4a15wh.cn/DangoTranslate/ShowDict"
+    # 2022.09.26 添加新参数
+    if "agree_collect_time" not in config.keys():
+        config["agree_collect_time"] = "2022-09-25"
+    # 2022.10.30 添加新参数
+    if "selenium_debug" not in config.keys():
+        config["selenium_debug"] = False
+    # 2022.11.13 添加新参数
+    if "range" in config.keys():
+        del config["range"]
+    if "range1" not in config.keys():
+        config["range1"] = {"x": 0, "y": 0, "w": 0, "h": 0}
+    if "range2" not in config.keys():
+        config["range2"] = {"x": 0, "y": 0, "w": 0, "h": 0}
+    if "range3" not in config.keys():
+        config["range3"] = {"x": 0, "y": 0, "w": 0, "h": 0}
+    if "range4" not in config.keys():
+        config["range4"] = {"x": 0, "y": 0, "w": 0, "h": 0}
 
     return config
 
