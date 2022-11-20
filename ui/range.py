@@ -16,7 +16,9 @@ DRAW_PATH = "./config/draw.jpg"
 # 选择范围
 class WScreenShot(QWidget) :
 
-    def __init__(self, object, parent=None) :
+    multi_range_sign = pyqtSignal(int, tuple)
+
+    def __init__(self, object, index=0, parent=None) :
 
         super(WScreenShot, self).__init__(parent)
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.Tool)
@@ -42,8 +44,10 @@ class WScreenShot(QWidget) :
         self.start_point = QPoint()
         self.end_point = QPoint()
         self.object = object
+        self.index = index
 
 
+    # 绘制事情
     def paintEvent(self, event):
 
         try:
@@ -61,6 +65,7 @@ class WScreenShot(QWidget) :
             pass
 
 
+    # 鼠标按下事件
     def mousePressEvent(self, event) :
 
         try:
@@ -72,6 +77,7 @@ class WScreenShot(QWidget) :
             pass
 
 
+    # 鼠标移动事件
     def mouseMoveEvent(self, event) :
 
         try:
@@ -82,46 +88,43 @@ class WScreenShot(QWidget) :
             pass
 
 
+    # 获取鼠标起始点坐标
     def getRange(self) :
 
-        start = re.findall(r'(\d+), (\d+)', str(self.start_point))[0]
-        end = re.findall(r'\d+, \d+', str(self.end_point))[0]
-        end = end.split(', ')
-
-        X1 = int(start[0])
-        Y1 = int(start[1])
-        X2 = int(end[0])
-        Y2 = int(end[1])
-
-        if X1 > X2:
-            tmp = X1
-            X1 = X2
-            X2 = tmp
-
-        if Y1 > Y2:
-            tmp = Y1
-            Y1 = Y2
-            Y2 = tmp
+        # 计算范围
+        x = self.start_point.x()
+        if self.start_point.x() > self.end_point.x() :
+            x = self.end_point.x()
+        y = self.start_point.y()
+        if self.start_point.y() > self.end_point.y() :
+            y = self.end_point.y()
+        w = abs(self.end_point.x() - self.start_point.x())
+        h = abs(self.end_point.y() - self.start_point.y())
 
         # 选择使用的范围
-        for index in range(1, 5):
-            if self.object.config["switch{}Use".format(index)]:
-                self.object.yaml["range{}".format(index)]["x"] = X1
-                self.object.yaml["range{}".format(index)]["y"] = Y1
-                self.object.yaml["range{}".format(index)]["w"] = X2 - X1
-                self.object.yaml["range{}".format(index)]["h"] = Y2 - Y1
+        if self.index == 0 :
+            for index in range(1, 5):
+                if self.object.config["switch{}Use".format(index)]:
+                    self.object.yaml["range{}".format(index)]["x"] = x
+                    self.object.yaml["range{}".format(index)]["y"] = y
+                    self.object.yaml["range{}".format(index)]["w"] = w
+                    self.object.yaml["range{}".format(index)]["h"] = h
 
-        # 显示范围框
-        self.object.range_ui.setGeometry(X1, Y1, X2-X1, Y2-Y1)
-        self.object.range_ui.label.setGeometry(0, 0, X2-X1, Y2-Y1)
-        self.object.range_ui.show_sign = True
-        self.object.range_ui.show()
+            # 显示范围框
+            self.object.range_ui.setGeometry(x, y, w, h)
+            self.object.range_ui.label.setGeometry(0, 0, w, h)
+            self.object.range_ui.show_sign = True
+            self.object.range_ui.show()
 
-        # 如果是自动模式下, 则解除暂停
-        if self.object.translation_ui.translate_mode :
-            self.object.translation_ui.stop_sign = False
+            # 如果是自动模式下, 则解除暂停
+            if self.object.translation_ui.translate_mode :
+                self.object.translation_ui.stop_sign = False
+        else :
+            # 多范围选择范围信号槽
+            self.multi_range_sign.emit(self.index, (x, y, w, h))
 
 
+    # 鼠标松开事件
     def mouseReleaseEvent(self, event):
 
         try:
@@ -129,10 +132,11 @@ class WScreenShot(QWidget) :
                 self.end_point = event.pos()
                 self.getRange()
                 self.close()
-                self.object.translation_ui.checkOverlap()
-                # 如果处于手动模式下则刷新一次翻译
-                if not self.object.translation_ui.translate_mode :
-                    utils.thread.createThread(self.object.translation_ui.startTranslater)
+                if self.index == 0 :
+                    self.object.translation_ui.checkOverlap()
+                    # 如果处于手动模式下则刷新一次翻译
+                    if not self.object.translation_ui.translate_mode :
+                        utils.thread.createThread(self.object.translation_ui.startTranslater)
         except Exception :
             pass
 
@@ -269,6 +273,7 @@ class Range(QMainWindow) :
                 self.object.yaml["range{}".format(index)]["y"] = self.y()
                 self.object.yaml["range{}".format(index)]["w"] = self.width()
                 self.object.yaml["range{}".format(index)]["h"] = self.height()
+        self.object.multi_range_ui.updateLabelRectText()
 
         # 如果是自动模式下, 则解除暂停
         if self.object.translation_ui.translate_mode :
@@ -318,6 +323,7 @@ class Range(QMainWindow) :
         self.object.show_range_ui_sign = True
 
 
+    # 退出信号
     def quit(self) :
 
         self.show_sign = False
@@ -413,6 +419,7 @@ class MultiRange(QWidget):
         self.choice_button_1 = QPushButton(self)
         self.customSetGeometry(self.choice_button_1, 100, 35, 60, 20)
         self.choice_button_1.setText("框选范围")
+        self.choice_button_1.clicked.connect(lambda: self.cutRange(1))
 
         # 范围二
         self.label_2 = QLabel(self)
@@ -426,6 +433,7 @@ class MultiRange(QWidget):
         self.choice_button_2 = QPushButton(self)
         self.customSetGeometry(self.choice_button_2, 100, 95, 60, 20)
         self.choice_button_2.setText("框选范围")
+        self.choice_button_2.clicked.connect(lambda: self.cutRange(2))
 
         # 范围三
         self.label_3 = QLabel(self)
@@ -439,6 +447,7 @@ class MultiRange(QWidget):
         self.choice_button_3 = QPushButton(self)
         self.customSetGeometry(self.choice_button_3, 100, 155, 60, 20)
         self.choice_button_3.setText("框选范围")
+        self.choice_button_3.clicked.connect(lambda: self.cutRange(3))
 
         # 范围四
         self.label_4 = QLabel(self)
@@ -452,6 +461,7 @@ class MultiRange(QWidget):
         self.choice_button_4 = QPushButton(self)
         self.customSetGeometry(self.choice_button_4, 100, 215, 60, 20)
         self.choice_button_4.setText("框选范围")
+        self.choice_button_4.clicked.connect(lambda: self.cutRange(4))
 
         # 切换范围快捷键开关
         label = QLabel(self)
@@ -480,8 +490,34 @@ class MultiRange(QWidget):
         self.choice_range_hotkey_sign_4.connect(self.choiceRangeHotkeyFunc)
 
 
+    # 框选范围按钮信号槽
+    def cutRange(self, index) :
+
+        self.screen_shot_ui = WScreenShot(self.object, index)
+        self.screen_shot_ui.multi_range_sign.connect(self.changeRange)
+        self.screen_shot_ui.show()
+
+
+    # 改变范围信号槽
+    def changeRange(self, index, rect) :
+
+        self.object.yaml["range{}".format(index)]["x"] = rect[0]
+        self.object.yaml["range{}".format(index)]["y"] = rect[1]
+        self.object.yaml["range{}".format(index)]["w"] = rect[2]
+        self.object.yaml["range{}".format(index)]["h"] = rect[3]
+        self.updateLabelRectText()
+
+        if (index == 1 and self.switch_1_use) \
+                or (index == 2 and self.switch_2_use) \
+                or (index == 3 and self.switch_3_use) \
+                or (index == 4 and self.switch_4_use) :
+            self.object.range_ui.setGeometry(rect[0], rect[1], rect[2], rect[3])
+            self.object.range_ui.label.setGeometry(0, 0, rect[2], rect[3])
+
+
     # 切换范围快捷键信号槽
     def choiceRangeHotkeyFunc(self, sign):
+
         if sign == 1 and not self.switch_1_use:
             self.switch_1.mousePressEvent(1)
             self.switch_1.updateValue()
@@ -552,7 +588,7 @@ class MultiRange(QWidget):
         else:
             self.switch_1_use = False
             self.object.range_ui.hide()
-
+        self.object.config["switch1Use"] = checked
 
 
     # 改变范围二开关状态
@@ -573,6 +609,7 @@ class MultiRange(QWidget):
         else:
             self.switch_2_use = False
             self.object.range_ui.hide()
+        self.object.config["switch2Use"] = checked
 
 
     # 改变范围三开关状态
@@ -593,6 +630,7 @@ class MultiRange(QWidget):
         else:
             self.switch_3_use = False
             self.object.range_ui.hide()
+        self.object.config["switch3Use"] = checked
 
 
     # 改变范围四开关状态
@@ -613,6 +651,7 @@ class MultiRange(QWidget):
         else:
             self.switch_4_use = False
             self.object.range_ui.hide()
+        self.object.config["switch4Use"] = checked
 
 
     # 改变范围框的坐标

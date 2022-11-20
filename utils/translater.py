@@ -268,7 +268,6 @@ class Translater(QThread) :
             and self.object.translation_ui.translate_mode :
             self.hide_range_ui_sign.emit(True)
 
-        print(x, y, w, h)
         image.save(IMAGE_PATH)
 
 
