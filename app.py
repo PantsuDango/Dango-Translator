@@ -56,10 +56,16 @@ class DangoTranslator :
 
 
     # 登录
-    def login(self) :
+    def login(self, auto_login=False) :
 
-        if not self.login_ui.login() :
-            return
+        # 是否为自动登录
+        if auto_login :
+            thread = utils.thread.createCheckAutoLoginQThread(self)
+            thread.signal.connect(self.autoLoginCheck)
+            utils.thread.runQThread(thread)
+        else :
+            if not self.login_ui.login() :
+                return
 
         # 从本地获取配置信息
         self.config = utils.config.readCloudConfigFormLocal(self.logger)
@@ -73,7 +79,8 @@ class DangoTranslator :
 
         # 翻译界面
         self.translation_ui = ui.translation.Translation(self)
-        self.login_ui.close()
+        if not auto_login:
+            self.login_ui.close()
         self.translation_ui.show()
 
         # 设置界面
@@ -101,12 +108,18 @@ class DangoTranslator :
         utils.thread.createThread(self.autoOpenOfflineOCR)
         # 界面置顶
         self.hwndObj = utils.hwnd.WindowHwnd(self)
-        if self.settin_ui.set_top_use :
+        if self.config["setTop"] :
             self.hwndObj.run()
 
         # 同步翻译历史
         if self.config["agreeCollectUse"]:
             utils.thread.createThread(translator.upload_trans_file.proccess(self))
+
+
+    # 自动登录后检查
+    def autoLoginCheck(self, message) :
+        utils.message.MessageBox("自动登录失败", message, self.yaml["screen_scale_rate"])
+        sys.exit()
 
 
     # 按下多范围键后做的事情
@@ -215,23 +228,23 @@ class DangoTranslator :
             utils.thread.runQThread(thread)
         # 初始化图片资源
         utils.thread.createThread(self.InitLoadFile)
-
-        # 登录界面
-        self.login_ui = ui.login.Login(self)
-        self.login_ui.login_button.clicked.connect(self.login)
-
         # 注册页面
         self.register_ui = ui.register.Register(self)
-        # 登录界面注册按键
-        self.login_ui.register_button.clicked.connect(self.register_ui.clickRegister)
-        # 登录界面忘记密码按键
-        self.login_ui.forget_password_button.clicked.connect(self.register_ui.clickForgetPassword)
 
-        # 自动登录
-        if self.yaml["auto_login"] :
-            self.login()
-        else :
+        if not self.yaml["auto_login"] :
+            # 登录界面
+            self.login_ui = ui.login.Login(self)
+            self.login_ui.login_button.clicked.connect(self.login)
+
+            # 登录界面注册按键
+            self.login_ui.register_button.clicked.connect(self.register_ui.clickRegister)
+            # 登录界面忘记密码按键
+            self.login_ui.forget_password_button.clicked.connect(self.register_ui.clickForgetPassword)
+
             self.login_ui.show()
+        else :
+            # 自动登录
+            self.login(auto_login=True)
 
         self.splash.close()
         app.exit(app.exec_())

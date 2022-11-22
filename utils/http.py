@@ -125,3 +125,48 @@ def onlineOCRQueryQuota(object) :
     except Exception :
         logger.error(format_exc())
         return "查询出错, 可联系客服娘, 或直接浏览器登录 https://cloud.stariver.org/auth/login.html 地址查看"
+
+
+# 登录检查
+def loginCheck(object) :
+
+    url = object.yaml["dict_info"]["dango_login"]
+    user = str(object.yaml["user"])
+    password = str(object.yaml["password"])
+    if password.find('%6?u!') != -1:
+        password = utils.enctry.dectry(password)
+    body = {
+        "User": user,
+        "Password": password
+    }
+    resp = post(url=url, body=body, logger=object.logger)
+    if not resp:
+        url = "https://trans.dango.cloud/DangoTranslate/Login"
+        resp = post(url=url, body=body, logger=object.logger)
+        # 如果因为网络原因登录失败
+        if not resp :
+            return "网络错误\n具体情况可查阅错误日志\n并通过交流群联系客服娘处理     "
+
+    result = resp.get("Result", "")
+    if result == "" :
+        object.logger.error("登录出错, response: %s"%resp)
+        return "网络错误\n具体情况可查阅错误日志\n并通过交流群联系客服娘处理     "
+
+    if result == "User dose not exist":
+        return "用户名不存在, 请先注册!     "
+
+    elif result == "Password error":
+        return "用户名和密码不匹配"
+
+    elif result == "User is black list":
+        return "账户已被纳入黑名单"
+
+    elif result == "OK":
+        # 保存配置
+        self.object.yaml["user"] = self.user
+        self.object.yaml["password"] = utils.enctry.enctry(self.password)
+        utils.config.saveConfig(self.object.yaml, self.logger)
+
+    else:
+        object.logger.error("登录出错, response: %s"%resp)
+        return "出现了出乎意料的情况\n请联系团子解决!     "

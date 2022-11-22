@@ -4,6 +4,7 @@ import threading
 import utils.config
 import utils.email
 import utils.message
+import utils.http
 
 
 # 创建线程
@@ -90,3 +91,21 @@ class createCheckVersionQThread(QThread) :
 
         if self.object.yaml["version"] != self.object.yaml["dict_info"]["latest_version"] :
             self.signal.emit(False)
+
+
+# 检查自动登录线程
+class createCheckAutoLoginQThread(QThread) :
+
+    signal = pyqtSignal(str)
+
+    def __init__(self, object):
+
+        super(createCheckAutoLoginQThread, self).__init__()
+        self.object = object
+
+
+    def run(self) :
+        message = utils.http.loginCheck(self.object)
+        if message :
+            self.signal.emit(message)
+
