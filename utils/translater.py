@@ -328,41 +328,45 @@ class Translater(QThread) :
             if not self.object.translation_ui.original or not self.object.translation_ui.translate_mode :
                 self.imageCut()
             else :
-                # 判断两张图片的相似度
-                imageA = imread(IMAGE_PATH)
-                self.imageCut()
-                imageB = imread(IMAGE_PATH)
-                image_score = self.compareImage(imageA, imageB)
+                try :
+                    # 判断两张图片的相似度
+                    imageA = imread(IMAGE_PATH)
+                    self.imageCut()
+                    imageB = imread(IMAGE_PATH)
+                    image_score = self.compareImage(imageA, imageB)
+                    # 在自动模式下, 如果如果相似度过高则不检测
+                    if (image_score > self.object.config["imageSimilarity"]):
+                        return
+                except Exception:
+                    self.logger.error(format_exc())
+                    # 如果判断相似度失败则直接截图
+                    self.imageCut()
 
-                # 在自动模式下, 如果如果相似度过高则不检测
-                if (image_score > self.object.config["imageSimilarity"]):
-                    return
         except Exception :
             self.logger.error(format_exc())
+            # 如果截图时出错
+            self.clear_text_sign.emit(True)
+            self.object.translation_ui.original = "截取范围时出错: %s"%format_exc()
+            utils.thread.createThread(self.creatTranslaterThread, "original")
+            return
 
         # OCR开始时间
         ocr_start_time = time.time()
 
         # 百度OCR
         if self.object.config["baiduOCR"] :
-            ocr_sign, original = translator.ocr.baidu.baiduOCR(self.object.config, self.logger)
-            # 如果网络出错重试一次
-            if original == "百度OCR错误: 请打开[网络和Internet设置]的[代理]页面, 将其中的全部代理设置开关都关掉, 保证关闭后请重试" :
-                ocr_sign, original = translator.ocr.baidu.baiduOCR(self.object.config, self.logger)
+            ocr_sign, original = translator.ocr.baidu.baiduOCR(self.object)
 
         # 团子OCR
         elif self.object.config["onlineOCR"] :
             ocr_sign, original = translator.ocr.dango.dangoOCR(self.object)
-            # 如果网络出错重试一次
-            if original == "在线OCR错误: 网络超时, 请尝试在[设置]-[OCR设定]-[在线OCR]右侧切换延迟最低的节点, 切换后重试翻译":
-                ocr_sign, original = translator.ocr.dango.dangoOCR(self.object)
 
         # 本地OCR
         elif self.object.config["offlineOCR"] :
             ocr_sign, original = translator.ocr.dango.offlineOCR(self.object)
 
         else :
-            original = "OCR错误: 未开启任何OCR, 请在[设置]-[OCR设定]内开启一种OCR, 不同OCR的区别请点击每种OCR对应的说明按钮"
+            original = "OCR错误: 未开启任何OCR, 请在[设置]-[识别设定]内开启要使用的OCR"
             ocr_sign = False
 
         # 记录OCR耗时
@@ -438,7 +442,7 @@ class Translater(QThread) :
         # 显示原文
         if self.object.config["showOriginal"] == "True" or not nothing_sign :
             if not nothing_sign :
-                self.object.translation_ui.original += "\n\n未开启任何翻译源, 无法翻译, 请在[设置]-[翻译设定]内开启至少一种翻译源, 不同翻译源的区别请点击每种翻译源对应的说明按钮"
+                self.object.translation_ui.original += "\n\n未开启任何翻译源, 无法翻译, 请在[设置]-[翻译设定]内开启至少一种翻译源"
             utils.thread.createThread(self.creatTranslaterThread, "original")
 
 
@@ -481,7 +485,7 @@ class Translater(QThread) :
                 except Exception :
                     self.logger.error(format_exc())
 
-                if self.object.config["onlineOCR"] :
+                if self.object.config["onlineOCR"]:
                     time.sleep(self.object.config["translateSpeed"]-0.2)
-                else :
+                else:
                     time.sleep(self.object.config["translateSpeed"]-0.4)

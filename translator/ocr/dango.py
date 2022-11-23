@@ -198,31 +198,16 @@ def resultSortMD(ocr_result, language) :
     return text, ocr_result
 
 
-# 校验图片md5
-def checkImageMD5(imageBase64, res) :
-
-    if res.get("Code", -1) != 0 :
-        return False
-    request_id = res.get("RequestId", "")
-    if request_id :
-        split = request_id.split("_")
-        if len(split) == 3 :
-            image_md5 = hashlib.md5(imageBase64.encode("utf-8")).hexdigest()
-            if (split[1] == image_md5) and (split[2] == str(len(imageBase64))):
-                return True
-
-    return False
-
-
 # 团子在线OCR服务
 def dangoOCR(object, test=False) :
 
-    token = object.config["DangoToken"]
-    url = object.config["nodeURL"]
-    language = object.config["language"]
-    showTranslateRow = object.config["showTranslateRow"]
-    branchLineUse = object.config["BranchLineUse"]
-    if language == "JAP" and showTranslateRow == "True":
+    # 获取配置
+    token = object.config.get("DangoToken", "")
+    url = object.config.get("nodeURL", object.yaml["dict_info"]["ocr_server"])
+    language = object.config.get("language", "JAP")
+    show_translate_row = object.config.get("showTranslateRow", "False")
+    branch_line_use = object.config.get("BranchLineUse", False)
+    if language == "JAP" and show_translate_row == "True":
         language = "Vertical_JAP"
     if test :
         image_path = TEST_IMAGE_PATH
@@ -253,16 +238,9 @@ def dangoOCR(object, test=False) :
         "Token": token
     }
 
-    for index in range(2) :
-        res = utils.http.post(url=url, body=body, logger=object.logger, headers=headers)
-        # 如果出错就直接结束
-        if not res :
-            return False, "在线OCR错误: 网络超时, 请尝试在[设置]-[OCR设定]-[在线OCR]右侧切换延迟最低的节点, 切换后重试翻译"
-        if index == 1 :
-            break
-        # 校验图片md5
-        if checkImageMD5(imageBase64, res) :
-            break
+    res = utils.http.post(url=url, body=body, logger=object.logger, headers=headers)
+    if not res :
+        return False, "在线OCR错误: 网络超时, 请尝试重试\n如果频繁出现, 请于[设置]-[识别设定]-[在线OCR]页面内, 切换延迟最低的节点并重新翻译"
 
     code = res.get("Code", -1)
     message = res.get("Message", "")
@@ -301,7 +279,7 @@ def dangoOCR(object, test=False) :
             # 贴字翻译采用文本聚类
             if object.config["drawImageUse"] :
                 # 开启了自动换行
-                if branchLineUse :
+                if branch_line_use :
                     for index, val in enumerate(ocr_result) :
                         # 获取字宽
                         word_width = val["Coordinate"]["LowerRight"][1] - val["Coordinate"]["UpperRight"][1]
@@ -320,14 +298,14 @@ def dangoOCR(object, test=False) :
             else :
                 for val in ocr_result :
                     # 开启了自动换行
-                    if branchLineUse and val != ocr_result[-1] :
+                    if branch_line_use and val != ocr_result[-1] :
                         content += val["Words"] + "\n"
                     else :
                         content += val["Words"]
         return True, content
     else :
         if code == -3 :
-            return False, "在线OCR错误: 在线OCR需购买才可使用, 请点击[设置]-[OCR设定]-[在线OCR]右侧的购买按钮\n若您已经购买但仍出现此提示, 请直接通过交流群联系客服"
+            return False, "在线OCR错误: 在线OCR需购买才可使用\n请于[设置]-[识别设定]-[在线OCR]页面内, 点击购买按钮完成支付后再使用\n若您已经购买但仍出现此提示, 请直接通过交流群联系客服"
         else :
             object.logger.error(message)
             return False, "在线OCR错误: %s"%message
@@ -352,11 +330,11 @@ def offlineOCR(object) :
     if language == "RU" and os.path.exists("./ocr/resources/app.py"):
         with open("./ocr/resources/app.py", "r", encoding="utf-8") as file:
             if "ruOcr" not in file.read():
-                return False, "本地OCR错误: 当前本地OCR版本尚未支持俄语, 请通过本地OCR的卸载和安装功能, 更新最新版本的本地OCR"
+                return False, "本地OCR错误: 当前本地OCR版本尚未支持俄语\n请于[设置]-[识别设定]-[本地OCR]页面内, 通过卸载和安装功能, 更新最新版本的本地OCR后重试"
 
     res = utils.http.post(url, body, object.logger)
     if not res :
-        return False, "本地OCR错误: 本地OCR所使用的端口可能被占用, 请重启电脑以释放端口并重试"
+        return False, "本地OCR错误: 本地OCR所使用的端口可能被占用, 请重启电脑以释放端口后重试\n如果频繁出现, 建议切换其他OCR使用"
 
     code = res.get("Code", -1)
     message = res.get("Message", "")
@@ -393,6 +371,6 @@ def offlineOCR(object) :
     else :
         object.logger.error(message)
         if message == "Language RU doesn't exist":
-            return False, "本地OCR错误: 当前本地OCR版本尚未支持俄语, 请通过本地OCR的卸载和安装功能, 更新最新版本的本地OCR"
+            return False, "本地OCR错误: 当前本地OCR版本尚未支持俄语\n请于[设置]-[识别设定]-[本地OCR]页面内, 通过卸载和安装功能, 更新最新版本的本地OCR后重试"
         else :
-            return False, "本地OCR错误: %s"%message
+            return False, "本地OCR错误: %s\n如果频繁出现, 建议切换其他OCR使用"%message

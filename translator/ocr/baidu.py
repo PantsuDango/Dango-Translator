@@ -1,10 +1,11 @@
 from traceback import format_exc
 import requests
 import base64
-
 import utils.message
 import utils.http
 
+IMAGE_PATH = "./config/image.jpg"
+TEST_IMAGE_PATH = "./config/other/image.jpg"
 
 # 获取访问百度OCR用的token
 def getAccessToken(object) :
@@ -16,7 +17,7 @@ def getAccessToken(object) :
     proxies = {"http": None, "https": None}
 
     try:
-        response = requests.get(host, proxies=proxies, timeout=10)
+        response = requests.get(host, proxies=proxies, timeout=5)
 
     except TypeError :
         object.logger.error(format_exc())
@@ -73,112 +74,100 @@ def getAccessToken(object) :
 
 
 # 百度ocr
-def baiduOCR(config, logger, test=False) :
+def baiduOCR(object, test=False) :
 
-    language = config["language"]
+    # 获取配置
+    language = object.config.get("language", "JAP")
     if language == "RU" :
         language = "RUS"
-    access_token = config["AccessToken"]
-    showTranslateRow = config["showTranslateRow"]
-    highPrecision = config["OCR"]["highPrecision"]
+    access_token = object.config.get("AccessToken", "")
+    show_translate_row = object.config.get("showTranslateRow", "False")
+    ocr_config = object.config.get("OCR", {})
+    high_precision = ocr_config.get("highPrecision", False)
+    branch_line_use = object.config.get("BranchLineUse", False)
 
+    # 鉴权token
     if not access_token :
-        sentence = "百度OCR错误：还未注册OCR API，不可使用"
+        return False, "百度OCR错误: 还未注册百度OCR密钥, 不可使用\n请于[设置]-[识别设定]-[百度OCR]页面内, 点击[注册]按钮完成注册并填入密钥后再使用"
+    # 是否使用高精度模式
+    if show_translate_row == "True" or high_precision :
+        request_url = "https://aip.baidubce.com/rest/2.0/ocr/v1/accurate_basic"
+    else :
+        request_url = "https://aip.baidubce.com/rest/2.0/ocr/v1/general_basic"
+    # 是否为接口测试
+    path = IMAGE_PATH
+    if test :
+        path = TEST_IMAGE_PATH
+        language = "JAP"
 
-    else:
-        if showTranslateRow == "True" or highPrecision :
-            # 高精度
-            request_url = "https://aip.baidubce.com/rest/2.0/ocr/v1/accurate_basic"
-        else :
-            # 普通
-            request_url = "https://aip.baidubce.com/rest/2.0/ocr/v1/general_basic"
+    # 封装请求体
+    with open(path, "rb") as file :
+        image = base64.b64encode(file.read())
+    params = {"image": image, "language_type": language}
+    headers = {"content-type": "application/x-www-form-urlencoded", "Connection": "close"}
+    proxies = {"http": None, "https": None}
+    request_url = request_url + "?access_token=" + access_token
 
-        if not test :
-            path = "./config/image.jpg"
-        else :
-            path = "./config/other/image.jpg"
-            language = "JAP"
+    # 请求百度ocr
+    try:
+        resp = requests.post(request_url, data=params, headers=headers, proxies=proxies, timeout=5).json()
+    except Exception:
+        object.logger.error(format_exc())
+        return False, "百度OCR错误: 网络超时, 请尝试重试\n如有正在使用任何代理或加速器, 请尝试关闭后重试\n如果频繁出现, 建议切换其他OCR使用"
+    if not resp :
+        return False, "百度OCR错误: 网络超时, 请尝试重试\n如有正在使用任何代理或加速器, 请尝试关闭后重试\n如果频繁出现, 建议切换其他OCR使用"
 
-        with open(path, "rb") as file :
-            image = base64.b64encode(file.read())
-        params = {"image": image, "language_type": language}
-        headers = {"content-type": "application/x-www-form-urlencoded", "Connection": "close"}
-        proxies = {"http": None, "https": None}
-        request_url = request_url + "?access_token=" + access_token
+    # 解析百度OCR结果
+    words = resp.get("words_result", {})
+    # 正常解析
+    if words :
+        content = ""
+        if show_translate_row == "True":
+            # 竖向翻译模式
+            if words:
+                for word in words[::-1]:
+                    content += word["words"] + ","
+                content = content.replace(",", "")
+        else:
+            # 横向翻译模式
+            for index, word in enumerate(words):
+                if branch_line_use and (index + 1 != len(words)):
+                    if language == "ENG":
+                        content += word["words"] + " \n"
+                    else:
+                        content += word["words"] + "\n"
+                else:
+                    if language == "ENG":
+                        content += word["words"] + " "
+                    else:
+                        content += word["words"]
+        return True, content
+    # 错误解析
+    else :
+        # 如果接口调用错误
+        error_code = resp.get("error_code", 0)
+        error_msg = resp.get("error_msg", "")
 
-        try:
-            response = requests.post(request_url, data=params, headers=headers, proxies=proxies, timeout=5)
+        content = "百度OCR错误: 错误码-%d, 错误信息-%s\n"%(error_code, error_msg)
+        if error_code == 6 :
+            content += "开通的服务类型非通用文字识别, 请检查百度OCR的注册网页, 注册的类型是不是通用文字识别"
+        elif error_code == 17 :
+            if show_translate_row == "True":
+                content += "竖排翻译模式每日额度已用光, 请关闭竖排翻译模式, 或切换其他OCR使用竖排翻译"
+            else:
+                content += "无使用额度或免费额度已用光, 可更换本地OCR或在线OCR"
+        elif error_code == 18 :
+            content += "使用频率过快, 如为自动翻译可调整自动翻译时间间隔(建议1s), 手动翻译请降低使用频率"
 
-        except TypeError:
-            logger.error(format_exc())
-            utils.message.MessageBox("百度OCR错误",
-                                     "需要翻译器目录的路径设置为纯英文\n"
-                                     "否则无法在非简中区的电脑系统下运行使用     ")
+        elif error_code == 111 :
+            content += "缓存密钥已过期, 请进入设置页面一次, 以重新生成缓存密钥"
 
-            sentence = "百度OCR错误: 需要翻译器目录的路径设置为纯英文, 否则无法在非简中区的电脑系统下运行使用"
-
-        except Exception:
-            logger.error(format_exc())
-            sentence = "百度OCR错误: 请打开[网络和Internet设置]的[代理]页面, 将其中的全部代理设置开关都关掉, 保证关闭后请重试"
+        elif error_code == 216202 :
+            content += "识别范围过小无法识别, 请重新框选要翻译的区域"
 
         else:
-            if response:
-                try:
-                    words = response.json()["words_result"]
+            content += "错误未知或未收录"
+        return False, content
 
-                except Exception :
-                    logger.error(format_exc())
-                    error_code = response.json()["error_code"]
-                    error_msg = response.json()["error_msg"]
 
-                    if error_code == 6 :
-                        sentence = "百度OCR错误: 检查一下你的OCR注册网页, 注册的类型是不是文字识别, 你可能注册到语音技术还是其它什么奇怪的东西了"
-
-                    elif error_code == 17 :
-                        if showTranslateRow == "True":
-                            sentence = "百度OCR错误：竖排翻译模式每日额度已用光, 请取消竖排翻译模式"
-                        else:
-                            sentence = "百度OCR错误: 百度ocr无额度或免费额度已用光, 可更换本地OCR或在线OCR"
-
-                    elif error_code == "18":
-                        sentence = "百度OCR错误: 您的翻译请求速度过快(1s内至多两次)，请调整自动翻译模式间隔(建议0.8s)或降低手动翻译频率"
-
-                    elif error_code == 111 :
-                        sentence = "百度OCR错误: 百度ocr缓存密钥已过期, 请进入设置页面后重新保存一次设置, 以重新生成缓存密钥"
-
-                    elif error_code == 216202:
-                        sentence = "百度OCR错误：范围截取过小无法识别，请重新框选一下你要翻译的区域"
-
-                    else:
-                        sentence = "百度OCR错误：%s, %s"%(error_code, error_msg)
-
-                else:
-                    sentence = ""
-
-                    # 竖排翻译模式
-                    if showTranslateRow == "True" :
-                        if words :
-                            for word in words[::-1] :
-                                sentence += word["words"] + ","
-                            sentence = sentence.replace(",", "")
-
-                    # 普通翻译模式
-                    else:
-                        for index, word in enumerate(words) :
-                            if config["BranchLineUse"] and (index+1 != len(words)) :
-                                if language == "ENG" :
-                                    sentence += word["words"] + " \n"
-                                else :
-                                    sentence += word["words"] + "\n"
-                            else :
-                                if language == "ENG" :
-                                    sentence += word["words"] + " "
-                                else :
-                                    sentence += word["words"]
-
-                    return True, sentence
-
-            else:
-                sentence = "百度OCR: response无响应"
-
-    return False, sentence
+    return False, "百度OCR错误: 错误未知或未收录"
