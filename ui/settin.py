@@ -666,7 +666,7 @@ class Settin(QMainWindow) :
         # 私人腾讯翻译教程按钮
         button = QPushButton(private_translater_tab)
         self.customSetGeometry(button, 340, 70, 60, 20)
-        button.setText("教程")
+        button.setText("注册")
         button.clicked.connect(self.openTencentTutorial)
         button.setCursor(ui.static.icon.SELECT_CURSOR)
 
@@ -713,7 +713,7 @@ class Settin(QMainWindow) :
         # 私人百度翻译教程按钮
         button = QPushButton(private_translater_tab)
         self.customSetGeometry(button, 340, 120, 60, 20)
-        button.setText("教程")
+        button.setText("注册")
         button.clicked.connect(self.openBaiduTutorial)
         button.setCursor(ui.static.icon.SELECT_CURSOR)
 
@@ -761,7 +761,7 @@ class Settin(QMainWindow) :
         # 私人彩云翻译教程按钮
         button = QPushButton(private_translater_tab)
         self.customSetGeometry(button, 340, 170, 60, 20)
-        button.setText("教程")
+        button.setText("注册")
         button.clicked.connect(self.openCaiyunTutorial)
         button.setCursor(ui.static.icon.SELECT_CURSOR)
 
