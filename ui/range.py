@@ -8,6 +8,7 @@ import utils.thread
 import ui.static.icon
 import ui.switch
 import utils.message
+import translator.sound
 
 
 DRAW_PATH = "./config/draw.jpg"
@@ -518,16 +519,24 @@ class MultiRange(QWidget):
     # 切换范围快捷键信号槽
     def choiceRangeHotkeyFunc(self, sign):
 
+        # 快捷键只允许在多范围界面或翻译界面活动的情况下使用
+        if not self.isActiveWindow() and not self.object.translation_ui.isActiveWindow() :
+            return
+
         if sign == 1 and not self.switch_1_use:
+            translator.sound.playButtonSound()
             self.switch_1.mousePressEvent(1)
             self.switch_1.updateValue()
         if sign == 2 and not self.switch_2_use:
+            translator.sound.playButtonSound()
             self.switch_2.mousePressEvent(1)
             self.switch_2.updateValue()
         if sign == 3 and not self.switch_3_use:
+            translator.sound.playButtonSound()
             self.switch_3.mousePressEvent(1)
             self.switch_3.updateValue()
         if sign == 4 and not self.switch_4_use:
+            translator.sound.playButtonSound()
             self.switch_4.mousePressEvent(1)
             self.switch_4.updateValue()
 
