@@ -42,7 +42,7 @@ class DangoTranslator :
         # 本地配置
         self.yaml = utils.config.openConfig(self.logger)
         # 版本号
-        self.yaml["version"] = "4.3.5"
+        self.yaml["version"] = "4.3.6-Beta"
         # 配置中心
         self.yaml["dict_info"] = utils.config.getDictInfo(self.yaml["dict_info_url"], self.logger)
         # 屏幕分辨率
@@ -53,6 +53,8 @@ class DangoTranslator :
         self.chrome_driver_finish = 0
         self.firefox_driver_finish = 0
         self.edge_driver_finish = 0
+        # 是否屏蔽绑定邮箱消息窗
+        self.checkBindEmailSign = False
 
 
     # 登录
@@ -118,6 +120,7 @@ class DangoTranslator :
 
     # 自动登录后检查
     def autoLoginCheck(self, message) :
+        self.checkBindEmailSign = True
         utils.message.MessageBox("自动登录失败", message, self.yaml["screen_scale_rate"])
         sys.exit()
 

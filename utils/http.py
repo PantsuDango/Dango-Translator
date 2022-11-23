@@ -156,16 +156,16 @@ def loginCheck(object) :
         return "用户名不存在, 请先注册!     "
 
     elif result == "Password error":
-        return "用户名和密码不匹配"
+        return "用户名和密码不匹配     "
 
     elif result == "User is black list":
-        return "账户已被纳入黑名单"
+        return "账户已被纳入黑名单     "
 
     elif result == "OK":
         # 保存配置
-        self.object.yaml["user"] = self.user
-        self.object.yaml["password"] = utils.enctry.enctry(self.password)
-        utils.config.saveConfig(self.object.yaml, self.logger)
+        object.yaml["user"] = user
+        object.yaml["password"] = utils.enctry.enctry(password)
+        utils.config.saveConfig(object.yaml, object.logger)
 
     else:
         object.logger.error("登录出错, response: %s"%resp)

@@ -95,6 +95,20 @@ class Translation(QMainWindow) :
 
         # 翻译框加入描边文字
         self.format = QTextCharFormat()
+        # 初始化
+        self.format.setTextOutline(QPen(QColor(self.font_color_1), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+        self.translate_text.mergeCurrentCharFormat(self.format)
+        self.translate_text.append("欢迎使用团子翻译器: Ver%s"%self.object.yaml["version"])
+        self.format.setTextOutline(QPen(QColor(self.font_color_2), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+        self.translate_text.mergeCurrentCharFormat(self.format)
+        self.translate_text.append("B站关注UP主[团子翻译器], 查看动态可了解翻译器最新情况")
+        self.format.setTextOutline(QPen(QColor(self.font_color_1), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+        self.translate_text.mergeCurrentCharFormat(self.format)
+        self.translate_text.append("——最新QQ交流群: %s"%self.object.yaml["dict_info"]["qq_group_number"])
+        self.format.setTextOutline(QPen(QColor(self.font_color_2), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+        self.translate_text.mergeCurrentCharFormat(self.format)
+        self.translate_text.append("软件在使用上有任何问题, 欢迎直接来交流群找客服娘协助")
+
         # 翻译界面显示通知信息
         thread = utils.thread.createShowTranslateTextQThread(self.object)
         thread.signal.connect(self.showTranslateText)
@@ -482,23 +496,11 @@ class Translation(QMainWindow) :
     def showTranslateText(self, result) :
 
         if result :
+            self.translate_text.clear()
             for content in result.split(r"\n") :
                 self.format.setTextOutline(QPen(QColor(self.font_color_1), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
                 self.translate_text.mergeCurrentCharFormat(self.format)
                 self.translate_text.append(content)
-        else :
-            self.format.setTextOutline(QPen(QColor(self.font_color_1), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
-            self.translate_text.mergeCurrentCharFormat(self.format)
-            self.translate_text.append("欢迎你 ~ %s 么么哒 ~" % self.user)
-            self.format.setTextOutline(QPen(QColor(self.font_color_2), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
-            self.translate_text.mergeCurrentCharFormat(self.format)
-            self.translate_text.append("b站关注[团子翻译器]查看动态可了解翻译器最新情况 ~")
-            self.format.setTextOutline(QPen(QColor(self.font_color_1), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
-            self.translate_text.mergeCurrentCharFormat(self.format)
-            self.translate_text.append("团子一个人开发不易，这个软件真的花了很大很大的精力 _(:з」∠)_")
-            self.format.setTextOutline(QPen(QColor(self.font_color_2), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
-            self.translate_text.mergeCurrentCharFormat(self.format)
-            self.translate_text.append("喜欢的话能不能在b站给团子一个关注，团子会很开心的~真心感谢你❤")
 
 
     # 当翻译内容改变时界面自适应窗口大小
