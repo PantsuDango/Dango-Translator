@@ -2,6 +2,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from system_hotkey import SystemHotkey
+from traceback import format_exc
 import qtawesome
 import os
 import time
@@ -26,17 +27,14 @@ import ui.static.icon
 # 翻译界面
 class Translation(QMainWindow) :
 
-    # 范围快捷键信号
-    range_hotkey_sign = pyqtSignal(bool)
     # 自动翻译模式信号
     auto_open_sign = pyqtSignal(bool)
-    # 隐藏范围框快捷键
-    hide_range_sign = pyqtSignal(bool)
+    # 范围快捷键信号
+    range_hotkey_sign = pyqtSignal(bool)
 
     def __init__(self, object) :
 
         super(Translation, self).__init__()
-
         self.translater_yaml_map = {
             "youdao": "youdao",
             "baidu": "baiduweb",
@@ -258,23 +256,108 @@ class Translation(QMainWindow) :
             self.statusbar.hide()
 
         # 注册翻译快捷键
-        self.translate_hotkey = SystemHotkey()
         if self.object.config["showHotKey1"] == "True" :
-            self.translate_hotkey.register((self.translate_hotkey_value1, self.translate_hotkey_value2),
-                                           callback=lambda x: utils.thread.createThread(self.startTranslater))
-
+            self.registerTranslateHotkey()
         # 注册范围快捷键
-        self.range_hotkey = SystemHotkey()
         if self.object.config["showHotKey2"] == "True" :
-            self.range_hotkey.register((self.range_hotkey_value1, self.range_hotkey_value2),
-                                       callback=lambda x: self.range_hotkey_sign.emit(True))
+            self.registerRangeHotkey()
         self.range_hotkey_sign.connect(self.clickRange)
-
         # 注册隐藏范围框快捷键
-        self.hide_range_hotkey = SystemHotkey()
-        if self.object.config["showHotKey3"] :
-            self.hide_range_hotkey.register((self.hide_range_hotkey_value1, self.hide_range_hotkey_value2),
-                                             callback=lambda x: self.hide_range_sign.emit(True))
+        if self.object.config["showHotKey3"] == "True" or self.object.config["showHotKey3"] == True :
+            self.registerHideRangeHotkey()
+
+
+    # 注册隐藏范围框快捷键
+    def registerHideRangeHotkey(self):
+
+        hotkey1 = self.object.config["hideRangeHotkeyValue1"]
+        if hotkey1 in self.hotkey_map:
+            hotkey1 = self.hotkey_map[hotkey1]
+        hotkey2 = self.object.config["hideRangeHotkeyValue2"]
+        if hotkey2 in self.hotkey_map:
+            hotkey2 = self.hotkey_map[hotkey2]
+        try:
+            self.hide_range_hotkey.register((hotkey1, hotkey2),
+                                            callback=lambda x: utils.thread.createThread(self.object.range_ui.hideRangeUI(True)))
+        except Exception:
+            self.logger.error(format_exc())
+
+
+    # 注销隐藏范围框快捷键
+    def unRegisterHideRangeHotkey(self):
+
+        hotkey1 = self.object.config["hideRangeHotkeyValue1"]
+        if hotkey1 in self.hotkey_map:
+            hotkey1 = self.hotkey_map[hotkey1]
+        hotkey2 = self.object.config["hideRangeHotkeyValue2"]
+        if hotkey2 in self.hotkey_map:
+            hotkey2 = self.hotkey_map[hotkey2]
+        try:
+            self.hide_range_hotkey.unregister((hotkey1, hotkey2))
+        except Exception:
+            self.logger.error(format_exc())
+
+
+    # 注册范围快捷键
+    def registerRangeHotkey(self):
+
+        hotkey1 = self.object.config["rangeHotkeyValue1"]
+        if hotkey1 in self.hotkey_map:
+            hotkey1 = self.hotkey_map[hotkey1]
+        hotkey2 = self.object.config["rangeHotkeyValue2"]
+        if hotkey2 in self.hotkey_map:
+            hotkey2 = self.hotkey_map[hotkey2]
+        try:
+            self.range_hotkey.register((hotkey1, hotkey2),
+                                       callback=lambda x: self.range_hotkey_sign.emit(True))
+        except Exception:
+            self.logger.error(format_exc())
+
+
+    # 注销范围快捷键
+    def unRegisterRangeHotkey(self):
+
+        hotkey1 = self.object.config["rangeHotkeyValue1"]
+        if hotkey1 in self.hotkey_map:
+            hotkey1 = self.hotkey_map[hotkey1]
+        hotkey2 = self.object.config["rangeHotkeyValue2"]
+        if hotkey2 in self.hotkey_map:
+            hotkey2 = self.hotkey_map[hotkey2]
+        try:
+            self.range_hotkey.unregister((hotkey1, hotkey2))
+        except Exception:
+            self.logger.error(format_exc())
+
+
+    # 注册翻译快捷键
+    def registerTranslateHotkey(self) :
+
+        hotkey1 = self.object.config["translateHotkeyValue1"]
+        if hotkey1 in self.hotkey_map:
+            hotkey1 = self.hotkey_map[hotkey1]
+        hotkey2 = self.object.config["translateHotkeyValue2"]
+        if hotkey2 in self.hotkey_map:
+            hotkey2 = self.hotkey_map[hotkey2]
+        try :
+            self.translate_hotkey.register((hotkey1, hotkey2),
+                                           callback=lambda x: utils.thread.createThread(self.startTranslater, True))
+        except Exception :
+            self.logger.error(format_exc())
+
+
+    # 注销翻译快捷键
+    def unRegisterTranslateHotkey(self):
+
+        hotkey1 = self.object.config["translateHotkeyValue1"]
+        if hotkey1 in self.hotkey_map:
+            hotkey1 = self.hotkey_map[hotkey1]
+        hotkey2 = self.object.config["translateHotkeyValue2"]
+        if hotkey2 in self.hotkey_map:
+            hotkey2 = self.hotkey_map[hotkey2]
+        try:
+            self.translate_hotkey.unregister((hotkey1, hotkey2))
+        except Exception:
+            self.logger.error(format_exc())
 
 
     # 窗口显示信号
@@ -338,27 +421,18 @@ class Translation(QMainWindow) :
         # 自动翻译线程存在标志
         self.auto_trans_exist = False
         # 按键转换映射关系
-        hotkey_map = {
+        self.hotkey_map = {
             "ctrl": "control",
             "win": "super"
         }
-        # 翻译快捷键
-        self.translate_hotkey_value1 = hotkey_map.get(self.object.config["translateHotkeyValue1"],
-                                                      self.object.config["translateHotkeyValue1"])
-        self.translate_hotkey_value2 = hotkey_map.get(self.object.config["translateHotkeyValue2"],
-                                                      self.object.config["translateHotkeyValue2"])
-        # 范围快捷键
-        self.range_hotkey_value1 = hotkey_map.get(self.object.config["rangeHotkeyValue1"],
-                                                  self.object.config["rangeHotkeyValue1"])
-        self.range_hotkey_value2 = hotkey_map.get(self.object.config["rangeHotkeyValue2"],
-                                                  self.object.config["rangeHotkeyValue2"])
-        # 范围快捷键
-        self.hide_range_hotkey_value1 = hotkey_map.get(self.object.config["hideRangeHotkeyValue1"],
-                                                       self.object.config["hideRangeHotkeyValue1"])
-        self.hide_range_hotkey_value2 = hotkey_map.get(self.object.config["hideRangeHotkeyValue2"],
-                                                       self.object.config["hideRangeHotkeyValue2"])
         # 竖排翻译贴字
         self.object.ocr_result = None
+        # 翻译快捷键
+        self.translate_hotkey = SystemHotkey()
+        # 范围快捷键
+        self.range_hotkey = SystemHotkey()
+        # 隐藏范围快捷键
+        self.hide_range_hotkey = SystemHotkey()
 
 
     # 根据分辨率定义控件位置尺寸
@@ -570,11 +644,16 @@ class Translation(QMainWindow) :
 
 
     # 按下翻译键
-    def startTranslater(self) :
+    def startTranslater(self, hotkey_sign=False) :
 
         # 如果已处在自动翻译模式下则直接退出
         if self.auto_trans_exist :
             return
+        # 如果是快捷键触发的
+        if hotkey_sign :
+            if not self.isActiveWindow() :
+                return
+            translator.sound.playButtonSound()
 
         thread = utils.translater.Translater(self.object)
         thread.clear_text_sign.connect(self.clearText)
@@ -596,19 +675,6 @@ class Translation(QMainWindow) :
         self.font.setFamily(self.object.config["fontType"])
         self.font.setPointSize(self.object.config["fontSize"])
         self.translate_text.setFont(self.font)
-
-
-    # 注销快捷键
-    def unregisterHotKey(self) :
-
-        if self.object.config["showHotKey1"] == "True" :
-            self.translate_hotkey.unregister((self.translate_hotkey_value1, self.translate_hotkey_value2))
-
-        if self.object.config["showHotKey2"] == "True" :
-            self.range_hotkey.unregister((self.range_hotkey_value1, self.range_hotkey_value2))
-
-        if self.object.config["showHotKey3"] :
-            self.hide_range_hotkey.unregister((self.hide_range_hotkey_value1, self.hide_range_hotkey_value2))
 
 
     # 将翻译结果打印
@@ -787,7 +853,13 @@ class Translation(QMainWindow) :
 
 
     # 按下范围框选键
-    def clickRange(self):
+    def clickRange(self, hotkey_sign=False):
+
+        # 如果是快捷键触发的
+        if hotkey_sign :
+            if not self.isActiveWindow() :
+                return
+            translator.sound.playButtonSound()
 
         # 如果处于自动模式下则暂停
         if self.translate_mode :
@@ -818,8 +890,6 @@ class Translation(QMainWindow) :
         # 界面关闭
         self.hide()
         self.object.range_ui.close()
-        # 注销快捷键
-        utils.thread.createThreadDaemonFalse(self.unregisterHotKey)
         # 关闭引擎模块
         utils.thread.createThreadDaemonFalse(self.sound.close)
         utils.thread.createThreadDaemonFalse(self.webdriver1.close)

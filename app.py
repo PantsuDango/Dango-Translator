@@ -96,7 +96,6 @@ class DangoTranslator :
         self.filter_ui = ui.filter.Filter(self)
         # 范围框界面
         self.range_ui = ui.range.Range(self)
-        self.translation_ui.hide_range_sign.connect(self.range_ui.hideRangeUI)
         # 多范围参数页面
         self.multi_range_ui = ui.range.MultiRange(self)
         self.translation_ui.multi_range_button.clicked.connect(self.clickMultiRange)
@@ -136,7 +135,6 @@ class DangoTranslator :
     # 按下充电键后做的事情
     def clickBattery(self) :
 
-        self.translation_ui.unregisterHotKey()
         self.translation_ui.close()
         self.range_ui.close()
         self.settin_ui.tab_widget.setCurrentIndex(4)
@@ -154,7 +152,6 @@ class DangoTranslator :
         elif self.settin_ui.baidu_ocr_use :
             self.settin_ui.ocr_tab_widget.setCurrentIndex(2)
 
-        self.translation_ui.unregisterHotKey()
         self.translation_ui.close()
         self.range_ui.close()
         self.settin_ui.show()

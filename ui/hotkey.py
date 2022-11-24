@@ -127,23 +127,51 @@ class HotKey(QWidget):
 
         content = self.comboBox_1.currentText() + "+" + self.comboBox_2.currentText()
 
+        # 翻译快捷键改变键位
         if key_type == "translate" :
+            # 注销旧快捷键
+            if self.object.config["showHotKey1"] == "True" :
+                self.object.translation_ui.unRegisterTranslateHotkey()
+            # 改变快捷键键位
             self.object.settin_ui.translate_hotkey_button.setText(content)
             self.object.config["translateHotkeyValue1"] = self.comboBox_1.currentText()
             self.object.config["translateHotkeyValue2"] = self.comboBox_2.currentText()
+            # 注册新快捷键
+            if self.object.config["showHotKey1"] == "True" :
+                self.object.translation_ui.registerTranslateHotkey()
 
+        # 范围快捷键改变键位
         elif key_type == "range" :
+            # 注销旧快捷键
+            if self.object.config["showHotKey2"] == "True":
+                self.object.translation_ui.unRegisterRangeHotkey()
             self.object.settin_ui.range_hotkey_button.setText(content)
             self.object.config["rangeHotkeyValue1"] = self.comboBox_1.currentText()
             self.object.config["rangeHotkeyValue2"] = self.comboBox_2.currentText()
+            # 注册新快捷键
+            if self.object.config["showHotKey2"] == "True":
+                self.object.translation_ui.registerRangeHotkey()
 
+        # 隐藏范围快捷键改变键位
         elif key_type == "hideRange" :
+            # 注销旧快捷键
+            if self.object.config["showHotKey3"] == "True" or self.object.config["showHotKey3"] == True :
+                self.object.translation_ui.unRegisterHideRangeHotkey()
             self.object.settin_ui.hide_range_hotkey_button.setText(content)
             self.object.config["hideRangeHotkeyValue1"] = self.comboBox_1.currentText()
             self.object.config["hideRangeHotkeyValue2"] = self.comboBox_2.currentText()
+            # 注册新快捷键
+            if self.object.config["showHotKey3"] == "True":
+                self.object.translation_ui.registerHideRangeHotkey()
 
+        # 切换范围快捷键改变键位
         elif key_type == "choiceRange" :
+            # 注销旧快捷键
+            if self.object.config["choiceRangeHotKeyUse"] == True:
+                self.object.multi_range_ui.choiceRangeHotkeyUnRegister()
             self.object.multi_range_ui.choice_range_hotkey_button.setText(self.comboBox_1.currentText() + " + " + "F1-F4")
             self.object.config["choiceRangeHotkeyValue"] = self.comboBox_1.currentText()
+            if self.object.config["choiceRangeHotKeyUse"] == True :
+                self.object.multi_range_ui.choiceRangeHotkeyRegister()
 
         self.close()

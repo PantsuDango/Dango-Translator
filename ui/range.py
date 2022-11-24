@@ -304,7 +304,10 @@ class Range(QMainWindow) :
 
 
     # 隐藏/显示窗体信号
-    def hideRangeUI(self) :
+    def hideRangeUI(self, hotkey_sign=False) :
+
+        if hotkey_sign :
+            translator.sound.playButtonSound()
 
         if self.object.show_range_ui_sign :
             self.hide()
@@ -363,7 +366,7 @@ class MultiRange(QWidget):
         self.switch_3_use = self.object.config["switch3Use"]
         self.switch_4_use = self.object.config["switch4Use"]
         # 切换范围快捷键开关
-        self.choice_range_hotkey_use = object.config["choiceRangeHotKey"]
+        self.choice_range_hotkey_use = object.config["choiceRangeHotKeyUse"]
         # 快捷键映射关系
         self.hotkey_map = {
             "ctrl": "control",
@@ -681,11 +684,11 @@ class MultiRange(QWidget):
 
         if checked:
             self.choice_range_hotkey_use = True
-            self.object.config["choiceRangeHotKey"] = True
+            self.object.config["choiceRangeHotKeyUse"] = True
             self.choiceRangeHotkeyRegister()
         else:
             self.choice_range_hotkey_use = False
-            self.object.config["choiceRangeHotKey"] = False
+            self.object.config["choiceRangeHotKeyUse"] = False
             self.choiceRangeHotkeyUnRegister()
 
 

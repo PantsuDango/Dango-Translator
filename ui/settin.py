@@ -1220,7 +1220,7 @@ class Settin(QMainWindow) :
         self.translate_hotkey_button.setCursor(ui.static.icon.SELECT_CURSOR)
         # 翻译快捷键标签
         label = QLabel(shortcut_key_tab)
-        self.customSetGeometry(label, 180, 30, 300, 20)
+        self.customSetGeometry(label, 180, 30, 500, 20)
         label.setText("手动模式下刷新翻译的快捷键")
 
         # 范围快捷键开关
@@ -1236,7 +1236,7 @@ class Settin(QMainWindow) :
         self.range_hotkey_button.setCursor(ui.static.icon.SELECT_CURSOR)
         # 范围快捷键标签
         label = QLabel(shortcut_key_tab)
-        self.customSetGeometry(label, 180, 80, 300, 20)
+        self.customSetGeometry(label, 180, 80, 500, 20)
         label.setText("重新框选范围框的快捷键")
 
         # 隐藏快捷键开关
@@ -1252,7 +1252,7 @@ class Settin(QMainWindow) :
         self.hide_range_hotkey_button.setCursor(ui.static.icon.SELECT_CURSOR)
         # 隐藏范围快捷键标签
         label = QLabel(shortcut_key_tab)
-        self.customSetGeometry(label, 180, 130, 300, 20)
+        self.customSetGeometry(label, 180, 130, 500, 20)
         label.setText("显示/隐藏范围框的快捷键")
 
         # 贴字翻译开关
@@ -2011,8 +2011,12 @@ class Settin(QMainWindow) :
 
         if checked :
             self.translate_hotkey_use = True
+            self.object.config["showHotKey1"] = "True"
+            self.object.translation_ui.registerTranslateHotkey()
         else:
             self.translate_hotkey_use = False
+            self.object.config["showHotKey1"] = "False"
+            self.object.translation_ui.unRegisterTranslateHotkey()
 
 
     # 改变范围热键开关状态
@@ -2020,8 +2024,12 @@ class Settin(QMainWindow) :
 
         if checked :
             self.range_hotkey_use = True
+            self.object.config["showHotKey2"] = "True"
+            self.object.translation_ui.registerRangeHotkey()
         else:
             self.range_hotkey_use = False
+            self.object.config["showHotKey2"] = "False"
+            self.object.translation_ui.unRegisterRangeHotkey()
 
 
     # 改变隐藏范围热键开关状态
@@ -2029,8 +2037,12 @@ class Settin(QMainWindow) :
 
         if checked:
             self.hide_range_hotkey_use = True
+            self.object.config["showHotKey3"] = True
+            self.object.translation_ui.registerHideRangeHotkey()
         else:
             self.hide_range_hotkey_use = False
+            self.object.config["showHotKey3"] = False
+            self.object.translation_ui.unRegisterHideRangeHotkey()
 
 
     # 改变自动登录开关状态
@@ -2745,44 +2757,12 @@ class Settin(QMainWindow) :
         if not self.draw_image_use or not self.online_ocr_use :
             self.object.range_ui.draw_label.hide()
         # 隐藏范围快捷键开关
-        self.object.config["showHotKey3"] = str(self.hide_range_hotkey_use)
+        self.object.config["showHotKey3"] = self.hide_range_hotkey_use
         # 是否全屏下置顶开关
         self.object.config["setTop"] = self.set_top_use
         # 是否同步翻译历史开关
         self.object.config["agreeCollectUse"] = self.agree_collect_use
 
-
-    # 注册新快捷键
-    def registerHotKey(self) :
-
-        hotkey_map = {
-            "ctrl": "control",
-            "win": "super"
-        }
-        self.object.translation_ui.translate_hotkey_value1 = hotkey_map.get(self.object.config["translateHotkeyValue1"], self.object.config["translateHotkeyValue1"])
-        self.object.translation_ui.translate_hotkey_value2 = hotkey_map.get(self.object.config["translateHotkeyValue2"], self.object.config["translateHotkeyValue2"])
-        self.object.translation_ui.range_hotkey_value1 = hotkey_map.get(self.object.config["rangeHotkeyValue1"], self.object.config["rangeHotkeyValue1"])
-        self.object.translation_ui.range_hotkey_value2 = hotkey_map.get(self.object.config["rangeHotkeyValue2"], self.object.config["rangeHotkeyValue2"])
-        self.object.translation_ui.hide_range_hotkey_value1 = hotkey_map.get(self.object.config["hideRangeHotkeyValue1"], self.object.config["hideRangeHotkeyValue1"])
-        self.object.translation_ui.hide_range_hotkey_value2 = hotkey_map.get(self.object.config["hideRangeHotkeyValue2"], self.object.config["hideRangeHotkeyValue2"])
-
-        # 注册新翻译快捷键
-        if self.translate_hotkey_use :
-            self.object.translation_ui.translate_hotkey.register((self.object.translation_ui.translate_hotkey_value1,
-                                                                  self.object.translation_ui.translate_hotkey_value2),
-                                                                  callback=lambda x: utils.thread.createThread(self.object.translation_ui.startTranslater))
-
-        # 注册新范围快捷键
-        if self.range_hotkey_use :
-            self.object.translation_ui.range_hotkey.register((self.object.translation_ui.range_hotkey_value1,
-                                                              self.object.translation_ui.range_hotkey_value2),
-                                                              callback=lambda x: self.object.translation_ui.range_hotkey_sign.emit(True))
-
-        # 注册新隐藏范围快捷键
-        if self.hide_range_hotkey_use :
-            self.object.translation_ui.hide_range_hotkey.register((self.object.translation_ui.hide_range_hotkey_value1,
-                                                                   self.object.translation_ui.hide_range_hotkey_value2),
-                                                                   callback=lambda x: self.object.translation_ui.hide_range_sign.emit(True))
 
     # 窗口显示信号
     def showEvent(self, e):
@@ -2799,8 +2779,6 @@ class Settin(QMainWindow) :
         self.saveConfig()
         # 保存本地配置
         utils.config.saveConfig(self.object.yaml, self.logger)
-        # 注册新快捷键
-        utils.thread.createThread(self.registerHotKey)
         # 重置翻译引擎
         self.resetWebdriver()
         # 刷新百度OCR的AccessToken
