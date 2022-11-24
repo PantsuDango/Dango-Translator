@@ -25,6 +25,7 @@ import ui.filter
 import ui.range
 import ui.settin
 import ui.static.icon
+import ui.trans_history
 
 import translator.update_chrome_driver
 import translator.update_edge_driver
@@ -99,6 +100,11 @@ class DangoTranslator :
         # 多范围参数页面
         self.multi_range_ui = ui.range.MultiRange(self)
         self.translation_ui.multi_range_button.clicked.connect(self.clickMultiRange)
+
+        # 翻译历史页面
+        self.trans_history_ui = ui.trans_history.TransHistory(self)
+        self.translation_ui.trans_history_button.clicked.connect(self.trans_history_ui.show)
+        self.translation_ui.trans_history_button.clicked.connect(self.translation_ui.hide)
 
         # 检查邮箱
         thread = utils.thread.createCheckBindEmailQThread(self)

@@ -169,7 +169,7 @@ class Translation(QMainWindow) :
         self.range_button.clicked.connect(self.clickRange)
         self.range_button.hide()
 
-        # 复制按钮
+        # 多范围按钮
         self.multi_range_button = QPushButton(qtawesome.icon("fa5s.layer-group", color=self.icon_color), "", self)
         self.customSetIconSize(self.multi_range_button, 20, 20)
         self.customSetGeometry(self.multi_range_button, 293, 5, 20, 20)
@@ -215,15 +215,15 @@ class Translation(QMainWindow) :
         self.battery_button.setCursor(ui.static.icon.SELECT_CURSOR)
         self.battery_button.hide()
 
-        # 锁按钮
-        self.lock_button = QPushButton(qtawesome.icon("fa.lock", color=self.icon_color), "", self)
-        self.customSetIconSize(self.lock_button, 20, 20)
-        self.customSetGeometry(self.lock_button, 527, 5, 20, 20)
-        self.lock_button.setToolTip("<b>锁定翻译界面 Lock</b>")
-        self.lock_button.setStyleSheet("background: transparent;")
-        self.lock_button.setCursor(ui.static.icon.SELECT_CURSOR)
-        self.lock_button.clicked.connect(self.lock)
-        self.lock_button.hide()
+        # 翻译历史按钮
+        self.trans_history_button = QPushButton(qtawesome.icon("fa5s.book-open", color=self.icon_color), "", self)
+        self.customSetIconSize(self.trans_history_button, 20, 20)
+        self.customSetGeometry(self.trans_history_button, 527, 5, 20, 20)
+        self.trans_history_button.setToolTip("<b>查看翻译历史 TransHistory</b>")
+        self.trans_history_button.setStyleSheet("background: transparent;")
+        self.trans_history_button.setCursor(ui.static.icon.SELECT_CURSOR)
+        #self.trans_history_button.clicked.connect(self.lock)
+        self.trans_history_button.hide()
 
         # 最小化按钮
         self.minimize_button = QPushButton(qtawesome.icon("fa.minus", color=self.icon_color), "", self)
@@ -396,8 +396,6 @@ class Translation(QMainWindow) :
             self.horizontal = 1
         # 当前登录的用户
         self.user = self.object.yaml["user"]
-        # 界面锁
-        self.lock_sign = False
         # 翻译模式
         self.translate_mode = False
         # 自动翻译暂停标志
@@ -458,10 +456,6 @@ class Translation(QMainWindow) :
             self.statusbar.show()
         elif not self.object.config["showStatusbarUse"] :
             self.statusbar.hide()
-
-        if self.lock_sign == True :
-            return
-
         try:
             self._endPos = e.pos() - self._startPos
             self.move(self.pos() + self._endPos)
@@ -474,10 +468,6 @@ class Translation(QMainWindow) :
 
     # 鼠标按下事件
     def mousePressEvent(self, e: QMouseEvent) :
-
-        if self.lock_sign == True :
-            return
-
         try:
             if e.button() == Qt.LeftButton :
                 self._isTracking = True
@@ -488,10 +478,6 @@ class Translation(QMainWindow) :
 
     # 鼠标松开事件
     def mouseReleaseEvent(self, e: QMouseEvent) :
-
-        if self.lock_sign == True :
-            return
-
         try:
             if e.button() == Qt.LeftButton :
                 self._isTracking = False
@@ -504,11 +490,6 @@ class Translation(QMainWindow) :
     # 鼠标进入控件事件
     def enterEvent(self, QEvent) :
 
-        if self.lock_sign == True :
-            self.lock_button.show()
-            self.lock_button.setStyleSheet("background-color:rgba(62, 62, 62, 0.1);")
-            return
-
         # 显示所有顶部工具栏控件
         self.switch_button.show()
         self.start_button.show()
@@ -519,7 +500,7 @@ class Translation(QMainWindow) :
         self.minimize_button.show()
         self.battery_button.show()
         self.play_voice_button.show()
-        self.lock_button.show()
+        self.trans_history_button.show()
         self.filter_word_button.show()
         self.setStyleSheet("QLabel#drag_label {background-color:rgba(62, 62, 62, 0.1)}")
         if self.statusbar_sign :
@@ -529,7 +510,7 @@ class Translation(QMainWindow) :
     # 鼠标离开控件事件
     def leaveEvent(self, QEvent) :
 
-        if self.lock_sign == False and self.statusbar_sign :
+        if self.statusbar_sign :
             self.statusbar.show()
 
         width = round((self.width() - 454*self.rate) / 2)
@@ -544,7 +525,7 @@ class Translation(QMainWindow) :
         self.switch_button.setGeometry(QRect(width + 200 * self.rate, 5 * self.rate, 50 * self.rate, 20 * self.rate))
         self.play_voice_button.setGeometry(QRect(width + 270 * self.rate, 5 * self.rate, 20 * self.rate, 20 * self.rate))
         self.battery_button.setGeometry(QRect(width + 314 * self.rate, 5 * self.rate, 24 * self.rate, 20 * self.rate))
-        self.lock_button.setGeometry(QRect(width + 358 * self.rate, 5 * self.rate, 24 * self.rate, 20 * self.rate))
+        self.trans_history_button.setGeometry(QRect(width + 358 * self.rate, 5 * self.rate, 24 * self.rate, 20 * self.rate))
         self.minimize_button.setGeometry(QRect(width + 398 * self.rate, 5 * self.rate, 20 * self.rate, 20 * self.rate))
         self.quit_button.setGeometry(QRect(width + 438 * self.rate, 5 * self.rate, 20 * self.rate, 20 * self.rate))
         self.translate_text.setGeometry(0, 30 * self.rate, self.width(), height * self.rate)
@@ -559,7 +540,7 @@ class Translation(QMainWindow) :
         self.minimize_button.hide()
         self.battery_button.hide()
         self.play_voice_button.hide()
-        self.lock_button.hide()
+        self.trans_history_button.hide()
         self.filter_word_button.hide()
 
         self.setStyleSheet("QLabel#drag_label {background-color:none}")
@@ -593,44 +574,6 @@ class Translation(QMainWindow) :
             self.checkOverlap()
         except Exception :
             pass
-
-
-    # 锁定界面
-    def lock(self) :
-
-        # 上锁
-        if not self.lock_sign :
-            self.lock_button.setIcon(qtawesome.icon("fa.unlock", color=self.icon_color))
-            self.drag_label.hide()
-            self.lock_sign = True
-
-            if self.horizontal == 1 :
-                self.horizontal = 0
-        # 解锁
-        else:
-            self.lock_button.setIcon(qtawesome.icon("fa.lock", color=self.icon_color))
-            self.lock_button.setStyleSheet("background: transparent;")
-            self.drag_label.show()
-            self.lock_sign = False
-
-            if self.horizontal == 0 :
-                self.horizontal = 1
-
-        self.translate_text.setStyleSheet("border-width:0;\
-                                          border-style:outset;\
-                                          border-top:0px solid #e8f3f9;\
-                                          color:white;\
-                                          font-weight: bold;\
-                                          background-color:rgba(62, 62, 62, %s)"
-                                          %(self.horizontal/100))
-
-        self.temp_text.setStyleSheet("border-width:0;\
-                                      border-style:outset;\
-                                      border-top:0px solid #e8f3f9;\
-                                      color:white;\
-                                      font-weight: bold;\
-                                      background-color:rgba(62, 62, 62, %s)"
-                                      %(self.horizontal/100))
 
 
     # 改变翻译模式
