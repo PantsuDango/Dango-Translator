@@ -229,9 +229,9 @@ class OfflineSwitch(QWidget):
         # 通过检查端口占用校验本地OCR是否运行成功
         sign = detectPort(self.object.yaml["port"])
         if not self.checked and not sign :
-            MessageBox("本地OCR使用失败", "请先点击 运行 按钮, 并保证其运行正常, 再打开此开关      \n"
-                                         "若启动时间较长或运行失败, 可通过交流群联系客服\n"
-                                         "使用期间可以缩小黑窗, 但不可以关闭它")
+            MessageBox("本地OCR使用失败", "请先运行本地OCR, 待运行成功后再打开此开关\n"
+                                          "若运行时间较长或者运行失败, 可通过交流群联系客服协助      \n"
+                                          "使用前期间不可以关闭此运行黑窗")
             return
 
         if not self.checked and self.object.settin_ui.text_direction_use :
