@@ -1,7 +1,8 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-from system_hotkey import SystemHotkey
+import system_hotkey
+from traceback import format_exc
 
 import re
 import utils.thread
@@ -373,10 +374,10 @@ class MultiRange(QWidget):
             "win": "super"
         }
         # 范围快捷键
-        self.choice_range_hotkey_1 = SystemHotkey()
-        self.choice_range_hotkey_2 = SystemHotkey()
-        self.choice_range_hotkey_3 = SystemHotkey()
-        self.choice_range_hotkey_4 = SystemHotkey()
+        self.choice_range_hotkey_1 = system_hotkey.SystemHotkey()
+        self.choice_range_hotkey_2 = system_hotkey.SystemHotkey()
+        self.choice_range_hotkey_3 = system_hotkey.SystemHotkey()
+        self.choice_range_hotkey_4 = system_hotkey.SystemHotkey()
 
         self.ui()
 
@@ -487,7 +488,7 @@ class MultiRange(QWidget):
 
         # 注册切换范围快捷键
         if self.choice_range_hotkey_use:
-            self.choiceRangeHotkeyRegister()
+            self.RegisterChoiceRangeHotkey()
         self.choice_range_hotkey_sign_1.connect(self.choiceRangeHotkeyFunc)
         self.choice_range_hotkey_sign_2.connect(self.choiceRangeHotkeyFunc)
         self.choice_range_hotkey_sign_3.connect(self.choiceRangeHotkeyFunc)
@@ -545,24 +546,40 @@ class MultiRange(QWidget):
 
 
     # 注册切换范围快捷键
-    def choiceRangeHotkeyRegister(self):
+    def RegisterChoiceRangeHotkey(self):
 
         hotkey = self.object.config["choiceRangeHotkeyValue"]
         if hotkey in self.hotkey_map:
             hotkey = self.hotkey_map[hotkey]
 
-        self.choice_range_hotkey_1.register((hotkey, "f1"),
-                                            callback=lambda x: self.choice_range_hotkey_sign_1.emit(1))
-        self.choice_range_hotkey_2.register((hotkey, "f2"),
-                                            callback=lambda x: self.choice_range_hotkey_sign_2.emit(2))
-        self.choice_range_hotkey_3.register((hotkey, "f3"),
-                                            callback=lambda x: self.choice_range_hotkey_sign_3.emit(3))
-        self.choice_range_hotkey_4.register((hotkey, "f4"),
-                                            callback=lambda x: self.choice_range_hotkey_sign_4.emit(4))
+        try :
+            self.choice_range_hotkey_1.register((hotkey, "f1"), overwrite=True,
+                                                callback=lambda x: self.choice_range_hotkey_sign_1.emit(1))
+            self.choice_range_hotkey_2.register((hotkey, "f2"), overwrite=True,
+                                                callback=lambda x: self.choice_range_hotkey_sign_2.emit(2))
+            self.choice_range_hotkey_3.register((hotkey, "f3"), overwrite=True,
+                                                callback=lambda x: self.choice_range_hotkey_sign_3.emit(3))
+            self.choice_range_hotkey_4.register((hotkey, "f4"), overwrite=True,
+                                                callback=lambda x: self.choice_range_hotkey_sign_4.emit(4))
+        except Exception :
+            self.object.logger.error(format_exc())
+
+
+    # 修改切换范围快捷键
+    def modifyChoiceRangeHotkey(self):
+
+        hotkey = self.object.config["choiceRangeHotkeyValue"]
+        if hotkey in self.hotkey_map:
+            hotkey = self.hotkey_map[hotkey]
+
+        self.choice_range_hotkey_1.order_hotkey((hotkey, "f1"))
+        self.choice_range_hotkey_2.order_hotkey((hotkey, "f2"))
+        self.choice_range_hotkey_3.order_hotkey((hotkey, "f3"))
+        self.choice_range_hotkey_4.order_hotkey((hotkey, "f4"))
 
 
     # 注销切换范围快捷键
-    def choiceRangeHotkeyUnRegister(self):
+    def UnRegisterChoiceRangeHotkey(self):
 
         hotkey = self.object.config["choiceRangeHotkeyValue"]
         if hotkey in self.hotkey_map:
@@ -685,11 +702,11 @@ class MultiRange(QWidget):
         if checked:
             self.choice_range_hotkey_use = True
             self.object.config["choiceRangeHotKeyUse"] = True
-            self.choiceRangeHotkeyRegister()
+            self.RegisterChoiceRangeHotkey()
         else:
             self.choice_range_hotkey_use = False
             self.object.config["choiceRangeHotKeyUse"] = False
-            self.choiceRangeHotkeyUnRegister()
+            self.UnRegisterChoiceRangeHotkey()
 
 
     # 更新显示的坐标文本

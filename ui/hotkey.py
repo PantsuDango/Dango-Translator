@@ -106,6 +106,11 @@ class HotKey(QWidget):
         # 所使用的颜色
         self.color_1 = "#595959"  # 灰色
         self.color_2 = "#5B8FF9"  # 蓝色
+        # 快捷键映射关系
+        self.hotkey_map = {
+            "ctrl": "control",
+            "win": "super"
+        }
 
 
     # 根据分辨率定义控件位置尺寸
@@ -168,10 +173,10 @@ class HotKey(QWidget):
         elif key_type == "choiceRange" :
             # 注销旧快捷键
             if self.object.config["choiceRangeHotKeyUse"] == True:
-                self.object.multi_range_ui.choiceRangeHotkeyUnRegister()
+                self.object.multi_range_ui.UnRegisterChoiceRangeHotkey()
             self.object.multi_range_ui.choice_range_hotkey_button.setText(self.comboBox_1.currentText() + " + " + "F1-F4")
             self.object.config["choiceRangeHotkeyValue"] = self.comboBox_1.currentText()
             if self.object.config["choiceRangeHotKeyUse"] == True :
-                self.object.multi_range_ui.choiceRangeHotkeyRegister()
+                self.object.multi_range_ui.RegisterChoiceRangeHotkey()
 
         self.close()

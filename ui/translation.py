@@ -890,6 +890,11 @@ class Translation(QMainWindow) :
         # 界面关闭
         self.hide()
         self.object.range_ui.close()
+        # 注销快捷键
+        self.object.multi_range_ui.UnRegisterChoiceRangeHotkey()
+        self.unRegisterTranslateHotkey()
+        self.unRegisterRangeHotkey()
+        self.unRegisterHideRangeHotkey()
         # 关闭引擎模块
         utils.thread.createThreadDaemonFalse(self.sound.close)
         utils.thread.createThreadDaemonFalse(self.webdriver1.close)
