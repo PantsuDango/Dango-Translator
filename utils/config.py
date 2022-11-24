@@ -237,7 +237,7 @@ def configConvert(object) :
     object.config["drawImageUse"] = object.config.get("drawImageUse", False)
     # 隐藏范围快捷键
     object.config["hideRangeHotkeyValue1"] = object.config.get("hideRangeHotkeyValue1", "ctrl")
-    object.config["hideRangeHotkeyValue2"] = object.config.get("hideRangeHotkeyValue2", "x")
+    object.config["hideRangeHotkeyValue2"] = object.config.get("hideRangeHotkeyValue2", "e")
 
     # 隐藏范围快捷键开关
     object.config["showHotKey3"] = object.config.get("showHotKey3", False)
