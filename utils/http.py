@@ -20,6 +20,7 @@ def post(url, body, logger, headers=None, timeout=5) :
     except Exception :
         pass
 
+    response = None
     try :
         if headers :
             response = requests.post(url, headers=headers, data=json.dumps(body), proxies=proxies, verify=False, timeout=timeout)
@@ -32,6 +33,11 @@ def post(url, body, logger, headers=None, timeout=5) :
         except Exception :
             response.encoding = "gb18030"
             result = json.loads(response.text)
+    except json.decoder.JSONDecodeError :
+        try :
+            logger.error("post %s error, httpcode is %s, response is %s"%(url, response.status_code, response.text))
+        except Exception :
+            pass
     except Exception :
         logger.error(format_exc())
 
