@@ -3,10 +3,9 @@ from PyQt5.QtWidgets import QApplication
 from skimage.metrics import structural_similarity
 from cv2 import imread, cvtColor, COLOR_BGR2GRAY
 from difflib import SequenceMatcher
-from traceback import format_exc, print_exc
+from traceback import format_exc
 import time
 import pyperclip
-import win32gui
 from PIL import Image, ImageDraw, ImageFont, ImageGrab
 
 import utils.thread
