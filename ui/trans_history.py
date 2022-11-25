@@ -3,10 +3,14 @@
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+import fileinput
+import collections
 import re
 
 import ui.static.icon
 import translator.upload_trans_file
+import utils.message
+
 
 TRANS_FILE = "../翻译历史.txt"
 
@@ -33,8 +37,10 @@ class TransHistory(QWidget) :
         # 界面尺寸
         self.window_width = int(800 * self.rate)
         self.window_height = int(500 * self.rate)
-        # 最大行数
-        self.max_line = 500
+        # 存500条翻译历史
+        self.data = collections.deque(maxlen=1000)
+        # 是否读取翻译历史完毕
+        self.read_file_finish = False
 
 
     def ui(self) :
@@ -75,20 +81,20 @@ class TransHistory(QWidget) :
                                  int(h * self.rate)))
 
 
+    # 读取翻译历史
+    def readTransHistory(self) :
+
+        with open(TRANS_FILE, "r", encoding="utf-8") as file:
+            for line in file:
+                self.data.append(line)
+        self.read_file_finish = True
+
+
     # 窗口显示信号
     def showEvent(self, e) :
 
-        # 打开翻译历史
-        with open(TRANS_FILE, mode="r", encoding="utf-8") as file:
-            data = file.readlines()
-        if not data :
-            return
-        data = data[:self.max_line:-1][::-1]
-        # 清屏
         self.text.clear()
-        # 显示
-        for val in data:
-            val = val.replace("\n", "")
+        for val in self.data :
             self.text.append(val)
 
 

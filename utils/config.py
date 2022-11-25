@@ -281,7 +281,9 @@ def saveOriginalHisTory(original) :
 
     date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
     with open(HISTORY_FILE_PATH, "a+", encoding="utf-8") as file :
-        file.write("\n\n[原文][%s]\n%s\n"%(date, original))
+        content = "\n\n[原文][%s]\n%s\n"%(date, original)
+        file.write(content)
+    return content
 
 
 # 保存翻译历史
@@ -310,6 +312,7 @@ def saveTransHisTory(text, translate_type) :
 
     with open(HISTORY_FILE_PATH, "a+", encoding="utf-8") as file :
         file.write(content)
+    return content
 
 
 # 获取版本广播信息

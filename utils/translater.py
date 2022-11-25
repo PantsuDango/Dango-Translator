@@ -405,7 +405,9 @@ class Translater(QThread) :
         if self.object.config["showClipboard"] == "True":
             pyperclip.copy(original)
         # 保存原文
-        utils.config.saveOriginalHisTory(original)
+        content = utils.config.saveOriginalHisTory(original)
+        if self.object.trans_history_ui.read_file_finish :
+            self.object.trans_history_ui.data.append(content)
         # 判断是否未开任何翻译源
         nothing_sign = False
 

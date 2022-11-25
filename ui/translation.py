@@ -661,7 +661,9 @@ class Translation(QMainWindow) :
         QApplication.processEvents()
 
         # 保存译文
-        utils.config.saveTransHisTory(result, trans_type)
+        content = utils.config.saveTransHisTory(result, trans_type)
+        if self.object.trans_history_ui.read_file_finish :
+            self.object.trans_history_ui.data.append(content)
 
         # 线程结束，减少线程数
         self.thread_state -= 1

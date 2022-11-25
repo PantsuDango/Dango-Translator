@@ -103,8 +103,8 @@ class DangoTranslator :
 
         # 翻译历史页面
         self.trans_history_ui = ui.trans_history.TransHistory(self)
-        self.translation_ui.trans_history_button.clicked.connect(self.trans_history_ui.show)
-        self.translation_ui.trans_history_button.clicked.connect(self.translation_ui.hide)
+        utils.thread.createThread(self.trans_history_ui.readTransHistory)
+        self.translation_ui.trans_history_button.clicked.connect(self.clickTransHistory)
 
         # 检查邮箱
         thread = utils.thread.createCheckBindEmailQThread(self)
@@ -121,6 +121,16 @@ class DangoTranslator :
         # 同步翻译历史
         if self.config["agreeCollectUse"]:
             utils.thread.createThread(translator.upload_trans_file.proccess(self))
+
+
+    # 点击翻译历史键
+    def clickTransHistory(self) :
+
+        if not self.trans_history_ui.read_file_finish :
+            utils.message.MessageBox("读取翻译历史文件中", "翻译历史文件过大, 读取仍在进行中, 请稍后再试       ")
+            return
+        self.trans_history_ui.show()
+        self.translation_ui.hide()
 
 
     # 自动登录后检查
