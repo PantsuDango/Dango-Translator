@@ -596,7 +596,7 @@ class Translation(QMainWindow) :
         if hotkey_sign :
             if not self.isActiveWindow() :
                 return
-            translator.sound.playButtonSound()
+            #translator.sound.playButtonSound()
 
         thread = utils.translater.Translater(self.object)
         thread.clear_text_sign.connect(self.clearText)
@@ -804,7 +804,7 @@ class Translation(QMainWindow) :
         if hotkey_sign :
             if not self.isActiveWindow() :
                 return
-            translator.sound.playButtonSound()
+            #translator.sound.playButtonSound()
 
         # 如果处于自动模式下则暂停
         if self.translate_mode :

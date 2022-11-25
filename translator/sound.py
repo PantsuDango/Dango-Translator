@@ -1,18 +1,18 @@
 from selenium import webdriver
 from traceback import format_exc
 import utils.thread
-import winsound
+# import winsound
 import time
 
 
 # 快捷键按键音
-def playButtonSound() :
-    def func() :
-        try :
-            winsound.Beep(440, 500)
-        except Exception :
-            pass
-    utils.thread.createThread(func)
+# def playButtonSound() :
+#     def func() :
+#         try :
+#             winsound.Beep(440, 500)
+#         except Exception :
+#             pass
+#     utils.thread.createThread(func)
 
 
 # 音乐朗读模块
