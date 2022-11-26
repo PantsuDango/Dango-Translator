@@ -222,7 +222,6 @@ class Translation(QMainWindow) :
         self.trans_history_button.setToolTip("<b>查看翻译历史 TransHistory</b>")
         self.trans_history_button.setStyleSheet("background: transparent;")
         self.trans_history_button.setCursor(ui.static.icon.SELECT_CURSOR)
-        #self.trans_history_button.clicked.connect(self.lock)
         self.trans_history_button.hide()
 
         # 最小化按钮
@@ -752,14 +751,14 @@ class Translation(QMainWindow) :
     def createWebdriverThread(self) :
 
         self.statusbar.showMessage("翻译模块启动中, 请等待完成后再操作...")
-        while True :
-            time.sleep(0.1)
-            # 有任何一个引擎驱动加载成功
-            if self.object.chrome_driver_finish == 1 or self.object.firefox_driver_finish == 1 or self.object.edge_driver_finish == 1 :
-                break
-            # 所有引擎驱动都加载失败了
-            if self.object.chrome_driver_finish == 2 and self.object.firefox_driver_finish == 2 and self.object.edge_driver_finish == 2 :
-                break
+        # while True :
+        #     time.sleep(0.1)
+        #     # 有任何一个引擎驱动加载成功
+        #     if self.object.chrome_driver_finish == 1 or self.object.firefox_driver_finish == 1 or self.object.edge_driver_finish == 1 :
+        #         break
+        #     # 所有引擎驱动都加载失败了
+        #     if self.object.chrome_driver_finish == 2 and self.object.firefox_driver_finish == 2 and self.object.edge_driver_finish == 2 :
+        #         break
 
         # 开启朗读模块
         self.sound = translator.sound.Sound(self.object)

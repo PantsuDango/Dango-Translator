@@ -149,42 +149,50 @@ class Webdriver(QObject) :
 
         try:
             # 使用谷歌浏览器
-            if self.object.chrome_driver_finish == 1:
-                option = webdriver.ChromeOptions()
-                if not self.object.yaml["selenium_debug"]:
-                    option.add_argument("--headless")
-                self.browser = webdriver.Chrome(executable_path="./config/tools/chromedriver.exe",
-                                                service_log_path="nul",
-                                                options=option)
-            # 使用火狐浏览器
-            elif self.object.firefox_driver_finish == 1:
+            option = webdriver.ChromeOptions()
+            if not self.object.yaml["selenium_debug"]:
+                option.add_argument("--headless")
+            self.browser = webdriver.Chrome(executable_path="./config/tools/chromedriver.exe",
+                                            service_log_path="nul",
+                                            options=option)
+        except Exception :
+            self.logger.error(format_exc())
+            try :
+                # 使用火狐浏览器
                 option = webdriver.FirefoxOptions()
                 if not self.object.yaml["selenium_debug"]:
                     option.add_argument("--headless")
                 self.browser = webdriver.Firefox(executable_path="./config/tools/geckodriver.exe",
                                                  service_log_path="nul",
                                                  options=option)
-            # 使用Edge浏览器
-            elif self.object.edge_driver_finish == 1:
-                EDGE = {
-                    "browserName": "MicrosoftEdge",
-                    "platform": "WINDOWS",
-                    "ms:edgeOptions": {
-                        'extensions': []
+            except Exception:
+                self.logger.error(format_exc())
+                try :
+                    # 使用Edge浏览器
+                    EDGE = {
+                        "browserName": "MicrosoftEdge",
+                        "platform": "WINDOWS",
+                        "ms:edgeOptions": {
+                            'extensions': []
+                        }
                     }
-                }
-                if not self.object.yaml["selenium_debug"]:
-                    EDGE["ms:edgeOptions"]["args"] = ['--headless']
-                self.browser = webdriver.Edge(executable_path="./config/tools/msedgedriver.exe",
-                                              service_log_path="nul",
-                                              capabilities=EDGE)
-        except Exception :
-            self.browser_sign = 2
-            self.logger.error(format_exc())
-            self.close()
-            self.message_sign.emit("公共翻译启动失败, 若需使用公共翻译请下载安装谷歌浏览器后重启翻译器, 若使用私人翻译请忽视此提示")
-            return
+                    if not self.object.yaml["selenium_debug"]:
+                        EDGE["ms:edgeOptions"]["args"] = ['--headless']
+                    self.browser = webdriver.Edge(executable_path="./config/tools/msedgedriver.exe",
+                                                  service_log_path="nul",
+                                                  capabilities=EDGE)
+                except Exception:
+                    self.logger.error(format_exc())
 
+                    # 公共翻译启动失败
+                    self.browser_sign = 2
+                    self.logger.error(format_exc())
+                    self.close()
+                    self.message_sign.emit(
+                        "公共翻译启动失败, 若需使用公共翻译请下载安装谷歌浏览器后重启翻译器, 若使用私人翻译请忽视此提示")
+                    return
+
+        # 公共翻译启动成功
         self.browser_sign = 1
         if self.object.translation_ui.webdriver1.browser_sign == 1 \
                 and self.object.translation_ui.webdriver2.browser_sign == 1 \
