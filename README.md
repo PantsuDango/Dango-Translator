@@ -87,28 +87,28 @@
 ## 软件预览
 
 #### 使用效果
-![](https://dango-1252620843.cos.ap-chengdu.myqcloud.com/images/github%E5%9B%BE%E5%BA%93/%E4%BD%BF%E7%94%A8%E6%95%88%E6%9E%9C.png)
+![](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.3.6/%E4%BD%BF%E7%94%A8%E6%95%88%E6%9E%9C.png)
 
 #### 登录界面
-<img src="https://dango-1252620843.cos.ap-chengdu.myqcloud.com/images/github%E5%9B%BE%E5%BA%93/%E7%99%BB%E5%BD%95.png" width="50%" height="50%">
+<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.3.6/%E7%99%BB%E5%BD%95.png" width="50%" height="50%">
 
 #### 注册界面
-<img src="https://dango-1252620843.cos.ap-chengdu.myqcloud.com/images/github%E5%9B%BE%E5%BA%93/%E6%B3%A8%E5%86%8C.png" width="50%" height="50%">
+<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.3.6/%E6%B3%A8%E5%86%8C.png" width="50%" height="50%">
 
 #### 主界面
-![](https://dango-1252620843.cos.ap-chengdu.myqcloud.com/images/github%E5%9B%BE%E5%BA%93/%E7%BF%BB%E8%AF%91%E7%95%8C%E9%9D%A2.png)
+![](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.3.6/%E7%BF%BB%E8%AF%91%E7%95%8C%E9%9D%A2.png)
 
 #### 设置界面
-<img src="https://dango-1252620843.cos.ap-chengdu.myqcloud.com/images/github%E5%9B%BE%E5%BA%93/%E8%AE%BE%E7%BD%AE-%E8%AF%86%E5%88%AB%E8%AE%BE%E5%AE%9A.png" width="100%" height="100%">
-<img src="https://dango-1252620843.cos.ap-chengdu.myqcloud.com/images/github%E5%9B%BE%E5%BA%93/%E8%AE%BE%E7%BD%AE-%E7%BF%BB%E8%AF%91%E8%AE%BE%E5%AE%9A.png" width="100%" height="100%">
-<img src="https://dango-1252620843.cos.ap-chengdu.myqcloud.com/images/github%E5%9B%BE%E5%BA%93/%E8%AE%BE%E7%BD%AE-%E6%98%BE%E7%A4%BA%E8%AE%BE%E5%AE%9A.png" width="100%" height="100%">
-<img src="https://dango-1252620843.cos.ap-chengdu.myqcloud.com/images/github%E5%9B%BE%E5%BA%93/%E8%AE%BE%E7%BD%AE-%E5%8A%9F%E8%83%BD%E8%AE%BE%E5%AE%9A.png" width="100%" height="100%">
-<img src="https://dango-1252620843.cos.ap-chengdu.myqcloud.com/images/github%E5%9B%BE%E5%BA%93/%E8%AE%BE%E7%BD%AE-%E5%85%B3%E4%BA%8E.png" width="100%" height="100%">
-<img src="https://dango-1252620843.cos.ap-chengdu.myqcloud.com/images/github%E5%9B%BE%E5%BA%93/%E5%A4%9A%E8%8C%83%E5%9B%B4%E5%88%87%E6%8D%A2.png" width="50%" height="50%">
-<img src="https://dango-1252620843.cos.ap-chengdu.myqcloud.com/images/github%E5%9B%BE%E5%BA%93/%E5%B1%8F%E8%94%BD%E8%AF%8D.png" width="50%" height="50%">
+<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.3.6/%E8%AE%BE%E7%BD%AE-%E8%AF%86%E5%88%AB%E8%AE%BE%E5%AE%9A.png" width="100%" height="100%">
+<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.3.6/%E8%AE%BE%E7%BD%AE-%E7%BF%BB%E8%AF%91%E8%AE%BE%E5%AE%9A.png" width="100%" height="100%">
+<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.3.6/%E8%AE%BE%E7%BD%AE-%E6%98%BE%E7%A4%BA%E8%AE%BE%E5%AE%9A.png" width="100%" height="100%">
+<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.3.6/%E8%AE%BE%E7%BD%AE-%E5%8A%9F%E8%83%BD%E8%AE%BE%E5%AE%9A.png" width="100%" height="100%">
+<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.3.6/%E8%AE%BE%E7%BD%AE-%E5%85%B3%E4%BA%8E.png" width="100%" height="100%">
+<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.3.6/%E5%A4%9A%E8%8C%83%E5%9B%B4%E5%88%87%E6%8D%A2.png" width="50%" height="50%">
+<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.3.6/%E5%B1%8F%E8%94%BD%E8%AF%8D.png" width="50%" height="50%">
 
 #### 支持作者
-<img src="https://dango-1252620843.cos.ap-chengdu.myqcloud.com/images/github%E5%9B%BE%E5%BA%93/%E8%AE%BE%E7%BD%AE-%E6%94%AF%E6%8C%81%E4%BD%9C%E8%80%85.png" width="100%" height="100%">
+<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.3.6/%E8%AE%BE%E7%BD%AE-%E6%94%AF%E6%8C%81%E4%BD%9C%E8%80%85.png" width="100%" height="100%">
 
 
 ## 开源协议
