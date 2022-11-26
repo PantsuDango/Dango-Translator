@@ -309,7 +309,7 @@ class Range(QMainWindow) :
         if hotkey_sign :
             if self.object.translation_ui.isHidden() and self.object.multi_range_ui.isHidden() :
                 return
-            self.object.translation_ui.sound.playButtonSound()
+            #self.object.translation_ui.sound.playButtonSound()
 
         if self.isHidden() :
             self.show()
@@ -517,19 +517,19 @@ class MultiRange(QWidget):
             return
 
         if sign == 1 and not self.switch_1_use:
-            self.object.translation_ui.sound.playButtonSound()
+            #self.object.translation_ui.sound.playButtonSound()
             self.switch_1.mousePressEvent(1)
             self.switch_1.updateValue()
         if sign == 2 and not self.switch_2_use:
-            self.object.translation_ui.sound.playButtonSound()
+            #self.object.translation_ui.sound.playButtonSound()
             self.switch_2.mousePressEvent(1)
             self.switch_2.updateValue()
         if sign == 3 and not self.switch_3_use:
-            self.object.translation_ui.sound.playButtonSound()
+            #self.object.translation_ui.sound.playButtonSound()
             self.switch_3.mousePressEvent(1)
             self.switch_3.updateValue()
         if sign == 4 and not self.switch_4_use:
-            self.object.translation_ui.sound.playButtonSound()
+            #self.object.translation_ui.sound.playButtonSound()
             self.switch_4.mousePressEvent(1)
             self.switch_4.updateValue()
 

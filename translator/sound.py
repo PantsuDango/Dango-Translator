@@ -1,7 +1,7 @@
 from selenium import webdriver
 from traceback import format_exc
-from PyQt5 import QtMultimedia
-from PyQt5.QtCore import QUrl
+# from PyQt5 import QtMultimedia
+# from PyQt5.QtCore import QUrl
 import utils.thread
 import ui.static.button_audio
 import time
@@ -9,7 +9,7 @@ import base64
 import os
 
 
-BUTTON_AUDIO_PATH = "./config/other/button.wav"
+#BUTTON_AUDIO_PATH = "./config/other/button.wav"
 
 
 # 音乐朗读模块
@@ -21,19 +21,19 @@ class Sound() :
         self.logger = object.logger
         self.content = ""
         self.url = "https://fanyi.qq.com/"
-        self.button_audio = QtMultimedia.QMediaPlayer()
-        self.createButtonSound()
+        #self.button_audio = QtMultimedia.QMediaPlayer()
+        #self.createButtonSound()
 
 
     # 创建按键音频文件
-    def createButtonSound(self) :
-
-        if not os.path.exists(BUTTON_AUDIO_PATH):
-            data = base64.b64decode(ui.static.button_audio.BUTTON_AUDIO_BASE64)
-            with open(BUTTON_AUDIO_PATH, "wb") as file:
-                file.write(data)
-        audio = QUrl.fromLocalFile(BUTTON_AUDIO_PATH)
-        self.button_audio.setMedia(QtMultimedia.QMediaContent(audio))
+    # def createButtonSound(self) :
+    #
+    #     if not os.path.exists(BUTTON_AUDIO_PATH):
+    #         data = base64.b64decode(ui.static.button_audio.BUTTON_AUDIO_BASE64)
+    #         with open(BUTTON_AUDIO_PATH, "wb") as file:
+    #             file.write(data)
+    #     audio = QUrl.fromLocalFile(BUTTON_AUDIO_PATH)
+    #     self.button_audio.setMedia(QtMultimedia.QMediaContent(audio))
 
 
     # 快捷键按键音
