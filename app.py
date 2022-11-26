@@ -119,8 +119,8 @@ class DangoTranslator :
             self.hwndObj.run()
 
         # 同步翻译历史
-        if self.config["agreeCollectUse"]:
-            utils.thread.createThread(translator.upload_trans_file.proccess(self))
+        # if self.config["agreeCollectUse"]:
+        #     utils.thread.createThread(translator.upload_trans_file.proccess(self))
 
 
     # 点击翻译历史键
