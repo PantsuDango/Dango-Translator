@@ -156,7 +156,6 @@ class Range(QMainWindow) :
         self.color = "#1E90FF"
         self.font_size = 12
         self.show_sign = False
-        self.object.show_range_ui_sign = False
         self.ui()
 
 
@@ -298,9 +297,9 @@ class Range(QMainWindow) :
     # 接收隐藏窗体信号
     def hideUI(self, sign) :
 
-        if sign :
+        if self.isHidden():
             self.show()
-        else :
+        else:
             self.hide()
 
 
@@ -308,24 +307,14 @@ class Range(QMainWindow) :
     def hideRangeUI(self, hotkey_sign=False) :
 
         if hotkey_sign :
+            if self.object.translation_ui.isHidden() and self.object.multi_range_ui.isHidden() :
+                return
             self.object.translation_ui.sound.playButtonSound()
 
-        if self.object.show_range_ui_sign :
-            self.hide()
-        else :
+        if self.isHidden() :
             self.show()
-
-
-    # 窗口隐藏信号
-    def hideEvent(self, e):
-
-        self.object.show_range_ui_sign = False
-
-
-    # 窗口显示信号
-    def showEvent(self, e):
-
-        self.object.show_range_ui_sign = True
+        else :
+            self.hide()
 
 
     # 退出信号
@@ -524,7 +513,7 @@ class MultiRange(QWidget):
     def choiceRangeHotkeyFunc(self, sign):
 
         # 快捷键只允许在多范围界面或翻译界面活动的情况下使用
-        if not self.isActiveWindow() and not self.object.translation_ui.isActiveWindow() :
+        if self.isHidden() and self.object.translation_ui.isHidden() :
             return
 
         if sign == 1 and not self.switch_1_use:

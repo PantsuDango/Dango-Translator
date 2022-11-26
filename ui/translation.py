@@ -593,7 +593,7 @@ class Translation(QMainWindow) :
             return
         # 如果是快捷键触发的
         if hotkey_sign :
-            if not self.isActiveWindow() :
+            if self.isHidden() :
                 return
             self.object.translation_ui.sound.playButtonSound()
 
@@ -801,7 +801,7 @@ class Translation(QMainWindow) :
 
         # 如果是快捷键触发的
         if hotkey_sign :
-            if not self.isActiveWindow() :
+            if self.isHidden() :
                 return
             self.object.translation_ui.sound.playButtonSound()
 

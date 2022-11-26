@@ -166,7 +166,7 @@ class HotKey(QWidget):
             self.object.config["hideRangeHotkeyValue1"] = self.comboBox_1.currentText()
             self.object.config["hideRangeHotkeyValue2"] = self.comboBox_2.currentText()
             # 注册新快捷键
-            if self.object.config["showHotKey3"] == "True":
+            if self.object.config["showHotKey3"] == "True" or self.object.config["showHotKey3"] == True :
                 self.object.translation_ui.registerHideRangeHotkey()
 
         # 切换范围快捷键改变键位

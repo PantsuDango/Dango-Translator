@@ -256,7 +256,7 @@ class Translater(QThread) :
             self.hide_range_ui_sign.emit(False)
             # 确保已经隐藏了范围框才截图
             while True :
-                if not self.object.show_range_ui_sign :
+                if self.object.range_ui.isHidden() :
                     break
 
         screen = QApplication.primaryScreen()
