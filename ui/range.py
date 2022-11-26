@@ -653,6 +653,7 @@ class MultiRange(QWidget):
 
     # 改变范围四开关状态
     def changeRangeSwitch4(self, checked):
+
         if checked:
             if self.switch_1_use:
                 self.switch_1.mousePressEvent(1)
@@ -673,15 +674,15 @@ class MultiRange(QWidget):
 
 
     # 改变范围框的坐标
-    def updateRangeUIRect(self, index):
-        self.object.range_ui.setGeometry(self.object.yaml["range{}".format(index)]["x"],
-                                         self.object.yaml["range{}".format(index)]["y"],
-                                         self.object.yaml["range{}".format(index)]["w"],
-                                         self.object.yaml["range{}".format(index)]["h"])
-        self.object.range_ui.label.setGeometry(0,
-                                               0,
-                                               self.object.yaml["range{}".format(index)]["w"],
-                                               self.object.yaml["range{}".format(index)]["h"])
+    def updateRangeUIRect(self, index) :
+
+        x = self.object.yaml["range{}".format(index)]["x"]
+        y = self.object.yaml["range{}".format(index)]["y"]
+        w = self.object.yaml["range{}".format(index)]["w"]
+        h = self.object.yaml["range{}".format(index)]["h"]
+        if (x, y, w, h) != (0, 0, 0, 0) :
+            self.object.range_ui.setGeometry(x, y, w, h)
+        self.object.range_ui.label.setGeometry(0, 0, w, h)
         self.object.range_ui.show()
 
 

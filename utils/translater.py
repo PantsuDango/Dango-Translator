@@ -313,7 +313,7 @@ class Translater(QThread) :
     def translate(self) :
 
         # 如果还未选取范围就操作翻译
-        if self.object.range_ui.x() == 0 and self.object.range_ui.y() == 0:
+        if self.object.range == (0, 0, 0, 0):
             self.clear_text_sign.emit(True)
             self.object.translation_ui.original = "还未选取翻译范围, 请先使用范围键框选要翻译的屏幕区域"
             utils.thread.createThread(self.creatTranslaterThread, "original")
