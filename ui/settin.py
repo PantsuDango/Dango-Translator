@@ -2521,6 +2521,9 @@ class Settin(QMainWindow) :
             self.hotkey_ui.setWindowTitle("切换范围区域快捷键")
             self.hotkey_ui.comboBox_1.setCurrentText(self.object.config["choiceRangeHotkeyValue"])
             self.hotkey_ui.comboBox_2.hide()
+            self.hotkey_ui.default_label.setText("不支持单键\n"
+                                                 "仅支持 ctrl/shift/win/alt + f1-f4\n"
+                                                 "示例 ctrl+z / alt+f1")
             self.hotkey_ui.choice_range_label.show()
             self.hotkey_ui.sure_button.clicked.connect(lambda: self.hotkey_ui.sure(key_type))
 

@@ -43,12 +43,12 @@ class HotKey(QWidget):
                                                  "padding-top:3px; }"
                            % (self.color_2, 6.66*self.rate))
 
-        label = QLabel(self)
-        self.customSetGeometry(label, 30, 10, 300, 50)
-        label.setText("不支持单键\n"
-                      "仅支持 ctrl/shitf/win/alt + 任意键\n"
-                      "示例 ctrl+z / alt+f1")
-        label.setStyleSheet("font: 10pt '华康方圆体W7';")
+        self.default_label = QLabel(self)
+        self.customSetGeometry(self.default_label, 30, 10, 300, 50)
+        self.default_label.setText("不支持单键\n"
+                                   "仅支持 ctrl/shift/win/alt + 任意键\n"
+                                   "示例 ctrl+z / alt+f1")
+        self.default_label.setStyleSheet("font: 10pt '华康方圆体W7';")
 
         # 键位一
         comboBox_list_1 = ["ctrl", "win", "alt", "shift"]
@@ -66,7 +66,7 @@ class HotKey(QWidget):
 
         self.choice_range_label = QLabel(self)
         self.customSetGeometry(self.choice_range_label, 170, 80, 100, 20)
-        self.choice_range_label.setText("F1-F4")
+        self.choice_range_label.setText("f1-f4")
         self.choice_range_label.hide()
 
         # 键位二
@@ -174,7 +174,7 @@ class HotKey(QWidget):
             # 注销旧快捷键
             if self.object.config["choiceRangeHotKeyUse"] == True:
                 self.object.multi_range_ui.UnRegisterChoiceRangeHotkey()
-            self.object.multi_range_ui.choice_range_hotkey_button.setText(self.comboBox_1.currentText() + " + " + "F1-F4")
+            self.object.multi_range_ui.choice_range_hotkey_button.setText(self.comboBox_1.currentText() + " + " + "f1-f4")
             self.object.config["choiceRangeHotkeyValue"] = self.comboBox_1.currentText()
             if self.object.config["choiceRangeHotKeyUse"] == True :
                 self.object.multi_range_ui.RegisterChoiceRangeHotkey()

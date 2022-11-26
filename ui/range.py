@@ -471,7 +471,7 @@ class MultiRange(QWidget):
         self.choice_range_hotkey_button = QPushButton(self)
         self.customSetGeometry(self.choice_range_hotkey_button, 100, 275, 100, 20)
         self.choice_range_hotkey_button.setText(
-            self.object.config["choiceRangeHotkeyValue"] + " + " + "F1-F4")
+            self.object.config["choiceRangeHotkeyValue"] + " + " + "f1-f4")
         self.choice_range_hotkey_button.clicked.connect(lambda: self.object.settin_ui.setHotKey("choiceRange"))
         self.choice_range_hotkey_button.setCursor(ui.static.icon.SELECT_CURSOR)
 
