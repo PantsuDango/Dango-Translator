@@ -1,8 +1,8 @@
 # 团子翻译器 - 基于OCR的生肉翻译软件
 
 
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.3.5-ff69b4)](https://github.com/PantsuDango/Dango-Translator)
-[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2022--10--30-ff69b4)]()
+[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.3.6-ff69b4)](https://github.com/PantsuDango/Dango-Translator)
+[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2022--11--26-ff69b4)]()
 [![更新时间](https://img.shields.io/badge/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-win7--10-ff69b4)]()
 [![GitHubStars](https://img.shields.io/github/stars/PantsuDango/Dango-Translator)]()
 [![GitHubForks](https://img.shields.io/github/forks/PantsuDango/Dango-Translator)]()
@@ -38,27 +38,30 @@
 
 #### 翻译器相关 
 
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.3.5-ff69b4)]()
-[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2022--10--30-ff69b4)]()
+[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.3.6-ff69b4)]()
+[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2022--11--26-ff69b4)]()
 
-发现新版本，版本号：4.3.5
-2022/10/30  更新内容:
+新增:
++ 添加俄语识别和翻译;      
++ 新增多范围切换功能, 界面于翻译框工具栏处开启, 有四个范围栏位, 支持快捷键操作;      
++ 新增查看翻译历史功能, 界面于翻译框工具栏处开启;      
 
-+ 修复了公共翻译的各种问题, 优化其使用  
-+ 删除了公共goole翻译, 添加公共bing翻译  
-+ 截取范围功能现在支持多屏操作了  
-+ 新增了程序启动图标  
-+ 修复设置页面侧边栏高度不齐  
-+ 文字方向开关在所有ocr页签下都显示    
+优化:
++ 修复登录后卡崩溃问题, 提高软件启动速度;      
++ 修复快捷键会失效问题, 保证快捷键稳定性;      
++ 修改了一些提示消息的说明描述文本;      
+
+移除:
++ 翻译框工具栏移除了复制按钮;      
++ 翻译框工具栏移除了锁按钮;          
 + 更多更新日志：[查看](https://docs1.ayano.top/#/4.0/develop/changelog)  
 
 #### OCR相关
 
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver1.2-ff69b4)]()
-[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2021--08--19-ff69b4)]()
+[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.3.6-ff69b4)]()
+[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2022--11--26-ff69b4)]()
 
-+ 优化了识别速度和识别质量;
-+ 优化了对个别环境的适配问题
++ 添加俄语识别;
 
 + 更多更新日志：[查看](https://docs1.ayano.top/#/4.0/develop/changelog)  
 
@@ -68,66 +71,44 @@
 ![](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E6%B5%81%E7%A8%8B%E5%9B%BE.png)
 
 
-  
-## 更新计划
+## 特别鸣谢
 
-#### 新增项
+[PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)  在线&本地OCR均基于此框架搭建
 
-- [x] 升级Ver4.0，全新的界面设计，更舒服的交互
-- [x] 加入DeepL 翻译
-- [ ] 离线OCR加入GPU模式
-- [x] 加入云服务在线OCR（收费）
-- [ ] 加入自定义OCR API接口功能，可以自由添加想要的OCR API接口（需要略懂开发）
+[QPT打包工具](https://github.com/GT-ZhangAcer/QPT)  本地OCR基于此工具打包
 
-#### 优化项
+[GT-Zhang](https://github.com/GT-ZhangAcer) 在线&本地OCR开发过程给予了诸多帮助
 
-- [x] 优化公共翻译和网页翻译，提高翻译质量，降低抽风率
-- [ ] 离线OCR取消黑窗，加入简单的GUI界面，最小化从任务栏改为系统托盘
-- [x] 对屏幕缩放比例175%以上做适配
-- [x] 离线OCR加入竖排文本检测模式用于翻译生肉本
+[C4a15Wh](https://c4a15wh.cn) 在线OCR, 星河云架构开发
 
-#### 修复项
-
-- [x] 修复快捷键会失效的问题
-- [x] 修复手动模式下，程序概率卡死的问题
-- [x] 修复多屏模式下，副屏幕无法截图的问题
-
-  
- ## 特别鸣谢
-
-[PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)  离线OCR基于此框架搭建
-
-[QPT打包工具](https://github.com/GT-ZhangAcer/QPT)  离线OCR基于此工具打包
-
-[GT-Zhang](https://github.com/GT-ZhangAcer) 离线OCR开发过程给予了诸多帮助的大佬
-
-[C4a15Wh](https://c4a15wh.cn) 星团云在线OCR主力开发
-
-[Cypas_Nya](https://blog.ayano.top) 在线教程文档、团子云盘搭建者
+[Cypas_Nya](https://blog.ayano.top) 在线教程文档, 星河云开发
 
   
 ## 软件预览
 
 #### 使用效果
-
-![](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E4%BD%BF%E7%94%A8%E6%95%88%E6%9E%9C.png)
+![](https://dango-1252620843.cos.ap-chengdu.myqcloud.com/images/github%E5%9B%BE%E5%BA%93/%E4%BD%BF%E7%94%A8%E6%95%88%E6%9E%9C.png)
 
 #### 登录界面
-<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.0/%E7%99%BB%E5%BD%95.png" width="50%" height="50%">
+<img src="https://dango-1252620843.cos.ap-chengdu.myqcloud.com/images/github%E5%9B%BE%E5%BA%93/%E7%99%BB%E5%BD%95.png" width="50%" height="50%">
+
+#### 注册界面
+<img src="https://dango-1252620843.cos.ap-chengdu.myqcloud.com/images/github%E5%9B%BE%E5%BA%93/%E6%B3%A8%E5%86%8C.png" width="50%" height="50%">
 
 #### 主界面
-
-![](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.0/%E4%B8%BB%E7%95%8C%E9%9D%A2.png)
+![](https://dango-1252620843.cos.ap-chengdu.myqcloud.com/images/github%E5%9B%BE%E5%BA%93/%E7%BF%BB%E8%AF%91%E7%95%8C%E9%9D%A2.png)
 
 #### 设置界面
-<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.0/OCR%E8%AE%BE%E5%AE%9A.png" width="100%" height="100%">
-<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.0/%E7%BF%BB%E8%AF%91%E6%BA%90%E8%AE%BE%E5%AE%9A.png" width="100%" height="100%">
-<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.0/%E5%85%B6%E4%BB%96%E8%AE%BE%E5%AE%9A.png" width="100%" height="100%">
-<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.0/%E5%85%B3%E4%BA%8E.png" width="100%" height="100%">
-<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.0/%E5%B1%8F%E8%94%BD%E8%AF%8D%E8%AE%BE%E7%BD%AE.png" width="50%" height="50%">
+<img src="https://dango-1252620843.cos.ap-chengdu.myqcloud.com/images/github%E5%9B%BE%E5%BA%93/%E8%AE%BE%E7%BD%AE-%E8%AF%86%E5%88%AB%E8%AE%BE%E5%AE%9A.png" width="100%" height="100%">
+<img src="https://dango-1252620843.cos.ap-chengdu.myqcloud.com/images/github%E5%9B%BE%E5%BA%93/%E8%AE%BE%E7%BD%AE-%E7%BF%BB%E8%AF%91%E8%AE%BE%E5%AE%9A.png" width="100%" height="100%">
+<img src="https://dango-1252620843.cos.ap-chengdu.myqcloud.com/images/github%E5%9B%BE%E5%BA%93/%E8%AE%BE%E7%BD%AE-%E6%98%BE%E7%A4%BA%E8%AE%BE%E5%AE%9A.png" width="100%" height="100%">
+<img src="https://dango-1252620843.cos.ap-chengdu.myqcloud.com/images/github%E5%9B%BE%E5%BA%93/%E8%AE%BE%E7%BD%AE-%E5%8A%9F%E8%83%BD%E8%AE%BE%E5%AE%9A.png" width="100%" height="100%">
+<img src="https://dango-1252620843.cos.ap-chengdu.myqcloud.com/images/github%E5%9B%BE%E5%BA%93/%E8%AE%BE%E7%BD%AE-%E5%85%B3%E4%BA%8E.png" width="100%" height="100%">
+<img src="https://dango-1252620843.cos.ap-chengdu.myqcloud.com/images/github%E5%9B%BE%E5%BA%93/%E5%A4%9A%E8%8C%83%E5%9B%B4%E5%88%87%E6%8D%A2.png" width="50%" height="50%">
+<img src="https://dango-1252620843.cos.ap-chengdu.myqcloud.com/images/github%E5%9B%BE%E5%BA%93/%E5%B1%8F%E8%94%BD%E8%AF%8D.png" width="50%" height="50%">
 
 #### 支持作者
-<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.0/%E6%94%AF%E6%8C%81%E4%BD%9C%E8%80%85.png" width="100%" height="100%">
+<img src="https://dango-1252620843.cos.ap-chengdu.myqcloud.com/images/github%E5%9B%BE%E5%BA%93/%E8%AE%BE%E7%BD%AE-%E6%94%AF%E6%8C%81%E4%BD%9C%E8%80%85.png" width="100%" height="100%">
 
 
 ## 开源协议
