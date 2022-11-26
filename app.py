@@ -56,6 +56,8 @@ class DangoTranslator :
         self.edge_driver_finish = 0
         # 是否屏蔽绑定邮箱消息窗
         self.checkBindEmailSign = False
+        # 记录截图坐标
+        self.range = (0, 0, 0, 0)
 
 
     # 登录

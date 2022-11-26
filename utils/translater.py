@@ -268,6 +268,7 @@ class Translater(QThread) :
             self.hide_range_ui_sign.emit(True)
 
         image.save(IMAGE_PATH)
+        self.object.range = (x, y, w, h)
 
 
     # 判断图片相似度
@@ -328,14 +329,22 @@ class Translater(QThread) :
                 self.imageCut()
             else :
                 try :
-                    # 判断两张图片的相似度
-                    imageA = imread(IMAGE_PATH)
-                    self.imageCut()
-                    imageB = imread(IMAGE_PATH)
-                    image_score = self.compareImage(imageA, imageB)
-                    # 在自动模式下, 如果如果相似度过高则不检测
-                    if (image_score > self.object.config["imageSimilarity"]):
-                        return
+                    # 范围框坐标
+                    x = self.object.range_ui.x()
+                    y = self.object.range_ui.y()
+                    w = self.object.range_ui.width()
+                    h = self.object.range_ui.height()
+                    # 如果坐标相同才判断相似度
+                    if (x, y, w, h) == self.object.range :
+                        imageA = imread(IMAGE_PATH)
+                        self.imageCut()
+                        imageB = imread(IMAGE_PATH)
+                        image_score = self.compareImage(imageA, imageB)
+                        # 在自动模式下, 如果如果相似度过高则不检测
+                        if (image_score > self.object.config["imageSimilarity"]):
+                            return
+                    else :
+                        self.imageCut()
                 except Exception:
                     self.logger.error(format_exc())
                     # 如果判断相似度失败则直接截图
