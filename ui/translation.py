@@ -15,6 +15,7 @@ import utils.translater
 import utils.http
 import utils.range
 import utils.message
+import utils.hwnd
 
 import translator.sound
 import translator.all
@@ -206,14 +207,15 @@ class Translation(QMainWindow) :
         self.play_voice_button.setCursor(ui.static.icon.SELECT_CURSOR)
         self.play_voice_button.hide()
 
-        # 充电按钮
-        self.battery_button = QPushButton(qtawesome.icon("fa.battery-half", color=self.icon_color), "", self)
-        self.customSetIconSize(self.battery_button, 24, 20)
-        self.customSetGeometry(self.battery_button, 483, 5, 24, 20)
-        self.battery_button.setToolTip("<b>充电入口 Support author</b><br>我要给团子充电支持!")
-        self.battery_button.setStyleSheet("background: transparent;")
-        self.battery_button.setCursor(ui.static.icon.SELECT_CURSOR)
-        self.battery_button.hide()
+        # 锁按钮
+        self.lock_button = QPushButton(qtawesome.icon("fa.unlock", color=self.icon_color), "", self)
+        self.customSetIconSize(self.lock_button, 24, 20)
+        self.customSetGeometry(self.lock_button, 483, 5, 24, 20)
+        self.lock_button.setToolTip("<b>锁定翻译界面 Lock</b>")
+        self.lock_button.setStyleSheet("background: transparent;")
+        self.lock_button.setCursor(ui.static.icon.SELECT_CURSOR)
+        self.lock_button.clicked.connect(self.checkLockStatus)
+        self.lock_button.hide()
 
         # 翻译历史按钮
         self.trans_history_button = QPushButton(qtawesome.icon("fa5s.book-open", color=self.icon_color), "", self)
@@ -264,6 +266,17 @@ class Translation(QMainWindow) :
         # 注册隐藏范围框快捷键
         if self.object.config["showHotKey3"] == "True" or self.object.config["showHotKey3"] == True :
             self.registerHideRangeHotkey()
+
+
+    # 改变锁状态
+    def checkLockStatus(self) :
+
+        if self.lock_sign :
+            self.lock_sign = False
+            self.lock_button.setIcon(qtawesome.icon("fa.unlock", color=self.icon_color))
+        else :
+            self.lock_sign = True
+            self.lock_button.setIcon(qtawesome.icon("fa.lock", color=self.icon_color))
 
 
     # 注册隐藏范围框快捷键
@@ -430,6 +443,8 @@ class Translation(QMainWindow) :
         self.range_hotkey = SystemHotkey()
         # 隐藏范围快捷键
         self.hide_range_hotkey = SystemHotkey()
+        # 界面锁
+        self.lock_sign = False
 
 
     # 根据分辨率定义控件位置尺寸
@@ -449,6 +464,9 @@ class Translation(QMainWindow) :
 
     # 鼠标移动事件
     def mouseMoveEvent(self, e: QMouseEvent) :
+
+        if self.lock_sign == True:
+            return
 
         # 判断鼠标位置以适配特定位置可拉伸
         if self.width() - e.x() < 15*self.rate and self.height() - e.y() < 15*self.rate :
@@ -489,6 +507,11 @@ class Translation(QMainWindow) :
     # 鼠标进入控件事件
     def enterEvent(self, QEvent) :
 
+        if self.lock_sign == True :
+            self.lock_button.show()
+            return
+
+
         # 显示所有顶部工具栏控件
         self.switch_button.show()
         self.start_button.show()
@@ -497,7 +520,7 @@ class Translation(QMainWindow) :
         self.multi_range_button.show()
         self.quit_button.show()
         self.minimize_button.show()
-        self.battery_button.show()
+        self.lock_button.show()
         self.play_voice_button.show()
         self.trans_history_button.show()
         self.filter_word_button.show()
@@ -523,7 +546,7 @@ class Translation(QMainWindow) :
         self.filter_word_button.setGeometry(QRect(width + 160 * self.rate, 5 * self.rate, 20 * self.rate, 20 * self.rate))
         self.switch_button.setGeometry(QRect(width + 200 * self.rate, 5 * self.rate, 50 * self.rate, 20 * self.rate))
         self.play_voice_button.setGeometry(QRect(width + 270 * self.rate, 5 * self.rate, 20 * self.rate, 20 * self.rate))
-        self.battery_button.setGeometry(QRect(width + 314 * self.rate, 5 * self.rate, 24 * self.rate, 20 * self.rate))
+        self.lock_button.setGeometry(QRect(width + 314 * self.rate, 5 * self.rate, 24 * self.rate, 20 * self.rate))
         self.trans_history_button.setGeometry(QRect(width + 358 * self.rate, 5 * self.rate, 24 * self.rate, 20 * self.rate))
         self.minimize_button.setGeometry(QRect(width + 398 * self.rate, 5 * self.rate, 20 * self.rate, 20 * self.rate))
         self.quit_button.setGeometry(QRect(width + 438 * self.rate, 5 * self.rate, 20 * self.rate, 20 * self.rate))
@@ -537,7 +560,7 @@ class Translation(QMainWindow) :
         self.multi_range_button.hide()
         self.quit_button.hide()
         self.minimize_button.hide()
-        self.battery_button.hide()
+        self.lock_button.hide()
         self.play_voice_button.hide()
         self.trans_history_button.hide()
         self.filter_word_button.hide()

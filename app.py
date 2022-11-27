@@ -43,7 +43,7 @@ class DangoTranslator :
         # 本地配置
         self.yaml = utils.config.openConfig(self.logger)
         # 版本号
-        self.yaml["version"] = "4.3.7"
+        self.yaml["version"] = "4.3.7-Beta"
         # 配置中心
         self.yaml["dict_info"] = utils.config.getDictInfo(self.yaml["dict_info_url"], self.logger)
         # 屏幕分辨率
@@ -92,8 +92,6 @@ class DangoTranslator :
         self.settin_ui = ui.settin.Settin(self)
         # 翻译界面设置页面按键信号
         self.translation_ui.settin_button.clicked.connect(self.clickSettin)
-        # 翻译界面充电按钮信号
-        self.translation_ui.battery_button.clicked.connect(self.clickBattery)
 
         # 屏蔽词界面
         self.filter_ui = ui.filter.Filter(self)
@@ -148,15 +146,6 @@ class DangoTranslator :
         self.translation_ui.hide()
         self.multi_range_ui.show()
         self.range_ui.show()
-
-
-    # 按下充电键后做的事情
-    def clickBattery(self) :
-
-        self.translation_ui.close()
-        self.range_ui.close()
-        self.settin_ui.tab_widget.setCurrentIndex(4)
-        self.settin_ui.show()
 
 
     # 按下设置键后做的事情
