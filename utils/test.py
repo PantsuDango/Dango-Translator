@@ -133,6 +133,6 @@ def testBaiduOCR(object) :
     QApplication.processEvents()
 
     translator.ocr.baidu.getAccessToken(object)
-    ocr_sign, original = translator.ocr.baidu.baiduOCR(object.config, object.logger, test=True)
+    ocr_sign, original = translator.ocr.baidu.baiduOCR(object, test=True)
     object.settin_ui.desc_ui.desc_text.append("\n识别结果: \n{}".format(original))
     object.settin_ui.desc_ui.desc_text.append("\n测试结束!")
