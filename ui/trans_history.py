@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import *
 import fileinput
 import collections
 import re
+import os
 
 import ui.static.icon
 import translator.upload_trans_file
@@ -84,9 +85,10 @@ class TransHistory(QWidget) :
     # 读取翻译历史
     def readTransHistory(self) :
 
-        with open(TRANS_FILE, "r", encoding="utf-8") as file:
-            for line in file:
-                self.data.append(line)
+        if os.path.exists(TRANS_FILE) :
+            with open(TRANS_FILE, "r", encoding="utf-8") as file:
+                for line in file:
+                    self.data.append(line)
         self.read_file_finish = True
 
 
