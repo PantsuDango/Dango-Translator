@@ -1,8 +1,8 @@
 # 团子翻译器 - 基于OCR的生肉翻译软件
 
 
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.3.7-ff69b4)](https://github.com/PantsuDango/Dango-Translator)
-[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2022--11--28-ff69b4)]()
+[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.3.8-ff69b4)](https://github.com/PantsuDango/Dango-Translator)
+[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2022--12--11-ff69b4)]()
 [![更新时间](https://img.shields.io/badge/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-win7--10-ff69b4)]()
 [![GitHubStars](https://img.shields.io/github/stars/PantsuDango/Dango-Translator)]()
 [![GitHubForks](https://img.shields.io/github/forks/PantsuDango/Dango-Translator)]()
@@ -38,8 +38,16 @@
 
 #### 翻译器相关 
 
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.3.7-ff69b4)]()
-[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2022--11--28-ff69b4)]()
+[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.3.8-ff69b4)]()
+[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2022--12--11-ff69b4)]()
+
+4.3.8新增:
+1. 在线OCR添加了试用功能;      
+2. 新增自动朗读功能;      
+
+4.3.8修复: 
+1. 修复自动翻译时翻译结果频闪问题;      
+2. 自动清理7天以前的日志, 避免冗余日志缓存; 
 
 4.3.7修复: 
 + 修复百度OCR测试按钮会导致程序崩溃问题;      
