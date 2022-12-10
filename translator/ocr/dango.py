@@ -238,6 +238,9 @@ def dangoOCR(object, test=False) :
         "Token": token
     }
 
+    # 是否为试用在线ocr
+    if object.settin_ui.online_ocr_probation_use == True and test == False :
+        url = object.yaml["dict_info"]["ocr_probation"]
     res = utils.http.post(url=url, body=body, logger=object.logger, headers=headers)
     if not res :
         return False, "在线OCR错误: 网络超时, 请尝试重试\n如果频繁出现, 请于[设置]-[识别设定]-[在线OCR]页面内, 切换延迟最低的节点并重新翻译"

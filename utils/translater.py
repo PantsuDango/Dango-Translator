@@ -366,7 +366,7 @@ class Translater(QThread) :
             ocr_sign, original = translator.ocr.baidu.baiduOCR(self.object)
 
         # 团子OCR
-        elif self.object.config["onlineOCR"] :
+        elif self.object.config["onlineOCR"] or self.object.config["onlineOCRProbation"] :
             ocr_sign, original = translator.ocr.dango.dangoOCR(self.object)
 
         # 本地OCR

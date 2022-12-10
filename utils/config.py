@@ -111,6 +111,10 @@ def configConvert(object) :
     object.config["offlineOCR"] = object.config.get("offlineOCR", False)
     # 在线OCR开关
     object.config["onlineOCR"] = object.config.get("onlineOCR", False)
+    # 团子云Token
+    object.config["DangoToken"] = object.config.get("DangoToken", "")
+    # 试用在线OCR开关
+    object.config["onlineOCRProbation"] = object.config.get("onlineOCRProbation", False)
     # 在线OCR节点
     object.config["nodeURL"] = object.config.get("nodeURL", object.yaml["dict_info"]["ocr_server"])
     node_info = eval(object.yaml["dict_info"]["ocr_node"])

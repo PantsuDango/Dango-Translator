@@ -43,7 +43,7 @@ class DangoTranslator :
         # 本地配置
         self.yaml = utils.config.openConfig(self.logger)
         # 版本号
-        self.yaml["version"] = "4.3.7"
+        self.yaml["version"] = "4.3.8-Beta"
         # 配置中心
         self.yaml["dict_info"] = utils.config.getDictInfo(self.yaml["dict_info_url"], self.logger)
         # 屏幕分辨率
@@ -58,6 +58,8 @@ class DangoTranslator :
         self.checkBindEmailSign = False
         # 记录截图坐标
         self.range = (0, 0, 0, 0)
+        # 在线ocr可用性
+        self.online_ocr_sign = False
 
 
     # 登录

@@ -129,7 +129,7 @@ def onlineOCRQueryQuota(object) :
         else :
             return "您的有效期截止至:\n\n%s\n\n在线OCR还可以继续使用~\n\n对额度如有任何疑问请联系客服娘" % max_end_time
     except Exception :
-        logger.error(format_exc())
+        object.logger.error(format_exc())
         return "查询出错, 可联系客服娘, 或直接浏览器登录 https://cloud.stariver.org/auth/login.html 地址查看"
 
 
@@ -176,3 +176,17 @@ def loginCheck(object) :
     else:
         object.logger.error("登录出错, response: %s"%resp)
         return "出现了出乎意料的情况\n请联系团子解决!     "
+
+
+# 查询在线ocr试用次数
+def ocrProbationReadCount(object) :
+
+    url = object.yaml["dict_info"]["ocr_probation_read_count"]
+    body = {"Username": object.yaml["user"]}
+    resp = post(url=url, body=body, logger=object.logger)
+    if not resp :
+        return
+    if resp.get("Code", -1) != 0 :
+        return
+    count = resp.get("Result", 0)
+    object.settin_ui.online_ocr_probation_label.setText("试用在线OCR, 剩余%d次"%count)

@@ -101,7 +101,8 @@ class Settin(QMainWindow) :
         # 窗口置顶及关闭窗口最小化最大化
         self.setWindowFlags(Qt.WindowCloseButtonHint)
         # 窗口标题
-        self.setWindowTitle("团子翻译器 Ver%s - 设置"%self.object.yaml["version"])
+        self.setWindowTitle("团子翻译器 Ver%s - 设置         当前登录用户: %s"%(
+            self.object.yaml["version"], self.object.yaml["user"]))
         # 窗口图标
         self.setWindowIcon(ui.static.icon.APP_LOGO_ICON)
         # 鼠标样式
@@ -281,6 +282,8 @@ class Settin(QMainWindow) :
             self.ocr_label.setText("当前正在使用【本地OCR】")
         elif self.baidu_ocr_use :
             self.ocr_label.setText("当前正在使用【百度OCR】")
+        elif self.online_ocr_probation_use :
+            self.ocr_label.setText("当前正在使用【在线OCR试用】")
         else :
             self.ocr_label.setText("请选择开启一种OCR开关, 否则翻译将无法使用")
         self.ocr_label.setStyleSheet("color: %s"%self.color_2)
@@ -306,7 +309,18 @@ class Settin(QMainWindow) :
         # 在线OCR标签
         label = QLabel(online_OCR_tab)
         self.customSetGeometry(label, 105, 70, 400, 20)
-        label.setText("使用在线OCR, 使用前需先购买")
+        label.setText("使用在线OCR")
+
+        # 在线OCR试用状态开关
+        self.online_ocr_probation_switch = ui.switch.SwitchOCR(online_OCR_tab, self.online_ocr_probation_use, startX=(65-20) * self.rate)
+        self.customSetGeometry(self.online_ocr_probation_switch, 220, 70, 65, 20)
+        self.online_ocr_probation_switch.checkedChanged.connect(self.changeProbationSwitch)
+        self.online_ocr_probation_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 在线OCR试用标签
+        self.online_ocr_probation_label = QLabel(online_OCR_tab)
+        self.customSetGeometry(self.online_ocr_probation_label, 305, 70, 400, 20)
+        self.online_ocr_probation_label.setText("试用在线OCR")
+        utils.thread.createThread(utils.http.ocrProbationReadCount, self.object)
 
         # 在线OCR购买按钮
         button = QPushButton(online_OCR_tab)
@@ -1552,6 +1566,7 @@ class Settin(QMainWindow) :
         # OCR各开关
         self.offline_ocr_use = self.object.config["offlineOCR"]
         self.online_ocr_use = self.object.config["onlineOCR"]
+        self.online_ocr_probation_use = self.object.config["onlineOCRProbation"]
         self.baidu_ocr_use = self.object.config["baiduOCR"]
         self.baidu_ocr_high_precision_use = self.object.config["OCR"]["highPrecision"]
 
@@ -1764,6 +1779,8 @@ class Settin(QMainWindow) :
                 self.resetSwitch("onlineOCR")
             if self.baidu_ocr_use == True :
                 self.resetSwitch("baiduOCR")
+            if self.online_ocr_probation_use == True :
+                self.resetSwitch("ProbationOCR")
             self.offline_ocr_use = True
             self.ocr_label.setText("当前正在使用【本地OCR】")
         else:
@@ -1779,10 +1796,29 @@ class Settin(QMainWindow) :
                 self.resetSwitch("offlineOCR")
             if self.baidu_ocr_use == True :
                 self.resetSwitch("baiduOCR")
+            if self.online_ocr_probation_use == True :
+                self.resetSwitch("ProbationOCR")
             self.online_ocr_use = True
             self.ocr_label.setText("当前正在使用【在线OCR】")
         else:
             self.online_ocr_use = False
+            self.ocr_label.setText("请选择开启一种OCR开关, 否则翻译将无法使用")
+
+
+    # 改变在线OCR试用开关状态
+    def changeProbationSwitch(self, checked):
+
+        if checked:
+            if self.offline_ocr_use == True:
+                self.resetSwitch("offlineOCR")
+            if self.baidu_ocr_use == True:
+                self.resetSwitch("baiduOCR")
+            if self.online_ocr_use == True:
+                self.resetSwitch("onlineOCR")
+            self.online_ocr_probation_use = True
+            self.ocr_label.setText("当前正在使用【在线OCR试用】")
+        else:
+            self.online_ocr_probation_use = False
             self.ocr_label.setText("请选择开启一种OCR开关, 否则翻译将无法使用")
 
 
@@ -1794,6 +1830,8 @@ class Settin(QMainWindow) :
                 self.resetSwitch("offlineOCR")
             if self.online_ocr_use == True :
                 self.resetSwitch("onlineOCR")
+            if self.online_ocr_probation_use == True :
+                self.resetSwitch("ProbationOCR")
             self.baidu_ocr_use = True
             self.ocr_label.setText("当前正在使用【百度OCR】")
         else :
@@ -2075,6 +2113,9 @@ class Settin(QMainWindow) :
         elif switch_type == "baiduOCR" :
             self.baidu_ocr_switch.mousePressEvent(1)
             self.baidu_ocr_switch.updateValue()
+        elif switch_type == "ProbationOCR" :
+            self.online_ocr_probation_switch.mousePressEvent(1)
+            self.online_ocr_probation_switch.updateValue()
 
 
     # 运行本地OCR
@@ -2669,6 +2710,7 @@ class Settin(QMainWindow) :
         # OCR开关
         self.object.config["offlineOCR"] = self.offline_ocr_use
         self.object.config["onlineOCR"] = self.online_ocr_use
+        self.object.config["onlineOCRProbation"] = self.online_ocr_probation_use
         self.object.config["baiduOCR"] = self.baidu_ocr_use
 
         # 翻译语种
@@ -2773,6 +2815,8 @@ class Settin(QMainWindow) :
         # 如果处于自动模式下则暂停
         if self.object.translation_ui.translate_mode :
             self.object.translation_ui.stop_sign = True
+        # 刷新在线ocr试用次数
+        utils.thread.createThread(utils.http.ocrProbationReadCount, self.object)
 
 
     # 窗口关闭处理
