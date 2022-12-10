@@ -182,8 +182,9 @@ class Sound() :
                 except Exception :
                     break
 
-        except Exception :
-            self.logger.error(format_exc())
+        except Exception as err:
+            if str(err) != "'Sound' object has no attribute 'browser'":
+                self.logger.error(format_exc())
 
 
     def close(self) :
