@@ -217,7 +217,7 @@ class DangoTranslator :
     # 主函数
     def main(self) :
 
-        # 更新贴字翻译所需的pil运行库
+        # 更新缺失的运行库
         utils.update.updatePilFile(self)
         # 自适应高分辨率
         QCoreApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
@@ -243,6 +243,7 @@ class DangoTranslator :
         # 注册页面
         self.register_ui = ui.register.Register(self)
 
+        # 是否自动登录
         if not self.yaml["auto_login"] :
             # 登录界面
             self.login_ui = ui.login.Login(self)

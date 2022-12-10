@@ -28,7 +28,7 @@ def updateOCRSrcFile(url, logger) :
 # 更新贴字翻译所需的文件
 def updatePilFile(object) :
 
-    if not os.path.exists(PIL_FILE_PATH) and "Beta" not in object.yaml["version"] :
+    if not os.path.exists(PIL_FILE_PATH)  :
         url = object.yaml["dict_info"]["pil_file_url"]
         if utils.http.downloadFile(url, PIL_FILE_PATH, object.logger) :
             sys.exit()
