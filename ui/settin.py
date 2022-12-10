@@ -1190,7 +1190,7 @@ class Settin(QMainWindow) :
         self.auto_speed_spinBox.setCursor(ui.static.icon.EDIT_CURSOR)
         # 自动翻译间隔标签
         label = QLabel(auto_mode_tab)
-        self.customSetGeometry(label, 85, 35, 500, 20)
+        self.customSetGeometry(label, 85, 35, 600, 20)
         label.setText("自动模式下刷新翻译的时间间隔(0.5-10.0秒), 建议1")
 
         # 图像相似度设定
@@ -1204,7 +1204,7 @@ class Settin(QMainWindow) :
         self.image_refresh_spinBox.setCursor(ui.static.icon.SELECT_CURSOR)
         # 图像相似度标签
         label = QLabel(auto_mode_tab)
-        self.customSetGeometry(label, 85, 80, 500, 20)
+        self.customSetGeometry(label, 85, 80, 600, 20)
         label.setText("自动模式下的图像相似度(80-100%), 数值越高越频繁刷新OCR识别结果, 建议98")
 
         # 文字相似度设定
@@ -1218,7 +1218,7 @@ class Settin(QMainWindow) :
         self.text_refresh_spinBox.setCursor(ui.static.icon.SELECT_CURSOR)
         # 文字相似度标签
         label = QLabel(auto_mode_tab)
-        self.customSetGeometry(label, 85, 130, 500, 20)
+        self.customSetGeometry(label, 85, 130, 600, 20)
         label.setText("自动模式下的文字相似度(80-100%), 数值越高越频繁刷新翻译结果, 建议90")
 
         # 翻译快捷键开关
@@ -1289,40 +1289,49 @@ class Settin(QMainWindow) :
         self.customSetGeometry(label, 105, 80, 400, 20)
         label.setText("每次识别到的原文自动复制到剪贴板")
 
+        # 自动朗读开关
+        self.auto_playsound_switch = ui.switch.SwitchOCR(other_tab, sign=self.auto_playsound_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.auto_playsound_switch, 20, 130, 65, 20)
+        self.auto_playsound_switch.checkedChanged.connect(self.changeAutoPlaysoundSwitch)
+        self.auto_playsound_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 自动朗读标签
+        label = QLabel(other_tab)
+        self.customSetGeometry(label, 105, 130, 400, 20)
+        label.setText("每次识别后都自动朗读识别到的原文")
+
         # 是否全屏下置顶开关
         self.set_top_switch = ui.switch.SwitchOCR(other_tab, self.set_top_use, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.set_top_switch, 20, 130, 65, 20)
+        self.customSetGeometry(self.set_top_switch, 20, 180, 65, 20)
         self.set_top_switch.checkedChanged.connect(self.changeSetTopSwitch)
         self.set_top_switch.setCursor(ui.static.icon.SELECT_CURSOR)
         # 是否全屏下置顶
         label = QLabel(other_tab)
-        self.customSetGeometry(label, 105, 130, 400, 20)
+        self.customSetGeometry(label, 105, 180, 400, 20)
         label.setText("在全屏模式的应用下置顶翻译器")
 
         # 自动登录开关
         self.auto_login_switch = ui.switch.SwitchOCR(other_tab, sign=self.auto_login_use, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.auto_login_switch, 20, 180, 65, 20)
+        self.customSetGeometry(self.auto_login_switch, 20, 230, 65, 20)
         self.auto_login_switch.checkedChanged.connect(self.changeAutoLoginSwitch)
         self.auto_login_switch.setCursor(ui.static.icon.SELECT_CURSOR)
         # 自动登录标签
         label = QLabel(other_tab)
-        self.customSetGeometry(label, 105, 180, 400, 20)
+        self.customSetGeometry(label, 105, 230, 400, 20)
         label.setText("开启软件后自动登录账号")
 
         # 同意收集翻译历史开关
         self.agree_collect_switch = ui.switch.SwitchOCR(other_tab, sign=self.agree_collect_use, startX=(65-20) * self.rate)
-        self.customSetGeometry(self.agree_collect_switch, 20, 230, 65, 20)
+        self.customSetGeometry(self.agree_collect_switch, 20, 280, 65, 20)
         self.agree_collect_switch.checkedChanged.connect(self.changeAgreeCollectSwitch)
         self.agree_collect_switch.setCursor(ui.static.icon.SELECT_CURSOR)
-
         # 同意收集翻译历史标签
         label = QLabel(other_tab)
-        self.customSetGeometry(label, 105, 230, 300, 20)
+        self.customSetGeometry(label, 105, 280, 300, 20)
         label.setText("加入用户体验改善计划")
         # 同意收集翻译历史?号图标
         button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", other_tab)
         self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 250, 230, 20, 20)
+        self.customSetGeometry(button, 250, 280, 20, 20)
         button.setStyleSheet("background: transparent;")
         button.clicked.connect(lambda: self.showDesc("agreeCollect"))
         button.setCursor(ui.static.icon.QUESTION_CURSOR)
@@ -1683,6 +1692,8 @@ class Settin(QMainWindow) :
         self.hide_range_hotkey_use = self.object.config["showHotKey3"]
         # 是否全屏下置顶开关
         self.set_top_use = self.object.config["setTop"]
+        # 自动朗读开关
+        self.auto_playsound_use = self.object.config["autoPlaysoundUse"]
 
 
     # 获取节点信息
@@ -2024,6 +2035,15 @@ class Settin(QMainWindow) :
             self.auto_clipboard_use = True
         else:
             self.auto_clipboard_use = False
+
+
+    # 改变自动朗读开关状态
+    def changeAutoPlaysoundSwitch(self, checked) :
+
+        if checked :
+            self.auto_playsound_use = True
+        else:
+            self.auto_playsound_use = False
 
 
     # 改变文字换行开关状态
@@ -2807,6 +2827,8 @@ class Settin(QMainWindow) :
         self.object.config["setTop"] = self.set_top_use
         # 是否同步翻译历史开关
         self.object.config["agreeCollectUse"] = self.agree_collect_use
+        # 自动朗读开关
+        self.object.config["autoPlaysoundUse"] = self.auto_playsound_use
 
 
     # 窗口显示信号

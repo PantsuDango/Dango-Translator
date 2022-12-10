@@ -264,6 +264,8 @@ def configConvert(object) :
     object.config["choiceRangeHotkeyValue"] = object.config.get("choiceRangeHotkeyValue", "ctrl")
     # 切换范围快捷键开关
     object.config["choiceRangeHotKeyUse"] = object.config.get("choiceRangeHotKeyUse", False)
+    # 自动朗读开关
+    object.config["autoPlaysoundUse"] = object.config.get("autoPlaysoundUse", False)
 
 
 # 保存配置至服务器

@@ -412,6 +412,10 @@ class Translater(QThread) :
         # 是否复制到剪贴板
         if self.object.config["showClipboard"] == "True":
             pyperclip.copy(original)
+        # 是否自动朗读
+        if self.object.config["autoPlaysoundUse"] == True :
+            utils.thread.createThread(self.object.translation_ui.sound.playSound, original)
+
         # 保存原文
         content = utils.config.saveOriginalHisTory(original)
         if self.object.trans_history_ui.read_file_finish :
