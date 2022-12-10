@@ -7,7 +7,7 @@
 [![GitHubStars](https://img.shields.io/github/stars/PantsuDango/Dango-Translator)]()
 [![GitHubForks](https://img.shields.io/github/forks/PantsuDango/Dango-Translator)]()
 [![作者](https://img.shields.io/badge/QQ-%E8%83%96%E6%AC%A1%E5%9B%A2%E5%AD%90-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E4%BD%9C%E8%80%85.png)
-[![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-16%E7%BE%A432523865-ff69b4)](https://l2.drive.c4a15wh.cn/api/v3/slave/source/0/dXBsb2Fkcy8yMDIyLzEwLzI4L0VkWWVtZUdKX-WbouWtkOe_u-ivkeWZqDE2576k576k6IGK5LqM57u056CBLnBuZw/%E5%9B%A2%E5%AD%90%E7%BF%BB%E8%AF%91%E5%99%A816%E7%BE%A4%E7%BE%A4%E8%81%8A%E4%BA%8C%E7%BB%B4%E7%A0%81.png?sign=bxQ3shRTcsdgTs91-5vEnrVMJI-ryZWEeZNAN7rzPC0%3D%3A0)
+[![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-16%E7%BE%A4432523865-ff69b4)](https://l2.drive.c4a15wh.cn/api/v3/slave/source/0/dXBsb2Fkcy8yMDIyLzEwLzI4L0VkWWVtZUdKX-WbouWtkOe_u-ivkeWZqDE2576k576k6IGK5LqM57u056CBLnBuZw/%E5%9B%A2%E5%AD%90%E7%BF%BB%E8%AF%91%E5%99%A816%E7%BE%A4%E7%BE%A4%E8%81%8A%E4%BA%8C%E7%BB%B4%E7%A0%81.png?sign=bxQ3shRTcsdgTs91-5vEnrVMJI-ryZWEeZNAN7rzPC0%3D%3A0)
 
   
 ## 简介
@@ -30,7 +30,7 @@
   
 ## 安装版下载
 
-- 群文件下载：[![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-16%E7%BE%A432523865-ff69b4)](https://l2.drive.c4a15wh.cn/api/v3/slave/source/0/dXBsb2Fkcy8yMDIyLzEwLzI4L0VkWWVtZUdKX-WbouWtkOe_u-ivkeWZqDE2576k576k6IGK5LqM57u056CBLnBuZw/%E5%9B%A2%E5%AD%90%E7%BF%BB%E8%AF%91%E5%99%A816%E7%BE%A4%E7%BE%A4%E8%81%8A%E4%BA%8C%E7%BB%B4%E7%A0%81.png?sign=bxQ3shRTcsdgTs91-5vEnrVMJI-ryZWEeZNAN7rzPC0%3D%3A0)  
+- 群文件下载：[![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-16%E7%BE%A4432523865-ff69b4)](https://l2.drive.c4a15wh.cn/api/v3/slave/source/0/dXBsb2Fkcy8yMDIyLzEwLzI4L0VkWWVtZUdKX-WbouWtkOe_u-ivkeWZqDE2576k576k6IGK5LqM57u056CBLnBuZw/%E5%9B%A2%E5%AD%90%E7%BF%BB%E8%AF%91%E5%99%A816%E7%BE%A4%E7%BE%A4%E8%81%8A%E4%BA%8C%E7%BB%B4%E7%A0%81.png?sign=bxQ3shRTcsdgTs91-5vEnrVMJI-ryZWEeZNAN7rzPC0%3D%3A0)  
 - 官网下载：[下载地址](https://translator.dango.cloud)
 
   
