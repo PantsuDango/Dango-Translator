@@ -124,6 +124,9 @@ class DangoTranslator :
         # if self.config["agreeCollectUse"]:
         #     utils.thread.createThread(translator.upload_trans_file.proccess(self))
 
+        # 清理历史日志缓存
+        utils.thread.createThread(utils.logger.clearLog)
+
 
     # 点击翻译历史键
     def clickTransHistory(self) :

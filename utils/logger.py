@@ -1,7 +1,9 @@
 import logging
 import os
 import time
+import datetime
 
+LOG_PATH = "../logs/"
 
 # 设置日志文件
 def setLog() :
@@ -11,7 +13,7 @@ def setLog() :
 
     date = time.strftime("%Y-%m-%d", time.localtime(time.time()))
     log_file_name = date + ".log"
-    logPath = "../logs/" + log_file_name
+    logPath = LOG_PATH + log_file_name
 
     try :
         os.makedirs("../logs")
@@ -26,3 +28,15 @@ def setLog() :
     logger.addHandler(file_handler)
 
     return logger
+
+
+# 清理日志
+def clearLog() :
+    log_list = os.listdir(LOG_PATH)
+    for filename in log_list :
+        if ".log" not in filename :
+            continue
+        log_date = filename.split(".log")[0]
+        time_point = (datetime.datetime.now() + datetime.timedelta(days=-7)).strftime("%Y-%m-%d")
+        if log_date < time_point :
+            os.remove(LOG_PATH+filename)
