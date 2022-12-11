@@ -348,10 +348,8 @@ class Translater(QThread) :
                 except Exception as err :
                     if str(err) != "Input images must have the same dimensions." :
                         self.logger.error(format_exc())
-                        # 如果判断相似度失败则直接截图
-                        self.imageCut()
-                    else :
-                        return
+                    # 如果判断相似度失败则直接截图
+                    self.imageCut()
 
         except Exception :
             self.logger.error(format_exc())
