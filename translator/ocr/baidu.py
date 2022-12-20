@@ -117,10 +117,9 @@ def baiduOCR(object, test=False) :
     if not resp :
         return False, "百度OCR错误: 网络超时, 请尝试重试\n如有正在使用任何代理或加速器, 请尝试关闭后重试\n如果频繁出现, 建议切换其他OCR使用"
 
-    # 解析百度OCR结果
-    words = resp.get("words_result", {})
     # 正常解析
-    if words :
+    if "words_result" in resp:
+        words = resp.get("words_result", [])
         content = ""
         if show_translate_row == "True":
             # 竖向翻译模式
@@ -168,6 +167,3 @@ def baiduOCR(object, test=False) :
         else:
             content += "错误未知或未收录"
         return False, content
-
-
-    return False, "百度OCR错误: 错误未知或未收录"
