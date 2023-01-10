@@ -278,15 +278,15 @@ class Webdriver(QObject) :
             self.browser.get(self.url_map[web_type])
             self.browser.maximize_window()
             # 原文选择
-            self.browserClickTimeout('//*[@id="langSelect"]')
+            self.browserClickTimeout('//*[@id="TextTranslate"]/div[1]/div[1]/div/div/div/div[2]')
             if language == "JAP" :
-                self.browserClickTimeout('//*[@id="languageSelect"]/li[5]/a')
+                self.browserClickTimeout('//*[@id="TextTranslate"]/div[1]/div[1]/div/div/div[2]/div/div/div/div/div[3]/div/div/div/div[8]')
             elif language == "ENG" :
-                self.browserClickTimeout('//*[@id="languageSelect"]/li[3]/a')
+                self.browserClickTimeout('//*[@id="TextTranslate"]/div[1]/div[1]/div/div/div[2]/div/div/div/div/div[3]/div/div/div/div[11]')
             elif language == "KOR" :
-                self.browserClickTimeout('//*[@id="languageSelect"]/li[7]/a')
+                self.browserClickTimeout('//*[@id="TextTranslate"]/div[1]/div[1]/div/div/div[2]/div/div/div/div/div[3]/div/div/div/div[5]')
             elif language == "RU" :
-                self.browserClickTimeout('//*[@id="languageSelect"]/li[13]/a')
+                self.browserClickTimeout('//*[@id="TextTranslate"]/div[1]/div[1]/div/div/div[2]/div/div/div/div/div[3]/div/div/div/div[3]')
             # 点击去掉 我知道了 广告弹窗
             self.browserClickTimeout('/html/body/div[1]/div/ul/li[4]/div/a[2]')
 
@@ -369,16 +369,19 @@ class Webdriver(QObject) :
         try :
             # 清空文本框
             if self.content :
-                self.browserClickTimeout('//*[@id="inputDelete"]')
+                self.browserClickTimeout('//*[@id="TextTranslate"]/div[1]/a')
             # 输入要翻译的文本
-            self.browser.find_element_by_xpath('//*[@id="inputOriginal"]').send_keys(content)
-            self.browser.find_element_by_xpath('//*[@id="transMachine"]').click()
+            self.browser.find_element_by_xpath('//*[@id="js_fanyi_input"]').send_keys(content)
+            self.browserClickTimeout('//*[@id="TextTranslate"]/div[1]/div[3]/div/div[2]/a')
 
             start = time.time()
             while True:
                 time.sleep(0.1)
-                # 提取翻译信息
-                text = self.browser.find_element_by_xpath('//*[@id="transTarget"]').text
+                try:
+                    # 提取翻译信息
+                    text = self.browser.find_element_by_xpath('//*[@id="js_fanyi_output_resultOutput"]/p').text
+                except Exception:
+                    continue
                 if text :
                     self.content = text
                     return self.content
