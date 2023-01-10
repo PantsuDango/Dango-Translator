@@ -319,7 +319,6 @@ class Settin(QMainWindow) :
         self.online_ocr_probation_label = QLabel(online_OCR_tab)
         self.customSetGeometry(self.online_ocr_probation_label, 305, 70, 400, 20)
         self.online_ocr_probation_label.setText("试用在线OCR")
-        utils.thread.createThread(utils.http.ocrProbationReadCount, self.object)
 
         # 在线OCR购买按钮
         button = QPushButton(online_OCR_tab)
