@@ -637,9 +637,9 @@ class Translation(QMainWindow) :
         self.translate_text.clear()
 
         # 设定翻译时的字体类型和大小
-        self.font.setFamily(self.object.config["fontType"])
-        self.font.setPointSize(self.object.config["fontSize"])
-        self.translate_text.setFont(self.font)
+        # self.font.setFamily(self.object.config["fontType"])
+        # self.font.setPointSize(self.object.config["fontSize"])
+        # self.translate_text.setFont(self.font)
 
 
     # 将翻译结果打印
@@ -774,14 +774,6 @@ class Translation(QMainWindow) :
     def createWebdriverThread(self) :
 
         self.statusbar.showMessage("翻译模块启动中, 请等待完成后再操作...")
-        # while True :
-        #     time.sleep(0.1)
-        #     # 有任何一个引擎驱动加载成功
-        #     if self.object.chrome_driver_finish == 1 or self.object.firefox_driver_finish == 1 or self.object.edge_driver_finish == 1 :
-        #         break
-        #     # 所有引擎驱动都加载失败了
-        #     if self.object.chrome_driver_finish == 2 and self.object.firefox_driver_finish == 2 and self.object.edge_driver_finish == 2 :
-        #         break
 
         # 开启朗读模块
         self.sound = translator.sound.Sound(self.object)

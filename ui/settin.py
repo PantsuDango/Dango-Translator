@@ -109,8 +109,7 @@ class Settin(QMainWindow) :
         self.setCursor(ui.static.icon.PIXMAP_CURSOR)
 
         # 设置字体
-        self.setStyleSheet("font: %spt '华康方圆体W7'; color: %s"
-                           %(self.font_size, self.color_1))
+        self.setStyleSheet("font: %spt '华康方圆体W7'; color: %s"%(self.font_size, self.color_1))
 
         # 顶部工具栏
         self.tab_widget = TabWidget(self)
@@ -320,7 +319,6 @@ class Settin(QMainWindow) :
         self.online_ocr_probation_label = QLabel(online_OCR_tab)
         self.customSetGeometry(self.online_ocr_probation_label, 305, 70, 400, 20)
         self.online_ocr_probation_label.setText("试用在线OCR")
-        utils.thread.createThread(utils.http.ocrProbationReadCount, self.object)
 
         # 在线OCR购买按钮
         button = QPushButton(online_OCR_tab)
@@ -835,7 +833,7 @@ class Settin(QMainWindow) :
 
         # 公共翻译备注
         label = QLabel(public_translater_tab)
-        self.customSetGeometry(label, 20, 20, 420, 20)
+        self.customSetGeometry(label, 20, 20, 500, 20)
         label.setText("免费, 无需注册, 安装Chrome浏览器后可直接使用, 但不保证其稳定性")
         label.setStyleSheet("color: %s"%self.color_2)
 
@@ -1116,7 +1114,8 @@ class Settin(QMainWindow) :
         self.comboBox_font = QFont(self.font_type)
         self.font_comboBox.setCurrentFont(self.comboBox_font)
         self.font_comboBox.setCursor(ui.static.icon.SELECT_CURSOR)
-        self.font_comboBox.setStyleSheet("QComboBox{color: %s}"%self.color_2)
+        self.font_comboBox.setStyleSheet("font: %spt '%s'; color: %s"
+                                         %(self.font_size, self.comboBox_font, self.color_1))
         # 翻译字体类型设定标签
         label = QLabel(font_tab)
         self.customSetGeometry(label, 225, 80, 300, 20)
@@ -2896,6 +2895,12 @@ class Settin(QMainWindow) :
         self.object.config["fontSize"] = self.fontSize_spinBox.value()
         # 翻译字体类型
         self.object.config["fontType"] = self.font_type
+        # 设定翻译框的字体类型和大小
+        font = QFont()
+        font.setFamily(self.object.config["fontType"])
+        font.setPointSize(self.object.config["fontSize"])
+        self.object.translation_ui.translate_text.setFont(font)
+
         # 字体样式开关
         self.object.config["showColorType"] = str(self.font_color_type)
         # 自动翻译间隔
