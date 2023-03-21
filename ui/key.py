@@ -100,6 +100,14 @@ class Key(QWidget) :
         self.caiyun_private_key_textEdit.hide()
         self.caiyun_private_key_textEdit.setCursor(ui.static.icon.EDIT_CURSOR)
 
+        # 私人ChatGPT api_key 输入框
+        self.chatgpt_private_key_textEdit = QLineEdit(self)
+        self.customSetGeometry(self.chatgpt_private_key_textEdit, 20, 20, 330, 25)
+        self.chatgpt_private_key_textEdit.setPlaceholderText("私人ChatGPT api_key")
+        self.chatgpt_private_key_textEdit.setText(self.object.config["chatgptAPI"])
+        self.chatgpt_private_key_textEdit.hide()
+        self.chatgpt_private_key_textEdit.setCursor(ui.static.icon.EDIT_CURSOR)
+
 
     # 初始化配置
     def getInitConfig(self) :
@@ -139,6 +147,7 @@ class Key(QWidget) :
         self.object.config["baiduAPI"]["Key"] = self.filterNullWord(self.baidu_private_key_textEdit)
         self.object.config["baiduAPI"]["Secret"] = self.filterNullWord(self.baidu_private_secret_textEdit)
         self.object.config["caiyunAPI"] = self.filterNullWord(self.caiyun_private_key_textEdit)
+        self.object.config["chatgptAPI"] = self.filterNullWord(self.chatgpt_private_key_textEdit)
 
         self.baidu_ocr_key_textEdit.hide()
         self.baidu_ocr_secret_textEdit.hide()
@@ -147,3 +156,4 @@ class Key(QWidget) :
         self.baidu_private_key_textEdit.hide()
         self.baidu_private_secret_textEdit.hide()
         self.caiyun_private_key_textEdit.hide()
+        self.chatgpt_private_key_textEdit.hide()

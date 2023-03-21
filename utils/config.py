@@ -153,6 +153,8 @@ def configConvert(object) :
     object.config["fontColor"]["baidu"] = object.config["fontColor"].get("baidu", "#5B8FF9")
     # 字体颜色 私人彩云
     object.config["fontColor"]["caiyunPrivate"] = object.config["fontColor"].get("caiyunPrivate", "#5B8FF9")
+    # 字体颜色 私人ChatGPT
+    object.config["fontColor"]["chatgptPrivate"] = object.config["fontColor"].get("chatgptPrivate", "#5B8FF9")
     # 原文颜色
     object.config["fontColor"]["original"] = object.config["fontColor"].get("original", "#5B8FF9")
 
@@ -174,6 +176,8 @@ def configConvert(object) :
     object.config["baiduUse"] = object.config.get("baiduUse", "False")
     # 私人彩云翻译开关
     object.config["caiyunPrivateUse"] = object.config.get("caiyunPrivateUse", "False")
+    # 私人ChatGPT翻译开关
+    object.config["chatgptPrivateUse"] = object.config.get("chatgptPrivateUse", "False")
 
     # 确保版本转换后至多只有2个翻译源能被同时开始
     tmp = []
@@ -199,6 +203,8 @@ def configConvert(object) :
     object.config["baiduAPI"]["Key"] = object.config["baiduAPI"].get("Key", "")
     # 私人彩云翻译密钥
     object.config["caiyunAPI"] = object.config.get("caiyunAPI", "")
+    # 私人ChatGPT翻译密钥
+    object.config["chatgptAPI"] = object.config.get("chatgptAPI", "")
 
     ################### 其他设定 ###################
     # 翻译界面透明度
