@@ -205,6 +205,8 @@ def configConvert(object) :
     object.config["caiyunAPI"] = object.config.get("caiyunAPI", "")
     # 私人ChatGPT翻译密钥
     object.config["chatgptAPI"] = object.config.get("chatgptAPI", "")
+    # 私人ChatGPT翻译代理
+    object.config["chatgptProxy"] = object.config.get("chatgptProxy", "")
 
     ################### 其他设定 ###################
     # 翻译界面透明度
@@ -319,6 +321,8 @@ def saveTransHisTory(text, translate_type) :
         content = "[私人腾讯]\n%s\n"%text
     elif translate_type == "caiyun_private" :
         content = "[私人彩云]\n%s\n"%text
+    elif translate_type == "chatgpt_private" :
+        content = "[私人ChatGPT]\n%s\n"%text
     else:
         return
 

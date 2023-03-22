@@ -108,6 +108,20 @@ class Key(QWidget) :
         self.chatgpt_private_key_textEdit.hide()
         self.chatgpt_private_key_textEdit.setCursor(ui.static.icon.EDIT_CURSOR)
 
+        # 私人ChatGPT 代理 输入框
+        self.chatgpt_private_proxy_textEdit = QLineEdit(self)
+        self.customSetGeometry(self.chatgpt_private_proxy_textEdit, 20, 20, 330, 25)
+        self.chatgpt_private_proxy_textEdit.setPlaceholderText("私人ChatGPT 代理")
+        self.chatgpt_private_proxy_textEdit.setText(self.object.config["chatgptProxy"])
+        self.chatgpt_private_proxy_textEdit.hide()
+        self.chatgpt_private_proxy_textEdit.setCursor(ui.static.icon.EDIT_CURSOR)
+
+        # 私人ChatGPT 代理标签
+        self.chatgpt_private_proxy_label = QLabel(self)
+        self.customSetGeometry(self.chatgpt_private_proxy_label, 20, 55, 330, 20)
+        self.chatgpt_private_proxy_label.setText("填入格式示例: 127.0.0.1:7890")
+        self.chatgpt_private_proxy_label.hide()
+
 
     # 初始化配置
     def getInitConfig(self) :
@@ -148,6 +162,7 @@ class Key(QWidget) :
         self.object.config["baiduAPI"]["Secret"] = self.filterNullWord(self.baidu_private_secret_textEdit)
         self.object.config["caiyunAPI"] = self.filterNullWord(self.caiyun_private_key_textEdit)
         self.object.config["chatgptAPI"] = self.filterNullWord(self.chatgpt_private_key_textEdit)
+        self.object.config["chatgptProxy"] = self.filterNullWord(self.chatgpt_private_proxy_textEdit)
 
         self.baidu_ocr_key_textEdit.hide()
         self.baidu_ocr_secret_textEdit.hide()
@@ -157,3 +172,5 @@ class Key(QWidget) :
         self.baidu_private_secret_textEdit.hide()
         self.caiyun_private_key_textEdit.hide()
         self.chatgpt_private_key_textEdit.hide()
+        self.chatgpt_private_proxy_textEdit.hide()
+        self.chatgpt_private_proxy_label.hide()

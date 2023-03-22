@@ -199,6 +199,16 @@ class TranslaterProcess(QThread) :
             secret_key = self.object.config["caiyunAPI"]
             result = translator.api.caiyun(self.object.translation_ui.original, secret_key, self.logger)
 
+        # 私人彩云
+        elif self.trans_type == "chatgpt_private":
+            result = translator.api.chatgpt(
+                self.object.config["chatgptAPI"],
+                self.object.config["language"],
+                self.object.config["chatgptProxy"],
+                self.object.translation_ui.original,
+                self.logger
+            )
+
         elif self.trans_type == "original" :
             result = self.object.translation_ui.original
 
@@ -452,6 +462,11 @@ class Translater(QThread) :
         # 私人彩云
         if self.object.config["caiyunPrivateUse"] == "True" :
             utils.thread.createThread(self.creatTranslaterThread, "caiyun_private")
+            nothing_sign = True
+
+        # 私人ChatGPT
+        if self.object.config["chatgptPrivateUse"] == "True":
+            utils.thread.createThread(self.creatTranslaterThread, "chatgpt_private")
             nothing_sign = True
 
         # 显示原文

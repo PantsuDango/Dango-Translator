@@ -827,8 +827,8 @@ class Settin(QMainWindow) :
         # 私人ChatGPT查额度按钮
         button = QPushButton(private_translater_tab)
         self.customSetGeometry(button, 445, 220, 60, 20)
-        button.setText("查额度")
-        button.clicked.connect(self.openChatGPTQueryQuota)
+        button.setText("代理")
+        button.clicked.connect(lambda: self.showKey("chatgptProxy"))
         button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 公共翻译备注
@@ -2593,10 +2593,16 @@ class Settin(QMainWindow) :
             self.key_ui.setWindowTitle("私人彩云翻译 - 密钥编辑 - 退出会自动保存")
             self.key_ui.caiyun_private_key_textEdit.show()
 
-        # 私人ChatGPT翻译
+        # 私人ChatGPT翻译-密钥设置
         elif key_type == "chatgptTranslate":
             self.key_ui.setWindowTitle("私人ChatGPT翻译 - 密钥编辑 - 退出会自动保存")
             self.key_ui.chatgpt_private_key_textEdit.show()
+
+        # 私人ChatGPT代理-代理设置
+        elif key_type == "chatgptProxy":
+            self.key_ui.setWindowTitle("私人ChatGPT翻译 - 代理编辑 - 退出会自动保存")
+            self.key_ui.chatgpt_private_proxy_textEdit.show()
+            self.key_ui.chatgpt_private_proxy_label.show()
 
         self.key_ui.show()
 

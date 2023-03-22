@@ -666,6 +666,9 @@ class Translation(QMainWindow) :
         # 私人彩云
         elif trans_type == "caiyun_private" :
             color = self.object.config["fontColor"]["caiyunPrivate"]
+        # 私人彩云
+        elif trans_type == "chatgpt_private":
+            color = self.object.config["fontColor"]["chatgptPrivate"]
         # 原文
         elif trans_type == "original" :
             color = self.object.config.get("fontColor", {}).get("original", self.font_color_1)

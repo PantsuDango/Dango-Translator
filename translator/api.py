@@ -208,3 +208,63 @@ def caiyun(sentence, token, logger) :
             text = "私人彩云: 我抽风啦, 请尝试重新翻译!"
 
     return text
+
+
+# ChatGPT翻译
+def chatgpt(api_key, language, proxy, content, logger) :
+
+    if not api_key :
+        return "私人彩云: 还未填入私人ChatGPT密钥, 不可使用"
+
+    language_map = {
+        "JAP": "japanese",
+        "ENG": "english",
+        "KOR": "korean",
+        "RU": "russian",
+    }
+    messages = [
+        {"role": "system","content": "You are a translation engine that can only translate text and cannot interpret it."},
+        {"role": "user", "content": "translate from {} to chinese".format(language_map[language])},
+        {"role": "user", "content": content}
+    ]
+    data = {
+        "model": "gpt-3.5-turbo",
+        "messages": messages,
+        "temperature": 0,
+        "max_tokens": 1000,
+        "top_p": 1,
+        "n": 1,
+        "frequency_penalty": 1,
+        "presence_penalty": 1,
+        "stream": False,
+    }
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {}".format(api_key)
+    }
+    proxies = {
+        "http": None,
+        "https": None
+    }
+    if proxy :
+        proxies = {
+            "http": "http://{}".format(proxy),
+            "https": "https://{}".format(proxy)
+        }
+    url = "https://api.openai.com/v1/chat/completions"
+    try :
+        response = requests.post(url, headers=headers, data=json.dumps(data), proxies=proxies, timeout=20)
+        response.encoding = "utf-8"
+        result = json.loads(response.text)
+        response.close()
+        try :
+            text = result["choices"][0]["message"]["content"]
+        except Exception:
+            return str(result)
+    except TimeoutError:
+        text = "私人ChatGPT：我超时啦, 请尝试重新翻译!"
+    except Exception :
+        logger.error(format_exc())
+        text = "私人ChatGPT：我抽风啦, 请尝试重新翻译!"
+
+    return text
