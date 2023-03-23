@@ -146,20 +146,32 @@ class Translation(QMainWindow) :
         self.customSetGeometry(self.drag_label, 0, 0, 4000, 2000)
         self.drag_label.setMouseTracking(True)
 
+        width = round((self.width() - 494 * self.rate) / 2)
+        height = self.height() - 30 * self.rate
         # 翻译按钮
-        self.start_button = QPushButton(qtawesome.icon("fa.play", color=self.icon_color), "", self)
+        self.start_button = QPushButton(qtawesome.icon("fa5s.play", color=self.icon_color), "", self)
         self.customSetIconSize(self.start_button, 20, 20)
-        self.customSetGeometry(self.start_button, 173, 5, 20, 20)
+        self.customSetGeometry(self.start_button, width, 5, 20, 20)
         self.start_button.setToolTip("<b>翻译键 Translate</b><br>点击后翻译（手动模式）")
         self.start_button.setStyleSheet("background: transparent;")
         self.start_button.clicked.connect(lambda: utils.thread.createThread(self.startTranslater))
         self.start_button.setCursor(ui.static.icon.SELECT_CURSOR)
         self.start_button.hide()
 
+        # 修改原文并刷新翻译按钮
+        self.edit_trans_button = QPushButton(qtawesome.icon("fa5s.edit", color=self.icon_color), "", self)
+        self.customSetIconSize(self.edit_trans_button, 20, 20)
+        self.customSetGeometry(self.edit_trans_button, width+40, 5, 20, 20)
+        self.edit_trans_button.setToolTip("<b>翻译键 Translate</b><br>点击后翻译（手动模式）")
+        self.edit_trans_button.setStyleSheet("background: transparent;")
+        #self.edit_trans_button.clicked.connect(lambda: utils.thread.createThread(self.startTranslater))
+        self.edit_trans_button.setCursor(ui.static.icon.SELECT_CURSOR)
+        self.edit_trans_button.hide()
+
         # 设置按钮
-        self.settin_button = QPushButton(qtawesome.icon("fa.cog", color=self.icon_color), "", self)
+        self.settin_button = QPushButton(qtawesome.icon("fa5s.cog", color=self.icon_color), "", self)
         self.customSetIconSize(self.settin_button, 20, 20)
-        self.customSetGeometry(self.settin_button, 213, 5, 20, 20)
+        self.customSetGeometry(self.settin_button, width+80, 5, 20, 20)
         self.settin_button.setToolTip("<b>设置键 Settin</b><br>翻译器的详细设置")
         self.settin_button.setStyleSheet("background: transparent;")
         self.settin_button.setCursor(ui.static.icon.SELECT_CURSOR)
@@ -168,7 +180,7 @@ class Translation(QMainWindow) :
         # 范围按钮
         self.range_button = QPushButton(qtawesome.icon("fa.crop", color=self.icon_color), "", self)
         self.customSetIconSize(self.range_button, 20, 20)
-        self.customSetGeometry(self.range_button, 253, 5, 20, 20)
+        self.customSetGeometry(self.range_button, width+120, 5, 20, 20)
         self.range_button.setToolTip("<b>范围 Range</b><br>框选要翻译的区域<br>需从左上到右下拖动")
         self.range_button.setStyleSheet("background: transparent;")
         self.range_button.setCursor(ui.static.icon.SELECT_CURSOR)
@@ -178,7 +190,7 @@ class Translation(QMainWindow) :
         # 多范围按钮
         self.multi_range_button = QPushButton(qtawesome.icon("fa5s.layer-group", color=self.icon_color), "", self)
         self.customSetIconSize(self.multi_range_button, 20, 20)
-        self.customSetGeometry(self.multi_range_button, 293, 5, 20, 20)
+        self.customSetGeometry(self.multi_range_button, width+160, 5, 20, 20)
         self.multi_range_button.setToolTip("<b>多区域 multi-range</b><br>设置多识别区域<br>同步识别不同区域的文字")
         self.multi_range_button.setStyleSheet("background: transparent;")
         self.multi_range_button.setCursor(ui.static.icon.SELECT_CURSOR)
@@ -187,7 +199,7 @@ class Translation(QMainWindow) :
         # 屏蔽词按钮
         self.filter_word_button = QPushButton(qtawesome.icon("fa.ban", color=self.icon_color), "", self)
         self.customSetIconSize(self.filter_word_button, 20, 20)
-        self.customSetGeometry(self.filter_word_button, 333, 5, 20, 20)
+        self.customSetGeometry(self.filter_word_button, width+200, 5, 20, 20)
         self.filter_word_button.setToolTip("<b>屏蔽字符 Filter</b><br>将特定翻译错误的词<br>屏蔽不显示")
         self.filter_word_button.setStyleSheet("background: transparent;")
         self.filter_word_button.setCursor(ui.static.icon.SELECT_CURSOR)
@@ -196,7 +208,7 @@ class Translation(QMainWindow) :
 
         # 翻译模式按钮
         self.switch_button = ui.switch.SwitchButton(self, sign=self.translate_mode, startX=(50-20)*self.rate)
-        self.customSetGeometry(self.switch_button, 373, 5, 50, 20)
+        self.customSetGeometry(self.switch_button, width+240, 5, 50, 20)
         self.switch_button.setToolTip("<b>模式 Mode</b><br>手动翻译/自动翻译")
         self.switch_button.checkedChanged.connect(self.changeTranslateMode)
         self.switch_button.setCursor(ui.static.icon.SELECT_CURSOR)
@@ -205,7 +217,7 @@ class Translation(QMainWindow) :
         # 朗读原文按钮
         self.play_voice_button = QPushButton(qtawesome.icon("fa.music", color=self.icon_color), "", self)
         self.customSetIconSize(self.play_voice_button, 20, 20)
-        self.customSetGeometry(self.play_voice_button, 443, 5, 20, 20)
+        self.customSetGeometry(self.play_voice_button, width+310, 5, 20, 20)
         self.play_voice_button.setToolTip("<b>朗读原文 Play Voice</b><br>朗读识别到的原文")
         self.play_voice_button.setStyleSheet("background: transparent;")
         self.play_voice_button.clicked.connect(lambda: utils.thread.createThread(self.sound.playSound, self.original))
@@ -215,7 +227,7 @@ class Translation(QMainWindow) :
         # 锁按钮
         self.lock_button = QPushButton(qtawesome.icon("fa.unlock", color=self.icon_color), "", self)
         self.customSetIconSize(self.lock_button, 24, 20)
-        self.customSetGeometry(self.lock_button, 483, 5, 24, 20)
+        self.customSetGeometry(self.lock_button, width+350, 5, 24, 20)
         self.lock_button.setToolTip("<b>锁定翻译界面 Lock</b>")
         self.lock_button.setStyleSheet("background: transparent;")
         self.lock_button.setCursor(ui.static.icon.SELECT_CURSOR)
@@ -225,7 +237,7 @@ class Translation(QMainWindow) :
         # 翻译历史按钮
         self.trans_history_button = QPushButton(qtawesome.icon("fa5s.book-open", color=self.icon_color), "", self)
         self.customSetIconSize(self.trans_history_button, 20, 20)
-        self.customSetGeometry(self.trans_history_button, 527, 5, 20, 20)
+        self.customSetGeometry(self.trans_history_button, width+394, 5, 20, 20)
         self.trans_history_button.setToolTip("<b>查看翻译历史 TransHistory</b>")
         self.trans_history_button.setStyleSheet("background: transparent;")
         self.trans_history_button.setCursor(ui.static.icon.SELECT_CURSOR)
@@ -234,7 +246,7 @@ class Translation(QMainWindow) :
         # 最小化按钮
         self.minimize_button = QPushButton(qtawesome.icon("fa.minus", color=self.icon_color), "", self)
         self.customSetIconSize(self.minimize_button, 20, 20)
-        self.customSetGeometry(self.minimize_button, 567, 5, 20, 20)
+        self.customSetGeometry(self.minimize_button, width+434, 5, 20, 20)
         self.minimize_button.setToolTip("<b>最小化 Minimize</b>")
         self.minimize_button.setStyleSheet("background: transparent;")
         self.minimize_button.setCursor(ui.static.icon.SELECT_CURSOR)
@@ -244,7 +256,7 @@ class Translation(QMainWindow) :
         # 退出按钮
         self.quit_button = QPushButton(qtawesome.icon("fa.times", color=self.icon_color), "", self)
         self.customSetIconSize(self.quit_button, 20, 20)
-        self.customSetGeometry(self.quit_button, 607, 5, 20, 20)
+        self.customSetGeometry(self.quit_button, width+474, 5, 20, 20)
         self.quit_button.setToolTip("<b>退出程序 Quit</b>")
         self.quit_button.setStyleSheet("background: transparent;")
         self.quit_button.setCursor(ui.static.icon.SELECT_CURSOR)
@@ -520,6 +532,7 @@ class Translation(QMainWindow) :
         # 显示所有顶部工具栏控件
         self.switch_button.show()
         self.start_button.show()
+        self.edit_trans_button.show()
         self.settin_button.show()
         self.range_button.show()
         self.multi_range_button.show()
@@ -540,26 +553,92 @@ class Translation(QMainWindow) :
         if self.statusbar_sign :
             self.statusbar.show()
 
-        width = round((self.width() - 454*self.rate) / 2)
-        height = self.height() - 30*self.rate
+        width = round((self.width() - 494 * self.rate) / 2)
+        height = self.height() - 30 * self.rate
 
         # 重置所有控件的位置和大小
-        self.start_button.setGeometry(QRect(width, 5 * self.rate, 20 * self.rate, 20 * self.rate))
-        self.settin_button.setGeometry(QRect(width + 40 * self.rate, 5 * self.rate, 20 * self.rate, 20 * self.rate))
-        self.range_button.setGeometry(QRect(width + 80 * self.rate, 5 * self.rate, 20 * self.rate, 20 * self.rate))
-        self.multi_range_button.setGeometry(QRect(width + 120 * self.rate, 5 * self.rate, 20 * self.rate, 20 * self.rate))
-        self.filter_word_button.setGeometry(QRect(width + 160 * self.rate, 5 * self.rate, 20 * self.rate, 20 * self.rate))
-        self.switch_button.setGeometry(QRect(width + 200 * self.rate, 5 * self.rate, 50 * self.rate, 20 * self.rate))
-        self.play_voice_button.setGeometry(QRect(width + 270 * self.rate, 5 * self.rate, 20 * self.rate, 20 * self.rate))
-        self.lock_button.setGeometry(QRect(width + 314 * self.rate, 5 * self.rate, 24 * self.rate, 20 * self.rate))
-        self.trans_history_button.setGeometry(QRect(width + 358 * self.rate, 5 * self.rate, 24 * self.rate, 20 * self.rate))
-        self.minimize_button.setGeometry(QRect(width + 398 * self.rate, 5 * self.rate, 20 * self.rate, 20 * self.rate))
-        self.quit_button.setGeometry(QRect(width + 438 * self.rate, 5 * self.rate, 20 * self.rate, 20 * self.rate))
-        self.translate_text.setGeometry(0, 30 * self.rate, self.width(), height * self.rate)
-
+        self.start_button.setGeometry(QRect(
+            width,
+            5 * self.rate,
+            20 * self.rate,
+            20 * self.rate
+        ))
+        self.edit_trans_button.setGeometry(QRect(
+            width + 40 * self.rate,
+            5 * self.rate,
+            20 * self.rate,
+            20 * self.rate
+        ))
+        self.settin_button.setGeometry(QRect(
+            width + 80 * self.rate,
+            5 * self.rate,
+            20 * self.rate,
+            20 * self.rate
+        ))
+        self.range_button.setGeometry(QRect(
+            width + 120 * self.rate,
+            5 * self.rate,
+            20 * self.rate,
+            20 * self.rate
+        ))
+        self.multi_range_button.setGeometry(QRect(
+            width + 160 * self.rate,
+            5 * self.rate,
+            20 * self.rate,
+            20 * self.rate
+        ))
+        self.filter_word_button.setGeometry(QRect(
+            width + 200 * self.rate,
+            5 * self.rate,
+            20 * self.rate,
+            20 * self.rate
+        ))
+        self.switch_button.setGeometry(QRect(
+            width + 240 * self.rate,
+            5 * self.rate,
+            50 * self.rate,
+            20 * self.rate
+        ))
+        self.play_voice_button.setGeometry(QRect(
+            width + 310 * self.rate,
+            5 * self.rate,
+            20 * self.rate,
+            20 * self.rate
+        ))
+        self.lock_button.setGeometry(QRect(
+            width + 350 * self.rate,
+            5 * self.rate,
+            24 * self.rate,
+            20 * self.rate
+        ))
+        self.trans_history_button.setGeometry(QRect(
+            width + 394 * self.rate,
+            5 * self.rate,
+            24 * self.rate,
+            20 * self.rate
+        ))
+        self.minimize_button.setGeometry(QRect(
+            width + 434 * self.rate,
+            5 * self.rate,
+            20 * self.rate,
+            20 * self.rate
+        ))
+        self.quit_button.setGeometry(QRect(
+            width + 474 * self.rate,
+            5 * self.rate,
+            20 * self.rate,
+            20 * self.rate
+        ))
+        self.translate_text.setGeometry(
+            0,
+            30 * self.rate,
+            self.width(),
+            height * self.rate
+        )
         # 隐藏所有顶部工具栏控件
         self.switch_button.hide()
         self.start_button.hide()
+        self.edit_trans_button.hide()
         self.settin_button.hide()
         self.range_button.hide()
         self.multi_range_button.hide()
