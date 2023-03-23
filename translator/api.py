@@ -261,10 +261,15 @@ def chatgpt(api_key, language, proxy, content, logger) :
             text = result["choices"][0]["message"]["content"]
         except Exception:
             return str(result)
-    except TimeoutError:
-        text = "私人ChatGPT：我超时啦, 请尝试重新翻译!"
-    except Exception :
+    except requests.exceptions.ReadTimeout:
+        text = "私人ChatGPT: 翻译超时, ChatGPT需要挂载代理才可使用, 请点击[代理]按钮, 正确配置好代理后重试"
+    except Exception as err:
         logger.error(format_exc())
-        text = "私人ChatGPT：我抽风啦, 请尝试重新翻译!"
+        text = "私人ChatGPT: 翻译出错: {}, 请排查完错误后重试".format(err)
+
+    regex = re.findall("\(Translated from .+? to .+?\)", text)
+    if len(regex) == 1 :
+        text = text.replace(regex[0], "")
+
 
     return text

@@ -814,7 +814,7 @@ class Settin(QMainWindow) :
         button = QPushButton(private_translater_tab)
         self.customSetGeometry(button, 285, 220, 60, 20)
         button.setText("测试")
-        #button.clicked.connect(lambda: utils.test.testChatGPT(self.object))
+        button.clicked.connect(lambda: utils.test.testChatGPT(self.object))
         button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 私人ChatGPT翻译注册按钮
