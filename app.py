@@ -97,8 +97,11 @@ class DangoTranslator :
 
         # 屏蔽词界面
         self.filter_ui = ui.filter.Filter(self)
+
         # 范围框界面
         self.range_ui = ui.range.Range(self)
+        self.range_ui.show()
+
         # 多范围参数页面
         self.multi_range_ui = ui.range.MultiRange(self)
         self.translation_ui.multi_range_button.clicked.connect(self.clickMultiRange)
