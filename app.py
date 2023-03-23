@@ -145,7 +145,20 @@ class DangoTranslator :
     def autoLoginCheck(self, message) :
         self.checkBindEmailSign = True
         utils.message.MessageBox("自动登录失败", message, self.yaml["screen_scale_rate"])
-        sys.exit()
+
+        # 如果自动登录失败就返回登录界面
+        self.login_ui = ui.login.Login(self)
+        self.login_ui.login_button.clicked.connect(self.login)
+        # 登录界面注册按键
+        self.login_ui.register_button.clicked.connect(self.register_ui.clickRegister)
+        # 登录界面忘记密码按键
+        self.login_ui.forget_password_button.clicked.connect(self.register_ui.clickForgetPassword)
+        # 关闭已经打开的界面
+        if self.translation_ui:
+            self.translation_ui.close()
+        if self.range_ui:
+            self.range_ui.close()
+        self.login_ui.show()
 
 
     # 按下多范围键后做的事情
