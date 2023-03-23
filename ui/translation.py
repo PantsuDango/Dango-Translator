@@ -58,7 +58,12 @@ class Translation(QMainWindow) :
     def ui(self) :
 
         # 窗口尺寸
-        self.resize(int(800*self.rate), int(130*self.rate))
+        if "translation_ui_coordinate" in self.object.yaml :
+            self.resize(self.object.yaml["translation_ui_coordinate"]["w"], int(130*self.rate))
+            self.move(self.object.yaml["translation_ui_coordinate"]["x"],
+                      self.object.yaml["translation_ui_coordinate"]["y"])
+        else:
+            self.resize(int(800*self.rate), int(130*self.rate))
         # 窗口无标题栏、窗口置顶、窗口透明
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
@@ -866,6 +871,12 @@ class Translation(QMainWindow) :
         self.killDriVer()
         # 退出程序前保存设置
         utils.thread.createThreadDaemonFalse(utils.config.postSaveSettin, self.object)
+        # 记录翻译框位置
+        self.object.yaml["translation_ui_coordinate"] = {
+            "x": self.x(),
+            "y": self.y(),
+            "w": self.width(),
+        }
         # 保存本地配置
         utils.config.saveConfig(self.object.yaml, self.logger)
         # 保存云本地配置
