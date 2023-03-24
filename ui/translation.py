@@ -767,7 +767,6 @@ class Translation(QMainWindow) :
                 rate=self.rate,
             )
             return
-
         self.edit_ui.edit_text.clear()
         self.edit_ui.edit_text.append(self.original)
         self.edit_ui.show()

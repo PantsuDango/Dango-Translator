@@ -420,6 +420,7 @@ class Translater(QThread) :
 
         # 更新原文
         self.object.translation_ui.original = original
+
         # 是否复制到剪贴板
         if self.object.config["showClipboard"] == "True":
             pyperclip.copy(original)

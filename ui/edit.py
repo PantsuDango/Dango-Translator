@@ -38,7 +38,7 @@ class Edit(QWidget) :
 
         # 编辑框
         self.edit_text = QTextBrowser(self)
-        self.customSetGeometry(self.edit_text, 0, 0, self.window_width, 220)
+        self.customSetGeometry(self.edit_text, 0, 0, 500, 230)
         #self.edit_text.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         #self.edit_text.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.edit_text.setStyleSheet("QTextBrowser { border-width: 0;"
