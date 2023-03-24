@@ -270,6 +270,9 @@ def chatgpt(api_key, language, proxy, content, logger) :
     regex = re.findall("\(Translated from .+? to .+?\)", text)
     if len(regex) == 1 :
         text = text.replace(regex[0], "")
+    regex = re.findall("\(Note.+?\)", text)
+    if len(regex) == 1:
+        text = text.replace(regex[0], "")
 
 
     return text

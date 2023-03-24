@@ -798,7 +798,7 @@ class Settin(QMainWindow) :
         # 私人ChatGPT翻译颜色选择
         self.chatgpt_private_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.chatgpt_color), "", private_translater_tab)
         self.customSetIconSize(self.chatgpt_private_color_button, 20, 20)
-        self.customSetGeometry(self.chatgpt_private_color_button, 215, 220, 20, 20)
+        self.customSetGeometry(self.chatgpt_private_color_button, 165, 220, 20, 20)
         self.chatgpt_private_color_button.setStyleSheet("background: transparent;")
         self.chatgpt_private_color_button.clicked.connect(lambda: self.ChangeTranslateColor("chatgpt_private", self.chatgpt_color))
         self.chatgpt_private_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
