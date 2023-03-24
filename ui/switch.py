@@ -1330,8 +1330,14 @@ class SwitchDirection(QWidget):
 
         if not self.checked and self.object.settin_ui.offline_ocr_use :
             MessageBox("竖向翻译开启失败", "检测到当前正在使用[本地OCR], [本地OCR]不支持竖向翻译      \n"
-                                         "请在[OCR设定]中选择其他OCR源再开启[竖向翻译]")
+                                         "请在[识别设定]中选择其他OCR源再开启[竖向翻译]")
             return
+
+        if not self.checked :
+            MessageBox("这是来自团子的提醒", "[竖向识别]用于当文字的阅读顺序是从上往下的时候      \n"
+                                         "常用于识别生肉漫画等场景      \n"
+                                         "请确保你理解且符合你的使用场景再开启[竖向识别]      \n"
+                                         "否则请保持此开关关闭")
 
         self.checked = not self.checked
         # 发射信号
@@ -1487,6 +1493,12 @@ class SwitchBranchLine(QWidget) :
 
 
     def mousePressEvent(self, event) :
+
+        if not self.checked :
+            MessageBox("这是来自团子的提醒", "[原文换行]开启后会强制将识别到的原文截断换行      \n"
+                                         "截断换行后原文可能不是完整句子从而导致翻译错意      \n"
+                                         "请确保你理解且符合你的使用场景再开启[原文换行]      \n"
+                                         "否则请保持此开关关闭")
 
         self.checked = not self.checked
         # 发射信号

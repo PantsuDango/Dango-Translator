@@ -833,7 +833,7 @@ class Settin(QMainWindow) :
 
         # 公共翻译备注
         label = QLabel(public_translater_tab)
-        self.customSetGeometry(label, 20, 20, 500, 20)
+        self.customSetGeometry(label, 20, 20, 800, 20)
         label.setText("免费, 无需注册, 安装Chrome浏览器后可直接使用, 但不保证其稳定性")
         label.setStyleSheet("color: %s"%self.color_2)
 
