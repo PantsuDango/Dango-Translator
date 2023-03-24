@@ -56,7 +56,7 @@ class Login(QWidget) :
         # 背景图片, 长宽比: 1.39
         label = QLabel(self)
         self.customSetGeometry(label, 0, 0, 400, 566)
-        label.setPixmap(ui.static.icon.createPixmap(ui.static.background.LOGIN, 400, 566))
+        label.setPixmap(ui.static.icon.createPixmap(ui.static.background.NEW_LOGIN, 400, 566))
 
         # 版本号
         label = QLabel(self)
