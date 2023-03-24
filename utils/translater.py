@@ -476,6 +476,65 @@ class Translater(QThread) :
             utils.thread.createThread(self.creatTranslaterThread, "original")
 
 
+    # 刷新翻译
+    def flushTranslate(self, original) :
+
+        # 更新原文
+        self.object.translation_ui.original = original
+
+        # 是否复制到剪贴板
+        if self.object.config["showClipboard"] == "True":
+            pyperclip.copy(original)
+
+        # 保存原文
+        content = utils.config.saveOriginalHisTory(original)
+        if self.object.trans_history_ui.read_file_finish:
+            self.object.trans_history_ui.data.append(content)
+        # 判断是否未开任何翻译源
+        nothing_sign = False
+
+        # 公共翻译一
+        if self.object.translation_ui.webdriver1.web_type:
+            utils.thread.createThread(self.creatTranslaterThread, "webdriver_1")
+            nothing_sign = True
+
+        # 公共翻译二
+        if self.object.translation_ui.webdriver2.web_type:
+            utils.thread.createThread(self.creatTranslaterThread, "webdriver_2")
+            nothing_sign = True
+
+        # 公共翻译三
+        if self.object.translation_ui.webdriver3.web_type:
+            utils.thread.createThread(self.creatTranslaterThread, "webdriver_3")
+            nothing_sign = True
+
+        # 私人百度
+        if self.object.config["baiduUse"] == "True":
+            utils.thread.createThread(self.creatTranslaterThread, "baidu_private")
+            nothing_sign = True
+
+        # 私人百度
+        if self.object.config["tencentUse"] == "True":
+            utils.thread.createThread(self.creatTranslaterThread, "tencent_private")
+            nothing_sign = True
+
+        # 私人彩云
+        if self.object.config["caiyunPrivateUse"] == "True":
+            utils.thread.createThread(self.creatTranslaterThread, "caiyun_private")
+            nothing_sign = True
+
+        # 私人ChatGPT
+        if self.object.config["chatgptPrivateUse"] == "True":
+            utils.thread.createThread(self.creatTranslaterThread, "chatgpt_private")
+            nothing_sign = True
+
+        # 显示原文
+        if self.object.config["showOriginal"] == "True" or not nothing_sign:
+            if not nothing_sign:
+                self.object.translation_ui.original += "\n\n未开启任何翻译源, 无法翻译, 请在[设置]-[翻译设定]内开启至少一种翻译源"
+            utils.thread.createThread(self.creatTranslaterThread, "original")
+
+
     def run(self) :
 
         # 手动翻译

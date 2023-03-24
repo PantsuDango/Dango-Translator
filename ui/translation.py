@@ -23,6 +23,7 @@ import translator.all
 import ui.switch
 import ui.range
 import ui.static.icon
+import ui.edit
 
 
 # 翻译界面
@@ -48,6 +49,7 @@ class Translation(QMainWindow) :
         self.logger = object.logger
         self.getInitConfig()
         self.ui()
+        self.edit_ui = ui.edit.Edit(self.object)
 
         # 开启翻译模块
         utils.thread.createThread(self.createWebdriverThread)
@@ -177,7 +179,7 @@ class Translation(QMainWindow) :
         ))
         self.edit_trans_button.setToolTip("<b>修改原文 Edit original</b><br>修改原文并重新翻译（手动模式）")
         self.edit_trans_button.setStyleSheet("background: transparent;")
-        #self.edit_trans_button.clicked.connect(lambda: utils.thread.createThread(self.startTranslater))
+        self.edit_trans_button.clicked.connect(self.clickEditOriginal)
         self.edit_trans_button.setCursor(ui.static.icon.SELECT_CURSOR)
         self.edit_trans_button.hide()
 
@@ -753,6 +755,22 @@ class Translation(QMainWindow) :
             self.auto_open_sign.emit(True)
         else:
             self.translate_mode = False
+
+
+    # 编辑原文并刷新翻译
+    def clickEditOriginal(self) :
+
+        if self.translate_mode :
+            utils.message.MessageBox(
+                title="这是来自团子的提醒~",
+                text="请先关闭自动翻译开关, 再进行原文编辑哦      ",
+                rate=self.rate,
+            )
+            return
+
+        self.edit_ui.edit_text.clear()
+        self.edit_ui.edit_text.append(self.original)
+        self.edit_ui.show()
 
 
     # 按下翻译键
