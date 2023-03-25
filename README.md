@@ -1,8 +1,8 @@
 # 团子翻译器 - 基于OCR的生肉翻译软件
 
 
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.3.9-ff69b4)](https://github.com/PantsuDango/Dango-Translator)
-[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2022--12--11-ff69b4)]()
+[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.4.1-ff69b4)](https://github.com/PantsuDango/Dango-Translator)
+[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2023--03--24-ff69b4)]()
 [![操作系统](https://img.shields.io/badge/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-win7--10-ff69b4)]()
 [![GitHubStars](https://img.shields.io/github/stars/PantsuDango/Dango-Translator)]()
 [![GitHubForks](https://img.shields.io/github/forks/PantsuDango/Dango-Translator)]()
@@ -19,7 +19,7 @@
 + 搭载了离线OCR，项目地址：[DangoOCR](https://github.com/PantsuDango/DangoOCR) 
 + 搭载了在线OCR，官网地址：[星河云OCR](https://cloud.stariver.org/auth/login.html)
 + 实现自动模式，循环识别区域内的文本并翻译
-+ 配置了9种翻译源
++ 配置了10种翻译源
 + 账号系统，能够自动云端保存配置
 
 
@@ -38,37 +38,24 @@
 
 #### 翻译器相关 
 
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.3.9-ff69b4)]()
-[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2022--12--11-ff69b4)]()
+[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.4.1-ff69b4)]()
+[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2023--03--24-ff69b4)]()
 
-4.3.8新增:
-1. 在线OCR添加了试用功能;      
-2. 新增自动朗读功能;      
+新增:
++ 私人翻译新增ChatGPT, 需要密钥+代理才可使用;
++ 新增可手动修改原文并刷新翻译功能, 位于翻译框的翻译键右侧新图标使用;
++ 新增翻译框自动记录上一次退出的位置和大小;
++ 在设置页面字体选择时下拉框可预览字体样式, 并且修改字体大小和样式后退出设置会立即生效;
++ 软件启动时范围框也会一起和翻译框显示;      
 
-4.3.8修复: 
-1. 修复自动翻译时翻译结果频闪问题;      
-2. 自动清理7天以前的日志, 避免冗余日志缓存; 
-
-4.3.7修复: 
-+ 修复百度OCR测试按钮会导致程序崩溃问题;      
-
-4.3.7新增:
-+ 恢复翻译界面的锁按钮;      
-
-4.3.6新增:
-+ 添加俄语识别和翻译;      
-+ 新增多范围切换功能, 界面于翻译框工具栏处开启, 有四个范围栏位, 支持快捷键操作;      
-+ 新增查看翻译历史功能, 界面于翻译框工具栏处开启;      
-
-4.3.6优化:
-+ 修复登录后卡崩溃问题, 提高软件启动速度;      
-+ 修复快捷键会失效问题, 保证快捷键稳定性;      
-+ 修改了一些提示消息的说明描述文本;      
-
-4.3.6移除:
-+ 翻译框工具栏移除了复制按钮;      
-+ 翻译框工具栏移除了锁按钮;          
-+ 更多更新日志：[查看](https://docs1.ayano.top/#/4.0/develop/changelog)  
+优化:
++ 修复自动翻译时前后截图相似度对比失效, 该问题会导致不停刷新翻译从而出现'闪烁'现象;
++ 修复公共有道翻译失效问题;
++ 自动登录失败会返回登录界面而不是失败死循环;
++ 一些提示窗口的文本优化;
++ 一些已知问题的优化;       
+ 
+更多更新日志：[查看](https://docs1.ayano.top/#/4.0/develop/changelog)  
 
 #### OCR相关
 
