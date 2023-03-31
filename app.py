@@ -1,3 +1,5 @@
+import subprocess
+
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -184,6 +186,17 @@ class DangoTranslator :
         self.range_ui.close()
         self.settin_ui.show()
 
+    # 启动本地 OCR
+    def startLocalOCR(self):
+        args = ["START"]
+        cmd = self.yaml["ocr_cmd_path"]
+        if isinstance(cmd, list):
+            for arg in cmd:
+                args.append(str(arg))
+        else:
+            args.append(str(cmd))
+        args.append(str(self.yaml["port"]))
+        subprocess.Popen(args, shell=True)
 
     # 自动打开本地OCR
     def autoOpenOfflineOCR(self) :
@@ -193,7 +206,7 @@ class DangoTranslator :
         if not utils.port.detectPort(self.yaml["port"]) :
             try :
                 # 启动本地OCR
-                os.startfile(self.yaml["ocr_cmd_path"])
+                self.startLocalOCR()
             except Exception :
                 self.logger.error(format_exc())
 

@@ -2215,13 +2215,13 @@ class Settin(QMainWindow) :
             utils.message.MessageBox("本地OCR运行失败",
                                      "本地OCR已启动, 请不要重复运行!     ")
         else :
-            try :
+            try:
                 # 启动本地OCR
-                os.startfile(self.object.yaml["ocr_cmd_path"])
-            except FileNotFoundError :
+                self.object.startLocalOCR()
+            except FileNotFoundError:
                 utils.message.MessageBox("本地OCR运行失败",
                                          "本地OCR还未安装, 请先安装!     ")
-            except Exception :
+            except Exception:
                 self.logger.error(format_exc())
                 utils.message.MessageBox("本地OCR运行失败",
                                          "原因: %s"%format_exc())

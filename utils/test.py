@@ -25,7 +25,7 @@ def testOfflineOCR(object) :
     QApplication.processEvents()
     total_time = 0
 
-    url = "http://127.0.0.1:6666/ocr/api"
+    url = "http://127.0.0.1:%d/ocr/api" % object.yaml["port"]
     body = {
         "ImagePath": TEST_IMAGE_PATH,
         "Language": "JAP"
