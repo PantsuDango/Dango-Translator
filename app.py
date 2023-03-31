@@ -1,4 +1,5 @@
 import subprocess
+import urllib.parse
 
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
@@ -19,6 +20,7 @@ import utils.message
 import utils.port
 import utils.update
 import utils.hwnd
+import utils.offline_ocr
 
 import ui.login
 import ui.register
@@ -186,28 +188,53 @@ class DangoTranslator :
         self.range_ui.close()
         self.settin_ui.show()
 
+    # 获取本地 OCR 的端口
+    def get_offline_ocr_local_port(self):
+        try:
+            url = urllib.parse.urlparse(self.yaml["offline_ocr_url"])
+        except BaseException:
+            return None
+        return url.port
+
+    # 本地 OCR 是否运行
+    def is_offline_ocr_running(self, port=None):
+        if not self.yaml["offline_ocr_cmd"]:
+            return False
+        if not port:
+            port = self.get_offline_ocr_local_port()
+        return utils.port.detectPort(port)
+
+    # 如果本地 OCR 正运行，则杀死进程
+    def kill_offline_ocr_if_running(self):
+        port = self.get_offline_ocr_local_port()
+        if not self.is_offline_ocr_running(port):
+            return False
+        utils.offline_ocr.killOfflineOCR(port)
+        return True
+
     # 启动本地 OCR
-    def startLocalOCR(self):
+    def start_offline_ocr(self):
+        cmd = self.yaml["offline_ocr_cmd"]
+        if not cmd:
+            return
         args = ["START"]
-        cmd = self.yaml["ocr_cmd_path"]
         if isinstance(cmd, list):
             for arg in cmd:
                 args.append(str(arg))
         else:
             args.append(str(cmd))
-        args.append(str(self.yaml["port"]))
         subprocess.Popen(args, shell=True)
 
     # 自动打开本地OCR
-    def autoOpenOfflineOCR(self) :
+    def autoOpenOfflineOCR(self):
 
-        if not self.config["offlineOCR"] :
+        if not self.config["offlineOCR"]:
             return
-        if not utils.port.detectPort(self.yaml["port"]) :
-            try :
+        if not self.is_offline_ocr_running():
+            try:
                 # 启动本地OCR
-                self.startLocalOCR()
-            except Exception :
+                self.start_offline_ocr()
+            except Exception:
                 self.logger.error(format_exc())
 
 

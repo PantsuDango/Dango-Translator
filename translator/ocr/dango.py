@@ -324,7 +324,7 @@ def offlineOCR(object) :
     # except Exception :
     #     object.logger.error(format_exc())
 
-    url = "http://127.0.0.1:%d/ocr/api" % object.yaml["port"]
+    url = object.yaml["offline_ocr_url"]
     language = object.config["language"]
     body = {
         "ImagePath": image_path,

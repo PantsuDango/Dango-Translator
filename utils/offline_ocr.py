@@ -15,20 +15,27 @@ OCR_ZIP_FILE_NAME = "ocr.zip"
 
 
 # 安装本地ocr
-def install_offline_ocr(object) :
+def install_offline_ocr(object):
+
+    cmd = object.yaml["offline_ocr_cmd"]
+    if cmd is False:
+        return
+
+    if isinstance(cmd, list) and len(cmd):
+        cmd = cmd[0]
 
     # 判断本地ocr是否已安装
-    if os.path.exists(object.yaml["ocr_cmd_path"]) :
+    if os.path.exists(cmd):
         utils.message.MessageBox("安装失败",
                                  "本地OCR已安装, 不需要重复安装!     ")
         return
 
-    try :
+    try:
         # 杀死本地ocr进程
-        killOfflineOCR(object.yaml["port"])
+        object.kill_offline_ocr_is_running()
         # 删除旧文件
         shutil.rmtree(OCR_INSTALL_PATH)
-    except Exception :
+    except Exception:
         object.logger.error(format_exc())
 
     object.settin_ui.progress_bar.finish_sign = False
@@ -67,10 +74,10 @@ def whether_uninstall_offline_ocr(object) :
 
 
 # 卸载本地ocr
-def uninstall_offline_ocr(object) :
+def uninstall_offline_ocr(object):
 
     # 杀死本地ocr进程解除占用
-    killOfflineOCR(object.yaml["port"])
+    object.kill_offline_ocr_if_running()
 
     # 删除本地ocr
     try:

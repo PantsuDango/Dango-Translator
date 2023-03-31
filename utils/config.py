@@ -24,8 +24,10 @@ def openConfig(logger) :
             "user": "",
             "password": "",
             "dict_info_url": "https://dango.c4a15wh.cn/DangoTranslate/ShowDict",
-            "ocr_cmd_path": ".\ocr\startOCR.cmd",
-            "port": 6666,
+            # 本地 OCR 接口地址
+            "offline_ocr_url": "http://127.0.0.1:6666/ocr/api",
+            # 本地 OCR 启动命令，可为：字符串、数组、False。当 False 时，表示不启动
+            "offline_ocr_cmd": ".\\ocr\\startOCR.cmd",
         }
 
     # 2022.02.19 添加新参数
