@@ -1,10 +1,15 @@
-import requests
+import socket
 
 
 def detectPort(port=6666):
-    if not port:
-        return False
+
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
-        return requests.head("http://127.0.0.1:%d/ocr/api" % port, timeout=2).headers.get("Dango-OCR") == "OK"
+        s.connect(("127.0.0.1", int(port)))
+        s.shutdown(2)
+        sign = True
     except Exception:
-        return False
+        sign = False
+    s.close()
+
+    return sign
