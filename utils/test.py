@@ -1,3 +1,5 @@
+import urllib.parse
+
 from PyQt5.QtWidgets import *
 import time
 import os
@@ -15,7 +17,7 @@ NEW_TEST_IMAGE_PATH = os.path.join(os.getcwd(), "config", "other", "new_image.jp
 
 
 # 测试本地OCR
-def testOfflineOCR(object) :
+def testOfflineOCR(object):
 
     # 测试信息显示窗
     object.settin_ui.desc_ui = ui.desc.Desc(object)
@@ -26,21 +28,30 @@ def testOfflineOCR(object) :
     total_time = 0
 
     url = object.yaml["offline_ocr_url"]
+    image_path = TEST_IMAGE_PATH
     body = {
-        "ImagePath": TEST_IMAGE_PATH,
-        "Language": "JAP"
+        "Language": "JAP",
     }
+    is_local = object.is_local_offline_ocr()
+    if is_local:
+        body["ImagePath"] = image_path
 
-    for num in range(1, 6) :
+    for num in range(1, 6):
         start = time.time()
         # try :
         #     translator.ocr.dango.imageBorder(TEST_IMAGE_PATH, NEW_TEST_IMAGE_PATH, "a", 20, color=(255, 255, 255))
         # except Exception :
         #     body["ImagePath"] = TEST_IMAGE_PATH
-        res = utils.http.post(url, body, object.logger)
+        if is_local:
+            res = utils.http.post(url, body, object.logger)
+        else:
+            with open(image_path, 'rb') as file:
+                res = utils.http.post(url, body, object.logger, files={
+                    'image': file
+                })
         end = time.time()
         total_time += end-start
-        if res.get("Code", -1) == 0 :
+        if res.get("Code", -1) == 0:
             object.settin_ui.desc_ui.desc_text.append("\n第{}次, 成功, 耗时{:.2f}s".format(num, (end - start)))
         else:
             object.settin_ui.desc_ui.desc_text.append("\n第{}次, 失败".format(num))

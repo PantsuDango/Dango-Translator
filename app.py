@@ -196,13 +196,18 @@ class DangoTranslator :
             return None
         return url.port
 
+    # 本地 OCR 是否本机运行
+    def is_local_offline_ocr(self):
+        return not not self.yaml["offline_ocr_cmd"]
+
     # 本地 OCR 是否运行
-    def is_offline_ocr_running(self, port=None):
-        if not self.yaml["offline_ocr_cmd"]:
+    def is_offline_ocr_running(self, local_port=None):
+        require_local = not not local_port
+        if require_local and not self.is_local_offline_ocr():
             return False
-        if not port:
-            port = self.get_offline_ocr_local_port()
-        return utils.port.detectPort(port)
+        if not local_port:
+            local_port = self.get_offline_ocr_local_port()
+        return utils.port.detectPort(local_port)
 
     # 如果本地 OCR 正运行，则杀死进程
     def kill_offline_ocr_if_running(self):
