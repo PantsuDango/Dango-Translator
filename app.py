@@ -1,6 +1,6 @@
 import subprocess
-import urllib.parse
 
+import requests
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -188,60 +188,48 @@ class DangoTranslator :
         self.range_ui.close()
         self.settin_ui.show()
 
-    # 获取本地 OCR 的端口
-    def get_offline_ocr_local_port(self):
-        try:
-            url = urllib.parse.urlparse(self.yaml["offline_ocr_url"])
-        except BaseException:
-            return None
-        return url.port
-
     # 本地 OCR 是否本机运行
     def is_local_offline_ocr(self):
         return not not self.yaml["offline_ocr_cmd"]
 
     # 本地 OCR 是否运行
-    def is_offline_ocr_running(self, local_port=None):
-        require_local = not not local_port
-        if require_local and not self.is_local_offline_ocr():
+    def is_offline_ocr_running(self):
+        try:
+            return requests.head(self.yaml["offline_ocr_url"], timeout=5).headers.get("Dango-OCR") == "OK"
+        except Exception:
             return False
-        if not local_port:
-            local_port = self.get_offline_ocr_local_port()
-        return utils.port.detectPort(local_port)
-
-    # 如果本地 OCR 正运行，则杀死进程
-    def kill_offline_ocr_if_running(self):
-        port = self.get_offline_ocr_local_port()
-        if not self.is_offline_ocr_running(port):
-            return False
-        utils.offline_ocr.killOfflineOCR(port)
-        return True
 
     # 启动本地 OCR
     def start_offline_ocr(self):
-        cmd = self.yaml["offline_ocr_cmd"]
-        if not cmd:
+        if not self.is_local_offline_ocr():
             return
-        args = ["START"]
-        if isinstance(cmd, list):
-            for arg in cmd:
-                args.append(str(arg))
+        args = ["START", "离线 OCR"]
+        cmd = self.yaml["offline_ocr_cmd"]
+
+        is_list = isinstance(cmd, list)
+        if is_list:
+            file = str(cmd[0])
         else:
-            args.append(str(cmd))
+            file = str(cmd)
+        _, ext = os.path.splitext(file)
+        if ext.lower() == ".cmd":
+            args.append("ConHost")
+        args.append(file)
+
+        if is_list:
+            for arg in cmd[1:]:
+                args.append(str(arg))
         subprocess.Popen(args, shell=True)
 
-    # 自动打开本地OCR
+    # 自动打开本地 OCR
     def autoOpenOfflineOCR(self):
-
-        if not self.config["offlineOCR"]:
+        if not self.config["offlineOCR"] or self.is_offline_ocr_running():
             return
-        if not self.is_offline_ocr_running():
-            try:
-                # 启动本地OCR
-                self.start_offline_ocr()
-            except Exception:
-                self.logger.error(format_exc())
-
+        try:
+            # 启动本地 OCR
+            self.start_offline_ocr()
+        except Exception:
+            self.logger.error(format_exc())
 
     # 初始化资源
     def InitLoadFile(self) :

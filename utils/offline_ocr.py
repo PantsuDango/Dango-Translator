@@ -1,3 +1,5 @@
+import subprocess
+
 from PyQt5.QtCore import *
 from traceback import format_exc
 import shutil
@@ -51,12 +53,37 @@ def install_offline_ocr(object):
 
 
 # 杀死本地ocr进程
-def killOfflineOCR(port) :
+def killOfflineOCR(object):
+    # path = ".\\ocr\\startOCR.cmd"
+    # path = os.path.realpath(path)
+    # path = path.replace("\\", "\\\\")
+    # subprocess.Popen(["WMIC", "PROCESS", "WHERE", "ExecutablePath='%s'" % path, "CALL", "Terminate"], shell=True)\
+    #     .wait()
 
-    popen_content = os.popen("netstat -ano |findstr %s"%port).read()
-    if popen_content :
-        pid = popen_content.split(" ")[-1]
-        os.popen("taskkill /f /t /im %s"%pid)
+    if not object.is_local_offline_ocr():
+        return
+    cmd = object.yaml["offline_ocr_cmd"]
+    if not isinstance(cmd, list):
+        cmd = [cmd]
+    _, ext = os.path.splitext(str(cmd[0]))
+    is_con_host = ext.lower() == ".cmd"
+
+    arr = []
+    for v in cmd:
+        v = str(v)
+        if " " in v:
+            v = "\"" + v + "\""
+        arr.append(v.replace("\\", "\\\\"))
+
+    cl = arr[0]
+    if len(arr) > 1:
+        if is_con_host:
+            space = ' '
+        else:
+            space = '  '
+        cl += space + ' '.join(arr[1:])
+    subprocess.Popen(["WMIC", "PROCESS", "WHERE", "CommandLine='%s'" % cl, "CALL", "Terminate"], shell=True)\
+        .wait()
 
 
 # 是否卸载本地ocr
@@ -77,7 +104,7 @@ def whether_uninstall_offline_ocr(object) :
 def uninstall_offline_ocr(object):
 
     # 杀死本地ocr进程解除占用
-    object.kill_offline_ocr_if_running()
+    utils.offline_ocr.killOfflineOCR(object)
 
     # 删除本地ocr
     try:

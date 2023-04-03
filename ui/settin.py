@@ -2203,17 +2203,21 @@ class Settin(QMainWindow) :
             self.online_ocr_probation_switch.mousePressEvent(1)
             self.online_ocr_probation_switch.updateValue()
 
-
     # 运行本地OCR
-    def runOfflineOCR(self) :
+    def runOfflineOCR(self):
+        if not self.object.is_local_offline_ocr():
+            return
 
-        # 杀死本地可能在运行 OCR 进程并检查端口是否被占用
-        if self.object.kill_offline_ocr_if_running() and self.object.is_offline_ocr_running():
+        # 杀死可能在运行的本地 OCR
+        utils.offline_ocr.killOfflineOCR(self.object)
+
+        # 本地 OCR 是否运行
+        if self.object.is_offline_ocr_running():
             utils.message.MessageBox("本地OCR运行失败",
                                      "本地OCR已启动, 请不要重复运行!     ")
         else:
             try:
-                # 启动本地OCR
+                # 启动本地 OCR
                 self.object.start_offline_ocr()
             except FileNotFoundError:
                 utils.message.MessageBox("本地OCR运行失败",
