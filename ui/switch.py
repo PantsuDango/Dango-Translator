@@ -227,7 +227,7 @@ class OfflineSwitch(QWidget):
     def mousePressEvent(self, event) :
 
         # 通过检查端口占用校验本地OCR是否运行成功
-        sign = detectPort(self.object.yaml["port"])
+        sign = self.object.is_offline_ocr_running()
         if not self.checked and not sign :
             MessageBox("本地OCR使用失败", "请先运行本地OCR, 待运行成功后再打开此开关\n"
                                           "若运行时间较长或者运行失败, 可通过交流群联系客服协助      \n"

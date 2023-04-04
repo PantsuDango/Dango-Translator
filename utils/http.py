@@ -6,7 +6,7 @@ import utils.enctry
 
 
 # 发送http请求
-def post(url, body, logger, headers=None, timeout=5) :
+def post(url, body, logger, headers=None, timeout=5, files=None):
 
     proxies = {
         "http": None,
@@ -14,33 +14,32 @@ def post(url, body, logger, headers=None, timeout=5) :
     }
     result = {}
 
-    try :
+    try:
         # 消除https警告
         requests.packages.urllib3.disable_warnings()
-    except Exception :
+    except Exception:
         pass
 
     response = None
-    try :
-        if headers :
-            response = requests.post(url, headers=headers, data=json.dumps(body), proxies=proxies, verify=False, timeout=timeout)
-        else :
-            response = requests.post(url, data=json.dumps(body), proxies=proxies, verify=False, timeout=timeout)
-        try :
+    try:
+        if not files:
+            body = json.dumps(body)
+        response = requests.post(url, headers=headers, data=body, files=files, proxies=proxies,
+                                 verify=False, timeout=timeout)
+        try:
             response.encoding = "utf-8"
             result = json.loads(response.text)
             response.close()
-        except Exception :
+        except Exception:
             response.encoding = "gb18030"
             result = json.loads(response.text)
-    except json.decoder.JSONDecodeError :
-        try :
-            logger.error("post %s error, httpcode is %s, response is %s"%(url, response.status_code, response.text))
-        except Exception :
+    except json.decoder.JSONDecodeError:
+        try:
+            logger.error("post %s error, httpcode is %s, response is %s" % (url, response.status_code, response.text))
+        except Exception:
             pass
-    except Exception :
+    except Exception:
         logger.error(format_exc())
-
 
     return result
 

@@ -1,3 +1,6 @@
+import subprocess
+
+import requests
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -17,6 +20,7 @@ import utils.message
 import utils.port
 import utils.update
 import utils.hwnd
+import utils.offline_ocr
 
 import ui.login
 import ui.register
@@ -184,19 +188,48 @@ class DangoTranslator :
         self.range_ui.close()
         self.settin_ui.show()
 
+    # 本地 OCR 是否本机运行
+    def is_local_offline_ocr(self):
+        return not not self.yaml["offline_ocr_cmd"]
 
-    # 自动打开本地OCR
-    def autoOpenOfflineOCR(self) :
+    # 本地 OCR 是否运行
+    def is_offline_ocr_running(self):
+        try:
+            return requests.head(self.yaml["offline_ocr_url"], timeout=5).headers.get("Dango-OCR") == "OK"
+        except Exception:
+            return False
 
-        if not self.config["offlineOCR"] :
+    # 启动本地 OCR
+    def start_offline_ocr(self):
+        if not self.is_local_offline_ocr():
             return
-        if not utils.port.detectPort(self.yaml["port"]) :
-            try :
-                # 启动本地OCR
-                os.startfile(self.yaml["ocr_cmd_path"])
-            except Exception :
-                self.logger.error(format_exc())
+        args = ["START", "离线 OCR"]
+        cmd = self.yaml["offline_ocr_cmd"]
 
+        is_list = isinstance(cmd, list)
+        if is_list:
+            file = str(cmd[0])
+        else:
+            file = str(cmd)
+        _, ext = os.path.splitext(file)
+        if ext.lower() == ".cmd":
+            args.append("ConHost")
+        args.append(file)
+
+        if is_list:
+            for arg in cmd[1:]:
+                args.append(str(arg))
+        subprocess.Popen(args, shell=True)
+
+    # 自动打开本地 OCR
+    def autoOpenOfflineOCR(self):
+        if not self.config["offlineOCR"] or self.is_offline_ocr_running():
+            return
+        try:
+            # 启动本地 OCR
+            self.start_offline_ocr()
+        except Exception:
+            self.logger.error(format_exc())
 
     # 初始化资源
     def InitLoadFile(self) :

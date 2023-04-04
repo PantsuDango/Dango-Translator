@@ -2203,35 +2203,35 @@ class Settin(QMainWindow) :
             self.online_ocr_probation_switch.mousePressEvent(1)
             self.online_ocr_probation_switch.updateValue()
 
-
     # 运行本地OCR
-    def runOfflineOCR(self) :
+    def runOfflineOCR(self):
+        if not self.object.is_local_offline_ocr():
+            return
 
-        # 杀死本地可能在运行ocr进程
-        utils.offline_ocr.killOfflineOCR(self.object.yaml["port"])
+        # 杀死可能在运行的本地 OCR
+        utils.offline_ocr.killOfflineOCR(self.object)
 
-        # 检查端口是否被占用
-        if utils.port.detectPort(self.object.yaml["port"]) :
+        # 本地 OCR 是否运行
+        if self.object.is_offline_ocr_running():
             utils.message.MessageBox("本地OCR运行失败",
                                      "本地OCR已启动, 请不要重复运行!     ")
-        else :
-            try :
-                # 启动本地OCR
-                os.startfile(self.object.yaml["ocr_cmd_path"])
-            except FileNotFoundError :
+        else:
+            try:
+                # 启动本地 OCR
+                self.object.start_offline_ocr()
+            except FileNotFoundError:
                 utils.message.MessageBox("本地OCR运行失败",
                                          "本地OCR还未安装, 请先安装!     ")
-            except Exception :
+            except Exception:
                 self.logger.error(format_exc())
                 utils.message.MessageBox("本地OCR运行失败",
                                          "原因: %s"%format_exc())
 
-
     # 测试本地OCR
-    def testOfflineOCR(self) :
+    def testOfflineOCR(self):
 
         # 检查端口是否被占用
-        if not utils.port.detectPort(self.object.yaml["port"]) :
+        if not self.object.is_offline_ocr_running():
             utils.message.MessageBox("测试失败",
                                      "本地OCR还没运行成功，不可以进行测试     \n"
                                      "请先启动本地OCR, 并保证其运行正常")

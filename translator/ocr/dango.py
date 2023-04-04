@@ -315,7 +315,7 @@ def dangoOCR(object, test=False) :
 
 
 # 本地OCR
-def offlineOCR(object) :
+def offlineOCR(object):
 
     image_path = os.path.join(os.getcwd(), "config", "image.jpg")
     # try :
@@ -324,14 +324,21 @@ def offlineOCR(object) :
     # except Exception :
     #     object.logger.error(format_exc())
 
-    url = "http://127.0.0.1:6666/ocr/api"
+    url = object.yaml["offline_ocr_url"]
     language = object.config["language"]
     body = {
-        "ImagePath": image_path,
         "Language": language
     }
 
-    res = utils.http.post(url, body, object.logger)
+    if object.is_local_offline_ocr():
+        body["ImagePath"] = image_path
+        res = utils.http.post(url, body, object.logger)
+    else:
+        with open(image_path, 'rb') as file:
+            res = utils.http.post(url, body, object.logger, files={
+                'Image': file
+            })
+
     if not res :
         return False, "本地OCR错误: 本地OCR所使用的端口可能被占用, 请重启电脑以释放端口后重试\n如果频繁出现, 建议切换其他OCR使用"
 
