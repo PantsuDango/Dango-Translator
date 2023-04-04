@@ -336,7 +336,7 @@ def offlineOCR(object):
     else:
         with open(image_path, 'rb') as file:
             res = utils.http.post(url, body, object.logger, files={
-                'image': file
+                'Image': file
             })
 
     if not res :

@@ -47,7 +47,7 @@ def testOfflineOCR(object):
         else:
             with open(image_path, 'rb') as file:
                 res = utils.http.post(url, body, object.logger, files={
-                    'image': file
+                    'Image': file
                 })
         end = time.time()
         total_time += end-start
