@@ -26,6 +26,7 @@ import ui.range
 import ui.settin
 import ui.static.icon
 import ui.trans_history
+import ui.manga
 
 import translator.update_chrome_driver
 import translator.update_edge_driver
@@ -111,6 +112,9 @@ class DangoTranslator :
         utils.thread.createThread(self.trans_history_ui.readTransHistory)
         self.translation_ui.trans_history_button.clicked.connect(self.clickTransHistory)
 
+        self.manga_ui = ui.manga.Manga(self)
+        self.translation_ui.manga_button.clicked.connect(self.clickManga)
+
         # 检查邮箱
         thread = utils.thread.createCheckBindEmailQThread(self)
         thread.signal.connect(self.register_ui.showBindEmailMessage)
@@ -129,6 +133,15 @@ class DangoTranslator :
 
         # 清理历史日志缓存
         utils.thread.createThread(utils.logger.clearLog)
+
+
+    # 点击漫画翻译键
+    def clickManga(self) :
+
+        self.translation_ui.hide()
+        self.range_ui.hide()
+        self.trans_history_ui.hide()
+        self.manga_ui.show()
 
 
     # 点击翻译历史键

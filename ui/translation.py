@@ -153,7 +153,7 @@ class Translation(QMainWindow) :
         self.customSetGeometry(self.drag_label, 0, 0, 4000, 2000)
         self.drag_label.setMouseTracking(True)
 
-        width = round((self.width() - 494 * self.rate) / 2)
+        width = round((self.width() - 534 * self.rate) / 2)
         # 翻译按钮
         self.start_button = QPushButton(qtawesome.icon("fa5s.play", color=self.icon_color), "", self)
         self.customSetIconSize(self.start_button, 20, 20)
@@ -298,11 +298,25 @@ class Translation(QMainWindow) :
         self.trans_history_button.setCursor(ui.static.icon.SELECT_CURSOR)
         self.trans_history_button.hide()
 
+        # 漫画翻译按钮
+        self.manga_button = QPushButton(qtawesome.icon("fa5s.image", color=self.icon_color), "", self)
+        self.customSetIconSize(self.manga_button, 20, 20)
+        self.manga_button.setGeometry(QRect(
+            width + 434 * self.rate,
+            5 * self.rate,
+            24 * self.rate,
+            20 * self.rate
+        ))
+        self.manga_button.setToolTip("<b>打开漫画翻译 MangaTranslater</b>")
+        self.manga_button.setStyleSheet("background: transparent;")
+        self.manga_button.setCursor(ui.static.icon.SELECT_CURSOR)
+        self.manga_button.hide()
+
         # 最小化按钮
         self.minimize_button = QPushButton(qtawesome.icon("fa.minus", color=self.icon_color), "", self)
         self.customSetIconSize(self.minimize_button, 20, 20)
         self.minimize_button.setGeometry(QRect(
-            width + 434 * self.rate,
+            width + 474 * self.rate,
             5 * self.rate,
             20 * self.rate,
             20 * self.rate
@@ -317,7 +331,7 @@ class Translation(QMainWindow) :
         self.quit_button = QPushButton(qtawesome.icon("fa.times", color=self.icon_color), "", self)
         self.customSetIconSize(self.quit_button, 20, 20)
         self.quit_button.setGeometry(QRect(
-            width + 474 * self.rate,
+            width + 514 * self.rate,
             5 * self.rate,
             20 * self.rate,
             20 * self.rate
@@ -607,6 +621,7 @@ class Translation(QMainWindow) :
         self.play_voice_button.show()
         self.trans_history_button.show()
         self.filter_word_button.show()
+        self.manga_button.show()
         self.setStyleSheet("QLabel#drag_label {background-color:rgba(62, 62, 62, 0.1)}")
         if self.statusbar_sign :
             self.statusbar.show()
@@ -618,7 +633,7 @@ class Translation(QMainWindow) :
         if self.statusbar_sign :
             self.statusbar.show()
 
-        width = round((self.width() - 494 * self.rate) / 2)
+        width = round((self.width() - 534 * self.rate) / 2)
         height = self.height() - 30 * self.rate
 
         # 重置所有控件的位置和大小
@@ -682,14 +697,20 @@ class Translation(QMainWindow) :
             24 * self.rate,
             20 * self.rate
         ))
-        self.minimize_button.setGeometry(QRect(
+        self.manga_button.setGeometry(QRect(
             width + 434 * self.rate,
             5 * self.rate,
             20 * self.rate,
             20 * self.rate
         ))
-        self.quit_button.setGeometry(QRect(
+        self.minimize_button.setGeometry(QRect(
             width + 474 * self.rate,
+            5 * self.rate,
+            20 * self.rate,
+            20 * self.rate
+        ))
+        self.quit_button.setGeometry(QRect(
+            width + 514 * self.rate,
             5 * self.rate,
             20 * self.rate,
             20 * self.rate
@@ -713,6 +734,7 @@ class Translation(QMainWindow) :
         self.play_voice_button.hide()
         self.trans_history_button.hide()
         self.filter_word_button.hide()
+        self.manga_button.hide()
 
         self.setStyleSheet("QLabel#drag_label {background-color:none}")
         self.textAreaChanged()
