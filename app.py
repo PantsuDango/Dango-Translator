@@ -80,7 +80,7 @@ class DangoTranslator :
         if not self.config :
             # 从云端获取配置信息
             self.config = utils.config.getDangoSettin(self)
-
+        # 配置转换组包
         utils.config.configConvert(self)
         # 登录OCR服务获取token
         utils.thread.createThread(utils.http.loginDangoOCR, self)
@@ -90,36 +90,31 @@ class DangoTranslator :
         if not auto_login:
             self.login_ui.close()
         self.translation_ui.show()
-
         # 设置界面
         self.settin_ui = ui.settin.Settin(self)
         # 翻译界面设置页面按键信号
         self.translation_ui.settin_button.clicked.connect(self.clickSettin)
-
         # 屏蔽词界面
         self.filter_ui = ui.filter.Filter(self)
-
         # 范围框界面
         self.range_ui = ui.range.Range(self)
         self.range_ui.show()
-
         # 多范围参数页面
         self.multi_range_ui = ui.range.MultiRange(self)
         self.translation_ui.multi_range_button.clicked.connect(self.clickMultiRange)
-
         # 翻译历史页面
         self.trans_history_ui = ui.trans_history.TransHistory(self)
         utils.thread.createThread(self.trans_history_ui.readTransHistory)
         self.translation_ui.trans_history_button.clicked.connect(self.clickTransHistory)
-
+        # 漫画翻译页面
         self.manga_ui = ui.manga.Manga(self)
         self.translation_ui.manga_button.clicked.connect(self.clickManga)
+        self.manga_ui.clickOldImages()
 
         # 检查邮箱
         thread = utils.thread.createCheckBindEmailQThread(self)
         thread.signal.connect(self.register_ui.showBindEmailMessage)
         utils.thread.runQThread(thread)
-
         # 自动启动本地OCR
         utils.thread.createThread(self.autoOpenOfflineOCR)
         # 界面置顶
