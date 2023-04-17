@@ -3,8 +3,11 @@
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+import os
+
 import ui.static.icon
 import utils.translater
+import translator.ocr.dango
 
 
 # 说明界面
@@ -35,7 +38,7 @@ class Manga(QWidget) :
         # 设置字体
         self.setStyleSheet("font: %spt '%s';"%(self.font_size, self.font_type))
 
-        # 打开按钮
+        # 导入原图
         button = QPushButton(self)
         self.customSetGeometry(button, 0, 0, 120, 35)
         button.setText(" 导入原图")
@@ -91,7 +94,7 @@ class Manga(QWidget) :
         # 原图列表框
         self.old_image_widget = QListWidget(self)
         self.customSetGeometry(self.old_image_widget, 0, 60, 150, 610)
-        self.old_image_widget.setIconSize(QSize(150 * self.rate, 150 * self.rate))
+        self.old_image_widget.setIconSize(QSize(100*self.rate, 100*self.rate))
         self.old_image_widget.itemSelectionChanged.connect(self.loadOldImage)
         self.old_image_widget.hide()
         self.old_image_widget.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -100,7 +103,7 @@ class Manga(QWidget) :
         # 译图列表框
         self.new_image_widget = QListWidget(self)
         self.customSetGeometry(self.new_image_widget, 0, 60, 150, 610)
-        self.new_image_widget.setIconSize(QSize(150 * self.rate, 150 * self.rate))
+        self.new_image_widget.setIconSize(QSize(100*self.rate, 100*self.rate))
         #self.new_image_widget.itemSelectionChanged.connect(self.loadNewImage)
         self.new_image_widget.hide()
 
@@ -155,6 +158,8 @@ class Manga(QWidget) :
             # 添加菜单项
             delete_action = menu.addAction("移除")
             delete_action.triggered.connect(lambda: self.removeItemWidget(item))
+            translater_action = menu.addAction("翻译")
+            translater_action.triggered.connect(lambda: self.translaterItemWidget(item))
             # 显示菜单
             cursorPos = QCursor.pos()
             menu.exec_(cursorPos)
@@ -177,14 +182,14 @@ class Manga(QWidget) :
                                                  "",
                                                  "图片类型(*.png *.jpg *.jpeg);;所有类型 (*)",
                                                  options=options)
-        # 遍历文件列表，将每个文件路径添加到 QListWidget 中
+        # 遍历文件列表, 将每个文件路径添加到列表框中
         for image_path in images :
             if image_path in self.old_image_path_list :
                 continue
             self.old_image_path_list.append(image_path)
             item = QListWidgetItem(image_path, self.old_image_widget)
             item.setIcon(QIcon(image_path))
-            item.setText("")
+            item.setText(os.path.basename(image_path))
             self.old_image_widget.addItem(item)
 
 
@@ -218,6 +223,14 @@ class Manga(QWidget) :
             pixmap = QPixmap.fromImage(image)
             self.show_image_label.setPixmap(pixmap)
             self.show_image_label.resize(pixmap.width(), pixmap.height())
+
+
+    # 单图翻译
+    def translaterItemWidget(self, item) :
+
+        row = self.old_image_widget.indexFromItem(item).row()
+        image_path = self.old_image_path_list[row]
+        translator.ocr.dango(self.object, image_path)
 
 
     # 窗口关闭处理

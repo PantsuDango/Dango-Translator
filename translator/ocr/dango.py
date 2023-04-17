@@ -224,7 +224,7 @@ def dangoOCR(object, test=False) :
 
     with open(image_path, "rb") as file :
         image = file.read()
-    imageBase64 = base64.b64encode(image).decode("utf-8")
+    image_base64 = base64.b64encode(image).decode("utf-8")
 
     headers = {}
     host = object.yaml["dict_info"].get("ocr_host", "")
@@ -232,7 +232,7 @@ def dangoOCR(object, test=False) :
         headers["Host"] = host
 
     body = {
-        "ImageB64": imageBase64,
+        "ImageB64": image_base64,
         "Language": language,
         "Verify": "Token",
         "Token": token
@@ -373,3 +373,28 @@ def offlineOCR(object) :
             return False, "本地OCR错误: 当前本地OCR版本尚未支持俄语\n请于[设置]-[识别设定]-[本地OCR]页面内, 通过卸载和安装功能, 更新最新版本的本地OCR后重试"
         else :
             return False, "本地OCR错误: %s\n如果频繁出现, 建议切换其他OCR使用"%message
+
+
+def mangaOCR(object, filepath) :
+
+    # 获取配置
+    token = object.config.get("DangoToken", "")
+    url = "https://dl-dev.ap-sh.starivercs.com:10443/v2/manga_trans/advanced/manga_ocr"
+    language = object.config.get("language", "JAP")
+    with open(image_path, "rb") as file :
+        data = file.read()
+    image_base64 = base64.b64encode(image).decode("utf-8")
+    body = {
+        "token": token,
+        "mask": True,
+        "image": image_base64
+    }
+    res = utils.http.post(url=url, body=body, logger=object.logger, timeout=20)
+    code = res.get("Code", -1)
+    if code == 0 :
+        mask = res.get("Data", {}).get("mask", "")
+        if mask :
+            with open("test.png", "wb") as file :
+                file.write(mask)
+
+    print(res)
