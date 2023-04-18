@@ -381,20 +381,24 @@ def mangaOCR(object, filepath) :
     token = object.config.get("DangoToken", "")
     url = "https://dl-dev.ap-sh.starivercs.com:10443/v2/manga_trans/advanced/manga_ocr"
     language = object.config.get("language", "JAP")
-    with open(image_path, "rb") as file :
+    with open(filepath, "rb") as file :
         data = file.read()
-    image_base64 = base64.b64encode(image).decode("utf-8")
+    image_base64 = base64.b64encode(data).decode("utf-8")
     body = {
         "token": token,
         "mask": True,
         "image": image_base64
     }
-    res = utils.http.post(url=url, body=body, logger=object.logger, timeout=20)
+    try :
+        res = utils.http.post(url=url, body=body, logger=object.logger, timeout=20)
+    except Exception as err:
+        return False, "请求漫画OCR服务失败: {}".format(err)
     code = res.get("Code", -1)
     if code == 0 :
         mask = res.get("Data", {}).get("mask", "")
         if mask :
             with open("test.png", "wb") as file :
-                file.write(mask)
-
-    print(res)
+                file.write(base64.b64decode(mask))
+        return True, res.get("Data", {})
+    else :
+        return False, "请求漫画OCR服务失败: {}".format(res.get("Message", ""))

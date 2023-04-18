@@ -62,7 +62,7 @@ def saveConfig(config, logger) :
     del config["dict_info"]
     try :
         with open(YAML_PATH, "w", encoding="utf-8") as file :
-            yaml.dump(config, file)
+            yaml.dump(config, file, allow_unicode=True, default_flow_style=False, sort_keys=False, Dumper=yaml.SafeDumper)
     except Exception :
         logger.error(format_exc())
 

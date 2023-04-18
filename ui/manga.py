@@ -156,10 +156,11 @@ class Manga(QWidget) :
         if item is not None:
             menu = QMenu(self)
             # 添加菜单项
-            delete_action = menu.addAction("移除")
-            delete_action.triggered.connect(lambda: self.removeItemWidget(item))
             translater_action = menu.addAction("翻译")
             translater_action.triggered.connect(lambda: self.translaterItemWidget(item))
+            delete_action = menu.addAction("移除")
+            delete_action.triggered.connect(lambda: self.removeItemWidget(item))
+
             # 显示菜单
             cursorPos = QCursor.pos()
             menu.exec_(cursorPos)
@@ -176,10 +177,11 @@ class Manga(QWidget) :
     # 打开图片文件列表
     def openImageFiles(self) :
 
+        dir_path = self.object.yaml.get("manga_dir_path", os.getcwd())
         options = QFileDialog.Options()
         images, _ = QFileDialog.getOpenFileNames(self,
                                                  "选择要翻译的生肉漫画原图（可多选）",
-                                                 "",
+                                                 dir_path,
                                                  "图片类型(*.png *.jpg *.jpeg);;所有类型 (*)",
                                                  options=options)
         # 遍历文件列表, 将每个文件路径添加到列表框中
@@ -191,6 +193,7 @@ class Manga(QWidget) :
             item.setIcon(QIcon(image_path))
             item.setText(os.path.basename(image_path))
             self.old_image_widget.addItem(item)
+            self.object.yaml["manga_dir_path"] = os.path.dirname(image_path)
 
 
     # 点击原图按钮
@@ -230,7 +233,7 @@ class Manga(QWidget) :
 
         row = self.old_image_widget.indexFromItem(item).row()
         image_path = self.old_image_path_list[row]
-        translator.ocr.dango(self.object, image_path)
+        translator.ocr.dango.mangaOCR(self.object, image_path)
 
 
     # 窗口关闭处理
