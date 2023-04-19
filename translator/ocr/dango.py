@@ -375,6 +375,7 @@ def offlineOCR(object) :
             return False, "本地OCR错误: %s\n如果频繁出现, 建议切换其他OCR使用"%message
 
 
+# 漫画OCR
 def mangaOCR(object, filepath) :
 
     # 获取配置
@@ -395,10 +396,6 @@ def mangaOCR(object, filepath) :
         return False, "请求漫画OCR服务失败: {}".format(err)
     code = res.get("Code", -1)
     if code == 0 :
-        mask = res.get("Data", {}).get("mask", "")
-        if mask :
-            with open("test.png", "wb") as file :
-                file.write(base64.b64decode(mask))
         return True, res.get("Data", {})
     else :
         return False, "请求漫画OCR服务失败: {}".format(res.get("Message", ""))

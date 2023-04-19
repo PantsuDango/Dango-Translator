@@ -8,6 +8,7 @@ import os
 import ui.static.icon
 import utils.translater
 import translator.ocr.dango
+import translator.api
 
 
 # 说明界面
@@ -18,6 +19,7 @@ class Manga(QWidget) :
         super(Manga, self).__init__()
 
         self.object = object
+        self.logger = object.logger
         self.getInitConfig()
         self.ui()
 
@@ -38,6 +40,9 @@ class Manga(QWidget) :
         # 设置字体
         self.setStyleSheet("font: %spt '%s';"%(self.font_size, self.font_type))
 
+        self.status_label = QLabel(self)
+        self.customSetGeometry(self.status_label, 10, 670, 1200, 20)
+
         # 导入原图
         button = QPushButton(self)
         self.customSetGeometry(button, 0, 0, 120, 35)
@@ -47,6 +52,32 @@ class Manga(QWidget) :
                              "QPushButton:pressed {background-color: #4480F9;}")
         button.setIcon(ui.static.icon.OPEN_ICON)
         button.clicked.connect(self.openImageFiles)
+
+        # 选择翻译源
+        button = QPushButton(self)
+        self.customSetGeometry(button, 120, 0, 120, 35)
+        button.setText(" 选择翻译源")
+        button.setStyleSheet("QPushButton {background: transparent;}"
+                             "QPushButton:hover {background-color: #83AAF9;}"
+                             "QPushButton:pressed {background-color: #4480F9;}")
+        button.setIcon(ui.static.icon.TRANSLATE_ICON)
+        # 翻译源菜单
+        self.trans_menu = QMenu(button)
+        self.trans_action_group = QActionGroup(self.trans_menu)
+        self.trans_action_group.setExclusive(True)
+        self.create_trans_action("私人-彩云翻译")
+        self.create_trans_action("私人-腾讯翻译")
+        self.create_trans_action("私人-百度翻译")
+        self.create_trans_action("私人-ChatGPT翻译")
+        # self.create_trans_action("公共-有道翻译")
+        # self.create_trans_action("公共-百度翻译")
+        # self.create_trans_action("公共-腾讯翻译")
+        # self.create_trans_action("公共-DeepL翻译")
+        # self.create_trans_action("公共-Bing翻译")
+        # self.create_trans_action("公共-彩云翻译")
+        # 将下拉菜单设置为按钮的菜单
+        button.setMenu(self.trans_menu)
+        self.trans_action_group.triggered.connect(self.change_select_trans)
 
         # 工具栏横向分割线
         label = QLabel(self)
@@ -109,11 +140,15 @@ class Manga(QWidget) :
 
         # 图片大图展示
         self.show_image_scroll_area = QScrollArea(self)
-        self.customSetGeometry(self.show_image_scroll_area, 150, 35, 850, 635)
+        self.customSetGeometry(self.show_image_scroll_area, 150, 35, 1000, 635)
         self.show_image_scroll_area.setWidgetResizable(True)
         #self.show_image_scroll_area.setFixedSize(600, 400)
         self.show_image_label = QLabel(self)
         self.show_image_scroll_area.setWidget(self.show_image_label)
+
+        # 译文文本列表框
+        self.text_list_widget = QListWidget(self)
+        self.customSetGeometry(self.text_list_widget, 1000, 35, 200, 635)
 
         # 底部横向分割线
         label = QLabel(self)
@@ -147,6 +182,26 @@ class Manga(QWidget) :
         object.setGeometry(QRect(int(x * self.rate),
                                  int(y * self.rate), int(w * self.rate),
                                  int(h * self.rate)))
+
+
+    # 创建下拉菜单
+    def create_trans_action(self, label) :
+
+        action = QAction(label, self.trans_menu)
+        action.setCheckable(True)
+        action.setData(label)
+        self.trans_action_group.addAction(action)
+        self.trans_menu.addAction(action)
+        if self.object.config["mangaTrans"] == label :
+            action.setChecked(True)
+            self.status_label.setText("正在使用: {}".format(label))
+
+
+    # 改变所使用的翻译源
+    def change_select_trans(self, action) :
+
+        self.object.config["mangaTrans"] = action.data()
+        self.status_label.setText("正在使用: {}".format(action.data()))
 
 
     # 设置列表框右键菜单
@@ -228,12 +283,60 @@ class Manga(QWidget) :
             self.show_image_label.resize(pixmap.width(), pixmap.height())
 
 
+    def textListWidgetAdd(self, text) :
+
+        text_edit = QTextEdit()
+        text_edit.append(text)
+        text_item = QListWidgetItem()
+        text_item.setSizeHint(text_edit.sizeHint())
+        self.text_list_widget.addItem(text_item)
+        self.text_list_widget.setItemWidget(text_item, text_edit)
+
+
     # 单图翻译
     def translaterItemWidget(self, item) :
 
         row = self.old_image_widget.indexFromItem(item).row()
         image_path = self.old_image_path_list[row]
-        translator.ocr.dango.mangaOCR(self.object, image_path)
+        # 漫画OCR
+        ocr_sign, ocr_result = translator.ocr.dango.mangaOCR(self.object, image_path)
+        if ocr_sign :
+            # 重置文本列表
+            self.text_list_widget.clear()
+            # 提取ocr文本
+            for val in ocr_result["text_block"] :
+                if not val["text"] :
+                    continue
+                original = ""
+                for text in val["text"] :
+                    original += text
+                # ocr结果加入文本列表
+                self.textListWidgetAdd(original)
+                # 翻译
+                manga_trans = self.object.config["mangaTrans"]
+                result = "未选择任何翻译源, 无法翻译"
+                if manga_trans == "私人-彩云翻译" :
+                    result = translator.api.caiyun(sentence=original,
+                                                   token=self.object.config["caiyunAPI"],
+                                                   logger=self.logger)
+                elif manga_trans == "私人-腾讯翻译" :
+                    result = translator.api.tencent(sentence=original,
+                                                    secret_id=self.object.config["tencentAPI"]["Key"],
+                                                    secret_key=self.object.config["tencentAPI"]["Secret"],
+                                                    logger=self.logger)
+                elif manga_trans == "私人-百度翻译" :
+                    result = translator.api.baidu(sentence=original,
+                                                  app_id=self.object.config["baiduAPI"]["Key"],
+                                                  secret_key=self.object.config["baiduAPI"]["Secret"],
+                                                  logger=self.logger)
+                elif manga_trans == "私人-ChatGPT翻译" :
+                    result = translator.api.chatgpt(api_key=self.object.config["chatgptAPI"],
+                                                    language=self.object.config["language"],
+                                                    proxy=self.object.config["chatgptProxy"],
+                                                    content=self.object.translation_ui.original,
+                                                    logger=self.logger)
+                # 翻译结果加入文本列表
+                self.textListWidgetAdd(result)
 
 
     # 窗口关闭处理
