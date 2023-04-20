@@ -1,10 +1,10 @@
 import time
-
 from PIL import Image
 import base64
 import os
 import hashlib
 from traceback import format_exc
+import json
 
 import utils.http
 import utils.range
@@ -380,7 +380,7 @@ def mangaOCR(object, filepath) :
 
     # 获取配置
     token = object.config.get("DangoToken", "")
-    url = "https://dl-dev.ap-sh.starivercs.com:10443/v2/manga_trans/advanced/manga_ocr"
+    url = object.yaml["dict_info"].get("manga_ocr", "https://dl-dev.ap-sh.starivercs.com:10443/v2/manga_trans/advanced/manga_ocr")
     language = object.config.get("language", "JAP")
     with open(filepath, "rb") as file :
         data = file.read()
@@ -392,10 +392,66 @@ def mangaOCR(object, filepath) :
     }
     try :
         res = utils.http.post(url=url, body=body, logger=object.logger, timeout=20)
-    except Exception as err:
+    except Exception as err :
         return False, "请求漫画OCR服务失败: {}".format(err)
+    code = res.get("Code", -1)
+    if code == 0 :
+        with open("1.json", "w", encoding="utf-8") as file :
+            file.write(json.dumps(res))
+        return True, res.get("Data", {})
+    else :
+        return False, "请求漫画OCR服务失败: {}".format(res.get("Message", ""))
+
+
+# 漫画文本消除
+def mangaIPT(object, filepath, mask) :
+
+    # 获取配置
+    token = object.config.get("DangoToken", "")
+    url = object.yaml["dict_info"].get("manga_text_inpaint", "https://dl-dev.ap-sh.starivercs.com:10443/v2/manga_trans/advanced/text_inpaint")
+    with open(filepath, "rb") as file :
+        data = file.read()
+    image_base64 = base64.b64encode(data).decode("utf-8")
+    body = {
+        "token": token,
+        "mask": mask,
+        "image": image_base64
+    }
+    try :
+        res = utils.http.post(url=url, body=body, logger=object.logger, timeout=20)
+    except Exception as err :
+        return False, "请求漫画文本消除服务失败: {}".format(err)
     code = res.get("Code", -1)
     if code == 0 :
         return True, res.get("Data", {})
     else :
-        return False, "请求漫画OCR服务失败: {}".format(res.get("Message", ""))
+        return False, "请求漫画文本消除服务失败: {}".format(res.get("Message", ""))
+
+
+# 漫画文本渲染
+def mangaRDR(object, filepath, mask, trans_list, inpainted_image, text_block) :
+
+    # 获取配置
+    token = object.config.get("DangoToken", "")
+    url = object.yaml["dict_info"].get("manga_text_render", "https://dl-dev.ap-sh.starivercs.com:10443/v2/manga_trans/advanced/text_render")
+    with open(filepath, "rb") as file :
+        data = file.read()
+    body = {
+        "token": token,
+        "image": "图像base64",
+        "mask": mask,
+        "inpainted_image": inpainted_image,
+        "translated_text": trans_list,
+        "text_block": text_block
+    }
+    with open("2.json", "w", encoding="utf-8") as file:
+        file.write(json.dumps(body))
+    try :
+        res = utils.http.post(url=url, body=body, logger=object.logger, timeout=20)
+    except Exception as err :
+        return False, "请求漫画文本渲染服务失败: {}".format(err)
+    code = res.get("Code", -1)
+    if code == 0 :
+        return True, res.get("Data", {})
+    else :
+        return False, "请求漫画文本渲染服务失败: {}".format(res.get("Message", ""))

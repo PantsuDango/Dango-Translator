@@ -4,11 +4,13 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import os
+import base64
 
 import ui.static.icon
 import utils.translater
 import translator.ocr.dango
 import translator.api
+import utils.thread
 
 
 # 说明界面
@@ -140,9 +142,8 @@ class Manga(QWidget) :
 
         # 图片大图展示
         self.show_image_scroll_area = QScrollArea(self)
-        self.customSetGeometry(self.show_image_scroll_area, 150, 35, 1000, 635)
+        self.customSetGeometry(self.show_image_scroll_area, 150, 35, 850, 635)
         self.show_image_scroll_area.setWidgetResizable(True)
-        #self.show_image_scroll_area.setFixedSize(600, 400)
         self.show_image_label = QLabel(self)
         self.show_image_scroll_area.setWidget(self.show_image_label)
 
@@ -174,6 +175,14 @@ class Manga(QWidget) :
         self.window_height = int(700 * self.rate)
         # 原图路径字典
         self.old_image_path_list = []
+        # ocr结果保存路径
+        self.ocr_result_map = {}
+        # 翻译结果暂存
+        self.trans_result_map = {}
+        # 文字消除结果暂存
+        self.ipt_result_map = {}
+        # 文字渲染结果暂存
+        self.rdr_result_map = {}
 
 
     # 根据分辨率定义控件位置尺寸
@@ -226,7 +235,25 @@ class Manga(QWidget) :
 
         row = self.old_image_widget.indexFromItem(item).row()
         self.old_image_widget.takeItem(row)
+        image_path = self.old_image_path_list[row]
+
+        # 列表框删除图片
         del self.old_image_path_list[row]
+        if image_path in self.ocr_result_map :
+            ocr_result = self.ocr_result_map[image_path]
+            # 删除ocr缓存
+            del self.ocr_result_map[image_path]
+            for val in ocr_result["text_block"] :
+                if not val["text"] :
+                    continue
+                original = ""
+                for text in val["text"] :
+                    original += text
+                if not original :
+                    continue
+                if original in self.trans_result_map :
+                    # 删除翻译缓存
+                    del self.trans_result_map[original]
 
 
     # 打开图片文件列表
@@ -281,8 +308,11 @@ class Manga(QWidget) :
             pixmap = QPixmap.fromImage(image)
             self.show_image_label.setPixmap(pixmap)
             self.show_image_label.resize(pixmap.width(), pixmap.height())
+            # 刷新文本列表框
+            self.refreshTextListWidget(self.old_image_path_list[index])
 
 
+    # 文本列表框添加子项
     def textListWidgetAdd(self, text) :
 
         text_edit = QTextEdit()
@@ -293,50 +323,139 @@ class Manga(QWidget) :
         self.text_list_widget.setItemWidget(text_item, text_edit)
 
 
+    # 刷新文本列表框
+    def refreshTextListWidget(self, image_path) :
+
+        # 重置文本列表
+        self.text_list_widget.clear()
+        # 提取ocr文本
+        if image_path not in self.ocr_result_map :
+            return
+        for val in self.ocr_result_map[image_path]["text_block"]:
+            if not val["text"]:
+                continue
+            original = ""
+            for text in val["text"]:
+                original += text
+            if not original:
+                continue
+            # ocr结果加入文本列表
+            self.textListWidgetAdd(original)
+            # 翻译结果加入文本列表
+            if original not in self.trans_result_map :
+                continue
+            self.textListWidgetAdd(self.trans_result_map[original])
+
+
     # 单图翻译
     def translaterItemWidget(self, item) :
 
         row = self.old_image_widget.indexFromItem(item).row()
         image_path = self.old_image_path_list[row]
         # 漫画OCR
-        ocr_sign, ocr_result = translator.ocr.dango.mangaOCR(self.object, image_path)
-        if ocr_sign :
-            # 重置文本列表
-            self.text_list_widget.clear()
-            # 提取ocr文本
-            for val in ocr_result["text_block"] :
-                if not val["text"] :
-                    continue
-                original = ""
-                for text in val["text"] :
-                    original += text
-                # ocr结果加入文本列表
-                self.textListWidgetAdd(original)
-                # 翻译
-                manga_trans = self.object.config["mangaTrans"]
-                result = "未选择任何翻译源, 无法翻译"
-                if manga_trans == "私人-彩云翻译" :
-                    result = translator.api.caiyun(sentence=original,
-                                                   token=self.object.config["caiyunAPI"],
-                                                   logger=self.logger)
-                elif manga_trans == "私人-腾讯翻译" :
-                    result = translator.api.tencent(sentence=original,
-                                                    secret_id=self.object.config["tencentAPI"]["Key"],
-                                                    secret_key=self.object.config["tencentAPI"]["Secret"],
-                                                    logger=self.logger)
-                elif manga_trans == "私人-百度翻译" :
-                    result = translator.api.baidu(sentence=original,
-                                                  app_id=self.object.config["baiduAPI"]["Key"],
-                                                  secret_key=self.object.config["baiduAPI"]["Secret"],
-                                                  logger=self.logger)
-                elif manga_trans == "私人-ChatGPT翻译" :
-                    result = translator.api.chatgpt(api_key=self.object.config["chatgptAPI"],
-                                                    language=self.object.config["language"],
-                                                    proxy=self.object.config["chatgptProxy"],
-                                                    content=self.object.translation_ui.original,
-                                                    logger=self.logger)
-                # 翻译结果加入文本列表
-                self.textListWidgetAdd(result)
+        if image_path not in self.ocr_result_map :
+            ocr_sign, ocr_result = translator.ocr.dango.mangaOCR(self.object, image_path)
+            # 如果请求漫画OCR出错
+            if not ocr_sign :
+                # @TODO 补全出错逻辑
+                return
+            # ocr结果暂存
+            self.ocr_result_map[image_path] = ocr_result
+            # 文字消除
+            ipt_thread = utils.thread.createThread(self.mangaTextInpaint, image_path, ocr_result["mask"])
+
+        # 提取ocr文本
+        for val in self.ocr_result_map[image_path]["text_block"] :
+            if not val["text"] :
+                continue
+            original = ""
+            for text in val["text"] :
+                original += text
+            if not original:
+                continue
+            # 翻译
+            if original not in self.trans_result_map :
+                trans_result = self.mangaTrans(self.object.config["mangaTrans"], original)
+                self.trans_result_map[original] = trans_result
+
+        # 刷新文本列表框
+        self.refreshTextListWidget(image_path)
+        # 如果有文字消除线程, 就等待文字消除完成
+        if "ipt_thread" in locals() :
+            ipt_thread.join()
+
+        # 漫画文字渲染
+        if image_path not in self.rdr_result_map :
+            self.mangaTextRdr(image_path)
+
+
+    # 漫画文字渲染
+    def mangaTextRdr(self, image_path) :
+
+        trans_list = []
+        for val in self.ocr_result_map[image_path]["text_block"]:
+            if not val["text"]:
+                continue
+            original = ""
+            for text in val["text"]:
+                original += text
+            if not original:
+                continue
+            trans_list.append(self.trans_result_map[original])
+
+        rdr_sign, result = translator.ocr.dango.mangaRDR(
+            object=self.object,
+            filepath=image_path,
+            mask=self.ocr_result_map[image_path]["mask"],
+            trans_list=trans_list,
+            inpainted_image=self.ipt_result_map[image_path],
+            text_block=self.ocr_result_map[image_path]["text_block"]
+        )
+        if not rdr_sign :
+            # @TODO 补全出错逻辑
+            print(result)
+            return
+        self.rdr_result_map[image_path] = result["rendered_image"]
+
+        with open("2.png", "wb") as file :
+            file.write(base64.b64decode(result["rendered_image"]))
+
+
+    # 漫画文字消除
+    def mangaTextInpaint(self, image_path, mask) :
+
+        ipt_sign, result = translator.ocr.dango.mangaIPT(self.object, image_path, mask)
+        if not ipt_sign :
+            # @TODO 补全出错逻辑
+            return
+        self.ipt_result_map[image_path] = result["inpainted_image"]
+
+
+    # 漫画翻译
+    def mangaTrans(self, manga_trans, original) :
+
+        result = "未选择翻译源, 无法完成翻译"
+        if manga_trans == "私人-彩云翻译":
+            result = translator.api.caiyun(sentence=original,
+                                           token=self.object.config["caiyunAPI"],
+                                           logger=self.logger)
+        elif manga_trans == "私人-腾讯翻译":
+            result = translator.api.tencent(sentence=original,
+                                            secret_id=self.object.config["tencentAPI"]["Key"],
+                                            secret_key=self.object.config["tencentAPI"]["Secret"],
+                                            logger=self.logger)
+        elif manga_trans == "私人-百度翻译":
+            result = translator.api.baidu(sentence=original,
+                                          app_id=self.object.config["baiduAPI"]["Key"],
+                                          secret_key=self.object.config["baiduAPI"]["Secret"],
+                                          logger=self.logger)
+        elif manga_trans == "私人-ChatGPT翻译":
+            result = translator.api.chatgpt(api_key=self.object.config["chatgptAPI"],
+                                            language=self.object.config["language"],
+                                            proxy=self.object.config["chatgptProxy"],
+                                            content=self.object.translation_ui.original,
+                                            logger=self.logger)
+        return result
 
 
     # 窗口关闭处理
