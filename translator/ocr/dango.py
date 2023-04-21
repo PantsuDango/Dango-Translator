@@ -388,6 +388,7 @@ def mangaOCR(object, filepath) :
     body = {
         "token": token,
         "mask": True,
+        "refine": True,
         "image": image_base64
     }
     try :
@@ -396,8 +397,6 @@ def mangaOCR(object, filepath) :
         return False, "请求漫画OCR服务失败: {}".format(err)
     code = res.get("Code", -1)
     if code == 0 :
-        with open("1.json", "w", encoding="utf-8") as file :
-            file.write(json.dumps(res))
         return True, res.get("Data", {})
     else :
         return False, "请求漫画OCR服务失败: {}".format(res.get("Message", ""))
@@ -444,8 +443,6 @@ def mangaRDR(object, filepath, mask, trans_list, inpainted_image, text_block) :
         "translated_text": trans_list,
         "text_block": text_block
     }
-    with open("2.json", "w", encoding="utf-8") as file:
-        file.write(json.dumps(body))
     try :
         res = utils.http.post(url=url, body=body, logger=object.logger, timeout=20)
     except Exception as err :
