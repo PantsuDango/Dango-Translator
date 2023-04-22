@@ -390,15 +390,23 @@ def mangaOCR(object, filepath) :
         "refine": True,
         "image": image_base64
     }
+    sign = False
+    result = ""
     try :
         res = utils.http.post(url=url, body=body, logger=object.logger, timeout=20)
     except Exception as err :
-        return False, "请求漫画OCR服务失败: {}".format(err)
-    code = res.get("Code", -1)
-    if code == 0 :
-        return True, res.get("Data", {})
-    else :
-        return False, "请求漫画OCR服务失败: {}".format(res.get("Message", ""))
+        result = "请求漫画OCR服务失败: {}".format(err)
+    except :
+        code = res.get("Code", -1)
+        if code == 0 :
+            result = res.get("Data", {})
+            sign = True
+        else :
+            result = "请求漫画OCR服务失败: {}".format(res.get("Message", ""))
+    if not sign :
+        object.logger.error(result)
+
+    return sign, result
 
 
 # 漫画文本消除
@@ -415,15 +423,23 @@ def mangaIPT(object, filepath, mask) :
         "mask": mask,
         "image": image_base64
     }
-    try :
+    sign = False
+    result = ""
+    try:
         res = utils.http.post(url=url, body=body, logger=object.logger, timeout=20)
-    except Exception as err :
-        return False, "请求漫画文本消除服务失败: {}".format(err)
-    code = res.get("Code", -1)
-    if code == 0 :
-        return True, res.get("Data", {})
-    else :
-        return False, "请求漫画文本消除服务失败: {}".format(res.get("Message", ""))
+    except Exception as err:
+        result = "请求漫画文本消除服务失败: {}".format(err)
+    except:
+        code = res.get("Code", -1)
+        if code == 0:
+            result = res.get("Data", {})
+            sign = True
+        else:
+            result = "请求漫画文本消除服务失败: {}".format(res.get("Message", ""))
+    if not sign :
+        object.logger.error(result)
+
+    return sign, result
 
 
 # 漫画文本渲染
@@ -439,12 +455,20 @@ def mangaRDR(object, mask, trans_list, inpainted_image, text_block) :
         "translated_text": trans_list,
         "text_block": text_block
     }
-    try :
+    sign = False
+    result = ""
+    try:
         res = utils.http.post(url=url, body=body, logger=object.logger, timeout=20)
-    except Exception as err :
-        return False, "请求漫画文本渲染服务失败: {}".format(err)
-    code = res.get("Code", -1)
-    if code == 0 :
-        return True, res.get("Data", {})
-    else :
-        return False, "请求漫画文本渲染服务失败: {}".format(res.get("Message", ""))
+    except Exception as err:
+        result = "请求漫画文本渲染服务失败: {}".format(err)
+    except:
+        code = res.get("Code", -1)
+        if code == 0:
+            result = res.get("Data", {})
+            sign = True
+        else:
+            result = "请求漫画文本渲染服务失败: {}".format(res.get("Message", ""))
+    if not sign:
+        object.logger.error(result)
+
+    return sign, result

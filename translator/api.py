@@ -214,7 +214,7 @@ def caiyun(sentence, token, logger) :
 def chatgpt(api_key, language, proxy, content, logger) :
 
     if not api_key :
-        return "私人彩云: 还未填入私人ChatGPT密钥, 不可使用"
+        return "私人ChatGPT: 还未填入私人ChatGPT密钥, 不可使用"
 
     language_map = {
         "JAP": "japanese",
