@@ -312,7 +312,13 @@ class Manga(QWidget) :
             item.setIcon(QIcon(image_path))
             item.setText(os.path.basename(image_path))
             self.old_image_widget.addItem(item)
-            self.object.yaml["manga_dir_path"] = os.path.dirname(image_path)
+
+        for image_path in images :
+            manga_dir_path = os.path.dirname(image_path)
+            # 记忆上次操作的目录
+            self.object.yaml["manga_dir_path"] = manga_dir_path
+
+            break
 
 
     # 点击原图按钮
@@ -412,6 +418,15 @@ class Manga(QWidget) :
             if not ocr_sign :
                 # @TODO 补全出错逻辑
                 return
+
+            # 缓存ocr结果
+            dango_manga_path, file_name = self.getDangoMangaPath(image_path)
+            ocr_result_file = os.path.join(dango_manga_path, "{}.json".format(file_name))
+            with open(ocr_result_file, "w", encoding="utf-8") as file :
+                json.dump(ocr_result, file, indent=4)
+
+            mask_result_file = os.path.join(dango_manga_path, "{}_mask.png".format(file_name))
+
             # ocr结果暂存
             self.ocr_result_map[image_path] = ocr_result
             # 文字消除
@@ -472,7 +487,6 @@ class Manga(QWidget) :
 
         rdr_sign, result = translator.ocr.dango.mangaRDR(
             object=self.object,
-            filepath=image_path,
             mask=self.ocr_result_map[image_path]["mask"],
             trans_list=trans_list,
             inpainted_image=self.ipt_result_map[image_path],
@@ -519,6 +533,64 @@ class Manga(QWidget) :
                                             content=self.object.translation_ui.original,
                                             logger=self.logger)
         return result
+
+
+    # 获取工作目录
+    def getDangoMangaPath(self, image_path) :
+
+        # 获取漫画翻译缓存目录
+        base_path = os.path.dirname(image_path)
+        dango_manga_path = os.path.join(base_path, "dango_manga")
+        # 如果目录不存在就创建工作缓存目录
+        if not os.path.exists(dango_manga_path) :
+            os.mkdir(dango_manga_path)
+        # 如果目录不存在就创建工作缓存目录
+        tmp_path = os.path.join(dango_manga_path, "tmp")
+        if not os.path.exists(tmp_path) :
+            os.mkdir(tmp_path)
+        # 获取不带拓展名的文件名
+        file_name = os.path.splitext(os.path.basename(image_path))[0]
+
+        return dango_manga_path, file_name
+
+
+    # 获取某张图对应的Json结果文件缓存路径
+    def getJsonFilePath(self, image_path) :
+
+        dango_manga_path, file_name = self.getDangoMangaPath(image_path)
+        tmp_path = os.path.join(dango_manga_path, "tmp")
+        file_path = os.path.join(tmp_path, "{}.json".format(file_name))
+
+        return file_path
+
+
+    # 获取某张图对应的mask结果文件缓存路径
+    def getMaskFilePath(self, image_path) :
+
+        dango_manga_path, file_name = self.getDangoMangaPath(image_path)
+        tmp_path = os.path.join(dango_manga_path, "tmp")
+        file_path = os.path.join(tmp_path, "{}_mask.png".format(file_name))
+
+        return file_path
+
+
+    # 获取某张图对应的文字消除结果文件缓存路径
+    def getIptFilePath(self, image_path) :
+
+        dango_manga_path, file_name = self.getDangoMangaPath(image_path)
+        tmp_path = os.path.join(dango_manga_path, "tmp")
+        file_path = os.path.join(tmp_path, "{}_ipt.png".format(file_name))
+
+        return file_path
+
+
+    # 获取某张图对应的文字渲染结果文件缓存路径
+    def getrdrFilePath(self, image_path) :
+
+        dango_manga_path, file_name = self.getDangoMangaPath(image_path)
+        file_path = os.path.join(dango_manga_path, "{}.png".format(file_name))
+
+        return file_path
 
 
     # 窗口关闭处理
