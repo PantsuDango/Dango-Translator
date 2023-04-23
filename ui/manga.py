@@ -5,6 +5,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import os
 import base64
+import shutil
 
 import ui.static.icon
 import utils.translater
@@ -153,6 +154,7 @@ class Manga(QWidget) :
         # 译文文本列表框
         self.text_list_widget = QListWidget(self)
         self.customSetGeometry(self.text_list_widget, 1000, 35, 200, 635)
+        self.text_list_widget.hide()
 
         # 底部横向分割线
         label = QLabel(self)
@@ -176,18 +178,10 @@ class Manga(QWidget) :
         # 界面尺寸
         self.window_width = int(1200 * self.rate)
         self.window_height = int(700 * self.rate)
-        # 原图路径字典
+        # 原图路径列表
         self.old_image_path_list = []
-        # 译图路径字典
+        # 译图路径列表
         self.new_image_path_list = []
-        # ocr结果保存路径
-        self.ocr_result_map = {}
-        # 翻译结果暂存
-        self.trans_result_map = {}
-        # 文字消除结果暂存
-        self.ipt_result_map = {}
-        # 文字渲染结果暂存
-        self.rdr_result_map = {}
 
 
     # 根据分辨率定义控件位置尺寸
@@ -198,7 +192,7 @@ class Manga(QWidget) :
                                  int(h * self.rate)))
 
 
-    # 创建下拉菜单
+    # 创建翻译源按钮的下拉菜单
     def create_trans_action(self, label) :
 
         action = QAction(label, self.trans_menu)
@@ -253,7 +247,7 @@ class Manga(QWidget) :
     # 译图框保存图片
     def saveImageItemWidget(self, item) :
 
-        row = self.old_image_widget.indexFromItem(item).row()
+        row = self.new_image_widget.indexFromItem(item).row()
         image_path = self.new_image_path_list[row]
 
         options = QFileDialog.Options()
@@ -263,35 +257,25 @@ class Manga(QWidget) :
                                                    "图片类型(*.png *.jpg *.jpeg);;所有类型 (*)",
                                                    options=options)
         if file_path :
-            rdr_result = self.rdr_result_map[image_path]
-            with open(file_path, "wb") as file :
-                file.write(base64.b64decode(rdr_result))
+            shutil.copy(self.getRdrFilePath(image_path), file_path)
 
 
     # 列表框右键菜单删除子项
     def removeItemWidget(self, item) :
 
         row = self.old_image_widget.indexFromItem(item).row()
-        self.old_image_widget.takeItem(row)
+        if row > (len(self.old_image_path_list) - 1) :
+            return
         image_path = self.old_image_path_list[row]
 
-        # 列表框删除图片
-        del self.old_image_path_list[row]
-        if image_path in self.ocr_result_map :
-            ocr_result = self.ocr_result_map[image_path]
-            # 删除ocr缓存
-            del self.ocr_result_map[image_path]
-            for val in ocr_result["text_block"] :
-                if not val["text"] :
-                    continue
-                original = ""
-                for text in val["text"] :
-                    original += text
-                if not original :
-                    continue
-                if original in self.trans_result_map :
-                    # 删除翻译缓存
-                    del self.trans_result_map[original]
+        # 原图列表框删除图片
+        self.old_image_path_list.remove(image_path)
+        self.old_image_widget.takeItem(row)
+        # 译图列表框删除图片
+        if image_path in self.new_image_path_list :
+            row = self.new_image_path_list.index(image_path)
+            self.new_image_path_list.remove(image_path)
+            self.new_image_widget.takeItem(row)
 
 
     # 打开图片文件列表
@@ -325,6 +309,7 @@ class Manga(QWidget) :
     # 点击原图按钮
     def clickOldImages(self) :
 
+        self.text_list_widget.hide()
         self.old_image_widget.show()
         self.new_image_widget.hide()
         self.old_images_button.setStyleSheet("background-color: #83AAF9;")
@@ -335,6 +320,7 @@ class Manga(QWidget) :
     # 点击译图按钮
     def clickNewImages(self) :
 
+        self.text_list_widget.show()
         self.old_image_widget.hide()
         self.new_image_widget.show()
         self.new_images_button.setStyleSheet("background-color: #83AAF9;")
