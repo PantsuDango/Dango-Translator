@@ -118,16 +118,25 @@ class Manga(QWidget) :
         # 原图列表框
         self.original_image_widget = QListWidget(self)
         self.customSetGeometry(self.original_image_widget, 0, 60, 200, 610)
-        self.original_image_widget.setIconSize(QSize(100*self.rate, 100*self.rate))
+        self.original_image_widget.setIconSize(QSize(180*self.rate, 180*self.rate))
         self.original_image_widget.itemSelectionChanged.connect(self.loadOriginalImage)
         self.original_image_widget.hide()
         self.original_image_widget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.original_image_widget.customContextMenuRequested.connect(self.showOriginalListWidgetMenu)
 
+        # 原图列表框
+        self.edit_image_widget = QListWidget(self)
+        self.customSetGeometry(self.edit_image_widget, 0, 60, 200, 610)
+        self.edit_image_widget.setIconSize(QSize(180*self.rate, 180*self.rate))
+        self.edit_image_widget.itemSelectionChanged.connect(self.loadEditImage)
+        self.edit_image_widget.hide()
+        self.edit_image_widget.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.edit_image_widget.customContextMenuRequested.connect(self.showEditListWidgetMenu)
+
         # 译图列表框
         self.trans_image_widget = QListWidget(self)
         self.customSetGeometry(self.trans_image_widget, 0, 60, 200, 610)
-        self.trans_image_widget.setIconSize(QSize(100*self.rate, 100*self.rate))
+        self.trans_image_widget.setIconSize(QSize(180*self.rate, 180*self.rate))
         self.trans_image_widget.itemSelectionChanged.connect(self.loadTransImage)
         self.trans_image_widget.hide()
         self.trans_image_widget.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -158,6 +167,8 @@ class Manga(QWidget) :
         self.window_height = int(700 * self.rate)
         # 原图路径列表
         self.original_image_path_list = []
+        # 编辑图路径列表
+        self.edit_image_path_list = []
         # 译图路径列表
         self.trans_image_path_list = []
 
@@ -180,6 +191,69 @@ class Manga(QWidget) :
         label.setStyleSheet("border-width: 1px; "
                             "border-style: solid; "
                             "border-color: rgba(62, 62, 62, 0.2);")
+
+
+    # 打开图片文件列表
+    def openImageFiles(self):
+
+        # 文件选择器
+        dir_path = self.object.yaml.get("manga_dir_path", os.getcwd())
+        options = QFileDialog.Options()
+        images, _ = QFileDialog.getOpenFileNames(self,
+                                                 "选择要翻译的生肉漫画原图（可多选）",
+                                                 dir_path,
+                                                 "图片类型(*.png *.jpg *.jpeg);;所有类型 (*)",
+                                                 options=options)
+        # 遍历文件列表, 将每个文件路径添加到列表框中
+        for image_path in images:
+            if image_path in self.original_image_path_list:
+                continue
+            # 原图添加至列表框
+            self.originalImageWidgetAddImage(image_path)
+
+            # 如果有ipt图, 则添加到编辑框
+            ipt_image_path = self.getIptFilePath(image_path)
+            if os.path.exists(ipt_image_path):
+                self.editImageWidgetAddImage(image_path)
+            else :
+                item = QListWidgetItem(ipt_image_path, self.edit_image_widget)
+                item.setSizeHint(QSize(0, 100*self.rate))
+                item.setText(os.path.basename(ipt_image_path))
+                self.edit_image_widget.addItem(item)
+
+            # 如果有rdr图, 则添加到译图框
+            if os.path.exists(self.getRdrFilePath(image_path)):
+                self.transImageWidgetAddImage(image_path)
+        # 记忆上次操作的目录
+        for image_path in images:
+            self.object.yaml["manga_dir_path"] = os.path.dirname(image_path)
+            break
+
+
+    # 点击 原图/编辑/译图 按钮
+    def clickImageButton(self, button_type):
+
+        self.original_image_widget.hide()
+        self.edit_image_widget.hide()
+        self.trans_image_widget.hide()
+        self.original_image_button.setStyleSheet("QPushButton {background: transparent;}"
+                                                 "QPushButton:hover {background-color: #83AAF9;}")
+        self.edit_image_button.setStyleSheet("QPushButton {background: transparent;}"
+                                             "QPushButton:hover {background-color: #83AAF9;}")
+        self.trans_image_button.setStyleSheet("QPushButton {background: transparent;}"
+                                              "QPushButton:hover {background-color: #83AAF9;}")
+        if button_type == "original":
+            self.loadOriginalImage()
+            self.original_image_widget.show()
+            self.original_image_button.setStyleSheet("background-color: #83AAF9;")
+        elif button_type == "edit":
+            self.loadEditImage()
+            self.edit_image_widget.show()
+            self.edit_image_button.setStyleSheet("background-color: #83AAF9;")
+        elif button_type == "trans":
+            self.loadTransImage()
+            self.trans_image_widget.show()
+            self.trans_image_button.setStyleSheet("background-color: #83AAF9;")
 
 
     # 创建翻译源按钮的下拉菜单
@@ -218,6 +292,20 @@ class Manga(QWidget) :
             menu.exec_(cursorPos)
 
 
+    # 设置编辑图列表框右键菜单
+    def showEditListWidgetMenu(self, pos):
+
+        item = self.edit_image_widget.itemAt(pos)
+        if item is not None:
+            menu = QMenu(self)
+            # 添加菜单项
+            rdr_action = menu.addAction("重新渲染翻译结果")
+            # rdr_action.triggered.connect(lambda: self.saveImageItemWidget(item))
+            # 显示菜单
+            cursorPos = QCursor.pos()
+            menu.exec_(cursorPos)
+
+
     # 设置译图列表框右键菜单
     def showTransListWidgetMenu(self, pos):
 
@@ -227,8 +315,6 @@ class Manga(QWidget) :
             # 添加菜单项
             output_action = menu.addAction("另存为")
             output_action.triggered.connect(lambda: self.saveImageItemWidget(item))
-            rdr_action = menu.addAction("重新渲染翻译结果")
-            #rdr_action.triggered.connect(lambda: self.saveImageItemWidget(item))
             # 显示菜单
             cursorPos = QCursor.pos()
             menu.exec_(cursorPos)
@@ -260,6 +346,11 @@ class Manga(QWidget) :
         # 原图列表框删除图片
         self.original_image_path_list.remove(image_path)
         self.original_image_widget.takeItem(row)
+        # 编辑图列表框删除图片
+        if image_path in self.edit_image_path_list :
+            row = self.edit_image_path_list.index(image_path)
+            self.edit_image_path_list.remove(image_path)
+            self.edit_image_widget.takeItem(row)
         # 译图列表框删除图片
         if image_path in self.trans_image_path_list :
             row = self.trans_image_path_list.index(image_path)
@@ -267,40 +358,27 @@ class Manga(QWidget) :
             self.trans_image_widget.takeItem(row)
 
 
-    # 打开图片文件列表
-    def openImageFiles(self) :
-
-        # 文件选择器
-        dir_path = self.object.yaml.get("manga_dir_path", os.getcwd())
-        options = QFileDialog.Options()
-        images, _ = QFileDialog.getOpenFileNames(self,
-                                                 "选择要翻译的生肉漫画原图（可多选）",
-                                                 dir_path,
-                                                 "图片类型(*.png *.jpg *.jpeg);;所有类型 (*)",
-                                                 options=options)
-        # 遍历文件列表, 将每个文件路径添加到列表框中
-        for image_path in images :
-            if image_path in self.original_image_path_list :
-                continue
-            # 原图添加至列表框
-            self.originalImageWidgetAddImage(image_path)
-            # 如果有译图, 则添加到译图框
-            if os.path.exists(self.getRdrFilePath(image_path)) :
-                self.transImageWidgetAddImage(image_path)
-        # 记忆上次操作的目录
-        for image_path in images :
-            self.object.yaml["manga_dir_path"] = os.path.dirname(image_path)
-            break
-
-
     # 原图列表框添加图片
     def originalImageWidgetAddImage(self, image_path):
 
         item = QListWidgetItem(image_path, self.original_image_widget)
+        item.setSizeHint(QSize(0, 100*self.rate))
         item.setIcon(QIcon(image_path))
         item.setText(os.path.basename(image_path))
         self.original_image_widget.addItem(item)
         self.original_image_path_list.append(image_path)
+
+
+    # 编辑列表框添加图片
+    def editImageWidgetAddImage(self, image_path) :
+
+        ipt_image_path = self.getIptFilePath(image_path)
+        item = QListWidgetItem(ipt_image_path, self.edit_image_widget)
+        item.setSizeHint(QSize(0, 100*self.rate))
+        item.setIcon(QIcon(ipt_image_path))
+        item.setText(os.path.basename(ipt_image_path))
+        self.edit_image_widget.addItem(item)
+        self.edit_image_path_list.append(image_path)
 
 
     # 译图列表框添加图片
@@ -308,33 +386,11 @@ class Manga(QWidget) :
 
         trans_image_path = self.getRdrFilePath(image_path)
         item = QListWidgetItem(trans_image_path, self.trans_image_widget)
+        item.setSizeHint(QSize(0, 100*self.rate))
         item.setIcon(QIcon(trans_image_path))
         item.setText(os.path.basename(trans_image_path))
         self.trans_image_widget.addItem(item)
         self.trans_image_path_list.append(image_path)
-
-
-    # 点击 原图/编辑/译图 按钮
-    def clickImageButton(self, button_type) :
-
-        self.original_image_widget.hide()
-        self.trans_image_widget.hide()
-        self.original_image_button.setStyleSheet("QPushButton {background: transparent;}"
-                                                 "QPushButton:hover {background-color: #83AAF9;}")
-        self.edit_image_button.setStyleSheet("QPushButton {background: transparent;}"
-                                             "QPushButton:hover {background-color: #83AAF9;}")
-        self.trans_image_button.setStyleSheet("QPushButton {background: transparent;}"
-                                              "QPushButton:hover {background-color: #83AAF9;}")
-
-        if button_type == "original" :
-            self.original_image_widget.show()
-            self.original_image_button.setStyleSheet("background-color: #83AAF9;")
-        elif button_type == "edit" :
-            self.trans_image_widget.show()
-            self.edit_image_button.setStyleSheet("background-color: #83AAF9;")
-        elif button_type == "trans" :
-            self.trans_image_widget.show()
-            self.trans_image_button.setStyleSheet("background-color: #83AAF9;")
 
 
     # 大图展示框刷新图片
@@ -351,17 +407,25 @@ class Manga(QWidget) :
     def loadOriginalImage(self) :
 
         index = self.original_image_widget.currentRow()
-        if index < len(self.original_image_path_list) :
+        if index >= 0 and index < len(self.original_image_path_list) :
             image_path = self.original_image_path_list[index]
             self.showImageLabelRefresh(image_path)
+
+
+    # 展示编辑图图片大图
+    def loadEditImage(self):
+
+        index = self.edit_image_widget.currentRow()
+        if index >= 0 and index < len(self.edit_image_path_list):
+            image_path = self.edit_image_path_list[index]
+            self.showImageLabelRefresh(self.getIptFilePath(image_path))
 
 
     # 展示译图图片大图
     def loadTransImage(self):
 
         index = self.trans_image_widget.currentRow()
-
-        if index < len(self.trans_image_path_list) :
+        if index >= 0 and index < len(self.trans_image_path_list) :
             image_path = self.trans_image_path_list[index]
             self.showImageLabelRefresh(self.getRdrFilePath(image_path))
 
@@ -394,6 +458,8 @@ class Manga(QWidget) :
             sign, ipt_result = self.mangaTextInpaint(image_path)
             if not sign:
                 return utils.message.MessageBox("文字消除过程失败", ipt_result, self.rate)
+            # 消除好的图片加入编辑图列表框
+            self.editImageWidgetAddImage(image_path)
 
         # 漫画文字渲染
         if not os.path.exists(self.getRdrFilePath(image_path)):
