@@ -59,7 +59,6 @@ def openConfig(logger) :
 def saveConfig(config, logger) :
 
     config = config.copy()
-    del config["dict_info"]
     try :
         with open(YAML_PATH, "w", encoding="utf-8") as file :
             yaml.dump(config, file)

@@ -43,9 +43,11 @@ class DangoTranslator :
         # 本地配置
         self.yaml = utils.config.openConfig(self.logger)
         # 版本号
-        self.yaml["version"] = "4.4.2"
+        self.yaml["version"] = "4.4.3"
         # 配置中心
-        self.yaml["dict_info"] = utils.config.getDictInfo(self.yaml["dict_info_url"], self.logger)
+        dict_info = utils.config.getDictInfo(self.yaml["dict_info_url"], self.logger)
+        if dict_info :
+            self.yaml["dict_info"] = dict_info
         # 屏幕分辨率
         self.yaml["screen_scale_rate"] = utils.screen_rate.getScreenRate(self.logger)
         # 保存配置
@@ -233,16 +235,16 @@ class DangoTranslator :
     # 主函数
     def main(self) :
 
-        # 更新缺失的运行库
-        utils.update.updatePilFile(self)
         # 自适应高分辨率
         QCoreApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
         app = QApplication(sys.argv)
-        # 连接配置中心
-        if not self.yaml["dict_info"] :
-            utils.message.serverClientFailMessage(self)
         # 加载静态资源
         ui.static.icon.initIcon(self.yaml["screen_scale_rate"])
+        # 连接配置中心
+        if not self.yaml.get("dict_info", {}) :
+            utils.message.serverClientFailMessage(self)
+        # 更新缺失的运行库
+        utils.update.updatePilFile(self)
         # 启动图标
         self.showSplash()
         # 检查是否为测试版本
