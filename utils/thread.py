@@ -47,13 +47,10 @@ class createCheckBindEmailQThread(QThread) :
     signal = pyqtSignal(bool)
 
     def __init__(self, object):
-
         super(createCheckBindEmailQThread, self).__init__()
         self.object = object
 
-
     def run(self) :
-
         if not utils.email.bindEmail(self.object):
             self.signal.emit(False)
 
@@ -65,13 +62,10 @@ class createShowTranslateTextQThread(QThread) :
     signal = pyqtSignal(str)
 
     def __init__(self, object):
-
         super(createShowTranslateTextQThread, self).__init__()
         self.object = object
 
-
     def run(self) :
-
         # 获取版本广播信息
         result = utils.config.getVersionMessage(self.object)
         if result != "" and result != "No" :
@@ -86,13 +80,10 @@ class createCheckVersionQThread(QThread) :
     signal = pyqtSignal(bool)
 
     def __init__(self, object):
-
         super(createCheckVersionQThread, self).__init__()
         self.object = object
 
-
     def run(self) :
-
         if self.object.yaml["version"] != self.object.yaml["dict_info"]["latest_version"] :
             self.signal.emit(False)
 
@@ -103,13 +94,29 @@ class createCheckAutoLoginQThread(QThread) :
     signal = pyqtSignal(str)
 
     def __init__(self, object):
-
         super(createCheckAutoLoginQThread, self).__init__()
         self.object = object
-
 
     def run(self) :
         message = utils.http.loginCheck(self.object)
         if message :
             self.signal.emit(message)
 
+
+# 漫画
+class createMangaTransQThread(QThread) :
+
+    def __init__(self, window, image_path):
+
+        super(createMangaTransQThread, self).__init__()
+        self.window = window
+        self.image_path = image_path
+
+    def run(self) :
+        # 翻译进程
+        self.window.transProcess(self.image_path)
+        # 跳转到译图栏
+        self.window.trans_image_button.click()
+        row = self.window.trans_image_path_list.index(self.image_path)
+        self.window.trans_image_widget.setCurrentRow(row)
+        self.window.loadTransImage()

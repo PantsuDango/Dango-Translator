@@ -396,7 +396,7 @@ def mangaOCR(object, filepath) :
         res = utils.http.post(url=url, body=body, logger=object.logger, timeout=20)
     except Exception as err :
         result = "请求漫画OCR服务失败: {}".format(err)
-    except :
+    else :
         code = res.get("Code", -1)
         if code == 0 :
             result = res.get("Data", {})
@@ -425,11 +425,11 @@ def mangaIPT(object, filepath, mask) :
     }
     sign = False
     result = ""
-    try:
+    try :
         res = utils.http.post(url=url, body=body, logger=object.logger, timeout=20)
-    except Exception as err:
+    except Exception as err :
         result = "请求漫画文本消除服务失败: {}".format(err)
-    except:
+    else :
         code = res.get("Code", -1)
         if code == 0:
             result = res.get("Data", {})
@@ -457,11 +457,11 @@ def mangaRDR(object, mask, trans_list, inpainted_image, text_block) :
     }
     sign = False
     result = ""
-    try:
+    try :
         res = utils.http.post(url=url, body=body, logger=object.logger, timeout=20)
-    except Exception as err:
+    except Exception as err :
         result = "请求漫画文本渲染服务失败: {}".format(err)
-    except:
+    else :
         code = res.get("Code", -1)
         if code == 0:
             result = res.get("Data", {})
