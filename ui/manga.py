@@ -80,51 +80,44 @@ class Manga(QWidget) :
         self.trans_action_group.triggered.connect(self.changeSelectTrans)
 
         # 工具栏横向分割线
-        label = QLabel(self)
-        self.customSetGeometry(label, 0, 35, self.window_width, 1)
-        label.setFrameShadow(QFrame.Raised)
-        label.setFrameShape(QFrame.Box)
-        label.setStyleSheet("border-width: 1px; "
-                            "border-style: solid; "
-                            "border-color: rgba(62, 62, 62, 0.2);")
+        self.createCutLine(0, 35, self.window_width, 1)
 
         # 原图按钮
         self.original_image_button = QPushButton(self)
-        self.customSetGeometry(self.original_image_button, 0, 35, 75, 25)
+        self.customSetGeometry(self.original_image_button, 0, 35, 66, 25)
         self.original_image_button.setText("原图")
         self.original_image_button.setStyleSheet("QPushButton {background: transparent;}"
                              "QPushButton:hover {background-color: #83AAF9;}")
-        self.original_image_button.clicked.connect(self.clickOriginalImageButton)
+        self.original_image_button.clicked.connect(lambda: self.clickImageButton("original"))
 
         # 原图按钮 和 译图按钮 竖向分割线
-        label = QLabel(self)
-        self.customSetGeometry(label, 74, 35, 1, 25)
-        label.setFrameShadow(QFrame.Raised)
-        label.setFrameShape(QFrame.Box)
-        label.setStyleSheet("border-width: 1px; "
-                            "border-style: solid; "
-                            "border-color: rgba(62, 62, 62, 0.2);")
+        self.createCutLine(67, 35, 1, 25)
+
+        # 编辑按钮
+        self.edit_image_button = QPushButton(self)
+        self.customSetGeometry(self.edit_image_button, 67, 35, 66, 25)
+        self.edit_image_button.setText("编辑")
+        self.edit_image_button.setStyleSheet("QPushButton {background: transparent;}"
+                                             "QPushButton:hover {background-color: #83AAF9;}")
+        self.edit_image_button.clicked.connect(lambda: self.clickImageButton("edit"))
+
+        # 原图按钮 和 译图按钮 竖向分割线
+        self.createCutLine(134, 35, 1, 25)
 
         # 译图按钮
         self.trans_image_button = QPushButton(self)
-        self.customSetGeometry(self.trans_image_button, 75, 35, 75, 25)
+        self.customSetGeometry(self.trans_image_button, 134, 35, 66, 25)
         self.trans_image_button.setText("译图")
         self.trans_image_button.setStyleSheet("QPushButton {background: transparent;}"
                              "QPushButton:hover {background-color: #83AAF9;}")
-        self.trans_image_button.clicked.connect(self.clickTransImageButton)
+        self.trans_image_button.clicked.connect(lambda: self.clickImageButton("trans"))
 
         # 译图右侧竖向分割线
-        label = QLabel(self)
-        self.customSetGeometry(label, 149, 35, 1, 25)
-        label.setFrameShadow(QFrame.Raised)
-        label.setFrameShape(QFrame.Box)
-        label.setStyleSheet("border-width: 1px; "
-                            "border-style: solid; "
-                            "border-color: rgba(62, 62, 62, 0.2);")
+        self.createCutLine(200, 35, 1, 25)
 
         # 原图列表框
         self.original_image_widget = QListWidget(self)
-        self.customSetGeometry(self.original_image_widget, 0, 60, 150, 610)
+        self.customSetGeometry(self.original_image_widget, 0, 60, 200, 610)
         self.original_image_widget.setIconSize(QSize(100*self.rate, 100*self.rate))
         self.original_image_widget.itemSelectionChanged.connect(self.loadOriginalImage)
         self.original_image_widget.hide()
@@ -133,7 +126,7 @@ class Manga(QWidget) :
 
         # 译图列表框
         self.trans_image_widget = QListWidget(self)
-        self.customSetGeometry(self.trans_image_widget, 0, 60, 150, 610)
+        self.customSetGeometry(self.trans_image_widget, 0, 60, 200, 610)
         self.trans_image_widget.setIconSize(QSize(100*self.rate, 100*self.rate))
         self.trans_image_widget.itemSelectionChanged.connect(self.loadTransImage)
         self.trans_image_widget.hide()
@@ -142,19 +135,13 @@ class Manga(QWidget) :
 
         # 图片大图展示
         self.show_image_scroll_area = QScrollArea(self)
-        self.customSetGeometry(self.show_image_scroll_area, 150, 35, 1050, 635)
+        self.customSetGeometry(self.show_image_scroll_area, 200, 35, 1000, 635)
         self.show_image_scroll_area.setWidgetResizable(True)
         self.show_image_label = QLabel(self)
         self.show_image_scroll_area.setWidget(self.show_image_label)
 
         # 底部横向分割线
-        label = QLabel(self)
-        self.customSetGeometry(label, 150, 670, self.window_width, 1)
-        label.setFrameShadow(QFrame.Raised)
-        label.setFrameShape(QFrame.Box)
-        label.setStyleSheet("border-width: 1px; "
-                            "border-style: solid; "
-                            "border-color: rgba(62, 62, 62, 0.2);")
+        self.createCutLine(200, 670, self.window_width, 1)
 
 
     # 初始化配置
@@ -181,6 +168,18 @@ class Manga(QWidget) :
         object.setGeometry(QRect(int(x * self.rate),
                                  int(y * self.rate), int(w * self.rate),
                                  int(h * self.rate)))
+
+
+    # 绘制一条分割线
+    def createCutLine(self, x, y, w, h) :
+
+        label = QLabel(self)
+        self.customSetGeometry(label, x, y, w, h)
+        label.setFrameShadow(QFrame.Raised)
+        label.setFrameShape(QFrame.Box)
+        label.setStyleSheet("border-width: 1px; "
+                            "border-style: solid; "
+                            "border-color: rgba(62, 62, 62, 0.2);")
 
 
     # 创建翻译源按钮的下拉菜单
@@ -228,6 +227,8 @@ class Manga(QWidget) :
             # 添加菜单项
             output_action = menu.addAction("另存为")
             output_action.triggered.connect(lambda: self.saveImageItemWidget(item))
+            rdr_action = menu.addAction("重新渲染翻译结果")
+            #rdr_action.triggered.connect(lambda: self.saveImageItemWidget(item))
             # 显示菜单
             cursorPos = QCursor.pos()
             menu.exec_(cursorPos)
@@ -313,26 +314,27 @@ class Manga(QWidget) :
         self.trans_image_path_list.append(image_path)
 
 
-    # 点击原图按钮
-    def clickOriginalImageButton(self) :
+    # 点击 原图/编辑/译图 按钮
+    def clickImageButton(self, button_type) :
 
-        #self.text_list_widget.hide()
-        self.original_image_widget.show()
-        self.trans_image_widget.hide()
-        self.original_image_button.setStyleSheet("background-color: #83AAF9;")
-        self.trans_image_button.setStyleSheet("QPushButton {background: transparent;}"
-                                             "QPushButton:hover {background-color: #83AAF9;}")
-
-
-    # 点击译图按钮
-    def clickTransImageButton(self) :
-
-        #self.text_list_widget.show()
         self.original_image_widget.hide()
-        self.trans_image_widget.show()
-        self.trans_image_button.setStyleSheet("background-color: #83AAF9;")
+        self.trans_image_widget.hide()
         self.original_image_button.setStyleSheet("QPushButton {background: transparent;}"
+                                                 "QPushButton:hover {background-color: #83AAF9;}")
+        self.edit_image_button.setStyleSheet("QPushButton {background: transparent;}"
                                              "QPushButton:hover {background-color: #83AAF9;}")
+        self.trans_image_button.setStyleSheet("QPushButton {background: transparent;}"
+                                              "QPushButton:hover {background-color: #83AAF9;}")
+
+        if button_type == "original" :
+            self.original_image_widget.show()
+            self.original_image_button.setStyleSheet("background-color: #83AAF9;")
+        elif button_type == "edit" :
+            self.trans_image_widget.show()
+            self.edit_image_button.setStyleSheet("background-color: #83AAF9;")
+        elif button_type == "trans" :
+            self.trans_image_widget.show()
+            self.trans_image_button.setStyleSheet("background-color: #83AAF9;")
 
 
     # 大图展示框刷新图片

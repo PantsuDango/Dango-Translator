@@ -31,7 +31,7 @@ import ui.manga
 import translator.update_chrome_driver
 import translator.update_edge_driver
 import translator.upload_firefox_driver
-import translator.upload_trans_file
+#import translator.upload_trans_file
 
 
 class DangoTranslator :
@@ -109,7 +109,7 @@ class DangoTranslator :
         # 漫画翻译页面
         self.manga_ui = ui.manga.Manga(self)
         self.translation_ui.manga_button.clicked.connect(self.clickManga)
-        self.manga_ui.clickOriginalImageButton()
+        self.manga_ui.clickImageButton("original")
 
         # 检查邮箱
         thread = utils.thread.createCheckBindEmailQThread(self)
