@@ -23,17 +23,13 @@ def openConfig(logger) :
         config = {
             "user": "",
             "password": "",
-            "dict_info_url": "https://dango.c4a15wh.cn/DangoTranslate/ShowDict",
+            "dict_info_url": "https://trans.dango.cloud/DangoTranslate/ShowDict",
             "ocr_cmd_path": ".\ocr\startOCR.cmd",
             "port": 6666,
         }
-
     # 2022.02.19 添加新参数
     if "auto_login" not in config.keys():
         config["auto_login"] = False
-    # 2022.03.08 修改参数
-    if "dict_info_url" in config.keys():
-        config["dict_info_url"] = "https://dango.c4a15wh.cn/DangoTranslate/ShowDict"
     # 2022.09.26 添加新参数
     if "agree_collect_time" not in config.keys():
         config["agree_collect_time"] = "2022-09-25"
@@ -51,6 +47,9 @@ def openConfig(logger) :
         config["range3"] = {"x": 0, "y": 0, "w": 0, "h": 0}
     if "range4" not in config.keys():
         config["range4"] = {"x": 0, "y": 0, "w": 0, "h": 0}
+    # 2022.03.08 修改参数
+    if "dict_info_url" in config.keys():
+        config["dict_info_url"] = "https://trans.dango.cloud/DangoTranslate/ShowDict"
 
     return config
 
@@ -71,7 +70,7 @@ def getDictInfo(url, logger) :
 
     res = utils.http.post(url, {}, logger)
     if not res :
-        res = utils.http.post("https://trans.dango.cloud/DangoTranslate/ShowDict", {}, logger)
+        res = utils.http.post("https://43.154.0.93/DangoTranslate/ShowDict", {}, logger)
     result = res.get("Result", {})
 
     return result
