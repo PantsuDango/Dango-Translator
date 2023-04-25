@@ -31,7 +31,6 @@ import ui.manga
 import translator.update_chrome_driver
 import translator.update_edge_driver
 import translator.upload_firefox_driver
-#import translator.upload_trans_file
 
 
 class DangoTranslator :
@@ -122,14 +121,8 @@ class DangoTranslator :
         self.hwndObj = utils.hwnd.WindowHwnd(self)
         if self.config["setTop"] :
             self.hwndObj.run()
-
         # 更新自动更新程序
         utils.thread.createThread(utils.update.updateAutoUpdateFile(self))
-
-        # 同步翻译历史
-        # if self.config["agreeCollectUse"]:
-        #     utils.thread.createThread(translator.upload_trans_file.proccess(self))
-
         # 清理历史日志缓存
         utils.thread.createThread(utils.logger.clearLog)
 

@@ -120,6 +120,7 @@ class Manga(QWidget) :
         self.original_image_widget.setIconSize(QSize(180*self.rate, 180*self.rate))
         self.original_image_widget.itemSelectionChanged.connect(self.loadOriginalImage)
         self.original_image_widget.show()
+        self.original_image_widget.show()
         self.original_image_widget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.original_image_widget.customContextMenuRequested.connect(self.showOriginalListWidgetMenu)
 
@@ -168,6 +169,8 @@ class Manga(QWidget) :
         self.image_path_list = []
         # 当前图片列表框的索引
         self.image_widget_index = 0
+        # 当前图片列表框的滑块坐标
+        self.image_widget_scroll_bar_value = 0
 
 
     # 根据分辨率定义控件位置尺寸
@@ -233,20 +236,25 @@ class Manga(QWidget) :
         self.trans_image_button.setStyleSheet("QPushButton {background: transparent;}"
                                               "QPushButton:hover {background-color: #83AAF9;}")
         if button_type == "original":
-            self.original_image_widget.setCurrentRow(self.image_widget_index)
-            self.loadOriginalImage()
             self.original_image_widget.show()
             self.original_image_button.setStyleSheet("background-color: #83AAF9;")
+            self.original_image_widget.verticalScrollBar().setValue(self.image_widget_scroll_bar_value)
+            self.original_image_widget.setCurrentRow(self.image_widget_index)
+            self.loadOriginalImage()
+
         elif button_type == "edit":
-            self.edit_image_widget.setCurrentRow(self.image_widget_index)
-            self.loadEditImage()
             self.edit_image_widget.show()
             self.edit_image_button.setStyleSheet("background-color: #83AAF9;")
+            self.edit_image_widget.verticalScrollBar().setValue(self.image_widget_scroll_bar_value)
+            self.edit_image_widget.setCurrentRow(self.image_widget_index)
+            self.loadEditImage()
+
         elif button_type == "trans":
-            self.trans_image_widget.setCurrentRow(self.image_widget_index)
-            self.loadTransImage()
             self.trans_image_widget.show()
             self.trans_image_button.setStyleSheet("background-color: #83AAF9;")
+            self.trans_image_widget.verticalScrollBar().setValue(self.image_widget_scroll_bar_value)
+            self.trans_image_widget.setCurrentRow(self.image_widget_index)
+            self.loadTransImage()
 
 
     # 创建翻译源按钮的下拉菜单
@@ -345,9 +353,10 @@ class Manga(QWidget) :
     def originalImageWidgetAddImage(self, image_path):
 
         item = QListWidgetItem(image_path, self.original_image_widget)
-        item.setSizeHint(QSize(0, 100*self.rate))
-        item.setIcon(QIcon(image_path))
-        item.setText(os.path.basename(image_path))
+        item.setSizeHint(QSize(100*self.rate, 100*self.rate))
+        pixmap = QPixmap(image_path)
+        pixmap = pixmap.scaled(180*self.rate, 180*self.rate, aspectRatioMode=Qt.KeepAspectRatio)
+        item.setIcon(QIcon(pixmap))
         self.original_image_widget.addItem(item)
         self.image_path_list.append(image_path)
 
@@ -374,7 +383,9 @@ class Manga(QWidget) :
         row = self.image_path_list.index(image_path)
         item = self.edit_image_widget.item(row)
         ipt_image_path = self.getIptFilePath(image_path)
-        item.setIcon(QIcon(ipt_image_path))
+        pixmap = QPixmap(ipt_image_path)
+        pixmap = pixmap.scaled(180 * self.rate, 180 * self.rate, aspectRatioMode=Qt.KeepAspectRatio)
+        item.setIcon(QIcon(pixmap))
 
 
     # 刷新译图列表框内item的图片
@@ -383,7 +394,9 @@ class Manga(QWidget) :
         row = self.image_path_list.index(image_path)
         item = self.trans_image_widget.item(row)
         rdr_image_path = self.getRdrFilePath(image_path)
-        item.setIcon(QIcon(rdr_image_path))
+        pixmap = QPixmap(rdr_image_path)
+        pixmap = pixmap.scaled(180 * self.rate, 180 * self.rate, aspectRatioMode=Qt.KeepAspectRatio)
+        item.setIcon(QIcon(pixmap))
 
 
     # 大图展示框刷新图片
@@ -404,6 +417,7 @@ class Manga(QWidget) :
             image_path = self.image_path_list[index]
             self.showImageLabelRefresh(image_path)
             self.image_widget_index = index
+            self.image_widget_scroll_bar_value = self.original_image_widget.verticalScrollBar().value()
 
 
     # 展示编辑图图片大图
@@ -418,6 +432,7 @@ class Manga(QWidget) :
             else :
                 self.show_image_label.clear()
             self.image_widget_index = index
+            self.image_widget_scroll_bar_value = self.edit_image_widget.verticalScrollBar().value()
 
 
     # 展示译图图片大图
@@ -432,6 +447,7 @@ class Manga(QWidget) :
             else :
                 self.show_image_label.clear()
             self.image_widget_index = index
+            self.image_widget_scroll_bar_value = self.trans_image_widget.verticalScrollBar().value()
 
 
     # 翻译进程

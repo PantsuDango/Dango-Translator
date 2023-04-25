@@ -9,7 +9,6 @@ import re
 import os
 
 import ui.static.icon
-import translator.upload_trans_file
 import utils.message
 
 
