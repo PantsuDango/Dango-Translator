@@ -117,6 +117,6 @@ class createMangaTransQThread(QThread) :
         self.window.transProcess(self.image_path)
         # 跳转到译图栏
         self.window.trans_image_button.click()
-        row = self.window.trans_image_path_list.index(self.image_path)
+        row = self.window.image_path_list.index(self.image_path)
         self.window.trans_image_widget.setCurrentRow(row)
         self.window.loadTransImage()

@@ -111,7 +111,6 @@ class DangoTranslator :
         # 漫画翻译页面
         self.manga_ui = ui.manga.Manga(self)
         self.translation_ui.manga_button.clicked.connect(self.clickManga)
-        self.manga_ui.clickImageButton("original")
 
         # 检查邮箱
         thread = utils.thread.createCheckBindEmailQThread(self)
