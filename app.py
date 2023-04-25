@@ -44,7 +44,7 @@ class DangoTranslator :
         # 本地配置
         self.yaml = utils.config.openConfig(self.logger)
         # 版本号
-        self.yaml["version"] = "4.4.3"
+        self.yaml["version"] = "4.4.4"
         # 配置中心
         dict_info = utils.config.getDictInfo(self.yaml["dict_info_url"], self.logger)
         if dict_info :
@@ -122,6 +122,9 @@ class DangoTranslator :
         self.hwndObj = utils.hwnd.WindowHwnd(self)
         if self.config["setTop"] :
             self.hwndObj.run()
+
+        # 更新自动更新程序
+        utils.thread.createThread(utils.update.updateAutoUpdateFile(self))
 
         # 同步翻译历史
         # if self.config["agreeCollectUse"]:
