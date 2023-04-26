@@ -16,7 +16,7 @@ import utils.thread
 import utils.message
 
 
-# 说明界面
+# 漫画翻译界面
 class Manga(QWidget) :
 
     def __init__(self, object) :
@@ -149,7 +149,7 @@ class Manga(QWidget) :
 
         self.show_image_widget = QWidget()
         self.show_image_widget.setStyleSheet("background: transparent;")
-        self.show_image_layout = QVBoxLayout(self.show_image_widget)
+        self.show_image_layout = QHBoxLayout()
 
         self.show_image_label = QLabel(self)
         self.show_image_label.setLayout(self.show_image_layout)
@@ -697,33 +697,42 @@ class Manga(QWidget) :
     def renderTextBlock(self, image_path) :
 
         # 从缓存文件中获取json结果
-        with open(self.getJsonFilePath(image_path), "r", encoding="utf-8") as file:
+        with open(self.getJsonFilePath(image_path), "r", encoding="utf-8") as file :
             json_data = json.load(file)
         for text_block, trans_text in zip(json_data["text_block"], json_data["translated_text"]) :
-            text_edit = QTextBrowser(self.show_image_widget)
-            text_edit.setStyleSheet("background: transparent;")
 
+            text_edit = QTextBrowser()
+            # 计算文本颜色
             line = len(text_block["lines"])
-            color = (
-                text_block["fg_r"]//line,
-                text_block["fg_g"]//line,
-                text_block["fg_b"]//line
-            )
-            print('<font color="rgb{}">{}</font>'.format(color, trans_text))
-            text_edit.setTextColor(QColor("rgb(47, 167, 237)"))
+            text_edit.setTextColor(QColor(
+                text_block["fg_r"] // line,
+                text_block["fg_g"] // line,
+                text_block["fg_b"] // line
+            ))
+            text_edit.setFontPointSize(text_block["font_size"]//line)
             text_edit.append(trans_text)
-
-            # text_edit.setStyleSheet("background: rgba({}, {}, {}, 100); border: none".format(
-            #     text_block["fg_r"]//line, text_block["fg_g"]//line, text_block["fg_b"]//line))
-
-            text_edit.setAttribute(Qt.WA_TranslucentBackground)
-            text_edit.setGeometry(
+            text_edit.setStyleSheet("background: transparent; "
+                                    "border: 2px dashed red;")
+            text_edit.setReadOnly(False)
+            # 计算文本坐标
+            # text_edit.setFixedSize(
+            #     text_block["xyxy"][2] - text_block["xyxy"][0],
+            #     text_block["xyxy"][3] - text_block["xyxy"][1]
+            # )
+            # text_edit.move(text_block["xyxy"][0], text_block["xyxy"][1])
+            # widget.setGeometry(
+            #     text_block["xyxy"][0],
+            #     text_block["xyxy"][1],
+            #     text_block["xyxy"][2] - text_block["xyxy"][0],
+            #     text_block["xyxy"][3] - text_block["xyxy"][1]
+            # )
+            self.show_image_layout.addItem(
+                text_edit,
                 text_block["xyxy"][0],
                 text_block["xyxy"][1],
                 text_block["xyxy"][2] - text_block["xyxy"][0],
                 text_block["xyxy"][3] - text_block["xyxy"][1]
             )
-            self.show_image_layout.addWidget(text_edit)
 
 
     # 窗口关闭处理
