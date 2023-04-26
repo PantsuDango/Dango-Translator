@@ -16,6 +16,68 @@ import utils.thread
 import utils.message
 
 
+# 范围框
+class RenderTextBlock(QWidget) :
+
+    def __init__(self, rect, json_data):
+
+        super(RenderTextBlock, self).__init__()
+        self.font_type = "华康方圆体W7"
+        self.font_size = 12
+        self.rect = rect
+        self.json_data = json_data
+        self.ui()
+
+
+    def ui(self) :
+
+        # 窗口大小
+        w, h = self.rect[0], self.rect[1]
+        self.resize(w, h)
+        # 窗口无标题栏、窗口置顶、窗口透明
+        self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint | Qt.Tool)
+        # self.setAttribute(Qt.WA_TranslucentBackground)
+        # 鼠标样式
+        self.setCursor(ui.static.icon.PIXMAP_CURSOR)
+
+        # 字体
+        self.font = QFont()
+        self.font.setFamily(self.font_type)
+        self.font.setPointSize(self.font_size)
+
+        for text_block, trans_text in zip(self.json_data["text_block"], self.json_data["translated_text"]) :
+            text_edit = QTextBrowser(self)
+            # 禁用滚轮
+            text_edit.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+            text_edit.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+            # 文本框样式
+            text_edit.setFontPointSize(text_block["font_size"] * 0.5)
+            option = QTextOption()
+            option.setWrapMode(QTextOption.WrapAtWordBoundaryOrAnywhere)
+            text_edit.document().setDefaultTextOption(option)
+
+            text_edit.setStyleSheet("background: transparent;"
+                                    "white-space: pre-wrap;")
+            text_edit.setReadOnly(False)
+            # 文本颜色
+            line = len(text_block["lines"])
+            text_edit.setTextColor(QColor(
+                text_block["fg_r"] // line,
+                text_block["fg_g"] // line,
+                text_block["fg_b"] // line
+            ))
+            # 实现竖向排列文字
+            text_edit.setText("\n".join(trans_text))
+
+            # 计算文本坐标
+            text_edit.setGeometry(
+                text_block["xyxy"][0],
+                text_block["xyxy"][1],
+                text_block["xyxy"][2] - text_block["xyxy"][0],
+                text_block["xyxy"][3] - text_block["xyxy"][1]
+            )
+
+
 # 漫画翻译界面
 class Manga(QWidget) :
 
@@ -146,14 +208,11 @@ class Manga(QWidget) :
         self.show_image_scroll_area = QScrollArea(self)
         self.customSetGeometry(self.show_image_scroll_area, 200, 35, 1000, 635)
         self.show_image_scroll_area.setWidgetResizable(True)
-
-        self.show_image_widget = QWidget()
-        self.show_image_widget.setStyleSheet("background: transparent;")
-        self.show_image_layout = QHBoxLayout()
-
         self.show_image_label = QLabel(self)
-        self.show_image_label.setLayout(self.show_image_layout)
         self.show_image_scroll_area.setWidget(self.show_image_label)
+
+        self.show_image_layout = QHBoxLayout()
+        self.show_image_label.setLayout(self.show_image_layout)
 
         # 底部横向分割线
         self.createCutLine(200, 670, self.window_width, 1)
@@ -415,7 +474,6 @@ class Manga(QWidget) :
         pixmap = QPixmap.fromImage(image)
         self.show_image_label.setPixmap(pixmap)
         self.show_image_label.resize(pixmap.width(), pixmap.height())
-        self.show_image_widget.resize(pixmap.width(), pixmap.height())
 
 
     # 展示原图图片大图
@@ -684,7 +742,7 @@ class Manga(QWidget) :
 
 
     # 清除图片上的文本块
-    def clearTextBlock(self) :
+    def clearTextBlock(self):
 
         for i in reversed(range(self.show_image_layout.count())):
             widget = self.show_image_layout.itemAt(i).widget()
@@ -699,40 +757,10 @@ class Manga(QWidget) :
         # 从缓存文件中获取json结果
         with open(self.getJsonFilePath(image_path), "r", encoding="utf-8") as file :
             json_data = json.load(file)
-        for text_block, trans_text in zip(json_data["text_block"], json_data["translated_text"]) :
 
-            text_edit = QTextBrowser()
-            # 计算文本颜色
-            line = len(text_block["lines"])
-            text_edit.setTextColor(QColor(
-                text_block["fg_r"] // line,
-                text_block["fg_g"] // line,
-                text_block["fg_b"] // line
-            ))
-            text_edit.setFontPointSize(text_block["font_size"]//line)
-            text_edit.append(trans_text)
-            text_edit.setStyleSheet("background: transparent; "
-                                    "border: 2px dashed red;")
-            text_edit.setReadOnly(False)
-            # 计算文本坐标
-            # text_edit.setFixedSize(
-            #     text_block["xyxy"][2] - text_block["xyxy"][0],
-            #     text_block["xyxy"][3] - text_block["xyxy"][1]
-            # )
-            # text_edit.move(text_block["xyxy"][0], text_block["xyxy"][1])
-            # widget.setGeometry(
-            #     text_block["xyxy"][0],
-            #     text_block["xyxy"][1],
-            #     text_block["xyxy"][2] - text_block["xyxy"][0],
-            #     text_block["xyxy"][3] - text_block["xyxy"][1]
-            # )
-            self.show_image_layout.addItem(
-                text_edit,
-                text_block["xyxy"][0],
-                text_block["xyxy"][1],
-                text_block["xyxy"][2] - text_block["xyxy"][0],
-                text_block["xyxy"][3] - text_block["xyxy"][1]
-            )
+        rect = (self.show_image_label.width(), self.show_image_label.height())
+        text_edit = RenderTextBlock(rect, json_data)
+        self.show_image_layout.addWidget(text_edit)
 
 
     # 窗口关闭处理
