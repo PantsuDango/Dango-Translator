@@ -34,7 +34,7 @@ class Manga(QWidget) :
         # 窗口尺寸及不可拉伸
         self.resize(self.window_width, self.window_height)
         self.setMinimumSize(QSize(self.window_width, self.window_height))
-        self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowMinimizeButtonHint | Qt.WindowCloseButtonHint)
+        self.setWindowFlags(Qt.WindowMinimizeButtonHint | Qt.WindowCloseButtonHint)
 
         # 窗口标题
         self.setWindowTitle("漫画翻译")
@@ -146,7 +146,13 @@ class Manga(QWidget) :
         self.show_image_scroll_area = QScrollArea(self)
         self.customSetGeometry(self.show_image_scroll_area, 200, 35, 1000, 635)
         self.show_image_scroll_area.setWidgetResizable(True)
+
+        self.show_image_widget = QWidget()
+        self.show_image_widget.setStyleSheet("background: transparent;")
+        self.show_image_layout = QVBoxLayout(self.show_image_widget)
+
         self.show_image_label = QLabel(self)
+        self.show_image_label.setLayout(self.show_image_layout)
         self.show_image_scroll_area.setWidget(self.show_image_label)
 
         # 底部横向分割线
@@ -353,10 +359,10 @@ class Manga(QWidget) :
     def originalImageWidgetAddImage(self, image_path):
 
         item = QListWidgetItem(image_path, self.original_image_widget)
-        item.setSizeHint(QSize(100*self.rate, 100*self.rate))
         pixmap = QPixmap(image_path)
         pixmap = pixmap.scaled(180*self.rate, 180*self.rate, aspectRatioMode=Qt.KeepAspectRatio)
         item.setIcon(QIcon(pixmap))
+        item.setText(os.path.basename(image_path))
         self.original_image_widget.addItem(item)
         self.image_path_list.append(image_path)
 
@@ -384,8 +390,9 @@ class Manga(QWidget) :
         item = self.edit_image_widget.item(row)
         ipt_image_path = self.getIptFilePath(image_path)
         pixmap = QPixmap(ipt_image_path)
-        pixmap = pixmap.scaled(180 * self.rate, 180 * self.rate, aspectRatioMode=Qt.KeepAspectRatio)
+        pixmap = pixmap.scaled(180*self.rate, 180*self.rate, aspectRatioMode=Qt.KeepAspectRatio)
         item.setIcon(QIcon(pixmap))
+        item.setText(os.path.basename(image_path))
 
 
     # 刷新译图列表框内item的图片
@@ -395,8 +402,9 @@ class Manga(QWidget) :
         item = self.trans_image_widget.item(row)
         rdr_image_path = self.getRdrFilePath(image_path)
         pixmap = QPixmap(rdr_image_path)
-        pixmap = pixmap.scaled(180 * self.rate, 180 * self.rate, aspectRatioMode=Qt.KeepAspectRatio)
+        pixmap = pixmap.scaled(180*self.rate, 180*self.rate, aspectRatioMode=Qt.KeepAspectRatio)
         item.setIcon(QIcon(pixmap))
+        item.setText(os.path.basename(image_path))
 
 
     # 大图展示框刷新图片
@@ -407,11 +415,13 @@ class Manga(QWidget) :
         pixmap = QPixmap.fromImage(image)
         self.show_image_label.setPixmap(pixmap)
         self.show_image_label.resize(pixmap.width(), pixmap.height())
+        self.show_image_widget.resize(pixmap.width(), pixmap.height())
 
 
     # 展示原图图片大图
     def loadOriginalImage(self) :
 
+        self.clearTextBlock()
         index = self.original_image_widget.currentRow()
         if index >= 0 and index < len(self.image_path_list) :
             image_path = self.image_path_list[index]
@@ -421,14 +431,17 @@ class Manga(QWidget) :
 
 
     # 展示编辑图图片大图
-    def loadEditImage(self):
+    def loadEditImage(self) :
 
+        self.clearTextBlock()
         index = self.edit_image_widget.currentRow()
         if index >= 0 and index < len(self.image_path_list):
             image_path = self.image_path_list[index]
             ipt_image_path = self.getIptFilePath(image_path)
             if os.path.exists(ipt_image_path) :
                 self.showImageLabelRefresh(ipt_image_path)
+                # 译文编辑框渲染
+                self.renderTextBlock(image_path)
             else :
                 self.show_image_label.clear()
             self.image_widget_index = index
@@ -438,6 +451,7 @@ class Manga(QWidget) :
     # 展示译图图片大图
     def loadTransImage(self):
 
+        self.clearTextBlock()
         index = self.trans_image_widget.currentRow()
         if index >= 0 and index < len(self.image_path_list) :
             image_path = self.image_path_list[index]
@@ -667,6 +681,49 @@ class Manga(QWidget) :
         file_path = os.path.join(dango_manga_path, "{}.png".format(file_name))
 
         return file_path
+
+
+    # 清除图片上的文本块
+    def clearTextBlock(self) :
+
+        for i in reversed(range(self.show_image_layout.count())):
+            widget = self.show_image_layout.itemAt(i).widget()
+            self.show_image_layout.removeWidget(widget)
+            if widget is not None:
+                widget.setParent(None)
+
+
+    # 渲染文本块
+    def renderTextBlock(self, image_path) :
+
+        # 从缓存文件中获取json结果
+        with open(self.getJsonFilePath(image_path), "r", encoding="utf-8") as file:
+            json_data = json.load(file)
+        for text_block, trans_text in zip(json_data["text_block"], json_data["translated_text"]) :
+            text_edit = QTextBrowser(self.show_image_widget)
+            text_edit.setStyleSheet("background: transparent;")
+
+            line = len(text_block["lines"])
+            color = (
+                text_block["fg_r"]//line,
+                text_block["fg_g"]//line,
+                text_block["fg_b"]//line
+            )
+            print('<font color="rgb{}">{}</font>'.format(color, trans_text))
+            text_edit.setTextColor(QColor("rgb(47, 167, 237)"))
+            text_edit.append(trans_text)
+
+            # text_edit.setStyleSheet("background: rgba({}, {}, {}, 100); border: none".format(
+            #     text_block["fg_r"]//line, text_block["fg_g"]//line, text_block["fg_b"]//line))
+
+            text_edit.setAttribute(Qt.WA_TranslucentBackground)
+            text_edit.setGeometry(
+                text_block["xyxy"][0],
+                text_block["xyxy"][1],
+                text_block["xyxy"][2] - text_block["xyxy"][0],
+                text_block["xyxy"][3] - text_block["xyxy"][1]
+            )
+            self.show_image_layout.addWidget(text_edit)
 
 
     # 窗口关闭处理
