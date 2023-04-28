@@ -191,12 +191,13 @@ class Manga(QWidget) :
         self.trans_image_widget.customContextMenuRequested.connect(self.showTransListWidgetMenu)
 
         # 图片大图展示
-        self.show_image_scroll_area = QScrollArea(self)
-        self.customSetGeometry(self.show_image_scroll_area, 200, 35, 1000, 635)
+        self.show_image_widget = QWidget(self)
+        self.customSetGeometry(self.show_image_widget, 200, 35, 1000, 635)
+        self.show_image_scroll_area = QScrollArea(self.show_image_widget)
+        self.show_image_scroll_area.resize(self.show_image_widget.width(), self.show_image_widget.height())
         self.show_image_scroll_area.setWidgetResizable(True)
-        self.show_image_widget = QWidget()
-        self.show_image_scroll_area.setWidget(self.show_image_widget)
         self.show_image_label = QLabel(self.show_image_widget)
+        self.show_image_scroll_area.setWidget(self.show_image_label)
 
         # 底部横向分割线
         self.createCutLine(200, 670, self.window_width, 1)
@@ -220,6 +221,8 @@ class Manga(QWidget) :
         self.image_widget_index = 0
         # 当前图片列表框的滑块坐标
         self.image_widget_scroll_bar_value = 0
+        # 渲染文本块的组件列表
+        self.render_text_block_label = []
 
 
     # 根据分辨率定义控件位置尺寸
@@ -484,7 +487,6 @@ class Manga(QWidget) :
                 self.showImageLabelRefresh(ipt_image_path)
                 # 译文编辑框渲染
                 self.renderTextBlock(image_path)
-                self.show_image_label.lower()
             else :
                 self.show_image_label.clear()
             self.image_widget_index = index
@@ -746,7 +748,7 @@ class Manga(QWidget) :
             json_data = json.load(file)
 
         for text_block, trans_text in zip(json_data["text_block"], json_data["translated_text"]):
-            label = QTextBrowser(self.show_image_widget)
+            label = QLabel(self.show_image_widget)
             label.setStyleSheet("background: transparent; border: 2px dashed red;")
             # 计算文本坐标
             label.setGeometry(
@@ -756,6 +758,7 @@ class Manga(QWidget) :
                 text_block["xyxy"][3] - text_block["xyxy"][1]
             )
             label.setText(trans_text)
+            self.render_text_block_label.append(label)
 
 
     def setLabel(self) :
