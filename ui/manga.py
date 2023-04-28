@@ -7,7 +7,8 @@ import os
 import base64
 import shutil
 import json
-import math
+from math import sqrt
+from PIL import Image
 
 import ui.static.icon
 import utils.translater
@@ -17,15 +18,68 @@ import utils.thread
 import utils.message
 
 
+# 根据文本块大小计算font_size
+def getFontSize(lines, trans_text):
+
+    line_x = [j[0] for i in lines for j in i]
+    line_y = [j[1] for i in lines for j in i]
+    w = max(line_x) - min(line_x)
+    h = max(line_y) - min(line_y)
+
+
+    def get_structure(pts):
+
+        p1 = [int((pts[0][0] + pts[1][0]) / 2), int((pts[0][1] + pts[1][1]) / 2)]
+        p2 = [int((pts[2][0] + pts[3][0]) / 2), int((pts[2][1] + pts[3][1]) / 2)]
+        p3 = [int((pts[1][0] + pts[2][0]) / 2), int((pts[1][1] + pts[2][1]) / 2)]
+        p4 = [int((pts[3][0] + pts[0][0]) / 2), int((pts[3][1] + pts[0][1]) / 2)]
+        return [p1, p2, p3, p4]
+
+
+    def get_font_size(pts) -> float:
+
+        [l1a, l1b, l2a, l2b] = [a for a in get_structure(pts)]
+        v1 = [l1b[0] - l1a[0], l1b[1] - l1a[1]]
+        v2 = [l2b[0] - l2a[0], l2b[1] - l2a[1]]
+        return min(sqrt(v2[0] ** 2 + v2[1] ** 2), sqrt(v1[0] ** 2 + v1[1] ** 2))
+
+
+    def findNextPowerOf2(n):
+
+        i = 0
+        while n != 0:
+            i += 1
+            n = n >> 1
+        return 1 << i
+
+    font_size = int(min([get_font_size(pts) for pts in lines]))
+    text_mag_ratio = 1
+
+    font_size_enlarged = findNextPowerOf2(font_size) * text_mag_ratio
+    enlarge_ratio = font_size_enlarged / font_size
+    font_size = font_size_enlarged
+
+    while True:
+        enlarged_w = round(enlarge_ratio * w)
+        enlarged_h = round(enlarge_ratio * h)
+        rows = enlarged_h // (font_size * 1.3)
+        cols = enlarged_w // (font_size * 1.3)
+        if rows * cols < len(trans_text) :
+            enlarge_ratio *= 1.1
+            continue
+        break
+
+    return font_size / enlarge_ratio
+
+
 # 渲染文本块
 class RenderTextBlock(QWidget) :
 
-    def __init__(self, rect, json_data):
+    def __init__(self, rate, image_path, json_data):
 
         super(RenderTextBlock, self).__init__()
-        self.font_type = "华康方圆体W7"
-        self.font_size = 12
-        self.rect = rect
+        self.rate = rate
+        self.image_path = image_path
         self.json_data = json_data
         self.ui()
 
@@ -33,35 +87,90 @@ class RenderTextBlock(QWidget) :
     def ui(self) :
 
         # 窗口大小
-        w, h = self.rect[0], self.rect[1]
-        self.resize(w, h)
+        self.resize(1000*self.rate, 635*self.rate)
         # 窗口无标题栏、窗口置顶、窗口透明
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint | Qt.Tool)
         # 鼠标样式
         self.setCursor(ui.static.icon.PIXMAP_CURSOR)
 
-        # 字体
-        self.font = QFont()
-        self.font.setFamily(self.font_type)
-        self.font.setPointSize(self.font_size)
+        # 图片大图展示
+        scroll_area = QScrollArea(self)
+        scroll_area.resize(self.width(), self.height())
+        scroll_area.setWidgetResizable(True)
 
-        for text_block, trans_text in zip(self.json_data["text_block"], self.json_data["translated_text"]) :
-            label = QLabel(self)
-            label.setStyleSheet("background: transparent; border: 2px dashed red;")
-            # 文本颜色
-            # line = len(text_block["lines"])
-            # text_edit.setTextColor(QColor(
-            #     text_block["fg_r"] // line,
-            #     text_block["fg_g"] // line,
-            #     text_block["fg_b"] // line
-            # ))
-            # 计算文本坐标
-            label.setGeometry(
-                text_block["xyxy"][0],
-                text_block["xyxy"][1],
-                text_block["xyxy"][2] - text_block["xyxy"][0],
-                text_block["xyxy"][3] - text_block["xyxy"][1]
-            )
+        # 加载大图
+        image_label = QLabel(self)
+        with open(self.image_path, "rb") as file:
+            image = QImage.fromData(file.read())
+        pixmap = QPixmap.fromImage(image)
+        image_label.setPixmap(pixmap)
+        image_label.resize(pixmap.width(), pixmap.height())
+        scroll_area.setWidget(image_label)
+
+        if self.json_data :
+            # 根据文本块坐标绘制矩形框
+            for text_block, trans_text in zip(self.json_data["text_block"], self.json_data["translated_text"]) :
+                text_browser = QTextBrowser(image_label)
+                text_browser.setStyleSheet("background: transparent; border: 3px dashed red;")
+                text_browser.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+                text_browser.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+                text_browser.setReadOnly(False)
+                # 计算文本坐标
+                text_browser.setGeometry(
+                    text_block["xyxy"][0],
+                    text_block["xyxy"][1],
+                    text_block["xyxy"][2] - text_block["xyxy"][0],
+                    text_block["xyxy"][3] - text_block["xyxy"][1]
+                )
+                # 计算文字大小
+                font_size = getFontSize(text_block["lines"], trans_text)
+                font_size = self.getImageDPI(font_size)
+                text_browser.setFontPointSize(font_size)
+                # 文本颜色
+                line = len(text_block["lines"])
+                font_color = QColor(
+                    text_block["fg_r"] // line,
+                    text_block["fg_g"] // line,
+                    text_block["fg_b"] // line
+                )
+                bg_color = QColor(
+                    text_block["bg_r"] // line,
+                    text_block["bg_g"] // line,
+                    text_block["bg_b"] // line
+                )
+                text_browser.setTextColor(font_color)
+                # 描边文字
+                # shadow_strength = text_block.get("shadow_strength", 0)
+                # if shadow_strength > 0 :
+                #     format = QTextCharFormat()
+                #     format.setTextOutline(QPen(bg_color, shadow_strength, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+                #     text_browser.mergeCurrentCharFormat(format)
+
+                # 竖向显示文本
+                if text_block["vertical"] :
+                    # 插入文本
+                    text_browser.setAlignment(Qt.AlignRight)
+                    text_browser.setLayoutDirection(Qt.RightToLeft)
+                    text_browser.setText("\n".join(trans_text))
+                else :
+                    # 插入文本
+                    text_browser.setPlainText(trans_text)
+
+
+    # 获取图片的DPI大小
+    def getImageDPI(self, px) :
+
+        image = QImage(self.image_path)
+        dpi_x = image.physicalDpiX()
+        dpi_y = image.physicalDpiY()
+        if dpi_x != dpi_y:
+            width_inch = image.width() / dpi_x
+            height_inch = image.height() / dpi_y
+            dpi_x = image.width() / width_inch
+            dpi_y = image.height() / height_inch
+        pt = px * 72 / dpi_x
+
+        return pt
 
 
 # 漫画翻译界面
@@ -168,7 +277,6 @@ class Manga(QWidget) :
         self.original_image_widget.setIconSize(QSize(180*self.rate, 180*self.rate))
         self.original_image_widget.itemSelectionChanged.connect(self.loadOriginalImage)
         self.original_image_widget.show()
-        self.original_image_widget.show()
         self.original_image_widget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.original_image_widget.customContextMenuRequested.connect(self.showOriginalListWidgetMenu)
 
@@ -191,13 +299,9 @@ class Manga(QWidget) :
         self.trans_image_widget.customContextMenuRequested.connect(self.showTransListWidgetMenu)
 
         # 图片大图展示
-        self.show_image_widget = QWidget(self)
-        self.customSetGeometry(self.show_image_widget, 200, 35, 1000, 635)
-        self.show_image_scroll_area = QScrollArea(self.show_image_widget)
-        self.show_image_scroll_area.resize(self.show_image_widget.width(), self.show_image_widget.height())
+        self.show_image_scroll_area = QScrollArea(self)
+        self.customSetGeometry(self.show_image_scroll_area, 200, 35, 1000, 635)
         self.show_image_scroll_area.setWidgetResizable(True)
-        self.show_image_label = QLabel(self.show_image_widget)
-        self.show_image_scroll_area.setWidget(self.show_image_label)
 
         # 底部横向分割线
         self.createCutLine(200, 670, self.window_width, 1)
@@ -453,24 +557,13 @@ class Manga(QWidget) :
         item.setText(os.path.basename(image_path))
 
 
-    # 大图展示框刷新图片
-    def showImageLabelRefresh(self, image_path) :
-
-        with open(image_path, "rb") as file:
-            image = QImage.fromData(file.read())
-        pixmap = QPixmap.fromImage(image)
-        self.show_image_label.setPixmap(pixmap)
-        self.show_image_label.resize(pixmap.width(), pixmap.height())
-
-
     # 展示原图图片大图
     def loadOriginalImage(self) :
 
-        self.clearTextBlock()
         index = self.original_image_widget.currentRow()
         if index >= 0 and index < len(self.image_path_list) :
             image_path = self.image_path_list[index]
-            self.showImageLabelRefresh(image_path)
+            self.renderImageAndTextBlock(image_path, "original")
             self.image_widget_index = index
             self.image_widget_scroll_bar_value = self.original_image_widget.verticalScrollBar().value()
 
@@ -478,17 +571,14 @@ class Manga(QWidget) :
     # 展示编辑图图片大图
     def loadEditImage(self) :
 
-        self.clearTextBlock()
         index = self.edit_image_widget.currentRow()
         if index >= 0 and index < len(self.image_path_list):
             image_path = self.image_path_list[index]
             ipt_image_path = self.getIptFilePath(image_path)
             if os.path.exists(ipt_image_path) :
-                self.showImageLabelRefresh(ipt_image_path)
-                # 译文编辑框渲染
-                self.renderTextBlock(image_path)
+                self.renderImageAndTextBlock(image_path, "edit")
             else :
-                self.show_image_label.clear()
+                self.show_image_scroll_area.hide()
             self.image_widget_index = index
             self.image_widget_scroll_bar_value = self.edit_image_widget.verticalScrollBar().value()
 
@@ -496,16 +586,14 @@ class Manga(QWidget) :
     # 展示译图图片大图
     def loadTransImage(self):
 
-        self.clearTextBlock()
         index = self.trans_image_widget.currentRow()
         if index >= 0 and index < len(self.image_path_list) :
             image_path = self.image_path_list[index]
             rdr_image_path = self.getRdrFilePath(image_path)
             if os.path.exists(rdr_image_path) :
-                self.showImageLabelRefresh(rdr_image_path)
-                # 译文编辑框渲染
+                self.renderImageAndTextBlock(image_path, "trans")
             else :
-                self.show_image_label.clear()
+                self.show_image_scroll_area.hide()
             self.image_widget_index = index
             self.image_widget_scroll_bar_value = self.trans_image_widget.verticalScrollBar().value()
 
@@ -729,45 +817,29 @@ class Manga(QWidget) :
         return file_path
 
 
-    # 清除图片上的文本块
-    def clearTextBlock(self):
+    # 渲染图片和文本块
+    def renderImageAndTextBlock(self, image_path, show_type) :
 
-        pass
-        # for i in reversed(range(self.show_image_layout.count())):
-        #     widget = self.show_image_layout.itemAt(i).widget()
-        #     self.show_image_layout.removeWidget(widget)
-        #     if widget is not None:
-        #         widget.setParent(None)
+        if show_type == "original" :
+            json_data = None
+        elif show_type == "edit" :
+            with open(self.getJsonFilePath(image_path), "r", encoding="utf-8") as file:
+                json_data = json.load(file)
+            image_path = self.getIptFilePath(image_path)
+        elif show_type == "trans" :
+            image_path = self.getRdrFilePath(image_path)
+            json_data = None
+        else :
+            return
 
-
-    # 渲染文本块
-    def renderTextBlock(self, image_path) :
-
-        # 从缓存文件中获取json结果
-        with open(self.getJsonFilePath(image_path), "r", encoding="utf-8") as file :
-            json_data = json.load(file)
-
-        for text_block, trans_text in zip(json_data["text_block"], json_data["translated_text"]):
-            label = QLabel(self.show_image_widget)
-            label.setStyleSheet("background: transparent; border: 2px dashed red;")
-            # 计算文本坐标
-            label.setGeometry(
-                text_block["xyxy"][0],
-                text_block["xyxy"][1],
-                text_block["xyxy"][2] - text_block["xyxy"][0],
-                text_block["xyxy"][3] - text_block["xyxy"][1]
-            )
-            label.setText(trans_text)
-            self.render_text_block_label.append(label)
-
-
-    def setLabel(self) :
-
-        self.label = QTextBrowser(self.show_image_widget)
-        self.label.setStyleSheet("background: transparent; border: 2px dashed red;")
-        # 计算文本坐标
-        self.label.setGeometry(100, 100, 500, 500)
-        self.label.setText("么么哒")
+        self.show_image_scroll_area.setWidget(None)
+        widget = RenderTextBlock(
+            rate=self.rate,
+            image_path=image_path,
+            json_data=json_data
+        )
+        self.show_image_scroll_area.setWidget(widget)
+        self.show_image_scroll_area.show()
 
 
     # 窗口关闭处理
