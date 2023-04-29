@@ -8,7 +8,7 @@ import base64
 import shutil
 import json
 from math import sqrt
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont, ImageGrab
 
 import ui.static.icon
 import utils.translater
@@ -16,7 +16,75 @@ import translator.ocr.dango
 import translator.api
 import utils.thread
 import utils.message
-from PyQt5 import QtWidgets, QtGui, QtCore
+
+
+DRAW_PATH = "./config/draw.jpg"
+#FONT_PATH = "./config/other/华康方圆体W7.TTC"
+FONT_PATH = "./config/other/NotoSansSC-Regular.otf"
+
+
+# 译文编辑界面
+class TransEdit(QWidget) :
+
+    def __init__(self, rate) :
+
+        super(TransEdit, self).__init__()
+        self.rate = rate
+        self.ui()
+
+
+    def ui(self) :
+
+        # 窗口尺寸及不可拉伸
+        self.window_width = int(500*self.rate)
+        self.window_height = int(300*self.rate)
+        self.resize(self.window_width, self.window_height)
+        self.setMinimumSize(QSize(self.window_width, self.window_height))
+        self.setMaximumSize(QSize(self.window_width, self.window_height))
+        self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowCloseButtonHint)
+
+        # 窗口标题
+        self.setWindowTitle("漫画翻译-译文编辑")
+        # 窗口图标
+        self.setWindowIcon(ui.static.icon.APP_LOGO_ICON)
+        # 鼠标样式
+        self.setCursor(ui.static.icon.PIXMAP_CURSOR)
+        # 设置字体
+        self.setStyleSheet("font: %spt '%s';"%(12, "华康方圆体W7"))
+
+        # 编辑框
+        self.edit_text = QTextBrowser(self)
+        self.customSetGeometry(self.edit_text, 0, 50, 500, 230)
+        #self.edit_text.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        #self.edit_text.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        # self.edit_text.setStyleSheet("QTextBrowser { border-width: 0;"
+        #                                             "border-style: outset;"
+        #                                             "border-top:0px solid #e8f3f9;"
+        #                                             "color: #5B8FF9;"
+        #                                             "background: rgba(255, 255, 255, 0.7); }")
+        self.edit_text.setCursor(ui.static.icon.PIXMAP_CURSOR)
+        self.edit_text.setReadOnly(False)
+
+        # 确定按钮
+        button = QPushButton(self)
+        self.customSetGeometry(button, 200, 240, 100, 50)
+        button.setText("重新渲染")
+        button.clicked.connect(self.renderTextBlock)
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
+
+
+    # 根据分辨率定义控件位置尺寸
+    def customSetGeometry(self, object, x, y, w, h):
+
+        object.setGeometry(QRect(int(x * self.rate),
+                                 int(y * self.rate), int(w * self.rate),
+                                 int(h * self.rate)))
+
+
+    # 刷新翻译
+    def renderTextBlock(self) :
+
+        pass
 
 
 # 根据文本块大小计算font_size
@@ -70,18 +138,18 @@ def getFontSize(lines, trans_text):
             continue
         break
 
-    return font_size / enlarge_ratio
+    return int(font_size / enlarge_ratio)
 
 
 # 渲染文本块
 class RenderTextBlock(QWidget) :
 
-    def __init__(self, rate, image_path, json_data):
-
+    def __init__(self, rate, image_path, json_data, edit_window):
         super(RenderTextBlock, self).__init__()
         self.rate = rate
         self.image_path = image_path
         self.json_data = json_data
+        self.trans_edit_ui = edit_window
         self.ui()
 
 
@@ -98,9 +166,63 @@ class RenderTextBlock(QWidget) :
         scroll_area = QScrollArea(self)
         scroll_area.resize(self.width(), self.height())
         scroll_area.setWidgetResizable(True)
+        image_label = QLabel(self)
+
+        if self.json_data :
+            # 渲染文本框
+            image = Image.open(self.image_path)
+            draw = ImageDraw.Draw(image)
+            for text_block, trans_text in zip(self.json_data["text_block"], self.json_data["translated_text"]) :
+                trans_text = trans_text.replace(' ', '').replace('\t', '').replace('\n', '')
+                # 计算文本坐标
+                x = text_block["xyxy"][0]
+                y = text_block["xyxy"][1]
+                w = text_block["xyxy"][2] - x
+                h = text_block["xyxy"][3] - y
+                # 计算文字大小
+                font_size = getFontSize(text_block["lines"], trans_text)
+                font_type = ImageFont.truetype(FONT_PATH, font_size)
+                # 文本颜色
+                line = len(text_block["lines"])
+                font_color = (text_block["fg_r"] // line, text_block["fg_g"] // line, text_block["fg_b"] // line)
+                # 绘制矩形框
+                button = QPushButton(image_label)
+                button.setGeometry(x, y, w, h)
+                button.setStyleSheet("QPushButton {background: transparent; border: 3px dashed red;}"
+                                     "QPushButton:hover {background-color:rgba(62, 62, 62, 0.1)}")
+                button.clicked.connect(lambda: self.clickTextBlock(trans_text, font_color, font_size))
+                # 取平均字高字宽
+                font_width_sum, font_height_sum = 0, 0
+                for char in trans_text :
+                    width, height = draw.textsize(char, font_type)
+                    font_width_sum += width
+                    font_height_sum += height
+                font_width = round(font_width_sum / len(trans_text))
+                font_height = round(font_height_sum / len(trans_text))
+                # 计算文本总宽度、总高度
+                max_width, max_height = self.getTextBlockSumSize((x, y, w, h), trans_text, font_width, font_height, draw, font_type)
+                # 绘制文本
+                text = ""
+                sum_height = 0
+                draw_x = x + w - (w - max_width) // 2 - font_width
+                draw_y = y + (h - max_height) // 2
+                for char in trans_text :
+                    text += char + "\n"
+                    sum_height += font_height
+                    text_width, text_height = draw.textsize(text, font=font_type)
+                    if text_height + font_height > h :
+                        #self.drawOutline(draw, draw_x, draw_y, text, font_type)
+                        draw.text((draw_x, draw_y), text, fill=font_color, font=font_type, direction=None)
+                        text = ""
+                        sum_height = 0
+                        draw_x = draw_x - font_width - 5
+                    elif char == trans_text[-1] :
+                        #self.drawOutline(draw, draw_x, draw_y, text, font_type)
+                        draw.text((draw_x, draw_y), text, fill=font_color, font=font_type, direction=None)
+            image.save(DRAW_PATH)
+            self.image_path = DRAW_PATH
 
         # 加载大图
-        image_label = QLabel(self)
         with open(self.image_path, "rb") as file:
             image = QImage.fromData(file.read())
         pixmap = QPixmap.fromImage(image)
@@ -108,48 +230,52 @@ class RenderTextBlock(QWidget) :
         image_label.resize(pixmap.width(), pixmap.height())
         scroll_area.setWidget(image_label)
 
-        if self.json_data :
-            # 根据文本块坐标绘制矩形框
-            for text_block, trans_text in zip(self.json_data["text_block"], self.json_data["translated_text"]) :
-                text_browser = QTextEdit(image_label)
-                text_browser.setStyleSheet("background: transparent; border: 3px dashed red;")
-                text_browser.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-                text_browser.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-                text_browser.setReadOnly(False)
-                # 计算文本坐标
-                text_browser.setGeometry(
-                    text_block["xyxy"][0],
-                    text_block["xyxy"][1],
-                    text_block["xyxy"][2] - text_block["xyxy"][0],
-                    text_block["xyxy"][3] - text_block["xyxy"][1]
-                )
-                # 计算文字大小
-                font_size = getFontSize(text_block["lines"], trans_text)
-                font_size = self.getImageDPI(font_size)
-                text_browser.setFontPointSize(font_size)
-                # 文本颜色
-                line = len(text_block["lines"])
-                font_color = QColor(
-                    text_block["fg_r"] // line,
-                    text_block["fg_g"] // line,
-                    text_block["fg_b"] // line
-                )
-                text_browser.setTextColor(font_color)
-                # # 描边文字
-                # shadow_strength = text_block.get("shadow_strength", 0)
-                # if shadow_strength > 0 :
-                #     bg_color = QColor(
-                #         text_block["bg_r"] // line,
-                #         text_block["bg_g"] // line,
-                #         text_block["bg_b"] // line
-                #     )
-                #     format = QTextCharFormat()
-                #     format.setTextOutline(QPen(bg_color, shadow_strength, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
-                #     text_browser.mergeCurrentCharFormat(format)
-                # 竖向显示文本
-                if text_block["vertical"] :
-                    pass
-                text_browser.setPlainText(trans_text)
+
+    # 绘制轮廓
+    def drawOutline(self, draw, draw_x, draw_y, text, font_type) :
+
+        outline = 3
+        for dx, dy in ((-outline, -outline), (-outline, outline), (outline, -outline), (outline, outline)) :
+            draw.text((draw_x + dx, draw_y + dy), text, fill=(255, 255, 255), font=font_type, direction=None)
+
+
+    # 计算文本总宽度、总高度
+    def getTextBlockSumSize(self, rect, trans_text, font_width, font_height, draw, font_type) :
+
+        x, y, w, h = rect[0], rect[1], rect[2], rect[3]
+        text = ""
+        sum_height = 0
+        draw_x = x + w - font_width - 5
+        max_width, max_height = 0, 0
+        for char in trans_text :
+            text += char + "\n"
+            sum_height += font_height
+            text_width, text_height = draw.textsize(text, font=font_type)
+            if text_height + font_height > h :
+                max_width += text_width
+                if text_height > max_height :
+                    max_height = text_height
+                text = ""
+                sum_height = 0
+                draw_x = draw_x - font_width - 5
+            elif char == trans_text[-1] :
+                max_width += text_width
+                if text_height > max_height :
+                    max_height = text_height
+
+        return max_width, max_height
+
+
+    # 点击文本框
+    def clickTextBlock(self, trans_text, font_color, font_size) :
+
+        # 计算文字大小
+        self.trans_edit_ui.edit_text.setFontPointSize(font_size)
+        # 文本颜色
+        font_color = QColor(font_color[0], font_color[1], font_color[2])
+        self.trans_edit_ui.edit_text.setTextColor(font_color)
+        self.trans_edit_ui.edit_text.setText(trans_text)
+        self.trans_edit_ui.show()
 
 
     # 获取图片的DPI大小
@@ -179,6 +305,7 @@ class Manga(QWidget) :
         self.logger = object.logger
         self.getInitConfig()
         self.ui()
+        self.trans_edit_ui = TransEdit(self.rate)
 
 
     def ui(self) :
@@ -831,7 +958,8 @@ class Manga(QWidget) :
         widget = RenderTextBlock(
             rate=self.rate,
             image_path=image_path,
-            json_data=json_data
+            json_data=json_data,
+            edit_window=self.trans_edit_ui
         )
         self.show_image_scroll_area.setWidget(widget)
         self.show_image_scroll_area.show()

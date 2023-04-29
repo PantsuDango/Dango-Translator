@@ -49,7 +49,7 @@ class Edit(QWidget) :
         self.edit_text.setCursor(ui.static.icon.PIXMAP_CURSOR)
         self.edit_text.setReadOnly(False)
 
-        # 公共翻译测试可用性按钮
+        # 重新翻译按钮
         button = QPushButton(self)
         self.customSetGeometry(button, 200, 240, 100, 50)
         button.setText("重新翻译")
