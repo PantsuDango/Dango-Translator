@@ -388,6 +388,7 @@ def mangaOCR(object, filepath) :
         "token": token,
         "mask": True,
         "refine": True,
+        "filtrate": True,
         "image": image_base64
     }
     sign = False

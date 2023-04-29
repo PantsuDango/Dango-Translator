@@ -16,6 +16,7 @@ import translator.ocr.dango
 import translator.api
 import utils.thread
 import utils.message
+from PyQt5 import QtWidgets, QtGui, QtCore
 
 
 # 根据文本块大小计算font_size
@@ -110,7 +111,7 @@ class RenderTextBlock(QWidget) :
         if self.json_data :
             # 根据文本块坐标绘制矩形框
             for text_block, trans_text in zip(self.json_data["text_block"], self.json_data["translated_text"]) :
-                text_browser = QTextBrowser(image_label)
+                text_browser = QTextEdit(image_label)
                 text_browser.setStyleSheet("background: transparent; border: 3px dashed red;")
                 text_browser.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
                 text_browser.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -133,28 +134,22 @@ class RenderTextBlock(QWidget) :
                     text_block["fg_g"] // line,
                     text_block["fg_b"] // line
                 )
-                bg_color = QColor(
-                    text_block["bg_r"] // line,
-                    text_block["bg_g"] // line,
-                    text_block["bg_b"] // line
-                )
                 text_browser.setTextColor(font_color)
-                # 描边文字
+                # # 描边文字
                 # shadow_strength = text_block.get("shadow_strength", 0)
                 # if shadow_strength > 0 :
+                #     bg_color = QColor(
+                #         text_block["bg_r"] // line,
+                #         text_block["bg_g"] // line,
+                #         text_block["bg_b"] // line
+                #     )
                 #     format = QTextCharFormat()
                 #     format.setTextOutline(QPen(bg_color, shadow_strength, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
                 #     text_browser.mergeCurrentCharFormat(format)
-
                 # 竖向显示文本
                 if text_block["vertical"] :
-                    # 插入文本
-                    text_browser.setAlignment(Qt.AlignRight)
-                    text_browser.setLayoutDirection(Qt.RightToLeft)
-                    text_browser.setText("\n".join(trans_text))
-                else :
-                    # 插入文本
-                    text_browser.setPlainText(trans_text)
+                    pass
+                text_browser.setPlainText(trans_text)
 
 
     # 获取图片的DPI大小
