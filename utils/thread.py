@@ -1,10 +1,11 @@
 from PyQt5.QtCore import *
 import threading
-
+import os
 import utils.config
 import utils.email
 import utils.message
 import utils.http
+import traceback
 
 
 # 创建线程
@@ -103,20 +104,58 @@ class createCheckAutoLoginQThread(QThread) :
             self.signal.emit(message)
 
 
-# 漫画
+# 漫画翻译进程
 class createMangaTransQThread(QThread) :
 
-    def __init__(self, window, image_path):
+    signal = pyqtSignal(str, bool)
+
+    def __init__(self, window, image_paths, reload_sign=False):
 
         super(createMangaTransQThread, self).__init__()
         self.window = window
-        self.image_path = image_path
+        self.image_paths = image_paths
+        self.reload_sign = reload_sign
 
     def run(self) :
-        # 翻译进程
-        self.window.transProcess(self.image_path)
-        # 跳转到译图栏
-        self.window.trans_image_button.click()
-        row = self.window.image_path_list.index(self.image_path)
-        self.window.trans_image_widget.setCurrentRow(row)
-        self.window.loadTransImage()
+
+        try :
+            for image_path in self.image_paths :
+                # 翻译进程
+                self.window.transProcess(image_path, self.reload_sign)
+                self.signal.emit(image_path, True)
+        except Exception :
+            self.signal.emit(traceback.format_exc(), False)
+
+
+# 漫画翻译导入图片进程
+class createInputImagesQThread(QThread) :
+
+    bar_signal = pyqtSignal(float, int, str)
+    image_widget_signal = pyqtSignal(str, bool)
+
+    def __init__(self, window, images):
+
+        super(createInputImagesQThread, self).__init__()
+        self.window = window
+        self.images = images
+
+    def run(self) :
+
+        # 遍历文件列表, 将每个文件路径添加到列表框中
+        for index, image_path in enumerate(self.images) :
+            if image_path in self.window.image_path_list :
+                continue
+            self.window.image_widget_ok = False
+            if index == len(image_path) :
+                self.image_widget_signal.emit(image_path, True)
+            else :
+                self.image_widget_signal.emit(image_path, False)
+            # 进度条
+            self.bar_signal.emit(
+                float(index + 1 / len(self.images) * 100),
+                int(index + 1 / len(self.images) * 100),
+                "%d/%d" % (index + 1, len(self.images))
+            )
+            while True :
+                if self.window.image_widget_ok :
+                    break

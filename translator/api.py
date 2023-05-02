@@ -196,14 +196,14 @@ def caiyun(sentence, token, logger) :
     try:
         response = requests.request("POST", url, data=json.dumps(payload), headers=headers, proxies=proxies, timeout=5)
         result = json.loads(response.text)['target']
-        for word in result:
+        for word in result :
             text += word
             if word != result[-1]:
                 text += "\n"
-    except Exception:
-        try:
+    except Exception :
+        try :
             text = str(json.loads(response.text))
-        except Exception:
+        except Exception :
             logger.error(format_exc())
             text = "私人彩云: 我抽风啦, 请尝试重新翻译!"
 

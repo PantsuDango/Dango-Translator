@@ -10,10 +10,11 @@ import utils.message
 # 进度条
 class ProgressBar(QWidget) :
 
-    def __init__(self, rate) :
+    def __init__(self, rate, use_type) :
 
         super(ProgressBar, self).__init__()
         self.rate = rate
+        self.use_type = use_type
         self.getInitConfig()
         self.ui()
 
@@ -101,9 +102,10 @@ class ProgressBar(QWidget) :
     # 窗口关闭处理
     def closeEvent(self, event) :
 
-        if not self.finish_sign :
-            utils.message.closeProcessBarMessageBox("停止安装",
-                                                    "本地OCR安装进行中\n确定要中止操作吗     ",
-                                                    self)
-            if not self.stop_sign :
-                event.ignore()
+        if self.use_type == "offline_ocr" :
+            if not self.finish_sign :
+                utils.message.closeProcessBarMessageBox("停止安装",
+                                                        "本地OCR安装进行中\n确定要中止操作吗     ",
+                                                        self)
+                if not self.stop_sign :
+                    event.ignore()

@@ -10,6 +10,7 @@ import utils.http
 OCR_SRC_FILE_PATH = "./ocr/resources/app.py"
 PIL_FILE_PATH = "./PIL/_imagingft.cp38-win32.pyd"
 AUTO_UPDATE_FILE_PATH = "../自动更新程序.exe"
+MANGA_FONT_PATH = "./config/other/NotoSansSC-Regular.otf"
 
 
 # 更新本地ocr源码文件
@@ -57,3 +58,10 @@ def updateAutoUpdateFile(object) :
     if not url :
         return
     utils.http.downloadFile(url, AUTO_UPDATE_FILE_PATH, object.logger)
+
+
+def updateManFontFile(object) :
+
+    if not os.path.exists(MANGA_FONT_PATH) :
+        url = object.yaml["dict_info"]["manga_font_file_url"]
+        utils.http.downloadFile(url, MANGA_FONT_PATH, object.logger)

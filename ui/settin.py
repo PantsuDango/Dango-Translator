@@ -415,7 +415,7 @@ class Settin(QMainWindow) :
         button.setText("安装")
         button.clicked.connect(lambda: utils.offline_ocr.install_offline_ocr(self.object))
         button.setCursor(ui.static.icon.SELECT_CURSOR)
-        self.progress_bar = ui.progress_bar.ProgressBar(self.object.yaml["screen_scale_rate"])
+        self.progress_bar = ui.progress_bar.ProgressBar(self.object.yaml["screen_scale_rate"], "offline_ocr")
         # 本地OCR卸载按钮
         button = QPushButton(offline_OCR_tab)
         self.customSetGeometry(button, 100, 170, 60, 20)

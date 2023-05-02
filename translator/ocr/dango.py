@@ -380,7 +380,7 @@ def mangaOCR(object, filepath) :
 
     # 获取配置
     token = object.config.get("DangoToken", "")
-    url = object.yaml["dict_info"].get("manga_ocr", "https://dl-dev.ap-sh.starivercs.com:10443/v2/manga_trans/advanced/manga_ocr")
+    url = object.yaml["dict_info"].get("manga_ocr", "https://dl-dev.ap-sh.starivercs.cn/v2/manga_trans/advanced/manga_ocr")
     with open(filepath, "rb") as file :
         data = file.read()
     image_base64 = base64.b64encode(data).decode("utf-8")
@@ -388,22 +388,22 @@ def mangaOCR(object, filepath) :
         "token": token,
         "mask": True,
         "refine": True,
-        "filtrate": True,
+        "filtrate": False,
         "image": image_base64
     }
     sign = False
-    result = ""
+    result = "请求漫画OCR服务失败: "
     try :
         res = utils.http.post(url=url, body=body, logger=object.logger, timeout=20)
     except Exception as err :
-        result = "请求漫画OCR服务失败: {}".format(err)
+        result += str(err)
     else :
         code = res.get("Code", -1)
         if code == 0 :
             result = res.get("Data", {})
             sign = True
         else :
-            result = "请求漫画OCR服务失败: {}".format(res.get("Message", ""))
+            result += res.get("Message", "")
     if not sign :
         object.logger.error(result)
 
@@ -425,18 +425,18 @@ def mangaIPT(object, filepath, mask) :
         "image": image_base64
     }
     sign = False
-    result = ""
+    result = "请求漫画文本消除服务失败: "
     try :
         res = utils.http.post(url=url, body=body, logger=object.logger, timeout=20)
     except Exception as err :
-        result = "请求漫画文本消除服务失败: {}".format(err)
+        result += str(err)
     else :
         code = res.get("Code", -1)
         if code == 0:
             result = res.get("Data", {})
             sign = True
         else:
-            result = "请求漫画文本消除服务失败: {}".format(res.get("Message", ""))
+            result += res.get("Message", "")
     if not sign :
         object.logger.error(result)
 
@@ -457,18 +457,18 @@ def mangaRDR(object, mask, trans_list, inpainted_image, text_block) :
         "text_block": text_block
     }
     sign = False
-    result = ""
+    result = "请求漫画文本渲染服务失败: "
     try :
         res = utils.http.post(url=url, body=body, logger=object.logger, timeout=20)
     except Exception as err :
-        result = "请求漫画文本渲染服务失败: {}".format(err)
+        result += str(err)
     else :
         code = res.get("Code", -1)
         if code == 0:
             result = res.get("Data", {})
             sign = True
         else:
-            result = "请求漫画文本渲染服务失败: {}".format(res.get("Message", ""))
+            result += res.get("Message", "")
     if not sign:
         object.logger.error(result)
 
