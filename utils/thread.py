@@ -138,6 +138,8 @@ class createInputImagesQThread(QThread) :
         super(createInputImagesQThread, self).__init__()
         self.window = window
         self.images = images
+        self.window.input_images_progress_bar.stop_sign = False
+        self.window.input_images_progress_bar.finish_sign = False
 
     def run(self) :
 
@@ -146,16 +148,18 @@ class createInputImagesQThread(QThread) :
             if image_path in self.window.image_path_list :
                 continue
             self.window.image_widget_ok = False
-            if index == len(image_path) :
-                self.image_widget_signal.emit(image_path, True)
-            else :
-                self.image_widget_signal.emit(image_path, False)
+            self.image_widget_signal.emit(image_path, False)
             # 进度条
             self.bar_signal.emit(
-                float(index + 1 / len(self.images) * 100),
-                int(index + 1 / len(self.images) * 100),
+                float((index + 1) / len(self.images) * 100),
+                int((index + 1) / len(self.images) * 100),
                 "%d/%d" % (index + 1, len(self.images))
             )
+            # 等待图片插入后继续
             while True :
                 if self.window.image_widget_ok :
                     break
+            # 如果停止
+            if self.window.input_images_progress_bar.stop_sign :
+                break
+        self.image_widget_signal.emit("", True)

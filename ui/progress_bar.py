@@ -102,10 +102,15 @@ class ProgressBar(QWidget) :
     # 窗口关闭处理
     def closeEvent(self, event) :
 
+        if self.finish_sign :
+            return
         if self.use_type == "offline_ocr" :
-            if not self.finish_sign :
-                utils.message.closeProcessBarMessageBox("停止安装",
-                                                        "本地OCR安装进行中\n确定要中止操作吗     ",
-                                                        self)
-                if not self.stop_sign :
-                    event.ignore()
+            utils.message.closeProcessBarMessageBox("停止安装",
+                                                    "本地OCR安装进行中\n确定要中止操作吗     ",
+                                                    self)
+        elif self.use_type == "input_images" :
+            utils.message.closeProcessBarMessageBox("停止导入",
+                                                    "图片导入进行中\n确定要中止操作吗     ",
+                                                    self)
+        if not self.stop_sign :
+            event.ignore()

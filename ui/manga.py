@@ -633,22 +633,25 @@ class Manga(QWidget) :
     # 导入图片
     def inputImage(self, image_path, finish_sign) :
 
-        # 图片添加至原图列表框
-        self.originalImageWidgetAddImage(image_path)
-        # 图片添加至编辑图列表框
-        self.editImageWidgetAddImage()
-        if os.path.exists(self.getIptFilePath(image_path)) :
-            self.editImageWidgetRefreshImage(image_path)
-        # 图片添加至译图列表框
-        self.transImageWidgetAddImage()
-        if os.path.exists(self.getRdrFilePath(image_path)) :
-            self.transImageWidgetRefreshImage(image_path)
+        if not finish_sign :
+            # 图片添加至原图列表框
+            self.originalImageWidgetAddImage(image_path)
+            # 图片添加至编辑图列表框
+            self.editImageWidgetAddImage()
+            if os.path.exists(self.getIptFilePath(image_path)) :
+                self.editImageWidgetRefreshImage(image_path)
+            # 图片添加至译图列表框
+            self.transImageWidgetAddImage()
+            if os.path.exists(self.getRdrFilePath(image_path)) :
+                self.transImageWidgetRefreshImage(image_path)
 
-        if finish_sign :
+        else :
             # 跳转到原图栏
             self.original_image_button.click()
             self.original_image_widget.setCurrentRow(0)
             self.loadOriginalImage()
+            self.input_images_progress_bar.finish_sign = True
+            self.input_images_progress_bar.close()
 
         self.image_widget_ok = True
 
