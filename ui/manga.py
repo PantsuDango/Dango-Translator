@@ -8,6 +8,7 @@ import base64
 import shutil
 import json
 from math import sqrt
+import webbrowser
 #from PIL import Image, ImageDraw, ImageFont
 
 import ui.static.icon
@@ -385,9 +386,19 @@ class Manga(QWidget) :
         button.setMenu(self.input_menu)
         self.input_action_group.triggered.connect(self.openImageFiles)
 
+        # 一键翻译
+        self.trans_all_button = QPushButton(self)
+        self.customSetGeometry(self.trans_all_button, 120, 0, 120, 35)
+        self.trans_all_button.setText(" 一键翻译")
+        self.trans_all_button.setStyleSheet("QPushButton {background: transparent;}"
+                                            "QPushButton:hover {background-color: #83AAF9;}"
+                                            "QPushButton:pressed {background-color: #4480F9;}")
+        self.trans_all_button.setIcon(ui.static.icon.RUN_ICON)
+        self.trans_all_button.clicked.connect(self.clickTransAllButton)
+
         # 选择翻译源
         button = QPushButton(self)
-        self.customSetGeometry(button, 120, 0, 120, 35)
+        self.customSetGeometry(button, 240, 0, 120, 35)
         button.setText(" 选择翻译源")
         button.setStyleSheet("QPushButton {background: transparent;}"
                              "QPushButton:hover {background-color: #83AAF9;}"
@@ -404,6 +415,16 @@ class Manga(QWidget) :
         # 将下拉菜单设置为按钮的菜单
         button.setMenu(self.trans_menu)
         self.trans_action_group.triggered.connect(self.changeSelectTrans)
+
+        # 教程按钮
+        button = QPushButton(self)
+        self.customSetGeometry(button, 1080, 0, 120, 35)
+        button.setText(" 使用教程")
+        button.setStyleSheet("QPushButton {background: transparent;}"
+                                            "QPushButton:hover {background-color: #83AAF9;}"
+                                            "QPushButton:pressed {background-color: #4480F9;}")
+        button.setIcon(ui.static.icon.RUN_ICON)
+        button.clicked.connect(self.openUseTutorial)
 
         # 工具栏横向分割线
         self.createCutLine(0, 35, self.window_width, 1)
@@ -946,6 +967,7 @@ class Manga(QWidget) :
         self.trans_process_bar.modifyTitle("漫画翻译 -- 执行中请勿关闭此窗口")
         self.trans_process_bar.show()
         # 创建执行线程
+        self.trans_all_button.setEnabled(False)
         reload_sign = True
         thread = utils.thread.createMangaTransQThread(self, image_paths, reload_sign)
         thread.signal.connect(self.finishTransProcessRefresh)
@@ -1164,6 +1186,34 @@ class Manga(QWidget) :
                 # @TODO 缺少错误处理
                 pass
             self.trans_process_bar.close()
+            self.trans_all_button.setEnabled(True)
+
+
+    # 一键翻译
+    def clickTransAllButton(self) :
+
+        self.trans_all_button.setEnabled(False)
+        # 进度条窗口
+        self.trans_process_bar.modifyTitle("漫画翻译 -- 执行中请勿关闭此窗口")
+        self.trans_process_bar.show()
+        # 创建执行线程
+        thread = utils.thread.createMangaTransQThread(self, self.image_path_list)
+        thread.signal.connect(self.finishTransProcessRefresh)
+        thread.bar_signal.connect(self.trans_process_bar.paintProgressBar)
+        utils.thread.runQThread(thread)
+
+
+    # 打开使用教程
+    def openUseTutorial(self) :
+
+        url = self.object.yaml["dict_info"]["manga_tutorial"]
+        try:
+            webbrowser.open(url, new=0, autoraise=True)
+        except Exception:
+            self.logger.error(format_exc())
+            utils.message.MessageBox("漫画翻译教程",
+                                     "打开失败, 请尝试手动打开此地址\n%s     "%url)
+
 
 
     # 窗口关闭处理
