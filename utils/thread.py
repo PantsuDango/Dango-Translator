@@ -108,6 +108,7 @@ class createCheckAutoLoginQThread(QThread) :
 class createMangaTransQThread(QThread) :
 
     signal = pyqtSignal(str, bool)
+    bar_signal = pyqtSignal(float, int, str)
 
     def __init__(self, window, image_paths, reload_sign=False):
 
@@ -115,16 +116,32 @@ class createMangaTransQThread(QThread) :
         self.window = window
         self.image_paths = image_paths
         self.reload_sign = reload_sign
+        self.window.trans_process_bar.stop_sign = False
+        self.window.trans_process_bar.finish_sign = False
 
     def run(self) :
 
+        # 初始化进度条
+        self.bar_signal.emit(0, 0, "0/%d"%len(self.image_paths))
         try :
-            for image_path in self.image_paths :
+            for index, image_path in enumerate(self.image_paths) :
                 # 翻译进程
                 self.window.transProcess(image_path, self.reload_sign)
                 self.signal.emit(image_path, True)
+                # 进度条
+                self.bar_signal.emit(
+                    float((index + 1) / len(self.image_paths) * 100),
+                    int((index + 1) / len(self.image_paths) * 100),
+                    "%d/%d"%(index + 1, len(self.image_paths))
+                )
+                # 如果停止
+                if self.window.trans_process_bar.stop_sign :
+                    break
         except Exception :
             self.signal.emit(traceback.format_exc(), False)
+        # 结束
+        self.window.trans_process_bar.finish_sign = True
+        self.signal.emit("", False)
 
 
 # 漫画翻译导入图片进程
@@ -143,11 +160,12 @@ class createInputImagesQThread(QThread) :
 
     def run(self) :
 
+        # 初始化进度条
+        self.bar_signal.emit(0, 0, "0/%d"%len(self.images))
         # 遍历文件列表, 将每个文件路径添加到列表框中
         for index, image_path in enumerate(self.images) :
             if image_path in self.window.image_path_list :
                 continue
-            self.window.image_widget_ok = False
             self.image_widget_signal.emit(image_path, False)
             # 进度条
             self.bar_signal.emit(
@@ -155,11 +173,8 @@ class createInputImagesQThread(QThread) :
                 int((index + 1) / len(self.images) * 100),
                 "%d/%d" % (index + 1, len(self.images))
             )
-            # 等待图片插入后继续
-            while True :
-                if self.window.image_widget_ok :
-                    break
             # 如果停止
             if self.window.input_images_progress_bar.stop_sign :
                 break
+        self.window.input_images_progress_bar.finish_sign = True
         self.image_widget_signal.emit("", True)

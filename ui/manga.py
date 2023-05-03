@@ -489,6 +489,8 @@ class Manga(QWidget) :
 
         # 导入图片进度条
         self.input_images_progress_bar = ui.progress_bar.ProgressBar(self.object.yaml["screen_scale_rate"], "input_images")
+        # 漫画翻译进度条
+        self.trans_process_bar = ui.progress_bar.ProgressBar(self.object.yaml["screen_scale_rate"], "trans")
 
 
     # 初始化配置
@@ -587,42 +589,18 @@ class Manga(QWidget) :
             return
 
         if images :
-            self.input_images_progress_bar.modifyTitle("导入图片 -- 加载中请勿关闭此窗口")
-            self.input_images_progress_bar.show()
             # 清除所有图片
             self.clearAllImages()
             # 根据文件名排序
             images = self.dirFilesPathSort(images)
-
-
+            # 进度条窗口
+            self.input_images_progress_bar.modifyTitle("导入图片 -- 加载中请勿关闭此窗口")
+            self.input_images_progress_bar.show()
+            # 导入图片线程
             thread = utils.thread.createInputImagesQThread(self, images)
             thread.bar_signal.connect(self.input_images_progress_bar.paintProgressBar)
             thread.image_widget_signal.connect(self.inputImage)
             utils.thread.runQThread(thread)
-
-            # 遍历文件列表, 将每个文件路径添加到列表框中
-            # for index, image_path in enumerate(images) :
-            #     if image_path in self.image_path_list:
-            #         continue
-            #     # 图片添加至列表框
-            #     self.originalImageWidgetAddImage(image_path)
-            #     self.editImageWidgetAddImage()
-            #     if os.path.exists(self.getIptFilePath(image_path)) :
-            #         self.editImageWidgetRefreshImage(image_path)
-            #     self.transImageWidgetAddImage()
-            #     if os.path.exists(self.getRdrFilePath(image_path)) :
-            #         self.transImageWidgetRefreshImage(image_path)
-            #     # 跳转到原图栏
-            #     self.original_image_button.click()
-            #     self.original_image_widget.setCurrentRow(0)
-            #     self.loadOriginalImage()
-            #     # 进度条
-            #     self.input_images_progress_bar.paint_progress_bar_signal.emit(
-            #         float(index + 1 / len(images) * 100),
-            #         int(index + 1 / len(images) * 100),
-            #         "%d/%d" % (index + 1, len(images))
-            #     )
-
 
         # 记忆上次操作的目录
         for image_path in images:
@@ -650,10 +628,7 @@ class Manga(QWidget) :
             self.original_image_button.click()
             self.original_image_widget.setCurrentRow(0)
             self.loadOriginalImage()
-            self.input_images_progress_bar.finish_sign = True
             self.input_images_progress_bar.close()
-
-        self.image_widget_ok = True
 
 
     # 文件列表排序
@@ -967,10 +942,14 @@ class Manga(QWidget) :
         image_path = self.image_path_list[row]
         image_paths = []
         image_paths.append(image_path)
+        # 进度条窗口
+        self.trans_process_bar.modifyTitle("漫画翻译 -- 执行中请勿关闭此窗口")
+        self.trans_process_bar.show()
         # 创建执行线程
         reload_sign = True
         thread = utils.thread.createMangaTransQThread(self, image_paths, reload_sign)
         thread.signal.connect(self.finishTransProcessRefresh)
+        thread.bar_signal.connect(self.trans_process_bar.paintProgressBar)
         utils.thread.runQThread(thread)
 
 
@@ -1181,8 +1160,10 @@ class Manga(QWidget) :
             self.trans_image_widget.setCurrentRow(row)
             self.loadTransImage()
         else :
-            # @TODO 错误处理补全
-            pass
+            if value :
+                # @TODO 缺少错误处理
+                pass
+            self.trans_process_bar.close()
 
 
     # 窗口关闭处理

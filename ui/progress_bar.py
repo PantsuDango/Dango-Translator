@@ -111,6 +111,10 @@ class ProgressBar(QWidget) :
         elif self.use_type == "input_images" :
             utils.message.closeProcessBarMessageBox("停止导入",
                                                     "图片导入进行中\n确定要中止操作吗     ",
-                                                    self)
+                                                     self)
+        elif self.use_type == "trans" :
+            utils.message.closeProcessBarMessageBox("停止翻译",
+                                                    "漫画翻译进行中\n确定要中止操作吗     ",
+                                                     self)
         if not self.stop_sign :
             event.ignore()
