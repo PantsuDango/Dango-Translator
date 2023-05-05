@@ -353,7 +353,7 @@ class Manga(QWidget) :
 
         # 窗口尺寸及不可拉伸
         self.resize(self.window_width, self.window_height)
-        #self.setMinimumSize(QSize(self.window_width, self.window_height))
+        self.setMinimumSize(QSize(self.window_width, self.window_height))
         #self.setWindowFlags(Qt.WindowMinimizeButtonHint | Qt.WindowCloseButtonHint)
 
         # 窗口标题
@@ -364,36 +364,29 @@ class Manga(QWidget) :
         self.setCursor(ui.static.icon.PIXMAP_CURSOR)
         # 设置字体
         self.setStyleSheet("font: %spt '%s';"%(self.font_size, self.font_type))
-        # 布局管理器
-        layout = QGridLayout()
-        self.setLayout(layout)
 
         self.status_label = QLabel(self)
         self.customSetGeometry(self.status_label, 10, 670, 1200, 20)
 
         # 导入原图按钮
-        button = QPushButton(self)
-        layout.addWidget(button, 0, 0, Qt.AlignLeft)
-        #self.customSetGeometry(button, 0, 0, 120, 35)
-        button.setText(" 导入原图")
-        button.setStyleSheet("QPushButton {background: transparent;}"
-                             "QPushButton:hover {background-color: #83AAF9;}"
-                             "QPushButton:pressed {background-color: #4480F9;}")
-        button.setIcon(ui.static.icon.OPEN_ICON)
+        self.input_image_button = QPushButton(self)
+        self.input_image_button.setText(" 导入原图")
+        self.input_image_button.setStyleSheet("QPushButton {background: transparent;}"
+                                              "QPushButton:hover {background-color: #83AAF9;}"
+                                              "QPushButton:pressed {background-color: #4480F9;}")
+        self.input_image_button.setIcon(ui.static.icon.OPEN_ICON)
         # 导入原图菜单
-        self.input_menu = QMenu(button)
+        self.input_menu = QMenu(self.input_image_button)
         self.input_action_group = QActionGroup(self.input_menu)
         self.input_action_group.setExclusive(True)
         self.createInputAction("从文件导入")
         self.createInputAction("从文件夹导入")
         # 将下拉菜单设置为按钮的菜单
-        button.setMenu(self.input_menu)
+        self.input_image_button.setMenu(self.input_menu)
         self.input_action_group.triggered.connect(self.openImageFiles)
 
-        # 一键翻译
+        # 一键翻译按钮
         self.trans_all_button = QPushButton(self)
-        layout.addWidget(self.trans_all_button, 0, 1, Qt.AlignmentFlag.AlignLeft)
-        #self.customSetGeometry(self.trans_all_button, 120, 0, 120, 35)
         self.trans_all_button.setText(" 一键翻译")
         self.trans_all_button.setStyleSheet("QPushButton {background: transparent;}"
                                             "QPushButton:hover {background-color: #83AAF9;}"
@@ -401,17 +394,15 @@ class Manga(QWidget) :
         self.trans_all_button.setIcon(ui.static.icon.RUN_ICON)
         self.trans_all_button.clicked.connect(self.clickTransAllButton)
 
-        # 选择翻译源
-        button = QPushButton(self)
-        layout.addWidget(button, 0, 2, Qt.AlignLeft)
-        #self.customSetGeometry(button, 240, 0, 120, 35)
-        button.setText(" 选择翻译源")
-        button.setStyleSheet("QPushButton {background: transparent;}"
-                             "QPushButton:hover {background-color: #83AAF9;}"
-                             "QPushButton:pressed {background-color: #4480F9;}")
-        button.setIcon(ui.static.icon.TRANSLATE_ICON)
+        # 选择翻译源按钮
+        self.select_trans_button = QPushButton(self)
+        self.select_trans_button.setText(" 选择翻译源")
+        self.select_trans_button.setStyleSheet("QPushButton {background: transparent;}"
+                                               "QPushButton:hover {background-color: #83AAF9;}"
+                                               "QPushButton:pressed {background-color: #4480F9;}")
+        self.select_trans_button.setIcon(ui.static.icon.TRANSLATE_ICON)
         # 翻译源菜单
-        self.trans_menu = QMenu(button)
+        self.trans_menu = QMenu(self.select_trans_button)
         self.trans_action_group = QActionGroup(self.trans_menu)
         self.trans_action_group.setExclusive(True)
         self.createTransAction("私人彩云")
@@ -419,28 +410,25 @@ class Manga(QWidget) :
         self.createTransAction("私人百度")
         self.createTransAction("私人ChatGPT")
         # 将下拉菜单设置为按钮的菜单
-        button.setMenu(self.trans_menu)
+        self.select_trans_button.setMenu(self.trans_menu)
         self.trans_action_group.triggered.connect(self.changeSelectTrans)
 
         # 教程按钮
-        button = QPushButton(self)
-        layout.addWidget(button, 0, 3, Qt.AlignRight)
-        #self.customSetGeometry(button, 1080, 0, 120, 35)
-        button.setText(" 使用教程")
-        button.setStyleSheet("QPushButton {background: transparent;}"
-                                            "QPushButton:hover {background-color: #83AAF9;}"
-                                            "QPushButton:pressed {background-color: #4480F9;}")
-        button.setIcon(ui.static.icon.RUN_ICON)
-        button.clicked.connect(self.openUseTutorial)
-        layout.addWidget(button, 0, 3)
+        self.tutorial_button = QPushButton(self)
+        self.customSetGeometry(self.tutorial_button, 1080, 0, 120, 35)
+        self.tutorial_button.setText(" 使用教程")
+        self.tutorial_button.setStyleSheet("QPushButton {background: transparent;}"
+                                           "QPushButton:hover {background-color: #83AAF9;}"
+                                           "QPushButton:pressed {background-color: #4480F9;}")
+        self.tutorial_button.setIcon(ui.static.icon.RUN_ICON)
+        self.tutorial_button.clicked.connect(self.openUseTutorial)
 
         # 工具栏横向分割线
         self.createCutLine(0, 35, self.window_width, 1)
 
         # 原图按钮
         self.original_image_button = QPushButton(self)
-        layout.addWidget(self.original_image_button, 1, 0)
-        #self.customSetGeometry(self.original_image_button, 0, 35, 66, 25)
+        self.customSetGeometry(self.original_image_button, 0, 35, 66, 25)
         self.original_image_button.setText("原图")
         self.original_image_button.setStyleSheet("background-color: #83AAF9;")
         self.original_image_button.clicked.connect(lambda: self.clickImageButton("original"))
@@ -450,8 +438,7 @@ class Manga(QWidget) :
 
         # 编辑按钮
         self.edit_image_button = QPushButton(self)
-        layout.addWidget(self.edit_image_button, 1, 1)
-        #self.customSetGeometry(self.edit_image_button, 67, 35, 66, 25)
+        self.customSetGeometry(self.edit_image_button, 67, 35, 66, 25)
         self.edit_image_button.setText("编辑")
         self.edit_image_button.setStyleSheet("QPushButton {background: transparent;}"
                                              "QPushButton:hover {background-color: #83AAF9;}")
@@ -462,8 +449,7 @@ class Manga(QWidget) :
 
         # 译图按钮
         self.trans_image_button = QPushButton(self)
-        layout.addWidget(self.trans_image_button, 1, 2)
-        #self.customSetGeometry(self.trans_image_button, 134, 35, 66, 25)
+        self.customSetGeometry(self.trans_image_button, 134, 35, 66, 25)
         self.trans_image_button.setText("译图")
         self.trans_image_button.setStyleSheet("QPushButton {background: transparent;}"
                                               "QPushButton:hover {background-color: #83AAF9;}")
@@ -474,8 +460,7 @@ class Manga(QWidget) :
 
         # 原图列表框
         self.original_image_widget = QListWidget(self)
-        layout.addWidget(self.original_image_widget, 2, 0)
-        #self.customSetGeometry(self.original_image_widget, 0, 60, 200, 610)
+        self.customSetGeometry(self.original_image_widget, 0, 60, 200, 610)
         self.original_image_widget.setIconSize(QSize(180*self.rate, 180*self.rate))
         self.original_image_widget.itemSelectionChanged.connect(self.loadOriginalImage)
         self.original_image_widget.show()
@@ -484,8 +469,7 @@ class Manga(QWidget) :
 
         # 编辑图列表框
         self.edit_image_widget = QListWidget(self)
-        layout.addWidget(self.edit_image_widget, 2, 0)
-        #self.customSetGeometry(self.edit_image_widget, 0, 60, 200, 610)
+        self.customSetGeometry(self.edit_image_widget, 0, 60, 200, 610)
         self.edit_image_widget.setIconSize(QSize(180*self.rate, 180*self.rate))
         self.edit_image_widget.itemSelectionChanged.connect(self.loadEditImage)
         self.edit_image_widget.hide()
@@ -494,8 +478,7 @@ class Manga(QWidget) :
 
         # 译图列表框
         self.trans_image_widget = QListWidget(self)
-        layout.addWidget(self.trans_image_widget, 2, 0)
-        #self.customSetGeometry(self.trans_image_widget, 0, 60, 200, 610)
+        self.customSetGeometry(self.trans_image_widget, 0, 60, 200, 610)
         self.trans_image_widget.setIconSize(QSize(180*self.rate, 180*self.rate))
         self.trans_image_widget.itemSelectionChanged.connect(self.loadTransImage)
         self.trans_image_widget.hide()
@@ -504,8 +487,7 @@ class Manga(QWidget) :
 
         # 图片大图展示
         self.show_image_scroll_area = QScrollArea(self)
-        layout.addWidget(self.show_image_scroll_area, 2, 1)
-        #self.customSetGeometry(self.show_image_scroll_area, 200, 35, 1000, 635)
+        self.customSetGeometry(self.show_image_scroll_area, 200, 35, 1000, 635)
         self.show_image_scroll_area.setWidgetResizable(True)
 
         # 底部横向分割线
@@ -1225,6 +1207,24 @@ class Manga(QWidget) :
             utils.message.MessageBox("漫画翻译教程",
                                      "打开失败, 请尝试手动打开此地址\n%s     "%url)
 
+
+    # 窗口尺寸变化信号
+    def resizeEvent(self, event) :
+
+        w = event.size().width()
+        h = event.size().height()
+        w_rate = w / self.window_width
+        h_rate = h / self.window_height
+        # # 设置字体
+        # self.setStyleSheet("font: %spt '%s';"%(self.font_size*w_rate, self.font_type))
+        # 导入原图按钮
+        self.customSetGeometry(self.input_image_button, 0, 0, 120*w_rate, 35*h_rate)
+        # 一键翻译按钮
+        self.customSetGeometry(self.trans_all_button, 120*w_rate, 0, 120*w_rate, 35*h_rate)
+        # 选择翻译源按钮
+        self.customSetGeometry(self.select_trans_button, 240*w_rate, 0, 120*w_rate, 35*h_rate)
+        # 教程按钮
+        self.customSetGeometry(self.tutorial_button, 1080*w_rate, 0, 120*w_rate, 35*h_rate)
 
 
     # 窗口关闭处理
