@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from PyQt5.QtCore import *
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import os
@@ -341,7 +342,6 @@ class Manga(QWidget) :
     def __init__(self, object) :
 
         super(Manga, self).__init__()
-
         self.object = object
         self.logger = object.logger
         self.getInitConfig()
@@ -353,8 +353,8 @@ class Manga(QWidget) :
 
         # 窗口尺寸及不可拉伸
         self.resize(self.window_width, self.window_height)
-        self.setMinimumSize(QSize(self.window_width, self.window_height))
-        self.setWindowFlags(Qt.WindowMinimizeButtonHint | Qt.WindowCloseButtonHint)
+        #self.setMinimumSize(QSize(self.window_width, self.window_height))
+        #self.setWindowFlags(Qt.WindowMinimizeButtonHint | Qt.WindowCloseButtonHint)
 
         # 窗口标题
         self.setWindowTitle("漫画翻译")
@@ -364,13 +364,17 @@ class Manga(QWidget) :
         self.setCursor(ui.static.icon.PIXMAP_CURSOR)
         # 设置字体
         self.setStyleSheet("font: %spt '%s';"%(self.font_size, self.font_type))
+        # 布局管理器
+        layout = QGridLayout()
+        self.setLayout(layout)
 
         self.status_label = QLabel(self)
         self.customSetGeometry(self.status_label, 10, 670, 1200, 20)
 
-        # 导入原图
+        # 导入原图按钮
         button = QPushButton(self)
-        self.customSetGeometry(button, 0, 0, 120, 35)
+        layout.addWidget(button, 0, 0, Qt.AlignLeft)
+        #self.customSetGeometry(button, 0, 0, 120, 35)
         button.setText(" 导入原图")
         button.setStyleSheet("QPushButton {background: transparent;}"
                              "QPushButton:hover {background-color: #83AAF9;}"
@@ -388,7 +392,8 @@ class Manga(QWidget) :
 
         # 一键翻译
         self.trans_all_button = QPushButton(self)
-        self.customSetGeometry(self.trans_all_button, 120, 0, 120, 35)
+        layout.addWidget(self.trans_all_button, 0, 1, Qt.AlignmentFlag.AlignLeft)
+        #self.customSetGeometry(self.trans_all_button, 120, 0, 120, 35)
         self.trans_all_button.setText(" 一键翻译")
         self.trans_all_button.setStyleSheet("QPushButton {background: transparent;}"
                                             "QPushButton:hover {background-color: #83AAF9;}"
@@ -398,7 +403,8 @@ class Manga(QWidget) :
 
         # 选择翻译源
         button = QPushButton(self)
-        self.customSetGeometry(button, 240, 0, 120, 35)
+        layout.addWidget(button, 0, 2, Qt.AlignLeft)
+        #self.customSetGeometry(button, 240, 0, 120, 35)
         button.setText(" 选择翻译源")
         button.setStyleSheet("QPushButton {background: transparent;}"
                              "QPushButton:hover {background-color: #83AAF9;}"
@@ -418,20 +424,23 @@ class Manga(QWidget) :
 
         # 教程按钮
         button = QPushButton(self)
-        self.customSetGeometry(button, 1080, 0, 120, 35)
+        layout.addWidget(button, 0, 3, Qt.AlignRight)
+        #self.customSetGeometry(button, 1080, 0, 120, 35)
         button.setText(" 使用教程")
         button.setStyleSheet("QPushButton {background: transparent;}"
                                             "QPushButton:hover {background-color: #83AAF9;}"
                                             "QPushButton:pressed {background-color: #4480F9;}")
         button.setIcon(ui.static.icon.RUN_ICON)
         button.clicked.connect(self.openUseTutorial)
+        layout.addWidget(button, 0, 3)
 
         # 工具栏横向分割线
         self.createCutLine(0, 35, self.window_width, 1)
 
         # 原图按钮
         self.original_image_button = QPushButton(self)
-        self.customSetGeometry(self.original_image_button, 0, 35, 66, 25)
+        layout.addWidget(self.original_image_button, 1, 0)
+        #self.customSetGeometry(self.original_image_button, 0, 35, 66, 25)
         self.original_image_button.setText("原图")
         self.original_image_button.setStyleSheet("background-color: #83AAF9;")
         self.original_image_button.clicked.connect(lambda: self.clickImageButton("original"))
@@ -441,7 +450,8 @@ class Manga(QWidget) :
 
         # 编辑按钮
         self.edit_image_button = QPushButton(self)
-        self.customSetGeometry(self.edit_image_button, 67, 35, 66, 25)
+        layout.addWidget(self.edit_image_button, 1, 1)
+        #self.customSetGeometry(self.edit_image_button, 67, 35, 66, 25)
         self.edit_image_button.setText("编辑")
         self.edit_image_button.setStyleSheet("QPushButton {background: transparent;}"
                                              "QPushButton:hover {background-color: #83AAF9;}")
@@ -452,7 +462,8 @@ class Manga(QWidget) :
 
         # 译图按钮
         self.trans_image_button = QPushButton(self)
-        self.customSetGeometry(self.trans_image_button, 134, 35, 66, 25)
+        layout.addWidget(self.trans_image_button, 1, 2)
+        #self.customSetGeometry(self.trans_image_button, 134, 35, 66, 25)
         self.trans_image_button.setText("译图")
         self.trans_image_button.setStyleSheet("QPushButton {background: transparent;}"
                                               "QPushButton:hover {background-color: #83AAF9;}")
@@ -463,7 +474,8 @@ class Manga(QWidget) :
 
         # 原图列表框
         self.original_image_widget = QListWidget(self)
-        self.customSetGeometry(self.original_image_widget, 0, 60, 200, 610)
+        layout.addWidget(self.original_image_widget, 2, 0)
+        #self.customSetGeometry(self.original_image_widget, 0, 60, 200, 610)
         self.original_image_widget.setIconSize(QSize(180*self.rate, 180*self.rate))
         self.original_image_widget.itemSelectionChanged.connect(self.loadOriginalImage)
         self.original_image_widget.show()
@@ -472,7 +484,8 @@ class Manga(QWidget) :
 
         # 编辑图列表框
         self.edit_image_widget = QListWidget(self)
-        self.customSetGeometry(self.edit_image_widget, 0, 60, 200, 610)
+        layout.addWidget(self.edit_image_widget, 2, 0)
+        #self.customSetGeometry(self.edit_image_widget, 0, 60, 200, 610)
         self.edit_image_widget.setIconSize(QSize(180*self.rate, 180*self.rate))
         self.edit_image_widget.itemSelectionChanged.connect(self.loadEditImage)
         self.edit_image_widget.hide()
@@ -481,7 +494,8 @@ class Manga(QWidget) :
 
         # 译图列表框
         self.trans_image_widget = QListWidget(self)
-        self.customSetGeometry(self.trans_image_widget, 0, 60, 200, 610)
+        layout.addWidget(self.trans_image_widget, 2, 0)
+        #self.customSetGeometry(self.trans_image_widget, 0, 60, 200, 610)
         self.trans_image_widget.setIconSize(QSize(180*self.rate, 180*self.rate))
         self.trans_image_widget.itemSelectionChanged.connect(self.loadTransImage)
         self.trans_image_widget.hide()
@@ -490,7 +504,8 @@ class Manga(QWidget) :
 
         # 图片大图展示
         self.show_image_scroll_area = QScrollArea(self)
-        self.customSetGeometry(self.show_image_scroll_area, 200, 35, 1000, 635)
+        layout.addWidget(self.show_image_scroll_area, 2, 1)
+        #self.customSetGeometry(self.show_image_scroll_area, 200, 35, 1000, 635)
         self.show_image_scroll_area.setWidgetResizable(True)
 
         # 底部横向分割线
@@ -1067,16 +1082,12 @@ class Manga(QWidget) :
         # 从缓存文件中获取json结果
         with open(self.getJsonFilePath(image_path), "r", encoding="utf-8") as file :
             json_data = json.load(file)
-        # 从缓存文件里获取mask图片
-        with open(self.getMaskFilePath(image_path), "rb") as file :
-            mask = base64.b64encode(file.read()).decode("utf-8")
         # 从缓存文件里获取ipt图片
         with open(self.getIptFilePath(image_path), "rb") as file :
             ipt = base64.b64encode(file.read()).decode("utf-8")
         # 漫画rdr
         sign, result = translator.ocr.dango.mangaRDR(
             object=self.object,
-            mask=mask,
             trans_list=json_data["translated_text"],
             inpainted_image=ipt,
             text_block=json_data["text_block"]

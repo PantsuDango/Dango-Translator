@@ -388,7 +388,7 @@ def mangaOCR(object, filepath) :
         "token": token,
         "mask": True,
         "refine": True,
-        "filtrate": False,
+        "filtrate": True,
         "image": image_base64
     }
     sign = False
@@ -444,14 +444,13 @@ def mangaIPT(object, filepath, mask) :
 
 
 # 漫画文本渲染
-def mangaRDR(object, mask, trans_list, inpainted_image, text_block) :
+def mangaRDR(object, trans_list, inpainted_image, text_block) :
 
     # 获取配置
     token = object.config.get("DangoToken", "")
     url = object.yaml["dict_info"].get("manga_text_render", "https://dl-dev.ap-sh.starivercs.com:10443/v2/manga_trans/advanced/text_render")
     body = {
         "token": token,
-        "mask": mask,
         "inpainted_image": inpainted_image,
         "translated_text": trans_list,
         "text_block": text_block
