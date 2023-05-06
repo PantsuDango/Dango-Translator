@@ -516,7 +516,7 @@ class Manga(QWidget) :
         # 字体颜色
         self.color = "#595959"
         # 界面字体大小
-        self.font_size = 10
+        self.font_size = 6
         # 界面尺寸
         self.window_width = 1200
         self.window_height = 700
@@ -1211,47 +1211,96 @@ class Manga(QWidget) :
         h = event.size().height()
         w_rate = w / self.window_width
         h_rate = h / self.window_height
-        # # 设置字体
-        # self.setStyleSheet("font: %spt '%s';"%(self.font_size*w_rate, self.font_type))
+
+        # 设置字体
+        self.setStyleSheet("font: %spt '%s';"%(self.font_size * w_rate, self.font_type))
         # 导入原图按钮
         self.customSetGeometry(self.input_image_button, 0, 0, 120, 35, w_rate, h_rate)
-        # 一键翻译按钮
-        self.customSetGeometry(self.trans_all_button, 120, 0, 120, 35, w_rate, h_rate)
-        # 选择翻译源按钮
-        self.customSetGeometry(self.select_trans_button, 240, 0, 120, 35, w_rate, h_rate)
-        # 教程按钮
-        self.customSetGeometry(self.tutorial_button, 1080, 0, 120, 35, w_rate, h_rate)
-        # 工具栏横向分割线
-        self.customSetGeometry(self.cut_line_label1, 0, 35, self.window_width, 1, w_rate, h_rate)
-        # 图片列表框原图按钮
-        self.customSetGeometry(self.original_image_button, 0, 35, 66, 25, w_rate, h_rate)
-        # 原图按钮 和 译图按钮 竖向分割线
-        self.customSetGeometry(self.cut_line_label2, 67, 35, 1, 25, w_rate, h_rate)
-        # 图片列表框编辑按钮
-        self.customSetGeometry(self.edit_image_button, 67, 35, 66, 25, w_rate, h_rate)
-        # 原图按钮 和 译图按钮 竖向分割线
-        self.customSetGeometry(self.cut_line_label3, 134, 35, 1, 25, w_rate, h_rate)
-        # 图片列表框译图按钮
-        self.customSetGeometry(self.trans_image_button, 134, 35, 66, 25, w_rate, h_rate)
-        # 译图右侧竖向分割线
-        self.customSetGeometry(self.cut_line_label4, 200, 35, 1, 25, w_rate, h_rate)
-        # 原图列表框
-        self.customSetGeometry(self.original_image_widget, 0, 60, 200, 610, w_rate, h_rate)
-        # 编辑列表框
-        self.customSetGeometry(self.edit_image_widget, 0, 60, 200, 610, w_rate, h_rate)
-        # 译图列表框
-        self.customSetGeometry(self.trans_image_widget, 0, 60, 200, 610, w_rate, h_rate)
-        # 图片大图展示
-        self.customSetGeometry(self.show_image_scroll_area, 200, 35, 1000, 635, w_rate, h_rate)
-        # 底部横向分割线
-        self.customSetGeometry(self.cut_line_label5, 200, 670, self.window_width, 1, w_rate, h_rate)
-        # 上一页按钮
-        self.customSetGeometry(self.last_page_button, 200, 200, 50, 300, w_rate, h_rate)
-        # 下一页按钮
-        self.customSetGeometry(self.next_page_button, 1130, 200, 50, 300, w_rate, h_rate)
         # 底部状态栏
-        self.customSetGeometry(self.status_label, 10, 670, 1200, 20, w_rate, h_rate)
-
+        self.status_label.setGeometry(
+            10 * w_rate, h- 30 * h_rate,
+            w, 30 * h_rate
+        )
+        # 一键翻译按钮
+        self.trans_all_button.setGeometry(
+            self.input_image_button.width(), 0,
+            self.input_image_button.width(), self.input_image_button.height()
+        )
+        # 选择翻译源按钮
+        self.select_trans_button.setGeometry(
+            self.trans_all_button.x() + self.input_image_button.width(), 0,
+            self.input_image_button.width(), self.input_image_button.height()
+        )
+        # 教程按钮
+        self.tutorial_button.setGeometry(
+            w-self.input_image_button.width(), 0,
+            self.input_image_button.width(), self.input_image_button.height()
+        )
+        # 工具栏横向分割线
+        self.cut_line_label1.setGeometry(
+            0, self.input_image_button.height(),
+            w, 1
+        )
+        # 图片列表框原图按钮
+        self.original_image_button.setGeometry(
+            0, self.input_image_button.height(),
+            66 * w_rate, 25 * h_rate
+        )
+        # 原图按钮 和 编辑按钮 竖向分割线
+        self.cut_line_label2.setGeometry(
+            self.original_image_button.width() + 1, self.input_image_button.height(),
+            1, self.original_image_button.height()
+        )
+        # 图片列表框编辑按钮
+        self.edit_image_button.setGeometry(
+            self.cut_line_label2.x(), self.input_image_button.height(),
+            self.original_image_button.width(), self.original_image_button.height()
+        )
+        # 编辑按钮 和 译图按钮 竖向分割线
+        self.cut_line_label3.setGeometry(
+            self.edit_image_button.x() + self.edit_image_button.width() + 1, self.input_image_button.height(),
+            1, self.original_image_button.height()
+        )
+        # 图片列表框译图按钮
+        self.trans_image_button.setGeometry(
+            self.cut_line_label3.x(), self.input_image_button.height(),
+            self.original_image_button.width(), self.original_image_button.height()
+        )
+        # 译图右侧竖向分割线
+        self.cut_line_label4.setGeometry(
+            self.trans_image_button.x() + self.trans_image_button.width(), self.input_image_button.height(),
+            1, self.original_image_button.height()
+        )
+        # 原图列表框
+        self.original_image_widget.setGeometry(
+            0, self.input_image_button.height() + self.original_image_button.height(),
+            self.cut_line_label4.x(), self.status_label.y() - (self.input_image_button.height() + self.original_image_button.height())
+        )
+        # 编辑列表框
+        self.edit_image_widget.setGeometry(
+            0, self.input_image_button.height() + self.original_image_button.height(),
+            self.cut_line_label4.x(), self.original_image_widget.height()
+        )
+        # 译图列表框
+        self.trans_image_widget.setGeometry(
+            0, self.input_image_button.height() + self.original_image_button.height(),
+            self.cut_line_label4.x(), self.original_image_widget.height()
+        )
+        # 图片大图展示
+        self.show_image_scroll_area.setGeometry(
+            self.cut_line_label4.x(), self.input_image_button.height(),
+            w-self.cut_line_label4.x(), self.status_label.y() - self.input_image_button.height()
+        )
+        # 上一页按钮
+        self.last_page_button.setGeometry(
+            self.cut_line_label4.x(), (self.show_image_scroll_area.height() - 300 * h_rate) // 2,
+            50 * w_rate, 300 * h_rate
+        )
+        # 下一页按钮
+        self.next_page_button.setGeometry(
+            w - self.last_page_button.width(), self.last_page_button.y(),
+            self.last_page_button.width(), self.last_page_button.height()
+        )
 
 
     # 窗口关闭处理
