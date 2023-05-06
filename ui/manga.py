@@ -351,9 +351,10 @@ class Manga(QWidget) :
 
     def ui(self) :
 
-        # 窗口尺寸及不可拉伸
-        self.resize(self.window_width, self.window_height)
-        self.setMinimumSize(QSize(self.window_width, self.window_height))
+        # 窗口尺寸
+        self.resize(self.window_width*self.rate, self.window_height*self.rate)
+        #self.setMinimumSize(QSize(self.window_width, self.window_height))
+        #self.setMaximumSize(QSize(self.window_width, self.window_height))
         #self.setWindowFlags(Qt.WindowMinimizeButtonHint | Qt.WindowCloseButtonHint)
 
         # 窗口标题
@@ -364,9 +365,8 @@ class Manga(QWidget) :
         self.setCursor(ui.static.icon.PIXMAP_CURSOR)
         # 设置字体
         self.setStyleSheet("font: %spt '%s';"%(self.font_size, self.font_type))
-
+        # 底部状态栏
         self.status_label = QLabel(self)
-        self.customSetGeometry(self.status_label, 10, 670, 1200, 20)
 
         # 导入原图按钮
         self.input_image_button = QPushButton(self)
@@ -415,7 +415,6 @@ class Manga(QWidget) :
 
         # 教程按钮
         self.tutorial_button = QPushButton(self)
-        self.customSetGeometry(self.tutorial_button, 1080, 0, 120, 35)
         self.tutorial_button.setText(" 使用教程")
         self.tutorial_button.setStyleSheet("QPushButton {background: transparent;}"
                                            "QPushButton:hover {background-color: #83AAF9;}"
@@ -424,43 +423,43 @@ class Manga(QWidget) :
         self.tutorial_button.clicked.connect(self.openUseTutorial)
 
         # 工具栏横向分割线
-        self.createCutLine(0, 35, self.window_width, 1)
+        self.cut_line_label1 = QLabel(self)
+        self.createCutLine(self.cut_line_label1)
 
         # 原图按钮
         self.original_image_button = QPushButton(self)
-        self.customSetGeometry(self.original_image_button, 0, 35, 66, 25)
         self.original_image_button.setText("原图")
-        self.original_image_button.setStyleSheet("background-color: #83AAF9;")
+        self.original_image_button.setStyleSheet("background-color: #83AAF9; border-right: 1px solid black;")
         self.original_image_button.clicked.connect(lambda: self.clickImageButton("original"))
 
         # 原图按钮 和 译图按钮 竖向分割线
-        self.createCutLine(67, 35, 1, 25)
+        self.cut_line_label2 = QLabel(self)
+        self.createCutLine(self.cut_line_label2)
 
         # 编辑按钮
         self.edit_image_button = QPushButton(self)
-        self.customSetGeometry(self.edit_image_button, 67, 35, 66, 25)
         self.edit_image_button.setText("编辑")
         self.edit_image_button.setStyleSheet("QPushButton {background: transparent;}"
                                              "QPushButton:hover {background-color: #83AAF9;}")
         self.edit_image_button.clicked.connect(lambda: self.clickImageButton("edit"))
 
         # 原图按钮 和 译图按钮 竖向分割线
-        self.createCutLine(134, 35, 1, 25)
+        self.cut_line_label3 = QLabel(self)
+        self.createCutLine(self.cut_line_label3)
 
         # 译图按钮
         self.trans_image_button = QPushButton(self)
-        self.customSetGeometry(self.trans_image_button, 134, 35, 66, 25)
         self.trans_image_button.setText("译图")
         self.trans_image_button.setStyleSheet("QPushButton {background: transparent;}"
                                               "QPushButton:hover {background-color: #83AAF9;}")
         self.trans_image_button.clicked.connect(lambda: self.clickImageButton("trans"))
 
         # 译图右侧竖向分割线
-        self.createCutLine(200, 35, 1, 25)
+        self.cut_line_label4 = QLabel(self)
+        self.createCutLine(self.cut_line_label4)
 
         # 原图列表框
         self.original_image_widget = QListWidget(self)
-        self.customSetGeometry(self.original_image_widget, 0, 60, 200, 610)
         self.original_image_widget.setIconSize(QSize(180*self.rate, 180*self.rate))
         self.original_image_widget.itemSelectionChanged.connect(self.loadOriginalImage)
         self.original_image_widget.show()
@@ -469,7 +468,6 @@ class Manga(QWidget) :
 
         # 编辑图列表框
         self.edit_image_widget = QListWidget(self)
-        self.customSetGeometry(self.edit_image_widget, 0, 60, 200, 610)
         self.edit_image_widget.setIconSize(QSize(180*self.rate, 180*self.rate))
         self.edit_image_widget.itemSelectionChanged.connect(self.loadEditImage)
         self.edit_image_widget.hide()
@@ -478,7 +476,6 @@ class Manga(QWidget) :
 
         # 译图列表框
         self.trans_image_widget = QListWidget(self)
-        self.customSetGeometry(self.trans_image_widget, 0, 60, 200, 610)
         self.trans_image_widget.setIconSize(QSize(180*self.rate, 180*self.rate))
         self.trans_image_widget.itemSelectionChanged.connect(self.loadTransImage)
         self.trans_image_widget.hide()
@@ -487,23 +484,21 @@ class Manga(QWidget) :
 
         # 图片大图展示
         self.show_image_scroll_area = QScrollArea(self)
-        self.customSetGeometry(self.show_image_scroll_area, 200, 35, 1000, 635)
         self.show_image_scroll_area.setWidgetResizable(True)
 
         # 底部横向分割线
-        self.createCutLine(200, 670, self.window_width, 1)
+        self.cut_line_label5 = QLabel(self)
+        self.createCutLine(self.cut_line_label5)
 
         # 上一页按钮
-        button = CustomButton(self)
-        self.customSetGeometry(button, 200, 200, 50, 300)
-        button.setIcon(ui.static.icon.LAST_PAGE_ICON)
-        button.clicked.connect(lambda: self.changeImageListPosition("last"))
+        self.last_page_button = CustomButton(self)
+        self.last_page_button.setIcon(ui.static.icon.LAST_PAGE_ICON)
+        self.last_page_button.clicked.connect(lambda: self.changeImageListPosition("last"))
 
         # 下一页按钮
-        button = CustomButton(self)
-        self.customSetGeometry(button, 1130, 200, 50, 300)
-        button.setIcon(ui.static.icon.NEXT_PAGE_ICON)
-        button.clicked.connect(lambda: self.changeImageListPosition("next"))
+        self.next_page_button = CustomButton(self)
+        self.next_page_button.setIcon(ui.static.icon.NEXT_PAGE_ICON)
+        self.next_page_button.clicked.connect(lambda: self.changeImageListPosition("next"))
 
         # 导入图片进度条
         self.input_images_progress_bar = ui.progress_bar.ProgressBar(self.object.yaml["screen_scale_rate"], "input_images")
@@ -523,8 +518,8 @@ class Manga(QWidget) :
         # 界面字体大小
         self.font_size = 10
         # 界面尺寸
-        self.window_width = int(1200 * self.rate)
-        self.window_height = int(700 * self.rate)
+        self.window_width = 1200
+        self.window_height = 700
         # 图片路径列表
         self.image_path_list = []
         # 当前图片列表框的索引
@@ -536,18 +531,19 @@ class Manga(QWidget) :
 
 
     # 根据分辨率定义控件位置尺寸
-    def customSetGeometry(self, object, x, y, w, h):
+    def customSetGeometry(self, object, x, y, w, h, w_rate=1, h_rate=1):
 
-        object.setGeometry(QRect(int(x * self.rate),
-                                 int(y * self.rate), int(w * self.rate),
-                                 int(h * self.rate)))
+        object.setGeometry(QRect(
+            int(x * w_rate),
+            int(y * w_rate),
+            int(w * h_rate),
+            int(h * h_rate))
+        )
 
 
     # 绘制一条分割线
-    def createCutLine(self, x, y, w, h) :
+    def createCutLine(self, label) :
 
-        label = QLabel(self)
-        self.customSetGeometry(label, x, y, w, h)
         label.setFrameShadow(QFrame.Raised)
         label.setFrameShape(QFrame.Box)
         label.setStyleSheet("border-width: 1px; "
@@ -1218,13 +1214,44 @@ class Manga(QWidget) :
         # # 设置字体
         # self.setStyleSheet("font: %spt '%s';"%(self.font_size*w_rate, self.font_type))
         # 导入原图按钮
-        self.customSetGeometry(self.input_image_button, 0, 0, 120*w_rate, 35*h_rate)
+        self.customSetGeometry(self.input_image_button, 0, 0, 120, 35, w_rate, h_rate)
         # 一键翻译按钮
-        self.customSetGeometry(self.trans_all_button, 120*w_rate, 0, 120*w_rate, 35*h_rate)
+        self.customSetGeometry(self.trans_all_button, 120, 0, 120, 35, w_rate, h_rate)
         # 选择翻译源按钮
-        self.customSetGeometry(self.select_trans_button, 240*w_rate, 0, 120*w_rate, 35*h_rate)
+        self.customSetGeometry(self.select_trans_button, 240, 0, 120, 35, w_rate, h_rate)
         # 教程按钮
-        self.customSetGeometry(self.tutorial_button, 1080*w_rate, 0, 120*w_rate, 35*h_rate)
+        self.customSetGeometry(self.tutorial_button, 1080, 0, 120, 35, w_rate, h_rate)
+        # 工具栏横向分割线
+        self.customSetGeometry(self.cut_line_label1, 0, 35, self.window_width, 1, w_rate, h_rate)
+        # 图片列表框原图按钮
+        self.customSetGeometry(self.original_image_button, 0, 35, 66, 25, w_rate, h_rate)
+        # 原图按钮 和 译图按钮 竖向分割线
+        self.customSetGeometry(self.cut_line_label2, 67, 35, 1, 25, w_rate, h_rate)
+        # 图片列表框编辑按钮
+        self.customSetGeometry(self.edit_image_button, 67, 35, 66, 25, w_rate, h_rate)
+        # 原图按钮 和 译图按钮 竖向分割线
+        self.customSetGeometry(self.cut_line_label3, 134, 35, 1, 25, w_rate, h_rate)
+        # 图片列表框译图按钮
+        self.customSetGeometry(self.trans_image_button, 134, 35, 66, 25, w_rate, h_rate)
+        # 译图右侧竖向分割线
+        self.customSetGeometry(self.cut_line_label4, 200, 35, 1, 25, w_rate, h_rate)
+        # 原图列表框
+        self.customSetGeometry(self.original_image_widget, 0, 60, 200, 610, w_rate, h_rate)
+        # 编辑列表框
+        self.customSetGeometry(self.edit_image_widget, 0, 60, 200, 610, w_rate, h_rate)
+        # 译图列表框
+        self.customSetGeometry(self.trans_image_widget, 0, 60, 200, 610, w_rate, h_rate)
+        # 图片大图展示
+        self.customSetGeometry(self.show_image_scroll_area, 200, 35, 1000, 635, w_rate, h_rate)
+        # 底部横向分割线
+        self.customSetGeometry(self.cut_line_label5, 200, 670, self.window_width, 1, w_rate, h_rate)
+        # 上一页按钮
+        self.customSetGeometry(self.last_page_button, 200, 200, 50, 300, w_rate, h_rate)
+        # 下一页按钮
+        self.customSetGeometry(self.next_page_button, 1130, 200, 50, 300, w_rate, h_rate)
+        # 底部状态栏
+        self.customSetGeometry(self.status_label, 10, 670, 1200, 20, w_rate, h_rate)
+
 
 
     # 窗口关闭处理
