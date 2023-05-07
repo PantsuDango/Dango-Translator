@@ -390,6 +390,7 @@ class Manga(QWidget) :
         self.original_image_widget.show()
         self.original_image_widget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.original_image_widget.customContextMenuRequested.connect(self.showOriginalListWidgetMenu)
+        self.original_image_widget.setSpacing(5)
 
         # 编辑图列表框
         self.edit_image_widget = QListWidget(self)
@@ -398,6 +399,7 @@ class Manga(QWidget) :
         self.edit_image_widget.hide()
         self.edit_image_widget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.edit_image_widget.customContextMenuRequested.connect(self.showEditListWidgetMenu)
+        self.edit_image_widget.setSpacing(5)
 
         # 译图列表框
         self.trans_image_widget = QListWidget(self)
@@ -406,6 +408,7 @@ class Manga(QWidget) :
         self.trans_image_widget.hide()
         self.trans_image_widget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.trans_image_widget.customContextMenuRequested.connect(self.showTransListWidgetMenu)
+        self.trans_image_widget.setSpacing(5)
 
         # 图片大图展示
         self.show_image_scroll_area = QScrollArea(self)
@@ -744,7 +747,7 @@ class Manga(QWidget) :
     def editImageWidgetAddImage(self) :
 
         item = QListWidgetItem(self.edit_image_widget)
-        item.setSizeHint(QSize(0, 100*self.rate))
+        item.setSizeHint(QSize(0, 180*self.rate))
         self.edit_image_widget.addItem(item)
 
 
@@ -752,7 +755,7 @@ class Manga(QWidget) :
     def transImageWidgetAddImage(self) :
 
         item = QListWidgetItem(self.trans_image_widget)
-        item.setSizeHint(QSize(0, 100*self.rate))
+        item.setSizeHint(QSize(0, 180*self.rate))
         self.trans_image_widget.addItem(item)
 
 
