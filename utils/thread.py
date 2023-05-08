@@ -114,6 +114,7 @@ class createMangaTransQThread(QThread) :
 
         super(createMangaTransQThread, self).__init__()
         self.window = window
+        self.logger = self.window.logger
         self.image_paths = image_paths
         self.reload_sign = reload_sign
         self.window.trans_process_bar.stop_sign = False
@@ -142,6 +143,7 @@ class createMangaTransQThread(QThread) :
                 if self.window.trans_process_bar.stop_sign :
                     break
         except Exception :
+            self.logger.error(format_exc())
             self.signal.emit(traceback.format_exc(), False)
         # 结束
         self.window.trans_process_bar.finish_sign = True

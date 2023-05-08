@@ -834,6 +834,16 @@ class Manga(QWidget) :
             sign, ocr_result = self.mangaOCR(image_path)
             if not sign:
                 return "OCR过程失败: %s"%ocr_result
+            else :
+                # 没有文字的图
+                if len(ocr_result.get("text_block", [])) == 0 :
+                    shutil.copy(image_path, self.getIptFilePath(image_path))
+                    shutil.copy(image_path, self.getRdrFilePath(image_path))
+                    # 直接将原图加入编辑图列表框
+                    self.editImageWidgetRefreshImage(image_path)
+                    # 直接将原图加入译图列表框
+                    self.transImageWidgetRefreshImage(image_path)
+                    return
 
         # 翻译
         trans_sign = False
