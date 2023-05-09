@@ -11,7 +11,7 @@ import shutil
 import json
 from math import sqrt
 import webbrowser
-#from PIL import Image, ImageDraw, ImageFont
+import qtawesome
 
 import ui.static.icon
 import utils.translater
@@ -34,6 +34,7 @@ class TransEdit(QWidget) :
 
         super(TransEdit, self).__init__()
         self.rate = rate
+        self.color = "#5B8FF9"
         self.ui()
 
 
@@ -45,7 +46,7 @@ class TransEdit(QWidget) :
         self.resize(self.window_width, self.window_height)
         self.setMinimumSize(QSize(self.window_width, self.window_height))
         self.setMaximumSize(QSize(self.window_width, self.window_height))
-        self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowCloseButtonHint)
+        self.setWindowFlags(Qt.WindowCloseButtonHint)
 
         # 窗口标题
         self.setWindowTitle("漫画翻译-译文编辑")
@@ -61,31 +62,86 @@ class TransEdit(QWidget) :
             font_type = font_list[0]
         except Exception :
             pass
-        self.setFont(QFont(font_type, 12))
+
+        # 修改字体颜色
+        self.color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color="#5B8FF9"), "", self)
+        self.customSetGeometry(self.color_button, 0, 0, 70, 30)
+        self.color_button.setCursor(ui.static.icon.EDIT_CURSOR)
+        self.color_button.setText(" 颜色")
+        self.color_button.clicked.connect(self.changeTranslateColor)
+        self.color_button.setStyleSheet("QPushButton {background: transparent; font: 8pt '华康方圆体W7';}"
+                                        "QPushButton:hover {background-color: #83AAF9;}"
+                                        "QPushButton:pressed {background-color: #4480F9;}")
+
+        # 私人彩云
+        button = QPushButton(self)
+        self.customSetGeometry(button, 70, 0, 70, 30)
+        button.setCursor(ui.static.icon.EDIT_CURSOR)
+        button.setText(" 彩云")
+        button.setIcon(ui.static.icon.TRANSLATE_ICON)
+        button.setStyleSheet("QPushButton {background: transparent; font: 8pt '华康方圆体W7';}"
+                             "QPushButton:hover {background-color: #83AAF9;}"
+                             "QPushButton:pressed {background-color: #4480F9;}")
+
+        # 私人腾讯
+        button = QPushButton(self)
+        self.customSetGeometry(button, 140, 0, 70, 30)
+        button.setCursor(ui.static.icon.EDIT_CURSOR)
+        button.setText(" 腾讯")
+        button.setIcon(ui.static.icon.TRANSLATE_ICON)
+        button.setStyleSheet("QPushButton {background: transparent; font: 8pt '华康方圆体W7';}"
+                             "QPushButton:hover {background-color: #83AAF9;}"
+                             "QPushButton:pressed {background-color: #4480F9;}")
+
+        # 私人百度
+        button = QPushButton(self)
+        self.customSetGeometry(button, 210, 0, 70, 30)
+        button.setCursor(ui.static.icon.EDIT_CURSOR)
+        button.setText(" 百度")
+        button.setIcon(ui.static.icon.TRANSLATE_ICON)
+        button.setStyleSheet("QPushButton {background: transparent; font: 8pt '华康方圆体W7';}"
+                             "QPushButton:hover {background-color: #83AAF9;}"
+                             "QPushButton:pressed {background-color: #4480F9;}")
+
+        # 私人ChatGPT
+        button = QPushButton(self)
+        self.customSetGeometry(button, 280, 0, 70, 30)
+        button.setCursor(ui.static.icon.EDIT_CURSOR)
+        button.setText(" ChatGPT")
+        button.setIcon(ui.static.icon.TRANSLATE_ICON)
+        button.setStyleSheet("QPushButton {background: transparent; font: 8pt '华康方圆体W7'; border-radius: 6px}"
+                             "QPushButton:hover {background-color: #83AAF9;}"
+                             "QPushButton:pressed {background-color: #4480F9;}")
 
         # 编辑框
         self.edit_text = QTextBrowser(self)
-        self.customSetGeometry(self.edit_text, 0, 0, 500, 230)
+        self.customSetGeometry(self.edit_text, 0, 30, 500, 200)
         self.edit_text.setCursor(ui.static.icon.PIXMAP_CURSOR)
         self.edit_text.setReadOnly(False)
+        self.edit_text.setFont(QFont(font_type, 12))
+        self.edit_text.setCursor(ui.static.icon.EDIT_CURSOR)
 
         # 确定按钮
         button = QPushButton(self)
         self.customSetGeometry(button, 125, 240, 100, 50)
         button.setText("重新贴字")
+        button.setStyleSheet("font: 12pt '华康方圆体W7';")
         button.clicked.connect(self.renderTextBlock)
         button.setCursor(ui.static.icon.SELECT_CURSOR)
+        button.setCursor(ui.static.icon.EDIT_CURSOR)
 
         # 确定按钮
         button = QPushButton(self)
         self.customSetGeometry(button, 275, 240, 100, 50)
         button.setText("取消")
+        button.setStyleSheet("font: 12pt '华康方圆体W7';")
         button.clicked.connect(self.close)
         button.setCursor(ui.static.icon.SELECT_CURSOR)
+        button.setCursor(ui.static.icon.EDIT_CURSOR)
 
 
     # 根据分辨率定义控件位置尺寸
-    def customSetGeometry(self, object, x, y, w, h):
+    def customSetGeometry(self, object, x, y, w, h) :
 
         object.setGeometry(QRect(int(x * self.rate),
                                  int(y * self.rate), int(w * self.rate),
@@ -96,6 +152,18 @@ class TransEdit(QWidget) :
     def renderTextBlock(self) :
 
         pass
+
+
+    # 修改字体颜色
+    def changeTranslateColor(self):
+
+        color = QColorDialog.getColor(QColor(self.color), None, "修改字体颜色")
+        if color.isValid() :
+            self.color = color.name()
+            text = self.edit_text.toPlainText()
+            self.edit_text.clear()
+            self.edit_text.setTextColor(color)
+            self.edit_text.insertPlainText(text)
 
 
 # 根据文本块大小计算font_size
@@ -235,6 +303,7 @@ class RenderTextBlock(QWidget) :
         self.trans_edit_ui.edit_text.setFontPointSize(font_size)
         # 文本颜色
         font_color = QColor(font_color[0], font_color[1], font_color[2])
+        self.trans_edit_ui.color = font_color.name()
         self.trans_edit_ui.edit_text.setTextColor(font_color)
         self.trans_edit_ui.edit_text.insertPlainText(trans_text)
         self.trans_edit_ui.show()

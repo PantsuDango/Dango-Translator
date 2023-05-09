@@ -519,7 +519,7 @@ class Settin(QMainWindow) :
         self.customSetIconSize(self.original_color_button, 20, 20)
         self.customSetGeometry(self.original_color_button, 415, 310, 20, 20)
         self.original_color_button.setStyleSheet("background: transparent;")
-        self.original_color_button.clicked.connect(lambda: self.ChangeTranslateColor("original", self.original_color))
+        self.original_color_button.clicked.connect(lambda: self.changeTranslateColor("original", self.original_color))
         self.original_color_button.setCursor(ui.static.icon.EDIT_CURSOR)
         # 显示原文备注
         label = QLabel(self.tab_1)
@@ -658,7 +658,7 @@ class Settin(QMainWindow) :
         self.customSetIconSize(self.tencent_private_color_button, 20, 20)
         self.customSetGeometry(self.tencent_private_color_button, 165, 70, 20, 20)
         self.tencent_private_color_button.setStyleSheet("background: transparent;")
-        self.tencent_private_color_button.clicked.connect(lambda: self.ChangeTranslateColor("tencent_private", self.tencent_use))
+        self.tencent_private_color_button.clicked.connect(lambda: self.changeTranslateColor("tencent_private", self.tencent_use))
         self.tencent_private_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 私人腾讯翻译密钥按钮
@@ -705,7 +705,7 @@ class Settin(QMainWindow) :
         self.customSetIconSize(self.baidu_private_color_button, 20, 20)
         self.customSetGeometry(self.baidu_private_color_button, 165, 120, 20, 20)
         self.baidu_private_color_button.setStyleSheet("background: transparent;")
-        self.baidu_private_color_button.clicked.connect(lambda: self.ChangeTranslateColor("baidu_private", self.baidu_color))
+        self.baidu_private_color_button.clicked.connect(lambda: self.changeTranslateColor("baidu_private", self.baidu_color))
         self.baidu_private_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 私人百度翻译密钥按钮
@@ -753,7 +753,7 @@ class Settin(QMainWindow) :
         self.customSetGeometry(self.caiyun_private_color_button, 165, 170, 20, 20)
         self.caiyun_private_color_button.setStyleSheet("background: transparent;")
         self.caiyun_private_color_button.clicked.connect(
-            lambda: self.ChangeTranslateColor("caiyun_private", self.caiyun_color))
+            lambda: self.changeTranslateColor("caiyun_private", self.caiyun_color))
         self.caiyun_private_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 私人彩云翻译密钥按钮
@@ -800,7 +800,7 @@ class Settin(QMainWindow) :
         self.customSetIconSize(self.chatgpt_private_color_button, 20, 20)
         self.customSetGeometry(self.chatgpt_private_color_button, 165, 220, 20, 20)
         self.chatgpt_private_color_button.setStyleSheet("background: transparent;")
-        self.chatgpt_private_color_button.clicked.connect(lambda: self.ChangeTranslateColor("chatgpt_private", self.chatgpt_color))
+        self.chatgpt_private_color_button.clicked.connect(lambda: self.changeTranslateColor("chatgpt_private", self.chatgpt_color))
         self.chatgpt_private_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 私人ChatGPT翻译密钥按钮
@@ -859,7 +859,7 @@ class Settin(QMainWindow) :
         self.customSetIconSize(self.youdao_color_button, 20, 20)
         self.customSetGeometry(self.youdao_color_button, 140, 70, 20, 20)
         self.youdao_color_button.setStyleSheet("background: transparent;")
-        self.youdao_color_button.clicked.connect(lambda: self.ChangeTranslateColor("youdao", self.youdao_color))
+        self.youdao_color_button.clicked.connect(lambda: self.changeTranslateColor("youdao", self.youdao_color))
         self.youdao_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 百度翻译标签
@@ -878,7 +878,7 @@ class Settin(QMainWindow) :
         self.customSetIconSize(self.baidu_color_button, 20, 20)
         self.customSetGeometry(self.baidu_color_button, 320, 70, 20, 20)
         self.baidu_color_button.setStyleSheet("background: transparent;")
-        self.baidu_color_button.clicked.connect(lambda: self.ChangeTranslateColor("baidu", self.baidu_web_color))
+        self.baidu_color_button.clicked.connect(lambda: self.changeTranslateColor("baidu", self.baidu_web_color))
         self.baidu_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 腾讯翻译标签
@@ -897,7 +897,7 @@ class Settin(QMainWindow) :
         self.customSetIconSize(self.tencent_color_button, 20, 20)
         self.customSetGeometry(self.tencent_color_button, 500, 70, 20, 20)
         self.tencent_color_button.setStyleSheet("background: transparent;")
-        self.tencent_color_button.clicked.connect(lambda: self.ChangeTranslateColor("tencent", self.tencent_web_color))
+        self.tencent_color_button.clicked.connect(lambda: self.changeTranslateColor("tencent", self.tencent_web_color))
         self.tencent_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # DeepL翻译标签
@@ -916,7 +916,7 @@ class Settin(QMainWindow) :
         self.customSetIconSize(self.deepl_color_button, 20, 20)
         self.customSetGeometry(self.deepl_color_button, 140, 120, 20, 20)
         self.deepl_color_button.setStyleSheet("background: transparent;")
-        self.deepl_color_button.clicked.connect(lambda: self.ChangeTranslateColor("deepl", self.deepl_color))
+        self.deepl_color_button.clicked.connect(lambda: self.changeTranslateColor("deepl", self.deepl_color))
         self.deepl_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # Bing翻译标签
@@ -935,7 +935,7 @@ class Settin(QMainWindow) :
         self.customSetIconSize(self.bing_color_button, 20, 20)
         self.customSetGeometry(self.bing_color_button, 320, 120, 20, 20)
         self.bing_color_button.setStyleSheet("background: transparent;")
-        self.bing_color_button.clicked.connect(lambda: self.ChangeTranslateColor("bing", self.bing_color))
+        self.bing_color_button.clicked.connect(lambda: self.changeTranslateColor("bing", self.bing_color))
         self.bing_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 彩云翻译标签
@@ -954,7 +954,7 @@ class Settin(QMainWindow) :
         self.customSetIconSize(self.caiyun_color_button, 20, 20)
         self.customSetGeometry(self.caiyun_color_button, 500, 120, 20, 20)
         self.caiyun_color_button.setStyleSheet("background: transparent;")
-        self.caiyun_color_button.clicked.connect(lambda: self.ChangeTranslateColor("caiyun", self.caiyun_web_color))
+        self.caiyun_color_button.clicked.connect(lambda: self.changeTranslateColor("caiyun", self.caiyun_web_color))
         self.caiyun_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 公共翻译测试可用性按钮
@@ -2488,7 +2488,7 @@ class Settin(QMainWindow) :
 
 
     # 翻译源字体颜色
-    def ChangeTranslateColor(self, translate_type, color_str) :
+    def changeTranslateColor(self, translate_type, color_str) :
 
         color = QColorDialog.getColor(QColor(color_str), None, "设定所选翻译显示时的颜色")
         if not color.isValid() :
