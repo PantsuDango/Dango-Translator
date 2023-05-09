@@ -108,7 +108,7 @@ class createCheckAutoLoginQThread(QThread) :
 class createMangaTransQThread(QThread) :
 
     signal = pyqtSignal(str, bool)
-    bar_signal = pyqtSignal(float, int, str)
+    bar_signal = pyqtSignal(int, str)
 
     def __init__(self, window, image_paths, reload_sign=False):
 
@@ -135,7 +135,6 @@ class createMangaTransQThread(QThread) :
                 self.signal.emit(image_path, True)
                 # 进度条
                 self.bar_signal.emit(
-                    float((index + 1) / len(self.image_paths) * 100),
                     int((index + 1) / len(self.image_paths) * 100),
                     "%d/%d"%(index + 1, len(self.image_paths))
                 )

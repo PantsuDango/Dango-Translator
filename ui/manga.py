@@ -427,7 +427,8 @@ class Manga(QWidget) :
         # 导入图片进度条
         self.input_images_progress_bar = ui.progress_bar.ProgressBar(self.object.yaml["screen_scale_rate"], "input_images")
         # 漫画翻译进度条
-        self.trans_process_bar = ui.progress_bar.ProgressBar(self.object.yaml["screen_scale_rate"], "trans")
+        self.trans_process_bar = ui.progress_bar.MangaProgressBar(self.object.yaml["screen_scale_rate"])
+        self.trans_process_bar.show()
 
 
     # 初始化配置
