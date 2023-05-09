@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import time
 
 from PyQt5.QtCore import *
 from PyQt5.QtCore import Qt
@@ -428,7 +429,6 @@ class Manga(QWidget) :
         self.input_images_progress_bar = ui.progress_bar.ProgressBar(self.object.yaml["screen_scale_rate"], "input_images")
         # 漫画翻译进度条
         self.trans_process_bar = ui.progress_bar.MangaProgressBar(self.object.yaml["screen_scale_rate"])
-        self.trans_process_bar.show()
 
 
     # 初始化配置
@@ -517,7 +517,7 @@ class Manga(QWidget) :
                                                            "选择要翻译的生肉漫画目录",
                                                            dir_path,
                                                            options=options)
-            if not folder_path :
+            if not os.path.exists(folder_path) :
                 return
             for file in os.listdir(folder_path) :
                 file_ext = os.path.splitext(file)[1].lower()
@@ -831,9 +831,10 @@ class Manga(QWidget) :
     def transProcess(self, image_path, reload_sign=False) :
 
         # 漫画OCR
+        start = time.time()
         if not os.path.exists(self.getJsonFilePath(image_path)) or reload_sign :
             sign, ocr_result = self.mangaOCR(image_path)
-            if not sign:
+            if not sign :
                 return "OCR过程失败: %s"%ocr_result
             else :
                 # 没有文字的图
@@ -845,8 +846,10 @@ class Manga(QWidget) :
                     # 直接将原图加入译图列表框
                     self.transImageWidgetRefreshImage(image_path)
                     return
+        self.trans_process_bar.paintStatus("ocr", round(time.time()-start, 1))
 
         # 翻译
+        start = time.time()
         trans_sign = False
         if not os.path.exists(self.getJsonFilePath(image_path)) or reload_sign :
             trans_sign = True
@@ -859,14 +862,18 @@ class Manga(QWidget) :
             sign, trans_result = self.mangaTrans(image_path)
             if not sign:
                 return "翻译过程失败: %s"%trans_result
+        self.trans_process_bar.paintStatus("trans", round(time.time()-start, 1))
 
         # 文字消除
+        start = time.time()
         if not os.path.exists(self.getIptFilePath(image_path)) or reload_sign :
             sign, ipt_result = self.mangaTextInpaint(image_path)
             if not sign :
                 return "文字消除过程失败: %s"%ipt_result
+        self.trans_process_bar.paintStatus("ipt", round(time.time()-start, 1))
 
         # 漫画文字渲染
+        start = time.time()
         if not os.path.exists(self.getRdrFilePath(image_path)) or reload_sign :
             sign, rdr_result = self.mangaTextRdr(image_path)
             if not sign:
@@ -875,6 +882,7 @@ class Manga(QWidget) :
             self.editImageWidgetRefreshImage(image_path)
             # 渲染好的图片加入译图列表框
             self.transImageWidgetRefreshImage(image_path)
+        self.trans_process_bar.paintStatus("rdr", round(time.time()-start, 1))
 
 
     # 单图翻译

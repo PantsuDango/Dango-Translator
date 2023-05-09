@@ -135,6 +135,7 @@ RUN_ICON = None
 LOADING_ICON = None
 # 完成
 FINISH_ICON = None
+FINISH_PIXMAP = None
 
 # 鼠标-睁眼图标
 PIXMAP_CURSOR = None
@@ -211,7 +212,8 @@ def initIcon(rate):
         NEXT_PAGE_ICON, \
         RUN_ICON, \
         LOADING_ICON, \
-        FINISH_ICON
+        FINISH_ICON, \
+        FINISH_PIXMAP
 
     RATE = rate
 
@@ -246,6 +248,7 @@ def initIcon(rate):
     RUN_ICON = createIcon(createPixmap(RUN, 20, 20))
     LOADING_ICON = createIcon(createPixmap(LOADING, 20, 20))
     FINISH_ICON = createIcon(createPixmap(FINISH, 20, 20))
+    FINISH_PIXMAP = createPixmap(FINISH, 20, 20)
 
     PIXMAP_CURSOR = createCursor(createPixmap(PIXMAP_ICON, 20, 20))
     SELECT_CURSOR = createCursor(createPixmap(SELECT_ICON, 20, 20))

@@ -51,6 +51,8 @@ class ProgressBar(QWidget) :
         self.customSetGeometry(self.file_size_label, 20, 25, 150, 20)
         self.file_size_label.setStyleSheet("color: %s" % self.color_2)
 
+        self.paintProgressBar(0, 0, "0/0")
+
 
     # 根据分辨率定义控件位置尺寸
     def customSetGeometry(self, object, x, y, w, h) :
@@ -156,38 +158,91 @@ class MangaProgressBar(QWidget) :
         self.progress_label.setStyleSheet("color: %s"%self.color_2)
 
         self.file_size_label = QLabel(self)
-        self.customSetGeometry(self.file_size_label, 20, 25, 150, 20)
+        self.customSetGeometry(self.file_size_label, 30, 25, 150, 20)
         self.file_size_label.setStyleSheet("color: %s"%self.color_2)
 
-        self.paintProgressBar(0, "0/0")
-
         widget = QWidget(self)
-        self.customSetGeometry(widget, 0, 50, 300, 250)
-        layout = QGridLayout()
+        self.customSetGeometry(widget, 15, 40, 300, 200)
+        layout = QGridLayout(self)
         widget.setLayout(layout)
 
-        loading_movie = QMovie(LOADING_PATH)
-        loading_movie.setScaledSize(QSize(50*self.rate, 50*self.rate))
+        label = QLabel(self)
+        label.setStyleSheet("color: %s"%self.color_2)
+        label.resize(QSize(100*self.rate, 20*self.rate))
+        label.setText("文字识别")
+        layout.addWidget(label, 0, 0)
 
-        self.ocr_label = QLabel(self)
-        self.customSetGeometry(self.ocr_label, 20, 50, 150, 20)
-        self.ocr_label.setStyleSheet("color: %s"%self.color_2)
-        self.ocr_label.setText("文字识别")
-        self.ocr_label.setMovie(loading_movie)
+        label = QLabel(self)
+        label.setStyleSheet("color: %s"%self.color_2)
+        label.resize(QSize(100*self.rate, 20*self.rate))
+        label.setText("文字翻译")
+        layout.addWidget(label, 1, 0)
 
-        self.ipt_label = QLabel(self)
-        self.customSetGeometry(self.ipt_label, 20, 75, 150, 20)
-        self.ipt_label.setStyleSheet("color: %s"%self.color_2)
-        self.ipt_label.setText("文字消除")
-        self.ipt_label.setMovie(loading_movie)
+        label = QLabel(self)
+        label.setStyleSheet("color: %s"%self.color_2)
+        label.resize(QSize(100*self.rate, 20*self.rate))
+        label.setText("文字消除")
+        layout.addWidget(label, 2, 0)
 
-        self.rdr_label = QLabel(self)
-        self.customSetGeometry(self.rdr_label, 20, 100, 150, 20)
-        self.rdr_label.setStyleSheet("color: %s"%self.color_2)
-        self.rdr_label.setText("文字渲染")
-        self.rdr_label.setMovie(loading_movie)
+        label = QLabel(self)
+        label.setStyleSheet("color: %s"%self.color_2)
+        label.resize(QSize(100*self.rate, 20*self.rate))
+        label.setText("文字渲染")
+        layout.addWidget(label, 3, 0)
 
-        loading_movie.start()
+        self.loading_movie = QMovie(LOADING_PATH)
+        self.loading_movie.setScaledSize(QSize(50*self.rate, 50*self.rate))
+        self.loading_movie.start()
+
+        self.ocr_icon_label = QLabel(self)
+        self.ocr_icon_label.resize(QSize(100*self.rate, 20*self.rate))
+        self.ocr_icon_label.setAlignment(Qt.AlignCenter)
+        self.ocr_icon_label.setMovie(self.loading_movie)
+        layout.addWidget(self.ocr_icon_label, 0, 1)
+
+        self.trans_icon_label = QLabel(self)
+        self.trans_icon_label.resize(QSize(100*self.rate, 20*self.rate))
+        self.trans_icon_label.setAlignment(Qt.AlignCenter)
+        self.trans_icon_label.setMovie(self.loading_movie)
+        layout.addWidget(self.trans_icon_label, 1, 1)
+
+        self.ipt_icon_label = QLabel(self)
+        self.ipt_icon_label.resize(QSize(100*self.rate, 20*self.rate))
+        self.ipt_icon_label.setAlignment(Qt.AlignCenter)
+        self.ipt_icon_label.setMovie(self.loading_movie)
+        layout.addWidget(self.ipt_icon_label, 2, 1)
+
+        self.rdr_icon_label = QLabel(self)
+        self.rdr_icon_label.resize(QSize(100*self.rate, 20*self.rate))
+        self.rdr_icon_label.setAlignment(Qt.AlignCenter)
+        self.rdr_icon_label.setMovie(self.loading_movie)
+        layout.addWidget(self.rdr_icon_label, 3, 1)
+
+        self.ocr_time_label = QLabel(self)
+        self.ocr_time_label.resize(QSize(100*self.rate, 20*self.rate))
+        self.ocr_time_label.setStyleSheet("color: %s"%self.color_2)
+        self.ocr_time_label.setText("耗时 - s")
+        layout.addWidget(self.ocr_time_label, 0, 2, 1, 2)
+
+        self.trans_time_label = QLabel(self)
+        self.trans_time_label.resize(QSize(100*self.rate, 20*self.rate))
+        self.trans_time_label.setStyleSheet("color: %s"%self.color_2)
+        self.trans_time_label.setText("耗时 - s")
+        layout.addWidget(self.trans_time_label, 1, 2, 1, 2)
+
+        self.ipt_time_label = QLabel(self)
+        self.ipt_time_label.resize(QSize(100*self.rate, 20*self.rate))
+        self.ipt_time_label.setStyleSheet("color: %s"%self.color_2)
+        self.ipt_time_label.setText("耗时 - s")
+        layout.addWidget(self.ipt_time_label, 2, 2, 1, 2)
+
+        self.rdr_time_label = QLabel(self)
+        self.rdr_time_label.resize(QSize(100*self.rate, 20*self.rate))
+        self.rdr_time_label.setStyleSheet("color: %s"%self.color_2)
+        self.rdr_time_label.setText("耗时 - s")
+        layout.addWidget(self.rdr_time_label, 3, 2, 1, 2)
+
+        self.paintProgressBar(0, "0/0")
 
 
     # 根据分辨率定义控件位置尺寸
@@ -212,7 +267,7 @@ class MangaProgressBar(QWidget) :
         self.color_2 = "#5B8FF9"
         # 界面尺寸
         self.window_width = int(300 * self.rate)
-        self.window_height = int(300 * self.rate)
+        self.window_height = int(250 * self.rate)
         # 结束信号
         self.finish_sign = False
         # 中止信号
@@ -225,6 +280,16 @@ class MangaProgressBar(QWidget) :
         self.progress_label.setText("{}%".format(int_val))
         self.progress_bar.setValue(int_val)
         self.file_size_label.setText(str_val)
+
+        self.ocr_icon_label.setMovie(self.loading_movie)
+        self.trans_icon_label.setMovie(self.loading_movie)
+        self.ipt_icon_label.setMovie(self.loading_movie)
+        self.rdr_icon_label.setMovie(self.loading_movie)
+
+        self.ocr_time_label.setText("耗时 - s")
+        self.trans_time_label.setText("耗时 - s")
+        self.ipt_time_label.setText("耗时 - s")
+        self.rdr_time_label.setText("耗时 - s")
 
 
     # 修改窗口标题
@@ -239,10 +304,33 @@ class MangaProgressBar(QWidget) :
         self.stop_sign = True
 
 
+    # 绘制当前翻译状态
+    def paintStatus(self, status_type, status_time) :
+
+        if status_type == "ocr" :
+            self.ocr_icon_label.setPixmap(ui.static.icon.FINISH_PIXMAP)
+            self.ocr_time_label.setText("耗时 {} s".format(status_time))
+
+        elif status_type == "trans" :
+            self.trans_icon_label.setPixmap(ui.static.icon.FINISH_PIXMAP)
+            self.trans_time_label.setText("耗时 {} s".format(status_time))
+
+        elif status_type == "ipt" :
+            self.ipt_icon_label.setPixmap(ui.static.icon.FINISH_PIXMAP)
+            self.ipt_time_label.setText("耗时 {} s".format(status_time))
+
+        elif status_type == "rdr" :
+            self.rdr_icon_label.setPixmap(ui.static.icon.FINISH_PIXMAP)
+            self.rdr_time_label.setText("耗时 {} s".format(status_time))
+
+
     # 窗口关闭处理
     def closeEvent(self, event) :
 
         if self.finish_sign :
             return
+        utils.message.closeProcessBarMessageBox("停止翻译",
+                                                "图片翻译进行中\n确定要中止操作吗     ",
+                                                self)
         if not self.stop_sign :
             event.ignore()

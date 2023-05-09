@@ -123,15 +123,15 @@ class createMangaTransQThread(QThread) :
     def run(self) :
 
         # 初始化进度条
-        self.bar_signal.emit(0, 0, "0/%d"%len(self.image_paths))
+        self.bar_signal.emit(0, "0/%d"%len(self.image_paths))
         try :
             for index, image_path in enumerate(self.image_paths) :
                 # 翻译进程
                 result = self.window.transProcess(image_path, self.reload_sign)
+                # 如果失败记录日志
                 if result :
-                    print(image_path)
-                    print(result)
-                    #utils.message.MessageBox("翻译失败", result+"        ")
+                    self.logger.error(result)
+                # 发送刷新图片列表框信号
                 self.signal.emit(image_path, True)
                 # 进度条
                 self.bar_signal.emit(
