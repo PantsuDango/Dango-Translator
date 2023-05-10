@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import copy
 import time
 
 from PyQt5.QtCore import *
@@ -6,12 +7,14 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import os
+import io
 import base64
 import shutil
 import json
 from math import sqrt
 import webbrowser
 import qtawesome
+from PIL import Image
 
 import ui.static.icon
 import utils.translater
@@ -30,11 +33,17 @@ FONT_PATH_2 = "./config/other/华康方圆体W7.TTC"
 # 译文编辑界面
 class TransEdit(QWidget) :
 
-    def __init__(self, rate) :
+    def __init__(self, object) :
 
         super(TransEdit, self).__init__()
-        self.rate = rate
+        self.object = object
+        self.rate = object.yaml["screen_scale_rate"]
+        self.logger = object.logger
         self.color = "#5B8FF9"
+        self.rect = []
+        self.rdr_image_path = ""
+        self.text_block = ""
+        self.index = 0
         self.ui()
 
 
@@ -72,6 +81,7 @@ class TransEdit(QWidget) :
         self.color_button.setStyleSheet("QPushButton {background: transparent; font: 8pt '华康方圆体W7';}"
                                         "QPushButton:hover {background-color: #83AAF9;}"
                                         "QPushButton:pressed {background-color: #4480F9;}")
+        self.color_button.setToolTip("<b>修改显示的字体颜色</b>")
 
         # 私人彩云
         button = QPushButton(self)
@@ -82,6 +92,8 @@ class TransEdit(QWidget) :
         button.setStyleSheet("QPushButton {background: transparent; font: 8pt '华康方圆体W7';}"
                              "QPushButton:hover {background-color: #83AAF9;}"
                              "QPushButton:pressed {background-color: #4480F9;}")
+        button.clicked.connect(lambda: self.refreshTrans("彩云"))
+        button.setToolTip("<b>使用私人彩云重新翻译</b>")
 
         # 私人腾讯
         button = QPushButton(self)
@@ -92,6 +104,8 @@ class TransEdit(QWidget) :
         button.setStyleSheet("QPushButton {background: transparent; font: 8pt '华康方圆体W7';}"
                              "QPushButton:hover {background-color: #83AAF9;}"
                              "QPushButton:pressed {background-color: #4480F9;}")
+        button.clicked.connect(lambda: self.refreshTrans("腾讯"))
+        button.setToolTip("<b>使用私人腾讯重新翻译</b>")
 
         # 私人百度
         button = QPushButton(self)
@@ -102,6 +116,8 @@ class TransEdit(QWidget) :
         button.setStyleSheet("QPushButton {background: transparent; font: 8pt '华康方圆体W7';}"
                              "QPushButton:hover {background-color: #83AAF9;}"
                              "QPushButton:pressed {background-color: #4480F9;}")
+        button.clicked.connect(lambda: self.refreshTrans("百度"))
+        button.setToolTip("<b>使用私人百度重新翻译</b>")
 
         # 私人ChatGPT
         button = QPushButton(self)
@@ -112,14 +128,24 @@ class TransEdit(QWidget) :
         button.setStyleSheet("QPushButton {background: transparent; font: 8pt '华康方圆体W7'; border-radius: 6px}"
                              "QPushButton:hover {background-color: #83AAF9;}"
                              "QPushButton:pressed {background-color: #4480F9;}")
+        button.clicked.connect(lambda: self.refreshTrans("ChatGPT"))
+        button.setToolTip("<b>使用私人ChatGPT重新翻译</b>")
 
-        # 编辑框
-        self.edit_text = QTextBrowser(self)
-        self.customSetGeometry(self.edit_text, 0, 30, 500, 200)
-        self.edit_text.setCursor(ui.static.icon.PIXMAP_CURSOR)
-        self.edit_text.setReadOnly(False)
-        self.edit_text.setFont(QFont(font_type, 12))
-        self.edit_text.setCursor(ui.static.icon.EDIT_CURSOR)
+        # 原文编辑框
+        self.original_text = QTextBrowser(self)
+        self.customSetGeometry(self.original_text, 0, 30, 500, 100)
+        self.original_text.setCursor(ui.static.icon.PIXMAP_CURSOR)
+        self.original_text.setReadOnly(False)
+        self.original_text.setStyleSheet("background-color: rgb(224, 224, 224); font: 10pt '%s';"%font_type)
+        self.original_text.setCursor(ui.static.icon.EDIT_CURSOR)
+
+        # 译文编辑框
+        self.trans_text = QTextBrowser(self)
+        self.customSetGeometry(self.trans_text, 0, 130, 500, 100)
+        self.trans_text.setCursor(ui.static.icon.PIXMAP_CURSOR)
+        self.trans_text.setReadOnly(False)
+        self.trans_text.setStyleSheet("font: 10pt '%s';"%font_type)
+        self.trans_text.setCursor(ui.static.icon.EDIT_CURSOR)
 
         # 确定按钮
         button = QPushButton(self)
@@ -130,7 +156,7 @@ class TransEdit(QWidget) :
         button.setCursor(ui.static.icon.SELECT_CURSOR)
         button.setCursor(ui.static.icon.EDIT_CURSOR)
 
-        # 确定按钮
+        # 取消按钮
         button = QPushButton(self)
         self.customSetGeometry(button, 275, 240, 100, 50)
         button.setText("取消")
@@ -148,10 +174,109 @@ class TransEdit(QWidget) :
                                  int(h * self.rate)))
 
 
-    # 刷新翻译
+    # 重新渲染文字
     def renderTextBlock(self) :
 
-        pass
+        # 获取ipt图片路径
+        file_name = os.path.splitext(os.path.basename(self.rdr_image_path))[0]
+        ipt_image_path = os.path.join(os.path.dirname(self.rdr_image_path), "tmp", "{}_ipt.png".format(file_name))
+
+        # 打开ipt图片, 按照文本块坐标截图
+        image = Image.open(ipt_image_path)
+        x, y, w, h = self.rect[0], self.rect[1], self.rect[2], self.rect[3]
+        cropped_image = image.crop((x, y, x + w, y + h))
+
+        # 截图转换为base64
+        buffered = io.BytesIO()
+        cropped_image.save(buffered, format="PNG")
+        inpainted_image = base64.b64encode(buffered.getvalue()).decode("utf-8")
+
+        # 重新计算截图后的坐标
+        text_block = copy.deepcopy(self.text_block)
+        text_block["block_coordinate"]["upper_left"] = [0, 0]
+        text_block["block_coordinate"]["upper_right"] = [w, 0]
+        text_block["block_coordinate"]["lower_right"] = [w, h]
+        text_block["block_coordinate"]["lower_left"] = [0, h]
+        for index, val in enumerate(text_block["coordinate"]) :
+            coordinate = {}
+            for k in val.keys() :
+                coordinate[k] = [val[k][0]-x, val[k][1]-y]
+            text_block["coordinate"][index] = coordinate
+
+        # 漫画rdr
+        sign, result = translator.ocr.dango.mangaRDR(
+            object=self.object,
+            trans_list=[self.trans_text.toPlainText()],
+            inpainted_image=inpainted_image,
+            text_block=[text_block]
+        )
+        if not sign :
+            print(result)
+            #@TODO 错误处理
+            return
+
+        # 渲染后的新图贴在大图上
+        ipt_image = Image.open(io.BytesIO(base64.b64decode(result["rendered_image"])))
+        rdr_image = Image.open(self.rdr_image_path)
+        rdr_image.paste(ipt_image, (x, y))
+        rdr_image.save(self.rdr_image_path)
+
+        # 刷新缓存文件中获取json结果
+        json_file_path = os.path.join(os.path.dirname(ipt_image_path), "%s.json" % file_name)
+        with open(json_file_path, "r", encoding="utf-8") as file :
+            json_data = json.load(file)
+        json_data["translated_text"][self.index] = self.trans_text.toPlainText()
+        # 缓存ocr结果
+        with open(json_file_path, "w", encoding="utf-8") as file :
+            json.dump(json_data, file, indent=4)
+
+        # 刷新大图
+        w_rate = self.object.manga_ui.width() / self.object.manga_ui.window_width
+        h_rate = self.object.manga_ui.height() / self.object.manga_ui.window_height
+        self.object.manga_ui.show_image_scroll_area.setWidget(None)
+        self.object.manga_ui.show_image_widget = RenderTextBlock(
+            rate=(w_rate, h_rate),
+            image_path=self.rdr_image_path,
+            json_data=json_data,
+            edit_window=self
+        )
+        self.object.manga_ui.show_image_scroll_area.setWidget(self.object.manga_ui.show_image_widget)
+        self.object.manga_ui.show_image_scroll_area.show()
+
+        self.close()
+
+
+    # 刷新翻译结果
+    def refreshTrans(self, trans_type) :
+
+        original = self.original_text.toPlainText()
+        result = ""
+        if trans_type == "彩云":
+            result = translator.api.caiyun(sentence=original,
+                                           token=self.object.config["caiyunAPI"],
+                                           logger=self.logger)
+        elif trans_type == "腾讯":
+            result = translator.api.tencent(sentence=original,
+                                            secret_id=self.object.config["tencentAPI"]["Key"],
+                                            secret_key=self.object.config["tencentAPI"]["Secret"],
+                                            logger=self.logger)
+        elif trans_type == "百度":
+            result = translator.api.baidu(sentence=original,
+                                          app_id=self.object.config["baiduAPI"]["Key"],
+                                          secret_key=self.object.config["baiduAPI"]["Secret"],
+                                          logger=self.logger)
+        elif trans_type == "ChatGPT":
+            result = translator.api.chatgpt(api_key=self.object.config["chatgptAPI"],
+                                            language=self.object.config["language"],
+                                            proxy=self.object.config["chatgptProxy"],
+                                            content=original,
+                                            logger=self.logger)
+        else :
+            return
+
+        if result :
+            self.trans_text.clear()
+            self.trans_text.insertPlainText(result)
 
 
     # 修改字体颜色
@@ -160,10 +285,17 @@ class TransEdit(QWidget) :
         color = QColorDialog.getColor(QColor(self.color), None, "修改字体颜色")
         if color.isValid() :
             self.color = color.name()
-            text = self.edit_text.toPlainText()
-            self.edit_text.clear()
-            self.edit_text.setTextColor(color)
-            self.edit_text.insertPlainText(text)
+            # 原文
+            text = self.original_text.toPlainText()
+            self.original_text.clear()
+            self.original_text.setTextColor(color)
+            self.original_text.insertPlainText(text)
+            # 译文
+            text = self.trans_text.toPlainText()
+            self.trans_text.clear()
+            self.trans_text.setTextColor(color)
+            self.trans_text.insertPlainText(text)
+
 
 
 # 根据文本块大小计算font_size
@@ -233,6 +365,7 @@ def getFontSize(coordinate, trans_text) :
 class RenderTextBlock(QWidget) :
 
     def __init__(self, rate, image_path, json_data, edit_window) :
+
         super(RenderTextBlock, self).__init__()
         self.rate = rate
         self.image_path = image_path
@@ -263,15 +396,15 @@ class RenderTextBlock(QWidget) :
 
         if not self.json_data :
             return
+
         # 渲染文本框
+        index = 0
         for text_block, trans_text in zip(self.json_data["text_block"], self.json_data["translated_text"]) :
             # 计算文本坐标
             x = text_block["block_coordinate"]["upper_left"][0]
             y = text_block["block_coordinate"]["upper_left"][1]
             w = text_block["block_coordinate"]["lower_right"][0] - x
             h = text_block["block_coordinate"]["lower_right"][1] - y
-            # 计算文字大小
-            font_size = getFontSize(text_block["coordinate"], trans_text)
             # 文本颜色
             font_color = tuple(text_block["foreground_color"])
             # 绘制矩形框
@@ -279,8 +412,12 @@ class RenderTextBlock(QWidget) :
             button.setGeometry(x, y, w, h)
             button.setStyleSheet("QPushButton {background: transparent; border: 3px dashed red;}"
                                  "QPushButton:hover {background-color:rgba(62, 62, 62, 0.1)}")
-            button.clicked.connect(lambda _, x=trans_text, y=font_color, z=font_size :
-                                   self.clickTextBlock(x, y, z))
+            original = ""
+            for text in text_block["texts"]:
+                original += text
+            button.clicked.connect(lambda _, x=original, y=trans_text, z=font_color, j=(x, y, w, h), k=text_block, i=index :
+                                   self.clickTextBlock(x, y, z, j, k, i))
+            index += 1
 
 
     # 加载大图
@@ -296,16 +433,24 @@ class RenderTextBlock(QWidget) :
 
 
     # 点击文本框
-    def clickTextBlock(self, trans_text, font_color, font_size) :
+    def clickTextBlock(self, original, trans, font_color, rect, text_block, index) :
 
-        self.trans_edit_ui.edit_text.clear()
-        # 计算文字大小
-        self.trans_edit_ui.edit_text.setFontPointSize(font_size)
+        self.trans_edit_ui.index = index
+        self.trans_edit_ui.text_block = text_block
+        self.trans_edit_ui.rdr_image_path = self.image_path
+        self.trans_edit_ui.rect = rect
         # 文本颜色
         font_color = QColor(font_color[0], font_color[1], font_color[2])
         self.trans_edit_ui.color = font_color.name()
-        self.trans_edit_ui.edit_text.setTextColor(font_color)
-        self.trans_edit_ui.edit_text.insertPlainText(trans_text)
+        # 原文
+        self.trans_edit_ui.original_text.clear()
+        self.trans_edit_ui.original_text.setTextColor(font_color)
+        self.trans_edit_ui.original_text.insertPlainText(original)
+        # 译文
+        self.trans_edit_ui.trans_text.clear()
+        self.trans_edit_ui.trans_text.setTextColor(font_color)
+        self.trans_edit_ui.trans_text.insertPlainText(trans)
+
         self.trans_edit_ui.show()
 
 
@@ -344,7 +489,7 @@ class Manga(QWidget) :
         self.logger = object.logger
         self.getInitConfig()
         self.ui()
-        self.trans_edit_ui = TransEdit(self.rate)
+        self.trans_edit_ui = TransEdit(object)
         self.show_image_widget = None
 
 
@@ -468,7 +613,6 @@ class Manga(QWidget) :
         self.edit_image_widget.itemSelectionChanged.connect(self.loadEditImage)
         self.edit_image_widget.hide()
         self.edit_image_widget.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.edit_image_widget.customContextMenuRequested.connect(self.showEditListWidgetMenu)
         self.edit_image_widget.setSpacing(5)
 
         # 译图列表框
@@ -740,20 +884,6 @@ class Manga(QWidget) :
             translater_action.triggered.connect(lambda: self.translaterItemWidget(item))
             delete_action = menu.addAction("移除")
             delete_action.triggered.connect(lambda: self.removeItemWidget(item))
-            # 显示菜单
-            cursorPos = QCursor.pos()
-            menu.exec_(cursorPos)
-
-
-    # 设置编辑图列表框右键菜单
-    def showEditListWidgetMenu(self, pos):
-
-        item = self.edit_image_widget.itemAt(pos)
-        if item is not None:
-            menu = QMenu(self)
-            # 添加菜单项
-            rdr_action = menu.addAction("重新渲染翻译结果")
-            # rdr_action.triggered.connect(lambda: self.saveImageItemWidget(item))
             # 显示菜单
             cursorPos = QCursor.pos()
             menu.exec_(cursorPos)
@@ -1048,7 +1178,7 @@ class Manga(QWidget) :
             result = translator.api.chatgpt(api_key=self.object.config["chatgptAPI"],
                                             language=self.object.config["language"],
                                             proxy=self.object.config["chatgptProxy"],
-                                            content=self.object.translation_ui.original,
+                                            content=original,
                                             logger=self.logger)
 
         for index, word in enumerate(result.split("\n")[:len(json_data["text_block"])]) :

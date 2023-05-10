@@ -121,8 +121,6 @@ class DangoTranslator :
         self.hwndObj = utils.hwnd.WindowHwnd(self)
         if self.config["setTop"] :
             self.hwndObj.run()
-        # 更新自动更新程序
-        utils.thread.createThread(utils.update.updateAutoUpdateFile(self))
         # 清理历史日志缓存
         utils.thread.createThread(utils.logger.clearLog)
 
@@ -247,7 +245,11 @@ class DangoTranslator :
         if not self.yaml.get("dict_info", {}) :
             utils.message.serverClientFailMessage(self)
         # 更新缺失的运行库
-        utils.update.updatePilFile(self)
+        utils.thread.createThread(utils.update.updatePilFile(self))
+        # 更新自动更新程序
+        utils.thread.createThread(utils.update.updateAutoUpdateFile(self))
+        # 更新漫画翻译字体
+        utils.thread.createThread(utils.update.updateManFontFile(self))
         # 启动图标
         self.showSplash()
         # 检查是否为测试版本
