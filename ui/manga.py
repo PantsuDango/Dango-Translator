@@ -39,7 +39,8 @@ class TransEdit(QWidget) :
         self.object = object
         self.rate = object.yaml["screen_scale_rate"]
         self.logger = object.logger
-        self.color = "#5B8FF9"
+        self.font_color = ""
+        self.bg_color = ""
         self.rect = []
         self.rdr_image_path = ""
         self.text_block = ""
@@ -73,19 +74,30 @@ class TransEdit(QWidget) :
             pass
 
         # 修改字体颜色
-        self.color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color="#5B8FF9"), "", self)
-        self.customSetGeometry(self.color_button, 0, 0, 70, 30)
-        self.color_button.setCursor(ui.static.icon.EDIT_CURSOR)
-        self.color_button.setText(" 颜色")
-        self.color_button.clicked.connect(self.changeTranslateColor)
-        self.color_button.setStyleSheet("QPushButton {background: transparent; font: 8pt '华康方圆体W7';}"
-                                        "QPushButton:hover {background-color: #83AAF9;}"
-                                        "QPushButton:pressed {background-color: #4480F9;}")
-        self.color_button.setToolTip("<b>修改显示的字体颜色</b>")
+        self.font_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.font_color), "", self)
+        self.customSetGeometry(self.font_color_button, 0, 0, 70, 30)
+        self.font_color_button.setCursor(ui.static.icon.EDIT_CURSOR)
+        self.font_color_button.setText(" 字体色")
+        self.font_color_button.clicked.connect(self.changeTranslateColor)
+        self.font_color_button.setStyleSheet("QPushButton {background: transparent; font: 8pt '华康方圆体W7';}"
+                                             "QPushButton:hover {background-color: #83AAF9;}"
+                                             "QPushButton:pressed {background-color: #4480F9;}")
+        self.font_color_button.setToolTip("<b>修改显示的字体颜色</b>")
+
+        # 修改轮廓颜色
+        self.bg_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.bg_color), "", self)
+        self.customSetGeometry(self.bg_color_button, 70, 0, 70, 30)
+        self.bg_color_button.setCursor(ui.static.icon.EDIT_CURSOR)
+        self.bg_color_button.setText(" 轮廓色")
+        self.bg_color_button.clicked.connect(self.changeBackgroundColor)
+        self.bg_color_button.setStyleSheet("QPushButton {background: transparent; font: 8pt '华康方圆体W7';}"
+                                           "QPushButton:hover {background-color: #83AAF9;}"
+                                           "QPushButton:pressed {background-color: #4480F9;}")
+        self.bg_color_button.setToolTip("<b>修改显示的轮廓颜色</b>")
 
         # 私人彩云
         button = QPushButton(self)
-        self.customSetGeometry(button, 70, 0, 70, 30)
+        self.customSetGeometry(button, 140, 0, 70, 30)
         button.setCursor(ui.static.icon.EDIT_CURSOR)
         button.setText(" 彩云")
         button.setIcon(ui.static.icon.TRANSLATE_ICON)
@@ -97,7 +109,7 @@ class TransEdit(QWidget) :
 
         # 私人腾讯
         button = QPushButton(self)
-        self.customSetGeometry(button, 140, 0, 70, 30)
+        self.customSetGeometry(button, 210, 0, 70, 30)
         button.setCursor(ui.static.icon.EDIT_CURSOR)
         button.setText(" 腾讯")
         button.setIcon(ui.static.icon.TRANSLATE_ICON)
@@ -109,7 +121,7 @@ class TransEdit(QWidget) :
 
         # 私人百度
         button = QPushButton(self)
-        self.customSetGeometry(button, 210, 0, 70, 30)
+        self.customSetGeometry(button, 280, 0, 70, 30)
         button.setCursor(ui.static.icon.EDIT_CURSOR)
         button.setText(" 百度")
         button.setIcon(ui.static.icon.TRANSLATE_ICON)
@@ -121,7 +133,7 @@ class TransEdit(QWidget) :
 
         # 私人ChatGPT
         button = QPushButton(self)
-        self.customSetGeometry(button, 280, 0, 70, 30)
+        self.customSetGeometry(button, 350, 0, 70, 30)
         button.setCursor(ui.static.icon.EDIT_CURSOR)
         button.setText(" ChatGPT")
         button.setIcon(ui.static.icon.TRANSLATE_ICON)
@@ -191,8 +203,17 @@ class TransEdit(QWidget) :
         cropped_image.save(buffered, format="PNG")
         inpainted_image = base64.b64encode(buffered.getvalue()).decode("utf-8")
 
-        # 重新计算截图后的坐标
         text_block = copy.deepcopy(self.text_block)
+        # 修改字体颜色
+        color = QColor(self.font_color)
+        f_r, f_g, f_b, f_a = color.getRgb()
+        text_block["foreground_color"] = [f_r, f_g, f_b]
+        # 修改轮廓颜色
+        color = QColor(self.bg_color)
+        b_r, b_g, b_b, b_a = color.getRgb()
+        text_block["background_color"] = [b_r, b_g, b_b]
+
+        # 重新计算截图后的坐标
         text_block["block_coordinate"]["upper_left"] = [0, 0]
         text_block["block_coordinate"]["upper_right"] = [w, 0]
         text_block["block_coordinate"]["lower_right"] = [w, h]
@@ -226,6 +247,9 @@ class TransEdit(QWidget) :
         with open(json_file_path, "r", encoding="utf-8") as file :
             json_data = json.load(file)
         json_data["translated_text"][self.index] = self.trans_text.toPlainText()
+        json_data["text_block"][self.index]["foreground_color"] = [f_r, f_g, f_b]
+        json_data["text_block"][self.index]["background_color"] = [b_r, b_g, b_b]
+
         # 缓存ocr结果
         with open(json_file_path, "w", encoding="utf-8") as file :
             json.dump(json_data, file, indent=4)
@@ -282,9 +306,10 @@ class TransEdit(QWidget) :
     # 修改字体颜色
     def changeTranslateColor(self):
 
-        color = QColorDialog.getColor(QColor(self.color), None, "修改字体颜色")
+        color = QColorDialog.getColor(QColor(self.font_color), None, "修改字体颜色")
         if color.isValid() :
-            self.color = color.name()
+            self.font_color = color.name()
+            self.font_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=self.font_color))
             # 原文
             text = self.original_text.toPlainText()
             self.original_text.clear()
@@ -296,6 +321,14 @@ class TransEdit(QWidget) :
             self.trans_text.setTextColor(color)
             self.trans_text.insertPlainText(text)
 
+
+    # 修改轮廓颜色
+    def changeBackgroundColor(self):
+
+        color = QColorDialog.getColor(QColor(self.bg_color), None, "修改字体颜色")
+        if color.isValid():
+            self.bg_color = color.name()
+            self.bg_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=self.bg_color))
 
 
 # 根据文本块大小计算font_size
@@ -407,6 +440,7 @@ class RenderTextBlock(QWidget) :
             h = text_block["block_coordinate"]["lower_right"][1] - y
             # 文本颜色
             font_color = tuple(text_block["foreground_color"])
+            bg_color = tuple(text_block["background_color"])
             # 绘制矩形框
             button = QPushButton(self.image_label)
             button.setGeometry(x, y, w, h)
@@ -415,8 +449,8 @@ class RenderTextBlock(QWidget) :
             original = ""
             for text in text_block["texts"]:
                 original += text
-            button.clicked.connect(lambda _, x=original, y=trans_text, z=font_color, j=(x, y, w, h), k=text_block, i=index :
-                                   self.clickTextBlock(x, y, z, j, k, i))
+            button.clicked.connect(lambda _, x=original, y=trans_text, z=font_color, f=bg_color, j=(x, y, w, h), k=text_block, i=index :
+                                   self.clickTextBlock(x, y, z, f, j, k, i))
             index += 1
 
 
@@ -433,7 +467,7 @@ class RenderTextBlock(QWidget) :
 
 
     # 点击文本框
-    def clickTextBlock(self, original, trans, font_color, rect, text_block, index) :
+    def clickTextBlock(self, original, trans, font_color, bg_color, rect, text_block, index) :
 
         self.trans_edit_ui.index = index
         self.trans_edit_ui.text_block = text_block
@@ -441,7 +475,12 @@ class RenderTextBlock(QWidget) :
         self.trans_edit_ui.rect = rect
         # 文本颜色
         font_color = QColor(font_color[0], font_color[1], font_color[2])
-        self.trans_edit_ui.color = font_color.name()
+        self.trans_edit_ui.font_color = font_color.name()
+        self.trans_edit_ui.font_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=font_color.name()))
+        # 轮廓颜色
+        bg_color = QColor(bg_color[0], bg_color[1], bg_color[2])
+        self.trans_edit_ui.bg_color = bg_color.name()
+        self.trans_edit_ui.bg_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=bg_color.name()))
         # 原文
         self.trans_edit_ui.original_text.clear()
         self.trans_edit_ui.original_text.setTextColor(font_color)
