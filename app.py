@@ -218,8 +218,13 @@ class DangoTranslator :
         settin_image_url = self.yaml["dict_info"]["settin_image_url"]
         utils.http.downloadFile(settin_image_url, "./config/background/settin.jpg", self.logger)
         # 加载测试ocr图片
-        test_image_url = self.yaml["dict_info"]["test_image"]
-        utils.http.downloadFile(test_image_url, "./config/other/image.jpg", self.logger)
+        if not os.path.exists("./config/other/image.jpg") :
+            test_image_url = self.yaml["dict_info"]["test_image"]
+            utils.http.downloadFile(test_image_url, "./config/other/image.jpg", self.logger)
+        # 加载图标
+        if not os.path.exists("./config/icon/loading.gif") :
+            loading_gif_url = self.yaml["dict_info"]["loading_gif_url"]
+            utils.http.downloadFile(loading_gif_url, "./config/icon/loading.gif", self.logger)
 
 
     # 启动图标
