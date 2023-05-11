@@ -25,7 +25,6 @@ import utils.message
 import ui.progress_bar
 
 
-DRAW_PATH = "./config/draw.jpg"
 FONT_PATH_1 = "./config/other/NotoSansSC-Regular.otf"
 FONT_PATH_2 = "./config/other/华康方圆体W7.TTC"
 
@@ -418,7 +417,11 @@ class RenderTextBlock(QWidget) :
 
         # 图片大图展示
         self.scroll_area = QScrollArea(self)
+        self.scroll_area.setGeometry(0, 0, self.width(), self.height())
         self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+
         self.image_label = QLabel(self)
         widget = QWidget()
         layout = QVBoxLayout()
@@ -433,11 +436,16 @@ class RenderTextBlock(QWidget) :
         # 渲染文本框
         index = 0
         for text_block, trans_text in zip(self.json_data["text_block"], self.json_data["translated_text"]) :
+            # 计算缩放比例
+            w_rate = self.scroll_area.width() / self.image_pixmap.width()
+            h_rate = self.scroll_area.height() / self.image_pixmap.height()
+            print("rate: ", w_rate, h_rate)
+            print("scroll_area: ", self.scroll_area.width(), self.scroll_area.height())
             # 计算文本坐标
-            x = text_block["block_coordinate"]["upper_left"][0]
-            y = text_block["block_coordinate"]["upper_left"][1]
-            w = text_block["block_coordinate"]["lower_right"][0] - x
-            h = text_block["block_coordinate"]["lower_right"][1] - y
+            x = text_block["block_coordinate"]["upper_left"][0] * w_rate
+            y = text_block["block_coordinate"]["upper_left"][1] * h_rate
+            w = (text_block["block_coordinate"]["lower_right"][0] - x) * w_rate
+            h = (text_block["block_coordinate"]["lower_right"][1] - y) * h_rate
             # 文本颜色
             font_color = tuple(text_block["foreground_color"])
             bg_color = tuple(text_block["background_color"])
@@ -459,11 +467,23 @@ class RenderTextBlock(QWidget) :
 
         if not os.path.exists(self.image_path) :
             return
-        with open(self.image_path, "rb") as file:
+        with open(self.image_path, "rb") as file :
             image = QImage.fromData(file.read())
-        pixmap = QPixmap.fromImage(image)
+        self.image_pixmap = QPixmap.fromImage(image)
+        self.matchImageSize()
+
+
+    # 图片自适配比例
+    def matchImageSize(self) :
+
+        pixmap = self.image_pixmap
+        if pixmap.height() > self.height() :
+            rate = self.height() / pixmap.height()
+            pixmap = pixmap.scaled(pixmap.width()*rate, pixmap.height()*rate)
+        if pixmap.width() > self.width() :
+            rate = self.width() / pixmap.width()
+            pixmap = pixmap.scaled(pixmap.width()*rate, pixmap.height() * rate)
         self.image_label.setPixmap(pixmap)
-        self.image_label.resize(pixmap.width(), pixmap.height())
 
 
     # 点击文本框
@@ -499,6 +519,7 @@ class RenderTextBlock(QWidget) :
         w = event.size().width()
         h = event.size().height()
         self.scroll_area.setGeometry(0, 0, w, h)
+        self.matchImageSize()
 
 
 # 自定义按键实现鼠标进入显示, 移出隐藏
@@ -666,6 +687,8 @@ class Manga(QWidget) :
         # 图片大图展示
         self.show_image_scroll_area = QScrollArea(self)
         self.show_image_scroll_area.setWidgetResizable(True)
+        self.show_image_scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.show_image_scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
         # 上一页按钮
         self.last_page_button = CustomButton(self)
@@ -1473,12 +1496,12 @@ class Manga(QWidget) :
         )
         # 上一页按钮
         self.last_page_button.setGeometry(
-            self.cut_line_label4.x()+20*w_rate, (self.show_image_scroll_area.height() - 300 * h_rate) // 2,
+            self.cut_line_label4.x(), (self.show_image_scroll_area.height() - 300 * h_rate) // 2,
             50 * w_rate, 300 * h_rate
         )
         # 下一页按钮
         self.next_page_button.setGeometry(
-            w - self.last_page_button.width()-20*w_rate, self.last_page_button.y(),
+            w - self.last_page_button.width(), self.last_page_button.y(),
             self.last_page_button.width(), self.last_page_button.height()
         )
         # 图片大图展示
