@@ -42,7 +42,7 @@ class TransEdit(QWidget) :
         self.bg_color = ""
         self.rect = []
         self.rdr_image_path = ""
-        self.text_block = ""
+        self.text_block = {}
         self.index = 0
         self.ui()
 
@@ -273,7 +273,6 @@ class TransEdit(QWidget) :
     def refreshTrans(self, trans_type) :
 
         original = self.original_text.toPlainText()
-        result = ""
         if trans_type == "彩云":
             result = translator.api.caiyun(sentence=original,
                                            token=self.object.config["caiyunAPI"],
@@ -403,6 +402,8 @@ class RenderTextBlock(QWidget) :
         self.image_path = image_path
         self.json_data = json_data
         self.trans_edit_ui = edit_window
+        self.image_rate = []
+        self.button_list = []
         self.ui()
 
 
@@ -419,47 +420,60 @@ class RenderTextBlock(QWidget) :
         self.scroll_area = QScrollArea(self)
         self.scroll_area.setGeometry(0, 0, self.width(), self.height())
         self.scroll_area.setWidgetResizable(True)
-        self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-
+        self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.image_label = QLabel(self)
         widget = QWidget()
         layout = QVBoxLayout()
         layout.addWidget(self.image_label, alignment=Qt.AlignCenter)
         widget.setLayout(layout)
         self.scroll_area.setWidget(widget)
+
+        # 显示图片缩放比例
+        self.rate_label = QLabel(self)
+        self.rate_label.setGeometry(950*self.rate[0], 590*self.rate[1], 30*self.rate[0], 30*self.rate[1])
+        # 载入大图
         self.loadImage()
 
-        if not self.json_data :
+        if not self.json_data or \
+                not self.json_data.get("text_block", []) or \
+                not self.json_data.get("translated_text", []) :
             return
-
         # 渲染文本框
         index = 0
         for text_block, trans_text in zip(self.json_data["text_block"], self.json_data["translated_text"]) :
-            # 计算缩放比例
-            w_rate = self.scroll_area.width() / self.image_pixmap.width()
-            h_rate = self.scroll_area.height() / self.image_pixmap.height()
-            print("rate: ", w_rate, h_rate)
-            print("scroll_area: ", self.scroll_area.width(), self.scroll_area.height())
             # 计算文本坐标
-            x = text_block["block_coordinate"]["upper_left"][0] * w_rate
-            y = text_block["block_coordinate"]["upper_left"][1] * h_rate
-            w = (text_block["block_coordinate"]["lower_right"][0] - x) * w_rate
-            h = (text_block["block_coordinate"]["lower_right"][1] - y) * h_rate
+            x_0 = text_block["block_coordinate"]["upper_left"][0]
+            y_0 = text_block["block_coordinate"]["upper_left"][1]
+            w_0 = text_block["block_coordinate"]["lower_right"][0] - x_0
+            h_0 = text_block["block_coordinate"]["lower_right"][1] - y_0
+            # 计算缩放比例
+            x = x_0*self.image_rate[0]
+            y = y_0*self.image_rate[1]
+            w = w_0*self.image_rate[0]
+            h = h_0*self.image_rate[1]
             # 文本颜色
             font_color = tuple(text_block["foreground_color"])
             bg_color = tuple(text_block["background_color"])
             # 绘制矩形框
             button = QPushButton(self.image_label)
             button.setGeometry(x, y, w, h)
-            button.setStyleSheet("QPushButton {background: transparent; border: 3px dashed red;}"
+            button.setStyleSheet("QPushButton {background: transparent; border: 2px dashed red;}"
                                  "QPushButton:hover {background-color:rgba(62, 62, 62, 0.1)}")
             original = ""
-            for text in text_block["texts"]:
+            for text in text_block["texts"] :
                 original += text
-            button.clicked.connect(lambda _, x=original, y=trans_text, z=font_color, f=bg_color, j=(x, y, w, h), k=text_block, i=index :
+            button.clicked.connect(lambda _,
+                                          x=original,
+                                          y=trans_text,
+                                          z=font_color,
+                                          f=bg_color,
+                                          j=(x_0, y_0, w_0, h_0),
+                                          k=text_block,
+                                          i=index :
                                    self.clickTextBlock(x, y, z, f, j, k, i))
             index += 1
+            self.button_list.append(button)
 
 
     # 加载大图
@@ -471,19 +485,6 @@ class RenderTextBlock(QWidget) :
             image = QImage.fromData(file.read())
         self.image_pixmap = QPixmap.fromImage(image)
         self.matchImageSize()
-
-
-    # 图片自适配比例
-    def matchImageSize(self) :
-
-        pixmap = self.image_pixmap
-        if pixmap.height() > self.height() :
-            rate = self.height() / pixmap.height()
-            pixmap = pixmap.scaled(pixmap.width()*rate, pixmap.height()*rate)
-        if pixmap.width() > self.width() :
-            rate = self.width() / pixmap.width()
-            pixmap = pixmap.scaled(pixmap.width()*rate, pixmap.height() * rate)
-        self.image_label.setPixmap(pixmap)
 
 
     # 点击文本框
@@ -513,13 +514,73 @@ class RenderTextBlock(QWidget) :
         self.trans_edit_ui.show()
 
 
+    # 图片自适配比例
+    def matchImageSize(self):
+
+        pixmap = self.image_pixmap
+        if pixmap.height() > self.height():
+            rate = self.height() / pixmap.height()
+            pixmap = pixmap.scaled(pixmap.width()*rate, pixmap.height()*rate)
+        if pixmap.width() > self.width():
+            rate = self.width() / pixmap.width()
+            pixmap = pixmap.scaled(pixmap.width()*rate, pixmap.height()*rate)
+        self.image_label.setPixmap(pixmap)
+
+        self.image_rate = [
+            pixmap.width() / self.image_pixmap.width(),
+            pixmap.height() / self.image_pixmap.height()
+        ]
+        self.rate_label.setText("{}%".format(round(self.image_rate[0]*100)))
+
+
+    # 文本框按钮自适配比例
+    def matchButtonSize(self) :
+
+        if not self.json_data or (len(self.button_list) != len(self.json_data["text_block"])) :
+            return
+        for button, text_block in zip(self.button_list, self.json_data["text_block"]) :
+            # 计算文本坐标
+            x = text_block["block_coordinate"]["upper_left"][0]
+            y = text_block["block_coordinate"]["upper_left"][1]
+            w = text_block["block_coordinate"]["lower_right"][0] - x
+            h = text_block["block_coordinate"]["lower_right"][1] - y
+            # 计算缩放比例
+            x = x * self.image_rate[0]
+            y = y * self.image_rate[1]
+            w = w * self.image_rate[0]
+            h = h * self.image_rate[1]
+            button.setGeometry(x, y, w, h)
+
+
+    # 鼠标滚轮信号
+    def wheelEvent(self, event) :
+
+        if event.angleDelta().y() > 0 :
+            self.image_rate[0] += 0.1
+            self.image_rate[1] += 0.1
+        else :
+            self.image_rate[0] -= 0.1
+            self.image_rate[1] -= 0.1
+        pixmap = self.image_pixmap.scaled(
+            self.image_pixmap.width() * self.image_rate[0],
+            self.image_pixmap.height() * self.image_rate[1]
+        )
+        self.image_label.setPixmap(pixmap)
+        self.rate_label.setText("{}%".format(round(self.image_rate[0] * 100)))
+        self.matchButtonSize()
+
+
     # 窗口尺寸变化信号
     def resizeEvent(self, event) :
 
         w = event.size().width()
         h = event.size().height()
+        w_rate = w / 1000
+        h_rete = h / 635
         self.scroll_area.setGeometry(0, 0, w, h)
         self.matchImageSize()
+        self.matchButtonSize()
+        self.rate_label.setGeometry(950*w_rate, 590*h_rete, 30*w_rate, 30*h_rete)
 
 
 # 自定义按键实现鼠标进入显示, 移出隐藏
@@ -1496,12 +1557,12 @@ class Manga(QWidget) :
         )
         # 上一页按钮
         self.last_page_button.setGeometry(
-            self.cut_line_label4.x(), (self.show_image_scroll_area.height() - 300 * h_rate) // 2,
+            self.cut_line_label4.x()+20*w_rate, (self.show_image_scroll_area.height() - 300 * h_rate) // 2,
             50 * w_rate, 300 * h_rate
         )
         # 下一页按钮
         self.next_page_button.setGeometry(
-            w - self.last_page_button.width(), self.last_page_button.y(),
+            w-self.last_page_button.width()-20*w_rate, self.last_page_button.y(),
             self.last_page_button.width(), self.last_page_button.height()
         )
         # 图片大图展示
