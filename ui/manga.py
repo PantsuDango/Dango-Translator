@@ -1430,10 +1430,11 @@ class Manga(QWidget) :
     def finishTransProcessRefresh(self, value, signal) :
 
         if signal :
-            self.trans_image_button.click()
-            row = self.image_path_list.index(value)
-            self.trans_image_widget.setCurrentRow(row)
-            self.loadTransImage()
+            # self.trans_image_button.click()
+            # row = self.image_path_list.index(value)
+            # self.trans_image_widget.setCurrentRow(row)
+            # self.loadTransImage()
+            return
         else :
             if value :
                 # @TODO 缺少错误处理

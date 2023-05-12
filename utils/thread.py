@@ -131,8 +131,8 @@ class createMangaTransQThread(QThread) :
                 # 如果失败记录日志
                 if result :
                     self.logger.error(result)
-                # 发送刷新图片列表框信号
-                self.signal.emit(image_path, True)
+                # # 发送刷新图片列表框信号
+                # self.signal.emit(image_path, True)
                 # 进度条
                 self.bar_signal.emit(
                     int((index + 1) / len(self.image_paths) * 100),
