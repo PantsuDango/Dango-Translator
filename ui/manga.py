@@ -1239,6 +1239,22 @@ class Manga(QWidget) :
             with open(self.getMaskFilePath(image_path), "wb") as file :
                 file.write(base64.b64decode(result["mask"]))
             del result["mask"]
+            # 过滤错误的文本块
+            new_text_block = []
+            for index, val in enumerate(result.get("text_block", [])) :
+                texts = val.get("texts", [])
+                if not texts :
+                    continue
+                skip_sign = False
+                for text in texts :
+                    if not text or text == "<skip>" :
+                        skip_sign = True
+                        break
+                if skip_sign :
+                    continue
+                new_text_block.append(val)
+            if new_text_block :
+                result["text_block"] = new_text_block
             # 缓存ocr结果
             with open(self.getJsonFilePath(image_path), "w", encoding="utf-8") as file:
                 json.dump(result, file, indent=4)
