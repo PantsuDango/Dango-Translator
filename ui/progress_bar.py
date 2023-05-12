@@ -138,7 +138,7 @@ class MangaProgressBar(QWidget) :
         # 窗口尺寸及不可拉伸
         self.resize(self.window_width, self.window_height)
         self.setMinimumSize(QSize(self.window_width, self.window_height))
-        self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowCloseButtonHint)
+        self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowMinimizeButtonHint | Qt.WindowCloseButtonHint)
         # 窗口图标
         self.setWindowIcon(ui.static.icon.APP_LOGO_ICON)
         # 设置字体
