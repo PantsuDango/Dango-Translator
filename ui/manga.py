@@ -304,7 +304,7 @@ class TransEdit(QWidget) :
     # 修改字体颜色
     def changeTranslateColor(self):
 
-        color = QColorDialog.getColor(QColor(self.font_color), None, "修改字体颜色")
+        self.hide()
         if color.isValid() :
             self.font_color = color.name()
             self.font_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=self.font_color))
@@ -317,16 +317,18 @@ class TransEdit(QWidget) :
             text = self.trans_text.toPlainText()
             self.trans_text.clear()
             self.trans_text.setTextColor(color)
-            self.trans_text.insertPlainText(text)
+        self.show()
 
 
     # 修改轮廓颜色
     def changeBackgroundColor(self):
 
+        self.hide()
         color = QColorDialog.getColor(QColor(self.bg_color), None, "修改字体颜色")
         if color.isValid():
             self.bg_color = color.name()
             self.bg_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=self.bg_color))
+        self.show()
 
 
 # 根据文本块大小计算font_size
