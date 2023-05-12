@@ -305,6 +305,7 @@ class TransEdit(QWidget) :
     def changeTranslateColor(self):
 
         self.hide()
+        color = QColorDialog.getColor(QColor(self.bg_color), None, "修改字体颜色")
         if color.isValid() :
             self.font_color = color.name()
             self.font_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=self.font_color))
@@ -324,7 +325,7 @@ class TransEdit(QWidget) :
     def changeBackgroundColor(self):
 
         self.hide()
-        color = QColorDialog.getColor(QColor(self.bg_color), None, "修改字体颜色")
+        color = QColorDialog.getColor(QColor(self.bg_color), None, "修改轮廓颜色")
         if color.isValid():
             self.bg_color = color.name()
             self.bg_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=self.bg_color))
