@@ -1,6 +1,8 @@
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+import os
+import base64
 
 import ui.static.icon
 import utils.thread
@@ -190,6 +192,9 @@ class MangaProgressBar(QWidget) :
         label.setText("文字渲染")
         layout.addWidget(label, 3, 0)
 
+        if not os.path.exists(LOADING_PATH) :
+            with open(LOADING_PATH, "wb") as file :
+                file.write(base64.b64decode(ui.static.icon.LOADING_GIF))
         self.loading_movie = QMovie(LOADING_PATH)
         self.loading_movie.setScaledSize(QSize(50*self.rate, 50*self.rate))
         self.loading_movie.start()
