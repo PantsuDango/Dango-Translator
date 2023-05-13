@@ -1174,20 +1174,24 @@ class Manga(QWidget) :
         self.trans_process_bar.paintStatus("ocr", round(time.time()-start, 1))
 
         # 翻译
-        start = time.time()
-        trans_sign = False
-        if not os.path.exists(self.getJsonFilePath(image_path)) or reload_sign :
-            trans_sign = True
-        else:
-            with open(self.getJsonFilePath(image_path), "r", encoding="utf-8") as file:
-                json_data = json.load(file)
-            if "translated_text" not in json_data:
+        self.trans_result = ""
+        def transThread() :
+            start = time.time()
+            trans_sign = False
+            if not os.path.exists(self.getJsonFilePath(image_path)) or reload_sign :
                 trans_sign = True
-        if trans_sign :
-            sign, trans_result = self.mangaTrans(image_path)
-            if not sign:
-                return "翻译过程失败: %s"%trans_result
-        self.trans_process_bar.paintStatus("trans", round(time.time()-start, 1))
+            else:
+                with open(self.getJsonFilePath(image_path), "r", encoding="utf-8") as file:
+                    json_data = json.load(file)
+                if "translated_text" not in json_data:
+                    trans_sign = True
+            if trans_sign :
+                sign, trans_result = self.mangaTrans(image_path)
+                if not sign :
+                    self.trans_result = "翻译过程失败: %s"%trans_result
+                    return
+            self.trans_process_bar.paintStatus("trans", round(time.time()-start, 1))
+        trans_thread = utils.thread.createThread(transThread)
 
         # 文字消除
         start = time.time()
@@ -1196,6 +1200,11 @@ class Manga(QWidget) :
             if not sign :
                 return "文字消除过程失败: %s"%ipt_result
         self.trans_process_bar.paintStatus("ipt", round(time.time()-start, 1))
+
+        # 阻塞, 等待翻译完成
+        trans_thread.join()
+        if self.trans_result :
+            return self.trans_result
 
         # 漫画文字渲染
         start = time.time()
