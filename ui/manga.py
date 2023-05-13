@@ -256,10 +256,13 @@ class TransEdit(QWidget) :
         # 刷新大图
         w_rate = self.object.manga_ui.width() / self.object.manga_ui.window_width
         h_rate = self.object.manga_ui.height() / self.object.manga_ui.window_height
+
+        original_image_path = self.object.manga_ui.show_image_widget.original_image_path
         self.object.manga_ui.show_image_scroll_area.setWidget(None)
         self.object.manga_ui.show_image_widget = RenderTextBlock(
             rate=(w_rate, h_rate),
             image_path=self.rdr_image_path,
+            original_image_path=original_image_path,
             json_data=json_data,
             edit_window=self
         )
@@ -399,11 +402,12 @@ def getFontSize(coordinate, trans_text) :
 # 渲染文本块
 class RenderTextBlock(QWidget) :
 
-    def __init__(self, rate, image_path, json_data, edit_window) :
+    def __init__(self, rate, image_path, original_image_path, json_data, edit_window) :
 
         super(RenderTextBlock, self).__init__()
         self.rate = rate
         self.image_path = image_path
+        self.original_image_path = original_image_path
         self.json_data = json_data
         self.trans_edit_ui = edit_window
         self.image_rate = []
@@ -464,6 +468,10 @@ class RenderTextBlock(QWidget) :
             button.setGeometry(x, y, w, h)
             button.setStyleSheet("QPushButton {background: transparent; border: 2px dashed red;}"
                                  "QPushButton:hover {background-color:rgba(62, 62, 62, 0.1)}")
+            # 右键菜单
+            button.setContextMenuPolicy(Qt.CustomContextMenu)
+            button.customContextMenuRequested.connect(lambda _, i=index, size=(x_0, y_0, w_0, h_0) : self.showTextBlockButtonMenu(i, size))
+
             original = ""
             for text in text_block["texts"] :
                 original += text
@@ -519,13 +527,13 @@ class RenderTextBlock(QWidget) :
 
 
     # 图片自适配比例
-    def matchImageSize(self):
+    def matchImageSize(self) :
 
         pixmap = self.image_pixmap
-        if pixmap.height() > self.height():
+        if pixmap.height() > self.height() :
             rate = self.height() / pixmap.height()
             pixmap = pixmap.scaled(pixmap.width()*rate, pixmap.height()*rate)
-        if pixmap.width() > self.width():
+        if pixmap.width() > self.width() :
             rate = self.width() / pixmap.width()
             pixmap = pixmap.scaled(pixmap.width()*rate, pixmap.height()*rate)
         self.image_label.setPixmap(pixmap)
@@ -585,6 +593,47 @@ class RenderTextBlock(QWidget) :
         self.matchImageSize()
         self.matchButtonSize()
         self.rate_label.setGeometry(950*w_rate, 590*h_rete, 30*w_rate, 30*h_rete)
+
+
+    # 文字块按钮右键菜单
+    def showTextBlockButtonMenu(self, index, size) :
+
+        menu = QMenu(self)
+        delete_action = menu.addAction("删除")
+        delete_action.triggered.connect(lambda: self.deleteTextBlock(index, size))
+        cursorPos = QCursor.pos()
+        menu.exec_(cursorPos)
+
+
+    # 删除文本块
+    def deleteTextBlock(self, index, size) :
+
+        if index >= len(self.json_data["text_block"]) or index >= len(self.json_data["translated_text"]) :
+            return
+        # 打开原图, 按照文本块坐标截图
+        image = Image.open(self.original_image_path)
+        x, y, w, h = size[0], size[1], size[2], size[3]
+        cropped_image = image.crop((x, y, x + w, y + h))
+        # 打开rdr图片, 将截图贴图
+        rdr_image = Image.open(self.image_path)
+        rdr_image.paste(cropped_image, (x, y))
+        rdr_image.save(self.image_path)
+
+        # 刷新缓存文件中获取json结果
+        file_name = os.path.splitext(os.path.basename(self.original_image_path))[0]
+        json_file_path = os.path.join(os.path.dirname(self.image_path), "tmp", "%s.json"%file_name)
+        with open(json_file_path, "r", encoding="utf-8") as file :
+            json_data = json.load(file)
+        del json_data["translated_text"][index]
+        del json_data["text_block"][index]
+        # 缓存ocr结果
+        with open(json_file_path, "w", encoding="utf-8") as file :
+            json.dump(json_data, file, indent=4)
+        # 隐藏该文本框按钮
+        button = self.button_list[index]
+        button.close()
+        # 刷新图片
+        self.loadImage()
 
 
 # 自定义按键实现鼠标进入显示, 移出隐藏
@@ -1440,6 +1489,7 @@ class Manga(QWidget) :
     # 渲染图片和文本块
     def renderImageAndTextBlock(self, image_path, show_type) :
 
+        original_image_path = image_path
         if show_type == "original" :
             json_data = None
         elif show_type == "edit" :
@@ -1458,6 +1508,7 @@ class Manga(QWidget) :
         self.show_image_widget = RenderTextBlock(
             rate=(w_rate, h_rate),
             image_path=image_path,
+            original_image_path=original_image_path,
             json_data=json_data,
             edit_window=self.trans_edit_ui
         )
