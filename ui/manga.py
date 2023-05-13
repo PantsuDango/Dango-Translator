@@ -318,6 +318,7 @@ class TransEdit(QWidget) :
             text = self.trans_text.toPlainText()
             self.trans_text.clear()
             self.trans_text.setTextColor(color)
+            self.trans_text.insertPlainText(text)
         self.show()
 
 
@@ -420,7 +421,7 @@ class RenderTextBlock(QWidget) :
         self.setCursor(ui.static.icon.PIXMAP_CURSOR)
 
         # 图片大图展示
-        self.scroll_area = QScrollArea(self)
+        self.scroll_area = CustomScrollArea(self)
         self.scroll_area.setGeometry(0, 0, self.width(), self.height())
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
@@ -603,6 +604,16 @@ class CustomButton(QPushButton) :
         return super().leaveEvent(a0)
 
 
+# 自定义QScrollArea禁用鼠标滚轮控制滚动条
+class CustomScrollArea(QScrollArea) :
+
+    def __init__(self, parent=None) :
+        super().__init__(parent)
+
+    def wheelEvent(self, event) :
+        event.ignore()  # 取消事件的传递，禁用滚轮控制滚动条
+
+
 # 漫画翻译界面
 class Manga(QWidget) :
 
@@ -749,7 +760,7 @@ class Manga(QWidget) :
         self.trans_image_widget.setSpacing(5)
 
         # 图片大图展示
-        self.show_image_scroll_area = QScrollArea(self)
+        self.show_image_scroll_area = CustomScrollArea(self)
         self.show_image_scroll_area.setWidgetResizable(True)
         self.show_image_scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.show_image_scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
