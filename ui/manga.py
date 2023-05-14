@@ -464,7 +464,7 @@ class RenderTextBlock(QWidget) :
             font_color = tuple(text_block["foreground_color"])
             bg_color = tuple(text_block["background_color"])
             # 绘制矩形框
-            button = QPushButton(self.image_label)
+            button = CustomTextBlockButton(self.image_label)
             button.setGeometry(x, y, w, h)
             button.setStyleSheet("QPushButton {background: transparent; border: 2px dashed red;}"
                                  "QPushButton:hover {background-color:rgba(62, 62, 62, 0.1)}")
@@ -1668,3 +1668,39 @@ class Manga(QWidget) :
         self.object.translation_ui.show()
         if self.object.range_ui.show_sign == True:
             self.object.range_ui.show()
+
+
+# 自定义TextBlock的按钮
+class CustomTextBlockButton(QPushButton) :
+
+    move_signal = pyqtSignal(bool)
+
+    def __init__(self, text) :
+        super().__init__(text)
+
+    # 鼠标移动事件
+    def mouseMoveEvent(self, e: QMouseEvent):
+        try:
+            self._endPos = e.pos() - self._startPos
+            self.move(self.pos() + self._endPos)
+        except Exception:
+            pass
+
+    # 鼠标按下事件
+    def mousePressEvent(self, e: QMouseEvent):
+        try:
+            if e.button() == Qt.LeftButton:
+                self._isTracking = True
+                self._startPos = QPoint(e.x(), e.y())
+        except Exception:
+            pass
+
+    # 鼠标松开事件
+    def mouseReleaseEvent(self, e: QMouseEvent):
+        try:
+            if e.button() == Qt.LeftButton:
+                self._isTracking = False
+                self._startPos = None
+                self._endPos = None
+        except Exception:
+            pass
