@@ -458,6 +458,9 @@ def mangaRDR(object, trans_list, inpainted_image, text_block) :
     sign = False
     result = "请求漫画文本渲染服务失败: "
     try :
+        # 缓存ocr结果
+        with open("req.json", "w", encoding="utf-8") as file:
+            json.dump(body, file, indent=4)
         res = utils.http.post(url=url, body=body, logger=object.logger, timeout=20)
     except Exception as err :
         result += str(err)

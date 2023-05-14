@@ -258,11 +258,13 @@ class TransEdit(QWidget) :
         h_rate = self.object.manga_ui.height() / self.object.manga_ui.window_height
 
         original_image_path = self.object.manga_ui.show_image_widget.original_image_path
+        ipt_image_path = self.object.manga_ui.show_image_widget.ipt_image_path
         self.object.manga_ui.show_image_scroll_area.setWidget(None)
         self.object.manga_ui.show_image_widget = RenderTextBlock(
             rate=(w_rate, h_rate),
             image_path=self.rdr_image_path,
             original_image_path=original_image_path,
+            ipt_image_path=ipt_image_path,
             json_data=json_data,
             edit_window=self
         )
@@ -402,12 +404,13 @@ def getFontSize(coordinate, trans_text) :
 # 渲染文本块
 class RenderTextBlock(QWidget) :
 
-    def __init__(self, rate, image_path, original_image_path, json_data, edit_window) :
+    def __init__(self, rate, image_path, original_image_path, ipt_image_path, json_data, edit_window) :
 
         super(RenderTextBlock, self).__init__()
         self.rate = rate
         self.image_path = image_path
         self.original_image_path = original_image_path
+        self.ipt_image_path = ipt_image_path
         self.json_data = json_data
         self.trans_edit_ui = edit_window
         self.image_rate = []
@@ -464,7 +467,13 @@ class RenderTextBlock(QWidget) :
             font_color = tuple(text_block["foreground_color"])
             bg_color = tuple(text_block["background_color"])
             # 绘制矩形框
-            button = CustomTextBlockButton(self.image_label)
+            button = CustomTextBlockButton(
+                self.image_label,
+                original_site=(x_0, y_0, w_0, h_0),
+                text_block=text_block,
+                trans_text=trans_text
+            )
+            button.move_signal.connect(self.refreshTextBlockPosition)
             button.setGeometry(x, y, w, h)
             button.setStyleSheet("QPushButton {background: transparent; border: 2px dashed red;}"
                                  "QPushButton:hover {background-color:rgba(62, 62, 62, 0.1)}")
@@ -634,6 +643,67 @@ class RenderTextBlock(QWidget) :
         button.close()
         # 刷新图片
         self.loadImage()
+
+
+    # 移动文本块位置后重新渲染
+    def refreshTextBlockPosition(self, original_site, now_site, text_block, trans_text) :
+
+        try :
+            # ipt截图
+            ipt_image = Image.open(self.ipt_image_path)
+            cropped_image = ipt_image.crop((
+                original_site[0],
+                original_site[1],
+                original_site[0] + original_site[2],
+                original_site[1] + original_site[3]
+            ))
+            # 打开rdr图片, 将截图贴图
+            rdr_image = Image.open(self.image_path)
+            rdr_image.paste(cropped_image, (original_site[0], original_site[1]))
+
+            # 新位置ipt截图
+            x = round(now_site[0] / self.image_rate[0])
+            y = round(now_site[1] / self.image_rate[1])
+            w = round(now_site[2] / self.image_rate[0])
+            h = round(now_site[3] / self.image_rate[1])
+            cropped_image = ipt_image.crop((x, y, x + w, y + h))
+            # 截图转换为base64
+            buffered = io.BytesIO()
+            cropped_image.save(buffered, format="PNG")
+            inpainted_image = base64.b64encode(buffered.getvalue()).decode("utf-8")
+
+            # 重新计算截图后的坐标
+            text_block["block_coordinate"]["upper_left"] = [0, 0]
+            text_block["block_coordinate"]["upper_right"] = [w, 0]
+            text_block["block_coordinate"]["lower_right"] = [w, h]
+            text_block["block_coordinate"]["lower_left"] = [0, h]
+            for index, val in enumerate(text_block["coordinate"]):
+                coordinate = {}
+                for k in val.keys():
+                    coordinate[k] = [val[k][0] - x, val[k][1] - y]
+                text_block["coordinate"][index] = coordinate
+
+            # 漫画rdr
+            sign, result = translator.ocr.dango.mangaRDR(
+                object=self.trans_edit_ui.object,
+                trans_list=[trans_text],
+                inpainted_image=inpainted_image,
+                text_block=[text_block]
+            )
+            if not sign:
+                print(result)
+                # @TODO 错误处理
+                return
+
+            # 渲染后的新图贴在rdr大图上
+            rdr_image.paste(Image.open(io.BytesIO(base64.b64decode(result["rendered_image"]))), (x, y))
+            rdr_image.save(self.image_path)
+            # 刷新图片
+            self.loadImage()
+        except Exception :
+            from traceback import print_exc
+            print_exc()
+
 
 
 # 自定义按键实现鼠标进入显示, 移出隐藏
@@ -1490,6 +1560,7 @@ class Manga(QWidget) :
     def renderImageAndTextBlock(self, image_path, show_type) :
 
         original_image_path = image_path
+        ipt_image_path = self.getIptFilePath(image_path)
         if show_type == "original" :
             json_data = None
         elif show_type == "edit" :
@@ -1509,6 +1580,7 @@ class Manga(QWidget) :
             rate=(w_rate, h_rate),
             image_path=image_path,
             original_image_path=original_image_path,
+            ipt_image_path=ipt_image_path,
             json_data=json_data,
             edit_window=self.trans_edit_ui
         )
@@ -1673,13 +1745,17 @@ class Manga(QWidget) :
 # 自定义TextBlock的按钮
 class CustomTextBlockButton(QPushButton) :
 
-    move_signal = pyqtSignal(bool)
+    move_signal = pyqtSignal(tuple, tuple, dict, str)
 
-    def __init__(self, text) :
+    def __init__(self, text, original_site, text_block, trans_text) :
         super().__init__(text)
+        self.original_site = original_site
+        self.text_block = text_block
+        self.trans_text = trans_text
+
 
     # 鼠标移动事件
-    def mouseMoveEvent(self, e: QMouseEvent):
+    def mouseMoveEvent(self, e: QMouseEvent) :
         try:
             self._endPos = e.pos() - self._startPos
             self.move(self.pos() + self._endPos)
@@ -1687,18 +1763,25 @@ class CustomTextBlockButton(QPushButton) :
             pass
 
     # 鼠标按下事件
-    def mousePressEvent(self, e: QMouseEvent):
+    def mousePressEvent(self, e: QMouseEvent) :
         try:
-            if e.button() == Qt.LeftButton:
+            if e.button() == Qt.LeftButton :
                 self._isTracking = True
                 self._startPos = QPoint(e.x(), e.y())
         except Exception:
             pass
 
     # 鼠标松开事件
-    def mouseReleaseEvent(self, e: QMouseEvent):
+    def mouseReleaseEvent(self, e: QMouseEvent) :
         try:
-            if e.button() == Qt.LeftButton:
+            if e.button() == Qt.LeftButton :
+                if self._endPos :
+                    self.move_signal.emit(
+                        self.original_site,
+                        (self.x(), self.y(), self.width(), self.height()),
+                        self.text_block,
+                        self.trans_text
+                    )
                 self._isTracking = False
                 self._startPos = None
                 self._endPos = None
