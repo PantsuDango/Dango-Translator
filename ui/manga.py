@@ -15,6 +15,7 @@ from math import sqrt
 import webbrowser
 import qtawesome
 from PIL import Image
+import traceback
 
 import ui.static.icon
 import utils.translater
@@ -473,26 +474,27 @@ class RenderTextBlock(QWidget) :
                 text_block=text_block,
                 trans_text=trans_text
             )
+            button.click_signal.connect(self.clickTextBlock)
             button.move_signal.connect(self.refreshTextBlockPosition)
             button.setGeometry(x, y, w, h)
-            button.setStyleSheet("QPushButton {background: transparent; border: 2px dashed red;}"
+            button.setStyleSheet("QPushButton {background: transparent; border: 2px solid red;}"
                                  "QPushButton:hover {background-color:rgba(62, 62, 62, 0.1)}")
             # 右键菜单
             button.setContextMenuPolicy(Qt.CustomContextMenu)
             button.customContextMenuRequested.connect(lambda _, i=index, size=(x_0, y_0, w_0, h_0) : self.showTextBlockButtonMenu(i, size))
-
+            # 文本块信息
             original = ""
             for text in text_block["texts"] :
                 original += text
-            button.clicked.connect(lambda _,
-                                          x=original,
-                                          y=trans_text,
-                                          z=font_color,
-                                          f=bg_color,
-                                          j=(x_0, y_0, w_0, h_0),
-                                          k=text_block,
-                                          i=index :
-                                   self.clickTextBlock(x, y, z, f, j, k, i))
+            button.initConfig(
+                original=original,
+                trans=trans_text,
+                font_color=font_color,
+                bg_color=bg_color,
+                rect=(x_0, y_0, w_0, h_0),
+                text_block=text_block,
+                index=index
+            )
             index += 1
             self.button_list.append(button)
 
@@ -657,6 +659,12 @@ class RenderTextBlock(QWidget) :
                 original_site[0] + original_site[2],
                 original_site[1] + original_site[3]
             ))
+            print((
+                original_site[0],
+                original_site[1],
+                original_site[0] + original_site[2],
+                original_site[1] + original_site[3]
+            ))
             # 打开rdr图片, 将截图贴图
             rdr_image = Image.open(self.image_path)
             rdr_image.paste(cropped_image, (original_site[0], original_site[1]))
@@ -664,8 +672,8 @@ class RenderTextBlock(QWidget) :
             # 新位置ipt截图
             x = round(now_site[0] / self.image_rate[0])
             y = round(now_site[1] / self.image_rate[1])
-            w = round(now_site[2] / self.image_rate[0])
-            h = round(now_site[3] / self.image_rate[1])
+            w = original_site[2]
+            h = original_site[3]
             cropped_image = ipt_image.crop((x, y, x + w, y + h))
             # 截图转换为base64
             buffered = io.BytesIO()
@@ -1645,7 +1653,7 @@ class Manga(QWidget) :
         self.customSetGeometry(self.input_image_button, 0, 0, 120, 35, w_rate, h_rate)
         # 底部状态栏
         self.status_label.setGeometry(
-            10 * w_rate, h- 30 * h_rate,
+            10 * w_rate, h - 30 * h_rate,
             w, 30 * h_rate
         )
         # 一键翻译按钮
@@ -1746,6 +1754,7 @@ class Manga(QWidget) :
 class CustomTextBlockButton(QPushButton) :
 
     move_signal = pyqtSignal(tuple, tuple, dict, str)
+    click_signal = pyqtSignal(str, str, tuple, tuple, tuple, dict, int)
 
     def __init__(self, text, original_site, text_block, trans_text) :
         super().__init__(text)
@@ -1753,13 +1762,22 @@ class CustomTextBlockButton(QPushButton) :
         self.text_block = text_block
         self.trans_text = trans_text
 
+    # 参数初始化
+    def initConfig(self, original, trans, font_color, bg_color, rect, text_block, index) :
+        self.original = original
+        self.trans = trans
+        self.font_color = font_color
+        self.bg_color = bg_color
+        self.rect = rect
+        self.text_block = text_block
+        self.index = index
 
     # 鼠标移动事件
     def mouseMoveEvent(self, e: QMouseEvent) :
         try:
             self._endPos = e.pos() - self._startPos
             self.move(self.pos() + self._endPos)
-        except Exception:
+        except Exception :
             pass
 
     # 鼠标按下事件
@@ -1768,7 +1786,7 @@ class CustomTextBlockButton(QPushButton) :
             if e.button() == Qt.LeftButton :
                 self._isTracking = True
                 self._startPos = QPoint(e.x(), e.y())
-        except Exception:
+        except Exception :
             pass
 
     # 鼠标松开事件
@@ -1782,8 +1800,23 @@ class CustomTextBlockButton(QPushButton) :
                         self.text_block,
                         self.trans_text
                     )
+                else :
+                    self.clickSignalEmit()
                 self._isTracking = False
                 self._startPos = None
                 self._endPos = None
-        except Exception:
+        except Exception :
+            self.clickSignalEmit()
             pass
+
+    # 发送点击信号
+    def clickSignalEmit(self):
+        self.click_signal.emit(
+            self.original,
+            self.trans,
+            self.font_color,
+            self.bg_color,
+            self.rect,
+            self.text_block,
+            self.index,
+        )
