@@ -648,70 +648,100 @@ class RenderTextBlock(QWidget) :
 
 
     # 移动文本块位置后重新渲染
-    def refreshTextBlockPosition(self, original_site, now_site, text_block, trans_text) :
+    def refreshTextBlockPosition(self, original_site, now_site, text_block, trans_text, index) :
 
-        try :
-            # ipt截图
-            ipt_image = Image.open(self.ipt_image_path)
-            cropped_image = ipt_image.crop((
-                original_site[0],
-                original_site[1],
-                original_site[0] + original_site[2],
-                original_site[1] + original_site[3]
-            ))
-            print((
-                original_site[0],
-                original_site[1],
-                original_site[0] + original_site[2],
-                original_site[1] + original_site[3]
-            ))
-            # 打开rdr图片, 将截图贴图
-            rdr_image = Image.open(self.image_path)
-            rdr_image.paste(cropped_image, (original_site[0], original_site[1]))
+        # 原坐标
+        x_0 = original_site[0]
+        y_0 = original_site[1]
+        w_0 = original_site[2]
+        h_0 = original_site[3]
+        # 当前坐标
+        x_n = round(now_site[0] / self.image_rate[0])
+        y_n = round(now_site[1] / self.image_rate[1])
+        w_n = w_0
+        h_n = h_0
 
-            # 新位置ipt截图
-            x = round(now_site[0] / self.image_rate[0])
-            y = round(now_site[1] / self.image_rate[1])
-            w = original_site[2]
-            h = original_site[3]
-            cropped_image = ipt_image.crop((x, y, x + w, y + h))
-            # 截图转换为base64
-            buffered = io.BytesIO()
-            cropped_image.save(buffered, format="PNG")
-            inpainted_image = base64.b64encode(buffered.getvalue()).decode("utf-8")
+        # 基于原坐标, 对ipt截图
+        ipt_image = Image.open(self.ipt_image_path)
+        cropped_image = ipt_image.crop((x_0, y_0, x_0 + w_0, y_0 + h_0))
+        # 打开rdr图片, 将截图贴图
+        rdr_image = Image.open(self.image_path)
+        rdr_image.paste(cropped_image, (x_0, y_0))
 
-            # 重新计算截图后的坐标
-            text_block["block_coordinate"]["upper_left"] = [0, 0]
-            text_block["block_coordinate"]["upper_right"] = [w, 0]
-            text_block["block_coordinate"]["lower_right"] = [w, h]
-            text_block["block_coordinate"]["lower_left"] = [0, h]
-            for index, val in enumerate(text_block["coordinate"]):
-                coordinate = {}
-                for k in val.keys():
-                    coordinate[k] = [val[k][0] - x, val[k][1] - y]
-                text_block["coordinate"][index] = coordinate
+        # 新位置ipt截图
+        cropped_image = ipt_image.crop((x_n, y_n, x_n + w_n, y_n + h_n))
+        # 截图转换为base64
+        buffered = io.BytesIO()
+        cropped_image.save(buffered, format="PNG")
+        image_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
 
-            # 漫画rdr
-            sign, result = translator.ocr.dango.mangaRDR(
-                object=self.trans_edit_ui.object,
-                trans_list=[trans_text],
-                inpainted_image=inpainted_image,
-                text_block=[text_block]
-            )
-            if not sign:
-                print(result)
-                # @TODO 错误处理
-                return
+        # 重新计算截图后的坐标
+        text_block["block_coordinate"]["upper_left"] = [0, 0]
+        text_block["block_coordinate"]["upper_right"] = [w_n, 0]
+        text_block["block_coordinate"]["lower_right"] = [w_n, h_n]
+        text_block["block_coordinate"]["lower_left"] = [0, h_n]
+        for i, val in enumerate(text_block["coordinate"]):
+            coordinate = {}
+            for k in val.keys():
+                coordinate[k] = [val[k][0] - x_0, val[k][1] - y_0]
+            text_block["coordinate"][i] = coordinate
 
-            # 渲染后的新图贴在rdr大图上
-            rdr_image.paste(Image.open(io.BytesIO(base64.b64decode(result["rendered_image"]))), (x, y))
-            rdr_image.save(self.image_path)
-            # 刷新图片
-            self.loadImage()
-        except Exception :
-            from traceback import print_exc
-            print_exc()
+        # 调用漫画rdr
+        sign, result = translator.ocr.dango.mangaRDR(
+            object=self.trans_edit_ui.object,
+            trans_list=[trans_text],
+            inpainted_image=image_base64,
+            text_block=[text_block]
+        )
+        if not sign or not result.get("rendered_image", ""):
+            print(result)
+            # @TODO 错误处理
+            return
 
+        # 渲染后的新图贴在rdr大图上
+        image_base64 = base64.b64decode(result["rendered_image"])
+        cropped_image = Image.open(io.BytesIO(image_base64))
+        rdr_image.paste(cropped_image, (x_n, y_n))
+        rdr_image.save(self.image_path)
+
+        # 获取文件名
+        file_name = os.path.splitext(os.path.basename(self.original_image_path))[0]
+        # 获取ocr缓存文件路径
+        json_file_path = os.path.join(os.path.dirname(self.ipt_image_path), "%s.json"%file_name)
+        # 从缓存文件中获取ocr信息
+        with open(json_file_path, "r", encoding="utf-8") as file :
+            json_data = json.load(file)
+
+        # 修改移动后的block_coordinate
+        block_coordinate = json_data["text_block"][index]["block_coordinate"]
+        block_coordinate["upper_left"] = [x_n, y_n]
+        block_coordinate["upper_right"] = [x_n + w_n, y_n]
+        block_coordinate["lower_right"] = [x_n + w_n, y_n + h_n]
+        block_coordinate["lower_left"] = [x_n, y_n + h_n]
+        json_data["text_block"][index]["block_coordinate"] = block_coordinate
+
+        # 修改移动后的coordinate
+        coordinate = json_data["text_block"][index]["coordinate"]
+        for i, val in enumerate(coordinate) :
+            tmp_coordinate = {}
+            for k in val.keys() :
+                tmp_coordinate[k] = [
+                    val[k][0] - (x_0 - x_n),
+                    val[k][1] - (y_0 - y_n)
+                ]
+            coordinate[i] = tmp_coordinate
+        json_data["text_block"][index]["coordinate"] = coordinate
+
+        # 缓存修改后的ocr结果
+        with open(json_file_path, "w", encoding="utf-8") as file :
+            json.dump(json_data, file, indent=4)
+
+        # 刷新按钮信息
+        button = self.button_list[index]
+        button.original_site = (x_n, y_n, w_n, h_n)
+        button.text_block = json_data["text_block"][index]
+        # 刷新图片
+        self.loadImage()
 
 
 # 自定义按键实现鼠标进入显示, 移出隐藏
@@ -1753,17 +1783,24 @@ class Manga(QWidget) :
 # 自定义TextBlock的按钮
 class CustomTextBlockButton(QPushButton) :
 
-    move_signal = pyqtSignal(tuple, tuple, dict, str)
+    move_signal = pyqtSignal(tuple, tuple, dict, str, int)
     click_signal = pyqtSignal(str, str, tuple, tuple, tuple, dict, int)
 
     def __init__(self, text, original_site, text_block, trans_text) :
+
         super().__init__(text)
         self.original_site = original_site
         self.text_block = text_block
         self.trans_text = trans_text
+        self._move = False
+        self._isTracking = False
+        self._startPos = None
+        self._endPos = None
+
 
     # 参数初始化
     def initConfig(self, original, trans, font_color, bg_color, rect, text_block, index) :
+
         self.original = original
         self.trans = trans
         self.font_color = font_color
@@ -1772,45 +1809,55 @@ class CustomTextBlockButton(QPushButton) :
         self.text_block = text_block
         self.index = index
 
+
     # 鼠标移动事件
     def mouseMoveEvent(self, e: QMouseEvent) :
-        try:
+
+        try :
             self._endPos = e.pos() - self._startPos
             self.move(self.pos() + self._endPos)
+            self._move = True
         except Exception :
-            pass
+            traceback.print_exc()
+
 
     # 鼠标按下事件
     def mousePressEvent(self, e: QMouseEvent) :
-        try:
+
+        try :
             if e.button() == Qt.LeftButton :
                 self._isTracking = True
                 self._startPos = QPoint(e.x(), e.y())
         except Exception :
-            pass
+            traceback.print_exc()
+
 
     # 鼠标松开事件
     def mouseReleaseEvent(self, e: QMouseEvent) :
-        try:
+
+        try :
             if e.button() == Qt.LeftButton :
-                if self._endPos :
+                if self._move :
                     self.move_signal.emit(
                         self.original_site,
                         (self.x(), self.y(), self.width(), self.height()),
                         self.text_block,
-                        self.trans_text
+                        self.trans_text,
+                        self.index
                     )
                 else :
                     self.clickSignalEmit()
                 self._isTracking = False
                 self._startPos = None
                 self._endPos = None
+                self._move = False
         except Exception :
-            self.clickSignalEmit()
-            pass
+            traceback.print_exc()
+
 
     # 发送点击信号
-    def clickSignalEmit(self):
+    def clickSignalEmit(self) :
+
         self.click_signal.emit(
             self.original,
             self.trans,
