@@ -479,8 +479,7 @@ class RenderTextBlock(QWidget) :
                                  "QPushButton:hover {background-color:rgba(62, 62, 62, 0.1)}")
             # 文本框右键菜单
             button.setContextMenuPolicy(Qt.CustomContextMenu)
-            button.customContextMenuRequested.connect(lambda _, i=index, size=(x_0, y_0, w_0, h_0) :
-                                                      self.showTextBlockButtonMenu(i, size))
+            button.customContextMenuRequested.connect(lambda _, b=button: self.showTextBlockButtonMenu(b))
             index += 1
             self.button_list.append(button)
 
@@ -584,23 +583,21 @@ class RenderTextBlock(QWidget) :
 
 
     # 文字块按钮右键菜单
-    def showTextBlockButtonMenu(self, index, size) :
+    def showTextBlockButtonMenu(self, button) :
 
         menu = QMenu(self)
         delete_action = menu.addAction("删除")
-        delete_action.triggered.connect(lambda: self.deleteTextBlock(index, size))
+        delete_action.triggered.connect(lambda: self.deleteTextBlock(button))
         cursorPos = QCursor.pos()
         menu.exec_(cursorPos)
 
 
     # 删除文本块
-    def deleteTextBlock(self, index, size) :
+    def deleteTextBlock(self, button) :
 
-        if index >= len(self.json_data["text_block"]) or index >= len(self.json_data["translated_text"]) :
-            return
         # 打开原图, 按照文本块坐标截图
         image = Image.open(self.original_image_path)
-        x, y, w, h = size[0], size[1], size[2], size[3]
+        x, y, w, h = button.rect[0], button.rect[1], button.rect[2], button.rect[3]
         cropped_image = image.crop((x, y, x + w, y + h))
         # 打开rdr图片, 将截图贴图
         rdr_image = Image.open(self.image_path)
@@ -609,17 +606,20 @@ class RenderTextBlock(QWidget) :
 
         # 刷新缓存文件中获取json结果
         file_name = os.path.splitext(os.path.basename(self.original_image_path))[0]
-        json_file_path = os.path.join(os.path.dirname(self.image_path), "tmp", "%s.json"%file_name)
+        json_file_path = os.path.join(os.path.dirname(self.ipt_image_path), "%s.json"%file_name)
         with open(json_file_path, "r", encoding="utf-8") as file :
             json_data = json.load(file)
-        del json_data["translated_text"][index]
-        del json_data["text_block"][index]
+        del json_data["translated_text"][button.index]
+        del json_data["text_block"][button.index]
         # 缓存ocr结果
         with open(json_file_path, "w", encoding="utf-8") as file :
             json.dump(json_data, file, indent=4)
-        # 隐藏该文本框按钮
-        button = self.button_list[index]
+        # 删除文本框按钮
         button.close()
+        del self.button_list[button.index]
+        # 刷新文本框按钮索引值
+        for i, button in enumerate(self.button_list) :
+            button.index = i
         # 刷新图片
         self.loadImage()
 
