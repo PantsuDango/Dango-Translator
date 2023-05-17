@@ -39,12 +39,9 @@ class TransEdit(QWidget) :
         self.object = object
         self.rate = object.yaml["screen_scale_rate"]
         self.logger = object.logger
-        self.font_color = ""
-        self.bg_color = ""
-        self.rect = []
-        self.rdr_image_path = ""
-        self.text_block = {}
-        self.index = 0
+        self.font_color = "#83AAF9"
+        self.bg_color = "#83AAF9"
+        self.button = None
         self.ui()
 
 
@@ -189,90 +186,88 @@ class TransEdit(QWidget) :
     # 重新渲染文字
     def renderTextBlock(self) :
 
-        # 获取ipt图片路径
-        file_name = os.path.splitext(os.path.basename(self.rdr_image_path))[0]
-        ipt_image_path = os.path.join(os.path.dirname(self.rdr_image_path), "tmp", "{}_ipt.png".format(file_name))
+        try :
+            if not self.button :
+                return
 
-        # 打开ipt图片, 按照文本块坐标截图
-        image = Image.open(ipt_image_path)
-        x, y, w, h = self.rect[0], self.rect[1], self.rect[2], self.rect[3]
-        cropped_image = image.crop((x, y, x + w, y + h))
+            # 打开ipt图片, 按照文本块坐标截图
+            image = Image.open(self.button.ipt_image_path)
+            x = self.button.rect[0]
+            y = self.button.rect[1]
+            w = self.button.rect[2]
+            h = self.button.rect[3]
+            cropped_image = image.crop((x, y, x + w, y + h))
 
-        # 截图转换为base64
-        buffered = io.BytesIO()
-        cropped_image.save(buffered, format="PNG")
-        inpainted_image = base64.b64encode(buffered.getvalue()).decode("utf-8")
+            # 截图转换为base64
+            buffered = io.BytesIO()
+            cropped_image.save(buffered, format="PNG")
+            image_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
 
-        text_block = copy.deepcopy(self.text_block)
-        # 修改字体颜色
-        color = QColor(self.font_color)
-        f_r, f_g, f_b, f_a = color.getRgb()
-        text_block["foreground_color"] = [f_r, f_g, f_b]
-        # 修改轮廓颜色
-        color = QColor(self.bg_color)
-        b_r, b_g, b_b, b_a = color.getRgb()
-        text_block["background_color"] = [b_r, b_g, b_b]
+            text_block = copy.deepcopy(self.button.text_block)
+            # 修改字体颜色
+            color = QColor(self.font_color)
+            f_r, f_g, f_b, f_a = color.getRgb()
+            text_block["foreground_color"] = [f_r, f_g, f_b]
+            # 修改轮廓颜色
+            color = QColor(self.bg_color)
+            b_r, b_g, b_b, b_a = color.getRgb()
+            text_block["background_color"] = [b_r, b_g, b_b]
 
-        # 重新计算截图后的坐标
-        text_block["block_coordinate"]["upper_left"] = [0, 0]
-        text_block["block_coordinate"]["upper_right"] = [w, 0]
-        text_block["block_coordinate"]["lower_right"] = [w, h]
-        text_block["block_coordinate"]["lower_left"] = [0, h]
-        for index, val in enumerate(text_block["coordinate"]) :
-            coordinate = {}
-            for k in val.keys() :
-                coordinate[k] = [val[k][0]-x, val[k][1]-y]
-            text_block["coordinate"][index] = coordinate
+            # 重新计算截图后的坐标
+            text_block["block_coordinate"]["upper_left"] = [0, 0]
+            text_block["block_coordinate"]["upper_right"] = [w, 0]
+            text_block["block_coordinate"]["lower_right"] = [w, h]
+            text_block["block_coordinate"]["lower_left"] = [0, h]
+            for i, val in enumerate(text_block["coordinate"]) :
+                coordinate = {}
+                for k in val.keys() :
+                    coordinate[k] = [val[k][0] - x, val[k][1] - y]
+                text_block["coordinate"][i] = coordinate
 
-        # 漫画rdr
-        sign, result = translator.ocr.dango.mangaRDR(
-            object=self.object,
-            trans_list=[self.trans_text.toPlainText()],
-            inpainted_image=inpainted_image,
-            text_block=[text_block]
-        )
-        if not sign :
-            print(result)
-            #@TODO 错误处理
-            return
+            # 漫画rdr
+            sign, result = translator.ocr.dango.mangaRDR(
+                object=self.object,
+                trans_list=[self.trans_text.toPlainText()],
+                inpainted_image=image_base64,
+                text_block=[text_block]
+            )
+            if not sign or not result.get("rendered_image", "") :
+                print(result)
+                #@TODO 错误处理
+                return
 
-        # 渲染后的新图贴在大图上
-        ipt_image = Image.open(io.BytesIO(base64.b64decode(result["rendered_image"])))
-        rdr_image = Image.open(self.rdr_image_path)
-        rdr_image.paste(ipt_image, (x, y))
-        rdr_image.save(self.rdr_image_path)
+            # 渲染后的新图贴在大图上
+            image_base64 = base64.b64decode(result["rendered_image"])
+            cropped_image = Image.open(io.BytesIO(image_base64))
+            rdr_image = Image.open(self.button.rdr_image_path)
+            rdr_image.paste(cropped_image, (x, y))
+            rdr_image.save(self.button.rdr_image_path)
 
-        # 刷新缓存文件中获取json结果
-        json_file_path = os.path.join(os.path.dirname(ipt_image_path), "%s.json" % file_name)
-        with open(json_file_path, "r", encoding="utf-8") as file :
-            json_data = json.load(file)
-        json_data["translated_text"][self.index] = self.trans_text.toPlainText()
-        json_data["text_block"][self.index]["foreground_color"] = [f_r, f_g, f_b]
-        json_data["text_block"][self.index]["background_color"] = [b_r, b_g, b_b]
+            # 刷新缓存文件中获取json结果
+            file_name = os.path.splitext(os.path.basename(self.button.original_image_path))[0]
+            json_file_path = os.path.join(os.path.dirname(self.button.ipt_image_path), "%s.json"%file_name)
+            with open(json_file_path, "r", encoding="utf-8") as file :
+                json_data = json.load(file)
+            json_data["translated_text"][self.button.index] = self.trans_text.toPlainText()
+            json_data["text_block"][self.button.index]["foreground_color"] = [f_r, f_g, f_b]
+            json_data["text_block"][self.button.index]["background_color"] = [b_r, b_g, b_b]
 
-        # 缓存ocr结果
-        with open(json_file_path, "w", encoding="utf-8") as file :
-            json.dump(json_data, file, indent=4)
+            # 缓存ocr结果
+            with open(json_file_path, "w", encoding="utf-8") as file :
+                json.dump(json_data, file, indent=4)
 
-        # 刷新大图
-        w_rate = self.object.manga_ui.width() / self.object.manga_ui.window_width
-        h_rate = self.object.manga_ui.height() / self.object.manga_ui.window_height
+            # 刷新文本块按钮信息
+            self.button.text_block = json_data["text_block"][self.button.index]
+            self.button.trans = self.trans_text.toPlainText()
+            self.button.font_color = [f_r, f_g, f_b]
+            self.button.bg_color = [b_r, b_g, b_b]
+            # 刷新大图
+            self.object.manga_ui.show_image_widget.loadImage()
+            self.object.manga_ui.show_image_widget.matchButtonSize()
+            self.close()
 
-        original_image_path = self.object.manga_ui.show_image_widget.original_image_path
-        ipt_image_path = self.object.manga_ui.show_image_widget.ipt_image_path
-        self.object.manga_ui.show_image_scroll_area.setWidget(None)
-        self.object.manga_ui.show_image_widget = RenderTextBlock(
-            rate=(w_rate, h_rate),
-            image_path=self.rdr_image_path,
-            original_image_path=original_image_path,
-            ipt_image_path=ipt_image_path,
-            json_data=json_data,
-            edit_window=self
-        )
-        self.object.manga_ui.show_image_scroll_area.setWidget(self.object.manga_ui.show_image_widget)
-        self.object.manga_ui.show_image_scroll_area.show()
-
-        self.close()
+        except Exception :
+            traceback.print_exc()
 
 
     # 刷新翻译结果
@@ -464,37 +459,28 @@ class RenderTextBlock(QWidget) :
             y = y_0*self.image_rate[1]
             w = w_0*self.image_rate[0]
             h = h_0*self.image_rate[1]
-            # 文本颜色
-            font_color = tuple(text_block["foreground_color"])
-            bg_color = tuple(text_block["background_color"])
             # 绘制矩形框
-            button = CustomTextBlockButton(
-                self.image_label,
-                original_site=(x_0, y_0, w_0, h_0),
+            button = CustomTextBlockButton(self.image_label)
+            button.initConfig(
                 text_block=text_block,
-                trans_text=trans_text
+                trans=trans_text,
+                rect=(x_0, y_0, w_0, h_0),
+                index=index,
+                original_image_path=self.original_image_path,
+                ipt_image_path=self.ipt_image_path,
+                rdr_image_path=self.image_path
             )
+            # 打开文本框编辑信号
             button.click_signal.connect(self.clickTextBlock)
+            # 移动文本框信号
             button.move_signal.connect(self.refreshTextBlockPosition)
             button.setGeometry(x, y, w, h)
             button.setStyleSheet("QPushButton {background: transparent; border: 2px solid red;}"
                                  "QPushButton:hover {background-color:rgba(62, 62, 62, 0.1)}")
-            # 右键菜单
+            # 文本框右键菜单
             button.setContextMenuPolicy(Qt.CustomContextMenu)
-            button.customContextMenuRequested.connect(lambda _, i=index, size=(x_0, y_0, w_0, h_0) : self.showTextBlockButtonMenu(i, size))
-            # 文本块信息
-            original = ""
-            for text in text_block["texts"] :
-                original += text
-            button.initConfig(
-                original=original,
-                trans=trans_text,
-                font_color=font_color,
-                bg_color=bg_color,
-                rect=(x_0, y_0, w_0, h_0),
-                text_block=text_block,
-                index=index
-            )
+            button.customContextMenuRequested.connect(lambda _, i=index, size=(x_0, y_0, w_0, h_0) :
+                                                      self.showTextBlockButtonMenu(i, size))
             index += 1
             self.button_list.append(button)
 
@@ -511,28 +497,26 @@ class RenderTextBlock(QWidget) :
 
 
     # 点击文本框
-    def clickTextBlock(self, original, trans, font_color, bg_color, rect, text_block, index) :
+    def clickTextBlock(self, button) :
 
-        self.trans_edit_ui.index = index
-        self.trans_edit_ui.text_block = text_block
-        self.trans_edit_ui.rdr_image_path = self.image_path
-        self.trans_edit_ui.rect = rect
+        self.trans_edit_ui.button = button
+
         # 文本颜色
-        font_color = QColor(font_color[0], font_color[1], font_color[2])
+        font_color = QColor(button.font_color[0], button.font_color[1], button.font_color[2])
         self.trans_edit_ui.font_color = font_color.name()
         self.trans_edit_ui.font_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=font_color.name()))
         # 轮廓颜色
-        bg_color = QColor(bg_color[0], bg_color[1], bg_color[2])
+        bg_color = QColor(button.bg_color[0], button.bg_color[1], button.bg_color[2])
         self.trans_edit_ui.bg_color = bg_color.name()
         self.trans_edit_ui.bg_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=bg_color.name()))
         # 原文
         self.trans_edit_ui.original_text.clear()
         self.trans_edit_ui.original_text.setTextColor(font_color)
-        self.trans_edit_ui.original_text.insertPlainText(original)
+        self.trans_edit_ui.original_text.insertPlainText(button.original)
         # 译文
         self.trans_edit_ui.trans_text.clear()
         self.trans_edit_ui.trans_text.setTextColor(font_color)
-        self.trans_edit_ui.trans_text.insertPlainText(trans)
+        self.trans_edit_ui.trans_text.insertPlainText(button.trans)
 
         self.trans_edit_ui.show()
 
@@ -559,19 +543,12 @@ class RenderTextBlock(QWidget) :
     # 文本框按钮自适配比例
     def matchButtonSize(self) :
 
-        if not self.json_data or (len(self.button_list) != len(self.json_data["text_block"])) :
-            return
-        for button, text_block in zip(self.button_list, self.json_data["text_block"]) :
-            # 计算文本坐标
-            x = text_block["block_coordinate"]["upper_left"][0]
-            y = text_block["block_coordinate"]["upper_left"][1]
-            w = text_block["block_coordinate"]["lower_right"][0] - x
-            h = text_block["block_coordinate"]["lower_right"][1] - y
+        for button in self.button_list :
             # 计算缩放比例
-            x = x * self.image_rate[0]
-            y = y * self.image_rate[1]
-            w = w * self.image_rate[0]
-            h = h * self.image_rate[1]
+            x = button.rect[0] * self.image_rate[0]
+            y = button.rect[1] * self.image_rate[1]
+            w = button.rect[2] * self.image_rate[0]
+            h = button.rect[3] * self.image_rate[1]
             button.setGeometry(x, y, w, h)
 
 
@@ -648,100 +625,104 @@ class RenderTextBlock(QWidget) :
 
 
     # 移动文本块位置后重新渲染
-    def refreshTextBlockPosition(self, original_site, now_site, text_block, trans_text, index) :
+    def refreshTextBlockPosition(self, button) :
 
-        # 原坐标
-        x_0 = original_site[0]
-        y_0 = original_site[1]
-        w_0 = original_site[2]
-        h_0 = original_site[3]
-        # 当前坐标
-        x_n = round(now_site[0] / self.image_rate[0])
-        y_n = round(now_site[1] / self.image_rate[1])
-        w_n = w_0
-        h_n = h_0
+        try :
+            # 原坐标
+            x_0 = button.rect[0]
+            y_0 = button.rect[1]
+            w_0 = button.rect[2]
+            h_0 = button.rect[3]
+            # 当前坐标
+            x_n = round(button.x() / self.image_rate[0])
+            y_n = round(button.y() / self.image_rate[1])
+            w_n = w_0
+            h_n = h_0
 
-        # 基于原坐标, 对ipt截图
-        ipt_image = Image.open(self.ipt_image_path)
-        cropped_image = ipt_image.crop((x_0, y_0, x_0 + w_0, y_0 + h_0))
-        # 打开rdr图片, 将截图贴图
-        rdr_image = Image.open(self.image_path)
-        rdr_image.paste(cropped_image, (x_0, y_0))
+            # 基于原坐标, 对ipt截图
+            ipt_image = Image.open(self.ipt_image_path)
+            cropped_image = ipt_image.crop((x_0, y_0, x_0 + w_0, y_0 + h_0))
+            # 打开rdr图片, 将截图贴图
+            rdr_image = Image.open(self.image_path)
+            rdr_image.paste(cropped_image, (x_0, y_0))
 
-        # 新位置ipt截图
-        cropped_image = ipt_image.crop((x_n, y_n, x_n + w_n, y_n + h_n))
-        # 截图转换为base64
-        buffered = io.BytesIO()
-        cropped_image.save(buffered, format="PNG")
-        image_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
+            # 新位置ipt截图
+            cropped_image = ipt_image.crop((x_n, y_n, x_n + w_n, y_n + h_n))
+            # 截图转换为base64
+            buffered = io.BytesIO()
+            cropped_image.save(buffered, format="PNG")
+            image_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
 
-        # 重新计算截图后的坐标
-        text_block["block_coordinate"]["upper_left"] = [0, 0]
-        text_block["block_coordinate"]["upper_right"] = [w_n, 0]
-        text_block["block_coordinate"]["lower_right"] = [w_n, h_n]
-        text_block["block_coordinate"]["lower_left"] = [0, h_n]
-        for i, val in enumerate(text_block["coordinate"]):
-            coordinate = {}
-            for k in val.keys():
-                coordinate[k] = [val[k][0] - x_0, val[k][1] - y_0]
-            text_block["coordinate"][i] = coordinate
+            # 重新计算截图后的坐标
+            text_block = copy.deepcopy(button.text_block)
+            text_block["block_coordinate"]["upper_left"] = [0, 0]
+            text_block["block_coordinate"]["upper_right"] = [w_n, 0]
+            text_block["block_coordinate"]["lower_right"] = [w_n, h_n]
+            text_block["block_coordinate"]["lower_left"] = [0, h_n]
+            for i, val in enumerate(text_block["coordinate"]):
+                coordinate = {}
+                for k in val.keys():
+                    coordinate[k] = [val[k][0] - x_0, val[k][1] - y_0]
+                text_block["coordinate"][i] = coordinate
 
-        # 调用漫画rdr
-        sign, result = translator.ocr.dango.mangaRDR(
-            object=self.trans_edit_ui.object,
-            trans_list=[trans_text],
-            inpainted_image=image_base64,
-            text_block=[text_block]
-        )
-        if not sign or not result.get("rendered_image", ""):
-            print(result)
-            # @TODO 错误处理
-            return
+            # 调用漫画rdr
+            sign, result = translator.ocr.dango.mangaRDR(
+                object=self.trans_edit_ui.object,
+                trans_list=[button.trans],
+                inpainted_image=image_base64,
+                text_block=[text_block]
+            )
+            if not sign or not result.get("rendered_image", ""):
+                print(result)
+                # @TODO 错误处理
+                return
 
-        # 渲染后的新图贴在rdr大图上
-        image_base64 = base64.b64decode(result["rendered_image"])
-        cropped_image = Image.open(io.BytesIO(image_base64))
-        rdr_image.paste(cropped_image, (x_n, y_n))
-        rdr_image.save(self.image_path)
+            # 渲染后的新图贴在rdr大图上
+            image_base64 = base64.b64decode(result["rendered_image"])
+            cropped_image = Image.open(io.BytesIO(image_base64))
+            rdr_image.paste(cropped_image, (x_n, y_n))
+            rdr_image.save(self.image_path)
 
-        # 获取文件名
-        file_name = os.path.splitext(os.path.basename(self.original_image_path))[0]
-        # 获取ocr缓存文件路径
-        json_file_path = os.path.join(os.path.dirname(self.ipt_image_path), "%s.json"%file_name)
-        # 从缓存文件中获取ocr信息
-        with open(json_file_path, "r", encoding="utf-8") as file :
-            json_data = json.load(file)
+            # 获取文件名
+            file_name = os.path.splitext(os.path.basename(self.original_image_path))[0]
+            # 获取ocr缓存文件路径
+            json_file_path = os.path.join(os.path.dirname(self.ipt_image_path), "%s.json"%file_name)
+            # 从缓存文件中获取ocr信息
+            with open(json_file_path, "r", encoding="utf-8") as file :
+                json_data = json.load(file)
 
-        # 修改移动后的block_coordinate
-        block_coordinate = json_data["text_block"][index]["block_coordinate"]
-        block_coordinate["upper_left"] = [x_n, y_n]
-        block_coordinate["upper_right"] = [x_n + w_n, y_n]
-        block_coordinate["lower_right"] = [x_n + w_n, y_n + h_n]
-        block_coordinate["lower_left"] = [x_n, y_n + h_n]
-        json_data["text_block"][index]["block_coordinate"] = block_coordinate
+            # 修改移动后的block_coordinate
+            block_coordinate = json_data["text_block"][button.index]["block_coordinate"]
+            block_coordinate["upper_left"] = [x_n, y_n]
+            block_coordinate["upper_right"] = [x_n + w_n, y_n]
+            block_coordinate["lower_right"] = [x_n + w_n, y_n + h_n]
+            block_coordinate["lower_left"] = [x_n, y_n + h_n]
+            json_data["text_block"][button.index]["block_coordinate"] = block_coordinate
 
-        # 修改移动后的coordinate
-        coordinate = json_data["text_block"][index]["coordinate"]
-        for i, val in enumerate(coordinate) :
-            tmp_coordinate = {}
-            for k in val.keys() :
-                tmp_coordinate[k] = [
-                    val[k][0] - (x_0 - x_n),
-                    val[k][1] - (y_0 - y_n)
-                ]
-            coordinate[i] = tmp_coordinate
-        json_data["text_block"][index]["coordinate"] = coordinate
+            # 修改移动后的coordinate
+            coordinate = json_data["text_block"][button.index]["coordinate"]
+            for i, val in enumerate(coordinate) :
+                tmp_coordinate = {}
+                for k in val.keys() :
+                    tmp_coordinate[k] = [
+                        val[k][0] - (x_0 - x_n),
+                        val[k][1] - (y_0 - y_n)
+                    ]
+                coordinate[i] = tmp_coordinate
+            json_data["text_block"][button.index]["coordinate"] = coordinate
 
-        # 缓存修改后的ocr结果
-        with open(json_file_path, "w", encoding="utf-8") as file :
-            json.dump(json_data, file, indent=4)
+            # 缓存修改后的ocr结果
+            with open(json_file_path, "w", encoding="utf-8") as file :
+                json.dump(json_data, file, indent=4)
 
-        # 刷新按钮信息
-        button = self.button_list[index]
-        button.original_site = (x_n, y_n, w_n, h_n)
-        button.text_block = json_data["text_block"][index]
-        # 刷新图片
-        self.loadImage()
+            # 刷新按钮信息
+            button.rect = (x_n, y_n, w_n, h_n)
+            button.text_block = json_data["text_block"][button.index]
+            # 刷新图片
+            self.loadImage()
+
+        except Exception :
+            traceback.print_exc()
 
 
 # 自定义按键实现鼠标进入显示, 移出隐藏
@@ -1783,15 +1764,12 @@ class Manga(QWidget) :
 # 自定义TextBlock的按钮
 class CustomTextBlockButton(QPushButton) :
 
-    move_signal = pyqtSignal(tuple, tuple, dict, str, int)
-    click_signal = pyqtSignal(str, str, tuple, tuple, tuple, dict, int)
+    move_signal = pyqtSignal(QPushButton)
+    click_signal = pyqtSignal(QPushButton)
 
-    def __init__(self, text, original_site, text_block, trans_text) :
+    def __init__(self, text) :
 
         super().__init__(text)
-        self.original_site = original_site
-        self.text_block = text_block
-        self.trans_text = trans_text
         self._move = False
         self._isTracking = False
         self._startPos = None
@@ -1799,15 +1777,23 @@ class CustomTextBlockButton(QPushButton) :
 
 
     # 参数初始化
-    def initConfig(self, original, trans, font_color, bg_color, rect, text_block, index) :
+    def initConfig(self, text_block, trans, rect, index, original_image_path, ipt_image_path, rdr_image_path) :
 
-        self.original = original
         self.trans = trans
-        self.font_color = font_color
-        self.bg_color = bg_color
-        self.rect = rect
         self.text_block = text_block
+        self.rect = rect
         self.index = index
+        self.original_image_path = original_image_path
+        self.ipt_image_path = ipt_image_path
+        self.rdr_image_path = rdr_image_path
+
+        # 文本块信息
+        self.original = ""
+        for text in text_block["texts"]:
+            self.original += text
+        # 文字颜色
+        self.font_color = text_block["foreground_color"]
+        self.bg_color = text_block["background_color"]
 
 
     # 鼠标移动事件
@@ -1838,32 +1824,15 @@ class CustomTextBlockButton(QPushButton) :
         try :
             if e.button() == Qt.LeftButton :
                 if self._move :
-                    self.move_signal.emit(
-                        self.original_site,
-                        (self.x(), self.y(), self.width(), self.height()),
-                        self.text_block,
-                        self.trans_text,
-                        self.index
-                    )
+                    # 移动事件
+                    self.move_signal.emit(self)
                 else :
-                    self.clickSignalEmit()
+                    # 点击事件
+                    self.click_signal.emit(self)
                 self._isTracking = False
                 self._startPos = None
                 self._endPos = None
                 self._move = False
+
         except Exception :
             traceback.print_exc()
-
-
-    # 发送点击信号
-    def clickSignalEmit(self) :
-
-        self.click_signal.emit(
-            self.original,
-            self.trans,
-            self.font_color,
-            self.bg_color,
-            self.rect,
-            self.text_block,
-            self.index,
-        )
