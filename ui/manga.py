@@ -1414,8 +1414,8 @@ class Manga(QWidget) :
                 if skip_sign :
                     continue
                 new_text_block.append(val)
-            if new_text_block :
-                result["text_block"] = new_text_block
+            result["text_block"] = new_text_block
+
             # 缓存ocr结果
             with open(self.getJsonFilePath(image_path), "w", encoding="utf-8") as file:
                 json.dump(result, file, indent=4)
