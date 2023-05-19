@@ -798,6 +798,24 @@ class Manga(QWidget) :
         self.input_image_button.setMenu(self.input_menu)
         self.input_action_group.triggered.connect(self.openImageFiles)
 
+        # 译图导出按钮
+        self.output_image_button = QPushButton(self)
+        self.output_image_button.setText(" 译图导出")
+        self.output_image_button.setStyleSheet("QPushButton {background: transparent;}"
+                                              "QPushButton:hover {background-color: #83AAF9;}"
+                                              "QPushButton:pressed {background-color: #4480F9;}")
+        self.output_image_button.setIcon(ui.static.icon.OUTPUT_ICON)
+        # 译图导出菜单
+        self.output_menu = QMenu(self.output_image_button)
+        self.output_action_group = QActionGroup(self.output_menu)
+        self.output_action_group.setExclusive(True)
+        self.createOutputAction("导出到指定目录")
+        self.createOutputAction("导出为压缩包")
+        self.createOutputAction("导出为PDF")
+        # 将下拉菜单设置为按钮的菜单
+        self.output_image_button.setMenu(self.output_menu)
+        self.output_action_group.triggered.connect(self.outputImages)
+
         # 一键翻译按钮
         self.trans_all_button = QPushButton(self)
         self.trans_all_button.setText(" 一键翻译")
@@ -1035,6 +1053,27 @@ class Manga(QWidget) :
             break
 
 
+    # 导出译图文件
+    def outputImages(self, action) :
+
+        output_image_list = []
+        for image_path in self.image_path_list :
+            rdr_image_path = self.getRdrFilePath(image_path)
+            if os.path.exists(rdr_image_path) :
+                output_image_list.append(rdr_image_path)
+        if len(output_image_list) == 0 :
+            return utils.message.MessageBox("导出失败", "没有可以导出的译图文件      ")
+
+        if action.data() == "导出到指定目录" :
+            pass
+        elif action.data() == "导出为压缩包" :
+            pass
+        elif action.data() == "导出为PDF" :
+            pass
+        else :
+            return
+
+
     # 导入图片
     def inputImage(self, image_path, finish_sign) :
 
@@ -1119,13 +1158,23 @@ class Manga(QWidget) :
 
 
     # 创建导入原图按钮的下拉菜单
-    def createInputAction(self, label):
+    def createInputAction(self, label) :
 
         action = QAction(label, self.input_menu)
         action.setCheckable(True)
         action.setData(label)
         self.input_action_group.addAction(action)
         self.input_menu.addAction(action)
+
+
+    # 创建译图导出按钮的下拉菜单
+    def createOutputAction(self, label) :
+
+        action = QAction(label, self.output_menu)
+        action.setCheckable(True)
+        action.setData(label)
+        self.output_action_group.addAction(action)
+        self.output_menu.addAction(action)
 
 
     # 创建翻译源按钮的下拉菜单
@@ -1667,9 +1716,14 @@ class Manga(QWidget) :
             10 * w_rate, h - 30 * h_rate,
             w, 30 * h_rate
         )
+        # 译图导出按钮
+        self.output_image_button.setGeometry(
+            self.input_image_button.width(), 0,
+            self.input_image_button.width(), self.input_image_button.height()
+        )
         # 一键翻译按钮
         self.trans_all_button.setGeometry(
-            self.input_image_button.width(), 0,
+            self.output_image_button.x() + self.input_image_button.width(), 0,
             self.input_image_button.width(), self.input_image_button.height()
         )
         # 选择翻译源按钮
