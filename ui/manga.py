@@ -799,12 +799,21 @@ class Manga(QWidget) :
         self.input_image_button.setMenu(self.input_menu)
         self.input_action_group.triggered.connect(self.openImageFiles)
 
+        # 一键翻译按钮
+        self.trans_all_button = QPushButton(self)
+        self.trans_all_button.setText(" 一键翻译")
+        self.trans_all_button.setStyleSheet("QPushButton {background: transparent;}"
+                                            "QPushButton:hover {background-color: #83AAF9;}"
+                                            "QPushButton:pressed {background-color: #4480F9;}")
+        self.trans_all_button.setIcon(ui.static.icon.RUN_ICON)
+        self.trans_all_button.clicked.connect(self.clickTransAllButton)
+
         # 译图导出按钮
         self.output_image_button = QPushButton(self)
         self.output_image_button.setText(" 译图导出")
         self.output_image_button.setStyleSheet("QPushButton {background: transparent;}"
-                                              "QPushButton:hover {background-color: #83AAF9;}"
-                                              "QPushButton:pressed {background-color: #4480F9;}")
+                                               "QPushButton:hover {background-color: #83AAF9;}"
+                                               "QPushButton:pressed {background-color: #4480F9;}")
         self.output_image_button.setIcon(ui.static.icon.OUTPUT_ICON)
         # 译图导出菜单
         self.output_menu = QMenu(self.output_image_button)
@@ -815,15 +824,6 @@ class Manga(QWidget) :
         # 将下拉菜单设置为按钮的菜单
         self.output_image_button.setMenu(self.output_menu)
         self.output_action_group.triggered.connect(self.outputImages)
-
-        # 一键翻译按钮
-        self.trans_all_button = QPushButton(self)
-        self.trans_all_button.setText(" 一键翻译")
-        self.trans_all_button.setStyleSheet("QPushButton {background: transparent;}"
-                                            "QPushButton:hover {background-color: #83AAF9;}"
-                                            "QPushButton:pressed {background-color: #4480F9;}")
-        self.trans_all_button.setIcon(ui.static.icon.RUN_ICON)
-        self.trans_all_button.clicked.connect(self.clickTransAllButton)
 
         # 选择翻译源按钮
         self.select_trans_button = QPushButton(self)
@@ -1730,19 +1730,19 @@ class Manga(QWidget) :
             10 * w_rate, h - 30 * h_rate,
             w, 30 * h_rate
         )
-        # 译图导出按钮
-        self.output_image_button.setGeometry(
+        # 一键翻译按钮
+        self.trans_all_button.setGeometry(
             self.input_image_button.width(), 0,
             self.input_image_button.width(), self.input_image_button.height()
         )
-        # 一键翻译按钮
-        self.trans_all_button.setGeometry(
-            self.output_image_button.x() + self.input_image_button.width(), 0,
+        # 译图导出按钮
+        self.output_image_button.setGeometry(
+            self.trans_all_button.x() + self.input_image_button.width(), 0,
             self.input_image_button.width(), self.input_image_button.height()
         )
         # 选择翻译源按钮
         self.select_trans_button.setGeometry(
-            self.trans_all_button.x() + self.input_image_button.width(), 0,
+            self.output_image_button.x() + self.input_image_button.width(), 0,
             self.input_image_button.width(), self.input_image_button.height()
         )
         # 教程按钮
