@@ -24,6 +24,7 @@ import translator.api
 import utils.thread
 import utils.message
 import ui.progress_bar
+import utils.zip
 
 
 FONT_PATH_1 = "./config/other/NotoSansSC-Regular.otf"
@@ -811,7 +812,6 @@ class Manga(QWidget) :
         self.output_action_group.setExclusive(True)
         self.createOutputAction("导出到指定目录")
         self.createOutputAction("导出为压缩包")
-        self.createOutputAction("导出为PDF")
         # 将下拉菜单设置为按钮的菜单
         self.output_image_button.setMenu(self.output_menu)
         self.output_action_group.triggered.connect(self.outputImages)
@@ -1056,22 +1056,42 @@ class Manga(QWidget) :
     # 导出译图文件
     def outputImages(self, action) :
 
-        output_image_list = []
-        for image_path in self.image_path_list :
-            rdr_image_path = self.getRdrFilePath(image_path)
-            if os.path.exists(rdr_image_path) :
-                output_image_list.append(rdr_image_path)
-        if len(output_image_list) == 0 :
-            return utils.message.MessageBox("导出失败", "没有可以导出的译图文件      ")
+        try :
+            output_image_list = []
+            for image_path in self.image_path_list :
+                rdr_image_path = self.getRdrFilePath(image_path)
+                if os.path.exists(rdr_image_path) :
+                    output_image_list.append(rdr_image_path)
+            if len(output_image_list) == 0 :
+                return utils.message.MessageBox("导出失败", "没有可以导出的译图文件      ")
 
-        if action.data() == "导出到指定目录" :
-            pass
-        elif action.data() == "导出为压缩包" :
-            pass
-        elif action.data() == "导出为PDF" :
-            pass
-        else :
-            return
+            # 选择指定位置
+            options = QFileDialog.Options()
+            folder_path = QFileDialog.getExistingDirectory(self, "选择要导出的位置", "", options=options)
+            if not os.path.exists(folder_path):
+                return utils.message.MessageBox("导出失败", "无效的目录      ")
+
+            if action.data() == "导出到指定目录" :
+                # 新建导出文件夹
+                folder_path = os.path.join(folder_path, os.path.basename(self.object.yaml["manga_dir_path"]))
+                if not os.path.exists(folder_path) :
+                    os.mkdir(folder_path)
+                # 复制完成的rdr图片
+                for image_path in output_image_list :
+                    new_image_path = os.path.join(folder_path, os.path.basename(image_path))
+                    shutil.copy(image_path, new_image_path)
+                os.startfile(folder_path)
+
+            elif action.data() == "导出为压缩包" :
+                zip_name = "{}.zip".format(os.path.basename(self.object.yaml["manga_dir_path"]))
+                zip_path = os.path.join(folder_path, zip_name)
+                utils.zip.zipFiles(output_image_list, zip_path)
+                os.startfile(folder_path)
+
+            else :
+                return
+        except Exception :
+            traceback.print_exc()
 
 
     # 导入图片
