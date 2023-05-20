@@ -307,7 +307,7 @@ class Translation(QMainWindow) :
             24 * self.rate,
             20 * self.rate
         ))
-        self.manga_button.setToolTip("<b>打开图片翻译 MangaTranslater</b>")
+        self.manga_button.setToolTip("<b>打开图片翻译 ImageTranslater</b>")
         self.manga_button.setStyleSheet("background: transparent;")
         self.manga_button.setCursor(ui.static.icon.SELECT_CURSOR)
         self.manga_button.hide()

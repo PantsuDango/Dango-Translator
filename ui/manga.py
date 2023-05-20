@@ -307,7 +307,7 @@ class TransEdit(QWidget) :
     def changeTranslateColor(self):
 
         self.hide()
-        color = QColorDialog.getColor(QColor(self.bg_color), None, "修改字体颜色")
+        color = QColorDialog.getColor(QColor(self.font_color), None, "修改字体颜色")
         if color.isValid() :
             self.font_color = color.name()
             self.font_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=self.font_color))
@@ -1679,14 +1679,8 @@ class Manga(QWidget) :
     # 翻译完成后刷新译图栏
     def finishTransProcessRefresh(self, value, signal) :
 
-        if signal :
-            # self.trans_image_button.click()
-            # row = self.image_path_list.index(value)
-            # self.trans_image_widget.setCurrentRow(row)
-            # self.loadTransImage()
-            return
-        else :
-            if value :
+        if not signal :
+            if value:
                 # @TODO 缺少错误处理
                 pass
             self.trans_process_bar.close()
@@ -1842,7 +1836,6 @@ class CustomTextBlockButton(QPushButton) :
     click_signal = pyqtSignal(QPushButton)
 
     def __init__(self, text) :
-
         super().__init__(text)
         self._move = False
         self._isTracking = False
@@ -1872,7 +1865,6 @@ class CustomTextBlockButton(QPushButton) :
 
     # 鼠标移动事件
     def mouseMoveEvent(self, e: QMouseEvent) :
-
         try :
             self._endPos = e.pos() - self._startPos
             self.move(self.pos() + self._endPos)
@@ -1883,7 +1875,6 @@ class CustomTextBlockButton(QPushButton) :
 
     # 鼠标按下事件
     def mousePressEvent(self, e: QMouseEvent) :
-
         try :
             if e.button() == Qt.LeftButton :
                 self._isTracking = True
@@ -1894,7 +1885,6 @@ class CustomTextBlockButton(QPushButton) :
 
     # 鼠标松开事件
     def mouseReleaseEvent(self, e: QMouseEvent) :
-
         try :
             if e.button() == Qt.LeftButton :
                 if self._move :
