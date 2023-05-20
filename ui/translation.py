@@ -298,7 +298,7 @@ class Translation(QMainWindow) :
         self.trans_history_button.setCursor(ui.static.icon.SELECT_CURSOR)
         self.trans_history_button.hide()
 
-        # 漫画翻译按钮
+        # 图片翻译按钮
         self.manga_button = QPushButton(qtawesome.icon("fa5s.image", color=self.icon_color), "", self)
         self.customSetIconSize(self.manga_button, 20, 20)
         self.manga_button.setGeometry(QRect(
@@ -307,7 +307,7 @@ class Translation(QMainWindow) :
             24 * self.rate,
             20 * self.rate
         ))
-        self.manga_button.setToolTip("<b>打开漫画翻译 MangaTranslater</b>")
+        self.manga_button.setToolTip("<b>打开图片翻译 MangaTranslater</b>")
         self.manga_button.setStyleSheet("background: transparent;")
         self.manga_button.setCursor(ui.static.icon.SELECT_CURSOR)
         self.manga_button.hide()

@@ -60,7 +60,7 @@ def updateAutoUpdateFile(object) :
     utils.http.downloadFile(url, AUTO_UPDATE_FILE_PATH, object.logger)
 
 
-# 下载漫画翻译用字体
+# 下载图片翻译用字体
 def updateManFontFile(object) :
 
     if not os.path.exists(MANGA_FONT_PATH) :

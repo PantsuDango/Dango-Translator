@@ -272,7 +272,7 @@ def configConvert(object) :
     object.config["choiceRangeHotKeyUse"] = object.config.get("choiceRangeHotKeyUse", False)
     # 自动朗读开关
     object.config["autoPlaysoundUse"] = object.config.get("autoPlaysoundUse", False)
-    # 漫画翻译所使用的翻译源
+    # 图片翻译所使用的翻译源
     object.config["mangaTrans"] = object.config.get("mangaTrans", "")
 
 

@@ -104,7 +104,7 @@ class createCheckAutoLoginQThread(QThread) :
             self.signal.emit(message)
 
 
-# 漫画翻译进程
+# 图片翻译进程
 class createMangaTransQThread(QThread) :
 
     signal = pyqtSignal(str, bool)
@@ -149,7 +149,7 @@ class createMangaTransQThread(QThread) :
         self.signal.emit("", False)
 
 
-# 漫画翻译导入图片进程
+# 图片翻译导入图片进程
 class createInputImagesQThread(QThread) :
 
     bar_signal = pyqtSignal(float, int, str)

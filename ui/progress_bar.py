@@ -122,7 +122,7 @@ class ProgressBar(QWidget) :
             event.ignore()
 
 
-# 漫画翻译进度条
+# 图片翻译进度条
 class MangaProgressBar(QWidget) :
 
     def __init__(self, rate) :

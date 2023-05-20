@@ -57,7 +57,7 @@ class TransEdit(QWidget) :
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowCloseButtonHint)
 
         # 窗口标题
-        self.setWindowTitle("漫画翻译-译文编辑")
+        self.setWindowTitle("图片翻译-译文编辑")
         # 窗口图标
         self.setWindowIcon(ui.static.icon.APP_LOGO_ICON)
         # 鼠标样式
@@ -753,7 +753,7 @@ class CustomScrollArea(QScrollArea) :
         event.ignore()  # 取消事件的传递，禁用滚轮控制滚动条
 
 
-# 漫画翻译界面
+# 图片翻译界面
 class Manga(QWidget) :
 
     def __init__(self, object) :
@@ -772,7 +772,7 @@ class Manga(QWidget) :
         # 窗口尺寸
         self.resize(self.window_width*self.rate, self.window_height*self.rate)
         # 窗口标题
-        self.setWindowTitle("漫画翻译")
+        self.setWindowTitle("图片翻译")
         # 窗口图标
         self.setWindowIcon(ui.static.icon.APP_LOGO_ICON)
         # 鼠标样式
@@ -933,7 +933,7 @@ class Manga(QWidget) :
 
         # 导入图片进度条
         self.input_images_progress_bar = ui.progress_bar.ProgressBar(self.object.yaml["screen_scale_rate"], "input_images")
-        # 漫画翻译进度条
+        # 图片翻译进度条
         self.trans_process_bar = ui.progress_bar.MangaProgressBar(self.object.yaml["screen_scale_rate"])
 
 
@@ -1449,7 +1449,7 @@ class Manga(QWidget) :
         image_paths = []
         image_paths.append(image_path)
         # 进度条窗口
-        self.trans_process_bar.modifyTitle("漫画翻译 -- 执行中请勿关闭此窗口")
+        self.trans_process_bar.modifyTitle("图片翻译 -- 执行中请勿关闭此窗口")
         self.trans_process_bar.show()
         # 创建执行线程
         self.trans_all_button.setEnabled(False)
@@ -1508,7 +1508,7 @@ class Manga(QWidget) :
         return sign, result
 
 
-    # 漫画翻译
+    # 图片翻译
     def mangaTrans(self, image_path) :
 
         # 从缓存文件中获取json结果
@@ -1589,7 +1589,7 @@ class Manga(QWidget) :
     # 获取工作目录
     def getDangoMangaPath(self, image_path) :
 
-        # 获取漫画翻译缓存目录
+        # 获取图片翻译缓存目录
         base_path = os.path.dirname(image_path)
         dango_manga_path = os.path.join(base_path, "dango_manga")
         # 如果目录不存在就创建工作缓存目录
@@ -1698,7 +1698,7 @@ class Manga(QWidget) :
 
         self.trans_all_button.setEnabled(False)
         # 进度条窗口
-        self.trans_process_bar.modifyTitle("漫画翻译 -- 执行中请勿关闭此窗口")
+        self.trans_process_bar.modifyTitle("图片翻译 -- 执行中请勿关闭此窗口")
         self.trans_process_bar.show()
         # 创建执行线程
         thread = utils.thread.createMangaTransQThread(self, self.image_path_list)
@@ -1715,7 +1715,7 @@ class Manga(QWidget) :
             webbrowser.open(url, new=0, autoraise=True)
         except Exception:
             self.logger.error(format_exc())
-            utils.message.MessageBox("漫画翻译教程",
+            utils.message.MessageBox("图片翻译教程",
                                      "打开失败, 请尝试手动打开此地址\n%s     "%url)
 
 

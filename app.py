@@ -107,7 +107,7 @@ class DangoTranslator :
         self.trans_history_ui = ui.trans_history.TransHistory(self)
         utils.thread.createThread(self.trans_history_ui.readTransHistory)
         self.translation_ui.trans_history_button.clicked.connect(self.clickTransHistory)
-        # 漫画翻译页面
+        # 图片翻译页面
         self.manga_ui = ui.manga.Manga(self)
         self.translation_ui.manga_button.clicked.connect(self.clickManga)
 
@@ -125,7 +125,7 @@ class DangoTranslator :
         utils.thread.createThread(utils.logger.clearLog)
 
 
-    # 点击漫画翻译键
+    # 点击图片翻译键
     def clickManga(self) :
 
         self.translation_ui.hide()
@@ -249,7 +249,7 @@ class DangoTranslator :
         utils.thread.createThread(utils.update.updatePilFile(self))
         # 更新自动更新程序
         utils.thread.createThread(utils.update.updateAutoUpdateFile(self))
-        # 更新漫画翻译字体
+        # 更新图片翻译字体
         utils.thread.createThread(utils.update.updateManFontFile(self))
         # 启动图标
         self.showSplash()
