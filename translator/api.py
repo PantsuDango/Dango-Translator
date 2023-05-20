@@ -79,7 +79,7 @@ def baidu(sentence, app_id, secret_key, logger):
 
     except Exception :
         logger.error(format_exc())
-        string = "私人百度：我抽风啦, 请尝试重新翻译!"
+        string = "私人百度: 我抽风啦, 请尝试重新翻译!"
 
     return string
 
@@ -121,54 +121,54 @@ def tencent(sentence, secret_id, secret_key, logger):
 
         except Exception :
             logger.error(format_exc())
-            result = "私人腾讯：我抽风啦, 请尝试重新翻译!"
+            result = "私人腾讯: 我抽风啦, 请尝试重新翻译!"
 
         else:
             if code == "MissingParameter" :
                 pass
 
             elif code == "FailedOperation.NoFreeAmount" :
-                result = "私人腾讯：本月免费额度已经用完"
+                result = "私人腾讯: 本月免费额度已经用完"
 
             elif code == "FailedOperation.ServiceIsolate" :
-                result = "私人腾讯：账号欠费停止服务"
+                result = "私人腾讯: 账号欠费停止服务"
 
             elif code == "FailedOperation.UserNotRegistered" :
-                result = "私人腾讯：还没有开通机器翻译服务"
+                result = "私人腾讯: 还没有开通机器翻译服务"
 
             elif code == "InternalError" :
-                result = "私人腾讯：内部错误"
+                result = "私人腾讯: 内部错误"
 
             elif code == "InternalError.BackendTimeout" :
-                result = "私人腾讯：后台服务超时，请稍后重试"
+                result = "私人腾讯: 后台服务超时，请稍后重试"
 
             elif code == "InternalError.ErrorUnknown" :
-                result = "私人腾讯：未知错误"
+                result = "私人腾讯: 未知错误"
 
             elif code == "LimitExceeded" :
-                result = "私人腾讯：超过配额限制"
+                result = "私人腾讯: 超过配额限制"
 
             elif code == "UnsupportedOperation" :
-                result = "私人腾讯：操作不支持"
+                result = "私人腾讯: 操作不支持"
 
             elif code == "InvalidCredential" :
-                result = "私人腾讯：secretId或secretKey错误"
+                result = "私人腾讯: secretId或secretKey错误"
 
             elif code == "AuthFailure.SignatureFailure" :
-                result = "私人腾讯：secretKey错误"
+                result = "私人腾讯: secretKey错误"
 
             elif code == "AuthFailure.SecretIdNotFound" :
-                result = "私人腾讯：secretId错误"
+                result = "私人腾讯: secretId错误"
 
             elif code == "AuthFailure.SignatureExpire" :
-                result = "私人腾讯：签名过期，请将电脑系统时间调整至准确的时间后重试"
+                result = "私人腾讯: 签名过期，请将电脑系统时间调整至准确的时间后重试"
 
             else:
                 result = "私人腾讯: %s, %s"%(code, error)
 
     except Exception:
         logger.error(format_exc())
-        result = "私人腾讯：我抽风啦, 请尝试重新翻译!"
+        result = "私人腾讯: 我抽风啦, 请尝试重新翻译!"
 
     return result
 
@@ -195,14 +195,15 @@ def caiyun(sentence, token, logger) :
     text = ""
     try:
         response = requests.request("POST", url, data=json.dumps(payload), headers=headers, proxies=proxies, timeout=5)
-        result = json.loads(response.text)['target']
+        result = json.loads(response.text)["target"]
         for word in result :
             text += word
-            if word != result[-1]:
+            if word != result[-1] :
                 text += "\n"
     except Exception :
         try :
-            text = str(json.loads(response.text))
+            logger.error(format_exc())
+            text = "私人彩云: %s"%str(json.loads(response.text))
         except Exception :
             logger.error(format_exc())
             text = "私人彩云: 我抽风啦, 请尝试重新翻译!"

@@ -756,6 +756,8 @@ class CustomScrollArea(QScrollArea) :
 # 图片翻译界面
 class Manga(QWidget) :
 
+    show_error_signal = pyqtSignal(list)
+
     def __init__(self, object) :
 
         super(Manga, self).__init__()
@@ -765,6 +767,7 @@ class Manga(QWidget) :
         self.ui()
         self.trans_edit_ui = TransEdit(object)
         self.show_image_widget = None
+        self.show_error_sign = False
 
 
     def ui(self) :
@@ -920,6 +923,12 @@ class Manga(QWidget) :
         self.show_image_scroll_area.setWidgetResizable(True)
         self.show_image_scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.show_image_scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+
+        # 错误展示提示窗
+        self.show_error_label = QPushButton(self)
+        self.show_error_label.setIcon(ui.static.icon.ERROR_ICON)
+        self.show_error_label.hide()
+        self.show_error_signal.connect(self.showError)
 
         # 上一页按钮
         self.last_page_button = CustomButton(self)
@@ -1378,7 +1387,9 @@ class Manga(QWidget) :
         if not os.path.exists(self.getJsonFilePath(image_path)) or reload_sign :
             sign, ocr_result = self.mangaOCR(image_path)
             if not sign :
-                return "OCR过程失败: %s"%ocr_result
+                message = "OCR过程失败: %s"%ocr_result
+                self.show_error_signal.emit([image_path, message])
+                return message
             else :
                 # 没有文字的图
                 if len(ocr_result.get("text_block", [])) == 0 :
@@ -1416,20 +1427,25 @@ class Manga(QWidget) :
         if not os.path.exists(self.getIptFilePath(image_path)) or reload_sign :
             sign, ipt_result = self.mangaTextInpaint(image_path)
             if not sign :
-                return "文字消除过程失败: %s"%ipt_result
+                message = "文字消除过程失败: %s"%ipt_result
+                self.show_error_signal.emit([image_path, message])
+                return message
         self.trans_process_bar.paintStatus("ipt", round(time.time()-start, 1))
 
         # 阻塞, 等待翻译完成
         trans_thread.join()
         if self.trans_result :
+            self.show_error_signal.emit([image_path, self.trans_result])
             return self.trans_result
 
         # 漫画文字渲染
         start = time.time()
         if not os.path.exists(self.getRdrFilePath(image_path)) or reload_sign :
             sign, rdr_result = self.mangaTextRdr(image_path)
-            if not sign:
-                return "文字渲染过程失败: %s"%rdr_result
+            if not sign :
+                message = "文字渲染过程失败: %s"%rdr_result
+                self.show_error_signal.emit([image_path, message])
+                return message
             # 渲染好的图片加入编辑图列表框
             self.editImageWidgetRefreshImage(image_path)
             # 渲染好的图片加入译图列表框
@@ -1533,32 +1549,42 @@ class Manga(QWidget) :
             result = translator.api.caiyun(sentence=original,
                                            token=self.object.config["caiyunAPI"],
                                            logger=self.logger)
+            if result[:6] == "私人彩云: " :
+                return False, result
+
         elif manga_trans == "私人腾讯" :
             result = translator.api.tencent(sentence=original,
                                             secret_id=self.object.config["tencentAPI"]["Key"],
                                             secret_key=self.object.config["tencentAPI"]["Secret"],
                                             logger=self.logger)
+            if result[:6] == "私人腾讯: " :
+                return False, result
+
         elif manga_trans == "私人百度" :
             result = translator.api.baidu(sentence=original,
                                           app_id=self.object.config["baiduAPI"]["Key"],
                                           secret_key=self.object.config["baiduAPI"]["Secret"],
                                           logger=self.logger)
+            if result[:6] == "私人百度: " :
+                return False, result
+
         elif manga_trans == "私人ChatGPT" :
             result = translator.api.chatgpt(api_key=self.object.config["chatgptAPI"],
                                             language=self.object.config["language"],
                                             proxy=self.object.config["chatgptProxy"],
                                             content=original,
                                             logger=self.logger)
+            if result[:11] == "私人ChatGPT: " :
+                return False, result
 
         for index, word in enumerate(result.split("\n")[:len(json_data["text_block"])]) :
             translated_text.append(word)
 
         json_data["translated_text"] = translated_text
-        # 缓存ocr结果
+        # 缓存翻译结果
         with open(self.getJsonFilePath(image_path), "w", encoding="utf-8") as file :
             json.dump(json_data, file, indent=4)
 
-        # @TODO 缺少错误处理
         return True, result
 
 
@@ -1722,7 +1748,7 @@ class Manga(QWidget) :
         h_rate = h / self.window_height
 
         # 设置字体
-        self.setStyleSheet("font: %spt '%s';"%(self.font_size * w_rate, self.font_type))
+        self.setStyleSheet("font: %spt '%s';"%(self.font_size*w_rate, self.font_type))
         # 导入原图按钮
         self.customSetGeometry(self.input_image_button, 0, 0, 120, 35, w_rate, h_rate)
         # 底部状态栏
@@ -1805,6 +1831,13 @@ class Manga(QWidget) :
             self.cut_line_label4.x(), self.input_image_button.height(),
             w-self.cut_line_label4.x(), self.status_label.y() - self.input_image_button.height()
         )
+        # 错误展示提示窗
+        self.show_error_label.setGeometry(
+            self.show_image_scroll_area.x(), self.show_image_scroll_area.y(),
+            self.show_image_scroll_area.width(), self.show_image_scroll_area.height() / 8
+        )
+        self.show_error_label.setStyleSheet("background-color: #98ff98;"
+                                            "font: %spt '%s';"%((self.font_size+5*w_rate), self.font_type))
         # 上一页按钮
         self.last_page_button.setGeometry(
             self.cut_line_label4.x()+20*w_rate, (self.show_image_scroll_area.height() - 300 * h_rate) // 2,
@@ -1818,6 +1851,34 @@ class Manga(QWidget) :
         # 图片大图展示
         if self.show_image_widget :
             self.show_image_widget.resize(self.show_image_scroll_area.width(), self.show_image_scroll_area.height())
+
+
+    # 展示错误消息
+    def showError(self, messages: list) :
+
+        # 刷新提示消息
+        text = ""
+        for message in messages :
+            if message == messages[-1] :
+                text += "     " + message
+            else :
+                text += "     " + message + "\n"
+        self.show_error_label.setText(text)
+        self.show_error_label.show()
+
+        # 刷新停留时间
+        self.show_error_start_time = time.time()
+        if self.show_error_sign :
+            return
+
+        # 展示消息等待线程, 停留时间5s
+        def waitThread() :
+            self.show_error_sign = True
+            while True :
+                if time.time() - self.show_error_start_time >= 5 :
+                    self.show_error_sign = False
+                    return self.show_error_label.hide()
+        utils.thread.createThread(waitThread)
 
 
     # 窗口关闭处理
