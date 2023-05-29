@@ -847,6 +847,22 @@ class Manga(QWidget) :
         self.select_trans_button.setMenu(self.trans_menu)
         self.trans_action_group.triggered.connect(self.changeSelectTrans)
 
+        # 高级设置按钮
+        self.setting_button = QPushButton(self)
+        self.setting_button.setText(" 高级设置")
+        self.setting_button.setStyleSheet("QPushButton {background: transparent;}"
+                                          "QPushButton:hover {background-color: #83AAF9;}"
+                                          "QPushButton:pressed {background-color: #4480F9;}")
+        self.setting_button.setIcon(ui.static.icon.SETTING_ICON)
+        # 高级设置菜单
+        self.setting_menu = QMenu(self.setting_button)
+        self.setting_action_group = QActionGroup(self.setting_menu)
+        self.setting_action_group.setExclusive(True)
+        self.createSettingAction("设置渲染缩放比例")
+        # 将下拉菜单设置为按钮的菜单
+        self.setting_button.setMenu(self.setting_menu)
+        self.setting_action_group.triggered.connect(self.advancedSetting)
+
         # 教程按钮
         self.tutorial_button = QPushButton(self)
         self.tutorial_button.setText(" 使用教程")
@@ -1103,6 +1119,15 @@ class Manga(QWidget) :
             traceback.print_exc()
 
 
+    # 高级设置
+    def advancedSetting(self, action: QAction):
+
+        if action.data() == "设置渲染缩放比例" :
+            action.setMenu(QMenu())
+            action.menu().addAction(QSlider())
+
+
+
     # 导入图片
     def inputImage(self, image_path, finish_sign) :
 
@@ -1217,6 +1242,16 @@ class Manga(QWidget) :
         if self.object.config["mangaTrans"] == label :
             action.setChecked(True)
             self.status_label.setText("正在使用: {}".format(label))
+
+
+    # 创建高级设置按钮的下拉菜单
+    def createSettingAction(self, label):
+
+        action = QAction(label, self.setting_menu)
+        action.setCheckable(True)
+        action.setData(label)
+        self.setting_action_group.addAction(action)
+        self.setting_menu.addAction(action)
 
 
     # 改变所使用的翻译源
@@ -1769,6 +1804,11 @@ class Manga(QWidget) :
         # 选择翻译源按钮
         self.select_trans_button.setGeometry(
             self.output_image_button.x() + self.input_image_button.width(), 0,
+            self.input_image_button.width(), self.input_image_button.height()
+        )
+        # 选择翻译源按钮
+        self.setting_button.setGeometry(
+            self.select_trans_button.x() + self.input_image_button.width(), 0,
             self.input_image_button.width(), self.input_image_button.height()
         )
         # 教程按钮

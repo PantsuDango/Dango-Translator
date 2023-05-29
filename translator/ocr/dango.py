@@ -376,7 +376,7 @@ def offlineOCR(object) :
 
 
 # 漫画OCR
-def mangaOCR(object, filepath) :
+def mangaOCR(object, filepath, detect_scale=1) :
 
     # 获取配置
     token = object.config.get("DangoToken", "")
@@ -389,6 +389,7 @@ def mangaOCR(object, filepath) :
         "mask": True,
         "refine": True,
         "filtrate": True,
+        "detect_scale": detect_scale,
         "image": image_base64
     }
     sign = False
