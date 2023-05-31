@@ -77,6 +77,7 @@ class Manga(QWidget) :
         self.input_action_group.setExclusive(True)
         self.createInputAction("从文件导入")
         self.createInputAction("从文件夹导入")
+        self.createInputAction("从多个文件夹导入")
         # 将下拉菜单设置为按钮的菜单
         self.input_image_button.setMenu(self.input_menu)
         self.input_action_group.triggered.connect(self.openImageFiles)
@@ -327,6 +328,30 @@ class Manga(QWidget) :
                 if file_ext != ".png" and file_ext != ".jpg" and file_ext != ".jpeg" :
                     continue
                 images.append(os.path.join(folder_path, file))
+
+        elif action.data() == "从多个文件夹导入" :
+            file_dialog = QFileDialog()
+            file_dialog.setFileMode(QFileDialog.Directory)
+            file_dialog.setOption(QFileDialog.DontUseNativeDialog, True)
+            l = file_dialog.findChild(QListView, "listView")
+            if l :
+                l.setSelectionMode(QAbstractItemView.MultiSelection)
+            t = file_dialog.findChild(QTreeView)
+            if t :
+                t.setSelectionMode(QAbstractItemView.MultiSelection)
+            file_dialog.setFilter(QDir.Dirs)
+            if file_dialog.exec_() == QDialog.Accepted :
+                folder_paths = file_dialog.selectedFiles()
+                # 遍历多个文件夹
+                for folder_path in folder_paths[1:] :
+                    if not os.path.exists(folder_path) :
+                        continue
+                    for file in os.listdir(folder_path) :
+                        file_ext = os.path.splitext(file)[1].lower()
+                        if file_ext != ".png" and file_ext != ".jpg" and file_ext != ".jpeg":
+                            continue
+                        images.append(os.path.join(folder_path, file))
+
         else :
             return
 
@@ -345,7 +370,7 @@ class Manga(QWidget) :
             utils.thread.runQThread(thread)
 
         # 记忆上次操作的目录
-        for image_path in images:
+        for image_path in images :
             self.object.yaml["manga_dir_path"] = os.path.dirname(image_path)
             break
 
