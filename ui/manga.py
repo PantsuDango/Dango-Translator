@@ -546,9 +546,9 @@ class Manga(QWidget) :
         if item is not None:
             menu = QMenu(self)
             # 添加菜单项
-            translater_action = menu.addAction("翻译")
+            translater_action = menu.addAction("翻译当前图片")
             translater_action.triggered.connect(lambda: self.translaterItemWidget(item))
-            delete_action = menu.addAction("移除")
+            delete_action = menu.addAction("移除当前图片")
             delete_action.triggered.connect(lambda: self.removeItemWidget(item))
             # 显示菜单
             cursorPos = QCursor.pos()
