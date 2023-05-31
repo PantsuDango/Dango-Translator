@@ -16,6 +16,7 @@ import webbrowser
 import qtawesome
 from PIL import Image
 import traceback
+import pyperclip
 
 import ui.static.icon
 import utils.translater
@@ -1674,6 +1675,16 @@ class TransEdit(QWidget) :
         self.original_text.setStyleSheet("background-color: rgb(224, 224, 224); font: 10pt '%s';"%font_type)
         self.original_text.setCursor(ui.static.icon.EDIT_CURSOR)
 
+        # 原文复制按钮
+        button = QPushButton(self)
+        self.customSetGeometry(button, 470, 30, 20, 20)
+        button.setIcon(ui.static.icon.COPY_ICON)
+        button.setStyleSheet("QPushButton {background: transparent; border-radius: 6px}"
+                             "QPushButton:hover {background-color: #83AAF9;}"
+                             "QPushButton:pressed {background-color: #4480F9;}")
+        button.setToolTip("<b>复制当前原文</b>")
+        button.clicked.connect(lambda: pyperclip.copy(self.original_text.toPlainText()))
+
         # 译文编辑框
         self.trans_text = QTextBrowser(self)
         self.customSetGeometry(self.trans_text, 0, 130, 500, 100)
@@ -1681,6 +1692,16 @@ class TransEdit(QWidget) :
         self.trans_text.setReadOnly(False)
         self.trans_text.setStyleSheet("font: 10pt '%s';"%font_type)
         self.trans_text.setCursor(ui.static.icon.EDIT_CURSOR)
+
+        # 译文复制按钮
+        button = QPushButton(self)
+        self.customSetGeometry(button, 470, 130, 20, 20)
+        button.setIcon(ui.static.icon.COPY_ICON)
+        button.setStyleSheet("QPushButton {background: transparent; border-radius: 6px}"
+                             "QPushButton:hover {background-color: #83AAF9;}"
+                             "QPushButton:pressed {background-color: #4480F9;}")
+        button.setToolTip("<b>复制当前译文</b>")
+        button.clicked.connect(lambda: pyperclip.copy(self.trans_text.toPlainText()))
 
         # 确定按钮
         button = QPushButton(self)
