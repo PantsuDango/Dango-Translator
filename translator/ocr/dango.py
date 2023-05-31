@@ -376,22 +376,21 @@ def offlineOCR(object) :
 
 
 # 漫画OCR
-def mangaOCR(object, filepath, detect_scale=1) :
+def mangaOCR(object, filepath) :
 
     # 获取配置
-    token = object.config.get("DangoToken", "")
-    url = object.yaml["dict_info"].get("manga_ocr", "https://dl-dev.ap-sh.starivercs.cn/v2/manga_trans/advanced/manga_ocr")
     with open(filepath, "rb") as file :
         data = file.read()
     image_base64 = base64.b64encode(data).decode("utf-8")
     body = {
-        "token": token,
+        "token": object.config.get("DangoToken", ""),
         "mask": True,
         "refine": True,
         "filtrate": True,
-        "detect_scale": detect_scale,
+        "detect_scale": object.config.get("mangaDetectScale", 1),
         "image": image_base64
     }
+    url = object.yaml["dict_info"].get("manga_ocr", "https://dl-dev.ap-sh.starivercs.cn/v2/manga_trans/advanced/manga_ocr")
     sign = False
     result = "请求漫画OCR服务失败: "
     try :

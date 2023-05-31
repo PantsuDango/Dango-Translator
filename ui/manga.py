@@ -42,9 +42,9 @@ class Manga(QWidget) :
         self.object = object
         self.logger = object.logger
         self.getInitConfig()
+        self.setting_ui = Setting(object)
         self.ui()
         self.trans_edit_ui = TransEdit(object)
-        self.setting_ui = Setting(object)
         self.show_image_widget = None
         self.show_error_sign = False
 
@@ -1987,6 +1987,9 @@ class Setting(QWidget) :
         self.object = object
         self.rate = object.yaml["screen_scale_rate"]
         self.logger = object.logger
+        self.color_1 = "#595959"  # 灰色
+        self.color_2 = "#5B8FF9"  # 蓝色
+        self.detect_scale = self.object.config.get("mangaDetectScale", 1)
         self.ui()
 
 
@@ -2007,7 +2010,56 @@ class Setting(QWidget) :
         # 鼠标样式
         self.setCursor(ui.static.icon.PIXMAP_CURSOR)
         # 设置字体
-        self.setStyleSheet("font: %spt '%s';"%("华康方圆体W7", "#595959"))
+        self.setStyleSheet("font: 10pt '华康方圆体W7';")
+
+        # 渲染缩放比例标签
+        label = QLabel(self)
+        label.setText("渲染缩放比例: ")
+        self.customSetGeometry(label, 20, 20, 500, 20)
+        # 渲染缩放比例滑块
+        self.detect_scale_slider = QSlider(self)
+        self.customSetGeometry(self.detect_scale_slider, 120, 20, 280, 25)
+        self.detect_scale_slider.setRange(1, 4)
+        self.detect_scale_slider.setSingleStep(1)
+        self.detect_scale_slider.setOrientation(Qt.Horizontal)
+        self.detect_scale_slider.setValue(self.detect_scale)
+        self.detect_scale_slider.valueChanged.connect(self.changeDetectScale)
+        self.detect_scale_slider.installEventFilter(self)
+        self.detect_scale_slider.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 设置字体
+        self.detect_scale_slider.setStyleSheet("QSlider:groove:horizontal { height: %spx;"
+                                                                           "border-radius: %spx;"
+                                                                           "margin-left: %spx;"
+                                                                           "margin-right: %spx;"
+                                                                           "background: rgba(89, 89, 89, 0.3); }"
+                                              "QSlider:handle:horizontal { width: %spx;"
+                                                                          "height: %spx;"
+                                                                          "margin-top: %spx;"
+                                                                          "margin-left: %spx;"
+                                                                          "margin-bottom: %spx;"
+                                                                          "margin-right: %spx;"
+                                                                          "border-image: url(./config/icon/slider.png); }"
+                                              "QSlider::sub-page:horizontal { height: %spx;"
+                                                                             "border-radius: %spx;"
+                                                                             "margin-left: %spx;"
+                                                                             "background: %s; }"
+                                              %(8.66*self.rate, 4*self.rate, 13.33*self.rate, 13.33*self.rate,
+                                                33.33*self.rate, 33.33*self.rate, -13.33*self.rate, -13.33*self.rate,
+                                                -13.33*self.rate, -13.33*self.rate, 8.66*self.rate, 4*self.rate,
+                                                10*self.rate, self.color_2))
+        # 渲染缩放比例滑块数值标签
+        self.detect_scale_slider_label = QLabel(self)
+        self.customSetGeometry(self.detect_scale_slider_label, 400, 20, 30, 20)
+        self.detect_scale_slider_label.setText("x%s"%self.detect_scale)
+        # 渲染缩放比例?号图标
+        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self)
+        self.customSetIconSize(button, 20, 20)
+        self.customSetGeometry(button, 430, 20, 20, 20)
+        button.clicked.connect(lambda: self.showDesc("detect_scale"))
+        button.setCursor(ui.static.icon.QUESTION_CURSOR)
+        button.setStyleSheet("QPushButton { background: transparent;}"
+                             "QPushButton:hover { background-color: #83AAF9; }"
+                             "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
 
 
     # 根据分辨率定义控件位置尺寸
@@ -2016,6 +2068,35 @@ class Setting(QWidget) :
         object.setGeometry(QRect(int(x * self.rate),
                                  int(y * self.rate), int(w * self.rate),
                                  int(h * self.rate)))
+
+    # 根据分辨率定义图标位置尺寸
+    def customSetIconSize(self, object, w, h) :
+
+        object.setIconSize(QSize(int(w * self.rate),
+                                 int(h * self.rate)))
+
+
+    # 改变渲染缩放比例
+    def changeDetectScale(self) :
+
+        self.detect_scale = self.detect_scale_slider.value()
+        self.object.config["mangaDetectScale"] = self.detect_scale
+        self.detect_scale_slider_label.setText("x{}".format(self.detect_scale))
+
+
+    # 说明窗口
+    def showDesc(self, message_type) :
+
+        self.desc_ui = ui.desc.Desc(self.object)
+        # 文字缩放比例
+        if message_type == "detect_scale" :
+            self.desc_ui.setWindowTitle("文字缩放比例说明")
+            self.desc_ui.desc_text.append("\n会对图片进行放大后再进行识别, 对于字体较小的图片可以调大此参数, 调大可能会增加文字识别耗时"
+                                          "\n\n日文默认值为1, \n英文默认值为3")
+        else :
+            return
+
+        self.desc_ui.show()
 
 
     # 窗口关闭处理
