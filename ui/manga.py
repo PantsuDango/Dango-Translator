@@ -1742,7 +1742,6 @@ class TransEdit(QWidget) :
                 text_block=[text_block]
             )
             if not sign or not result.get("rendered_image", "") :
-                print(result)
                 #@TODO 错误处理
                 return
 
@@ -1774,7 +1773,6 @@ class TransEdit(QWidget) :
             # 刷新大图
             self.object.manga_ui.show_image_widget.loadImage()
             self.object.manga_ui.show_image_widget.matchButtonSize()
-            self.close()
 
         except Exception :
             traceback.print_exc()
