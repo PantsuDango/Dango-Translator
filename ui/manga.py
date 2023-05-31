@@ -816,8 +816,18 @@ class Manga(QWidget) :
                 if skip_sign :
                     continue
                 new_text_block.append(val)
-            result["text_block"] = new_text_block
+            # 过滤屏蔽词和替换词
+            for index, val in enumerate(new_text_block) :
+                new_texts = []
+                for text in val["texts"] :
+                    for filter in self.object.config["Filter"]:
+                        if not filter[0]:
+                            continue
+                        text = text.replace(filter[0], filter[1])
+                    new_texts.append(text)
+                new_text_block[index]["texts"] = new_texts
 
+            result["text_block"] = new_text_block
             # 缓存ocr结果
             with open(self.getJsonFilePath(image_path), "w", encoding="utf-8") as file:
                 json.dump(result, file, indent=4)
@@ -893,6 +903,12 @@ class Manga(QWidget) :
                                             logger=self.logger)
             if result[:11] == "私人ChatGPT: " :
                 return False, result
+
+        # 根据屏蔽词过滤
+        for filter in self.object.config["Filter"]:
+            if not filter[0]:
+                continue
+            result = result.replace(filter[0], filter[1])
 
         for index, word in enumerate(result.split("\n")[:len(json_data["text_block"])]) :
             translated_text.append(word)
