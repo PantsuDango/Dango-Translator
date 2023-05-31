@@ -151,7 +151,7 @@ class createMangaTransQThread(QThread) :
 class createInputImagesQThread(QThread) :
 
     bar_signal = pyqtSignal(float, int, str)
-    image_widget_signal = pyqtSignal(str, bool)
+    image_widget_signal = pyqtSignal(str, str, bool)
 
     def __init__(self, window, images):
 
@@ -169,7 +169,7 @@ class createInputImagesQThread(QThread) :
         for index, image_path in enumerate(self.images) :
             if image_path in self.window.image_path_list :
                 continue
-            self.image_widget_signal.emit(image_path, False)
+            self.image_widget_signal.emit(str(index+1), image_path, False)
             # 进度条
             self.bar_signal.emit(
                 float((index + 1) / len(self.images) * 100),
@@ -180,4 +180,4 @@ class createInputImagesQThread(QThread) :
             if self.window.input_images_progress_bar.stop_sign :
                 break
         self.window.input_images_progress_bar.finish_sign = True
-        self.image_widget_signal.emit("", True)
+        self.image_widget_signal.emit("", "", True)

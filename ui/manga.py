@@ -392,17 +392,17 @@ class Manga(QWidget) :
 
 
     # 导入图片
-    def inputImage(self, image_path, finish_sign) :
+    def inputImage(self, index, image_path, finish_sign) :
 
         if not finish_sign :
             # 图片添加至原图列表框
-            self.originalImageWidgetAddImage(image_path)
+            self.originalImageWidgetAddImage(index, image_path)
             # 图片添加至编辑图列表框
-            self.editImageWidgetAddImage()
+            self.editImageWidgetAddImage(index)
             if os.path.exists(self.getRdrFilePath(image_path)) :
                 self.editImageWidgetRefreshImage(image_path)
             # 图片添加至译图列表框
-            self.transImageWidgetAddImage()
+            self.transImageWidgetAddImage(index)
             if os.path.exists(self.getRdrFilePath(image_path)) :
                 self.transImageWidgetRefreshImage(image_path)
 
@@ -574,29 +574,33 @@ class Manga(QWidget) :
 
 
     # 原图列表框添加图片
-    def originalImageWidgetAddImage(self, image_path):
+    def originalImageWidgetAddImage(self, index, image_path):
 
         item = QListWidgetItem(self.original_image_widget)
         pixmap = QPixmap(image_path)
         pixmap = pixmap.scaled(180*self.rate, 180*self.rate, aspectRatioMode=Qt.KeepAspectRatio)
+        item.setText(index)
         item.setIcon(QIcon(pixmap))
+        item.listWidget()
         self.original_image_widget.addItem(item)
         self.image_path_list.append(image_path)
 
 
     # 编辑图列表框添加图片
-    def editImageWidgetAddImage(self) :
+    def editImageWidgetAddImage(self, index) :
 
         item = QListWidgetItem(self.edit_image_widget)
         item.setSizeHint(QSize(0, 180*self.rate))
+        item.setText(index)
         self.edit_image_widget.addItem(item)
 
 
     # 译图列表框添加图片
-    def transImageWidgetAddImage(self) :
+    def transImageWidgetAddImage(self, index) :
 
         item = QListWidgetItem(self.trans_image_widget)
         item.setSizeHint(QSize(0, 180*self.rate))
+        item.setText(index)
         self.trans_image_widget.addItem(item)
 
 
