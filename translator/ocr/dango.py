@@ -475,3 +475,28 @@ def mangaRDR(object, trans_list, inpainted_image, text_block) :
         object.logger.error(result)
 
     return sign, result
+
+
+# 获取漫画可用字体列表
+def mangaFontList(object) :
+
+    token = object.config.get("DangoToken", "")
+    if token == "" :
+        return False, "获取漫画可用字体列表失败: 未设置DangoToken"
+    url = object.yaml["dict_info"].get("manga_font_list", "https://dl-dev.ap-sh.starivercs.cn/v2/manga_trans/advanced/get_available_fonts")
+    body = {"token": token}
+    try :
+        result = utils.http.post(url=url, body=body, logger=object.logger, timeout=5)
+    except Exception as err :
+        response += str(err)
+    else :
+        code = result.get("Code", -1)
+        if code == 0 :
+            response = result.get("Data", {})
+            sign = True
+        else :
+            response += result.get("Message", "")
+    if not sign :
+        object.logger.error(response)
+
+    return sign, response

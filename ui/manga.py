@@ -303,7 +303,7 @@ class Manga(QWidget) :
 
 
     # 打开图片文件列表
-    def openImageFiles(self, action):
+    def openImageFiles(self, action) :
 
         dir_path = self.object.yaml.get("manga_dir_path", os.getcwd())
         options = QFileDialog.Options()
@@ -1576,7 +1576,7 @@ class TransEdit(QWidget) :
 
         # 窗口尺寸及不可拉伸
         self.window_width = int(500*self.rate)
-        self.window_height = int(300*self.rate)
+        self.window_height = int(330*self.rate)
         self.resize(self.window_width, self.window_height)
         self.setMinimumSize(QSize(self.window_width, self.window_height))
         self.setMaximumSize(QSize(self.window_width, self.window_height))
@@ -1618,6 +1618,36 @@ class TransEdit(QWidget) :
                                            "QPushButton:hover {background-color: #83AAF9;}"
                                            "QPushButton:pressed {background-color: #4480F9;}")
         self.bg_color_button.setToolTip("<b>修改显示的轮廓颜色</b>")
+
+        # 字体样式
+        # button = QPushButton(self)
+        # self.customSetGeometry(button, 140, 0, 70, 30)
+        # button.setCursor(ui.static.icon.EDIT_CURSOR)
+        # button.setText(" 字体")
+        # button.setIcon(ui.static.icon.FONT_ICON)
+        # button.setStyleSheet("QPushButton {background: transparent; font: 8pt '华康方圆体W7';}"
+        #                      "QPushButton:hover {background-color: #83AAF9;}"
+        #                      "QPushButton:pressed {background-color: #4480F9;}")
+        # button.setToolTip("<b>设置字体样式</b>")
+        # # 字体样式菜单
+        # menu = QMenu(button)
+        # group = QActionGroup(menu)
+        # group.setExclusive(True)
+        # # 将下拉菜单设置为按钮的菜单
+        # button.setMenu(menu)
+        # group.triggered.connect(self.changeFont)
+        # utils.thread.createThread(self.createFontAction, menu, group)
+
+        # 字体样式
+        label = QLabel(self)
+        self.customSetGeometry(label, 7, 32, 20, 20)
+        label.setPixmap(ui.static.icon.FONT_PIXMAP)
+        self.font_box = QComboBox(self)
+        self.customSetGeometry(self.font_box, 28, 30, 185, 25)
+        self.font_box.setCursor(ui.static.icon.SELECT_CURSOR)
+        self.font_box.setToolTip("<b>设置字体样式</b>")
+        self.font_box.setStyleSheet("font: 8pt '华康方圆体W7';")
+        utils.thread.createThread(self.createFontBox)
 
         # 私人彩云
         button = QPushButton(self)
@@ -1669,7 +1699,7 @@ class TransEdit(QWidget) :
 
         # 原文编辑框
         self.original_text = QTextBrowser(self)
-        self.customSetGeometry(self.original_text, 0, 30, 500, 100)
+        self.customSetGeometry(self.original_text, 0, 60, 500, 100)
         self.original_text.setCursor(ui.static.icon.PIXMAP_CURSOR)
         self.original_text.setReadOnly(False)
         self.original_text.setStyleSheet("background-color: rgb(224, 224, 224); font: 10pt '%s';"%font_type)
@@ -1677,7 +1707,7 @@ class TransEdit(QWidget) :
 
         # 原文复制按钮
         button = QPushButton(self)
-        self.customSetGeometry(button, 470, 30, 20, 20)
+        self.customSetGeometry(button, 480, 140, 20, 20)
         button.setIcon(ui.static.icon.COPY_ICON)
         button.setStyleSheet("QPushButton {background: transparent; border-radius: 6px}"
                              "QPushButton:hover {background-color: #83AAF9;}"
@@ -1687,7 +1717,7 @@ class TransEdit(QWidget) :
 
         # 译文编辑框
         self.trans_text = QTextBrowser(self)
-        self.customSetGeometry(self.trans_text, 0, 130, 500, 100)
+        self.customSetGeometry(self.trans_text, 0, 160, 500, 100)
         self.trans_text.setCursor(ui.static.icon.PIXMAP_CURSOR)
         self.trans_text.setReadOnly(False)
         self.trans_text.setStyleSheet("font: 10pt '%s';"%font_type)
@@ -1695,7 +1725,7 @@ class TransEdit(QWidget) :
 
         # 译文复制按钮
         button = QPushButton(self)
-        self.customSetGeometry(button, 470, 130, 20, 20)
+        self.customSetGeometry(button, 480, 240, 20, 20)
         button.setIcon(ui.static.icon.COPY_ICON)
         button.setStyleSheet("QPushButton {background: transparent; border-radius: 6px}"
                              "QPushButton:hover {background-color: #83AAF9;}"
@@ -1703,9 +1733,9 @@ class TransEdit(QWidget) :
         button.setToolTip("<b>复制当前译文</b>")
         button.clicked.connect(lambda: pyperclip.copy(self.trans_text.toPlainText()))
 
-        # 确定按钮
+        # 重新贴字按钮
         button = QPushButton(self)
-        self.customSetGeometry(button, 125, 240, 100, 50)
+        self.customSetGeometry(button, 125, 270, 100, 50)
         button.setText("重新贴字")
         button.setStyleSheet("font: 12pt '华康方圆体W7';")
         button.clicked.connect(self.renderTextBlock)
@@ -1714,7 +1744,7 @@ class TransEdit(QWidget) :
 
         # 取消按钮
         button = QPushButton(self)
-        self.customSetGeometry(button, 275, 240, 100, 50)
+        self.customSetGeometry(button, 275, 270, 100, 50)
         button.setText("取消")
         button.setStyleSheet("font: 12pt '华康方圆体W7';")
         button.clicked.connect(self.close)
@@ -1877,6 +1907,41 @@ class TransEdit(QWidget) :
             self.bg_color = color.name()
             self.bg_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=self.bg_color))
         self.show()
+
+
+    # 创建字体按钮的下拉菜单
+    def createFontAction(self, menu, group) :
+
+        sign, resp = translator.ocr.dango.mangaFontList(self.object)
+        if not sign :
+            #@TODO 错误处理
+            return
+        font_list = resp.get("available_fonts", [])
+        for font in font_list :
+            action = QAction(font, menu)
+            action.setCheckable(True)
+            action.setData(font)
+            group.addAction(action)
+            menu.addAction(action)
+
+
+    # 创建字体按钮的下拉菜单
+    def createFontBox(self):
+
+        sign, resp = translator.ocr.dango.mangaFontList(self.object)
+        if not sign:
+            # @TODO 错误处理
+            return
+        font_list = resp.get("available_fonts", [])
+        for index, font in enumerate(font_list) :
+            self.font_box.addItem("")
+            self.font_box.setItemText(index, font)
+
+
+    # 改变字体样式
+    def changeFont(self, action) :
+
+        print(action.data())
 
 
 # 根据文本块大小计算font_size
