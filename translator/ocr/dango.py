@@ -444,7 +444,7 @@ def mangaIPT(object, filepath, mask) :
 
 
 # 漫画文本渲染
-def mangaRDR(object, trans_list, inpainted_image, text_block) :
+def mangaRDR(object, trans_list, inpainted_image, text_block, font="Noto_Sans_SC/NotoSansSC-Regular") :
 
     # 获取配置
     token = object.config.get("DangoToken", "")
@@ -454,6 +454,7 @@ def mangaRDR(object, trans_list, inpainted_image, text_block) :
         "inpainted_image": inpainted_image,
         "translated_text": trans_list,
         "text_block": text_block,
+        "font_selector": [{font: []}],
         "fast_render": True
     }
     sign = False

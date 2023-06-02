@@ -1806,7 +1806,8 @@ class TransEdit(QWidget) :
                 object=self.object,
                 trans_list=[self.trans_text.toPlainText()],
                 inpainted_image=image_base64,
-                text_block=[text_block]
+                text_block=[text_block],
+                font=self.font_box.currentText()
             )
             if not sign or not result.get("rendered_image", "") :
                 #@TODO 错误处理
@@ -1936,6 +1937,7 @@ class TransEdit(QWidget) :
         for index, font in enumerate(font_list) :
             self.font_box.addItem("")
             self.font_box.setItemText(index, font)
+        self.font_box.setCurrentText("Noto_Sans_SC/NotoSansSC-Regular")
 
 
     # 改变字体样式
