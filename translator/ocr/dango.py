@@ -454,7 +454,7 @@ def mangaRDR(object, trans_list, inpainted_image, text_block, font="Noto_Sans_SC
         "inpainted_image": inpainted_image,
         "translated_text": trans_list,
         "text_block": text_block,
-        "font_selector": [{font: []}],
+        "font_selector": [{font: None}],
         "fast_render": True
     }
     sign = False

@@ -1261,6 +1261,7 @@ class RenderTextBlock(QWidget) :
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.scroll_area.setCursor(Qt.OpenHandCursor)
         self.image_label = QLabel(self)
         widget = QWidget()
         layout = QVBoxLayout()
@@ -1293,6 +1294,7 @@ class RenderTextBlock(QWidget) :
             h = h_0*self.image_rate[1]
             # 绘制矩形框
             button = CustomTextBlockButton(self.image_label)
+            button.setCursor(ui.static.icon.EDIT_CURSOR)
             button.initConfig(
                 text_block=text_block,
                 trans=trans_text,
@@ -2032,8 +2034,52 @@ class CustomScrollArea(QScrollArea) :
     def __init__(self, parent=None) :
         super().__init__(parent)
 
+
+    # 取消事件的传递，禁用滚轮控制滚动条
     def wheelEvent(self, event) :
-        event.ignore()  # 取消事件的传递，禁用滚轮控制滚动条
+        event.ignore()
+
+
+    # 鼠标移动事件
+    def mouseMoveEvent(self, e: QMouseEvent) :
+        try :
+            self._endPos = e.pos() - self._startPos
+            horizontal = self.horizontalScrollBar()
+            if self._endPos.x() > 3 :
+                horizontal.setValue(horizontal.value() -3)
+            else :
+                horizontal.setValue(horizontal.value() +3)
+            vertical = self.verticalScrollBar()
+            if self._endPos.y() > 3 :
+                vertical.setValue(vertical.value() -3)
+            else :
+                vertical.setValue(vertical.value() +3)
+        except Exception :
+            traceback.print_exc()
+
+
+    # 鼠标按下事件
+    def mousePressEvent(self, e: QMouseEvent) :
+        try :
+            if e.button() == Qt.LeftButton :
+                self._isTracking = True
+                self._startPos = QPoint(e.x(), e.y())
+                self.setCursor(Qt.ClosedHandCursor)
+        except Exception:
+            traceback.print_exc()
+
+
+    # 鼠标松开事件
+    def mouseReleaseEvent(self, e: QMouseEvent):
+        try :
+            if e.button() == Qt.LeftButton :
+                self._isTracking = False
+                self._startPos = None
+                self._endPos = None
+                self.setCursor(Qt.OpenHandCursor)
+
+        except Exception:
+            traceback.print_exc()
 
 
 # 自定义TextBlock的按钮
