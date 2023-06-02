@@ -62,6 +62,9 @@ class Manga(QWidget) :
         self.setCursor(ui.static.icon.PIXMAP_CURSOR)
         # 设置字体
         self.setStyleSheet("font: %spt '%s';"%(self.font_size, self.font_type))
+        # 最大化
+        self.setWindowState(Qt.WindowMaximized)
+
         # 底部状态栏
         self.status_label = QLabel(self)
 
@@ -1344,11 +1347,9 @@ class RenderTextBlock(QWidget) :
         self.trans_edit_ui.bg_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=bg_color.name()))
         # 原文
         self.trans_edit_ui.original_text.clear()
-        self.trans_edit_ui.original_text.setTextColor(font_color)
         self.trans_edit_ui.original_text.insertPlainText(button.original)
         # 译文
         self.trans_edit_ui.trans_text.clear()
-        self.trans_edit_ui.trans_text.setTextColor(font_color)
         self.trans_edit_ui.trans_text.insertPlainText(button.trans)
 
         self.trans_edit_ui.show()
@@ -1605,7 +1606,7 @@ class TransEdit(QWidget) :
         self.font_color_button.setCursor(ui.static.icon.EDIT_CURSOR)
         self.font_color_button.setText(" 字体色")
         self.font_color_button.clicked.connect(self.changeTranslateColor)
-        self.font_color_button.setStyleSheet("QPushButton {background: transparent; font: 8pt '华康方圆体W7';}"
+        self.font_color_button.setStyleSheet("QPushButton {background: transparent; font: 9pt '华康方圆体W7';}"
                                              "QPushButton:hover {background-color: #83AAF9;}"
                                              "QPushButton:pressed {background-color: #4480F9;}")
         self.font_color_button.setToolTip("<b>修改显示的字体颜色</b>")
@@ -1616,29 +1617,10 @@ class TransEdit(QWidget) :
         self.bg_color_button.setCursor(ui.static.icon.EDIT_CURSOR)
         self.bg_color_button.setText(" 轮廓色")
         self.bg_color_button.clicked.connect(self.changeBackgroundColor)
-        self.bg_color_button.setStyleSheet("QPushButton {background: transparent; font: 8pt '华康方圆体W7';}"
+        self.bg_color_button.setStyleSheet("QPushButton {background: transparent; font: 9pt '华康方圆体W7';}"
                                            "QPushButton:hover {background-color: #83AAF9;}"
                                            "QPushButton:pressed {background-color: #4480F9;}")
         self.bg_color_button.setToolTip("<b>修改显示的轮廓颜色</b>")
-
-        # 字体样式
-        # button = QPushButton(self)
-        # self.customSetGeometry(button, 140, 0, 70, 30)
-        # button.setCursor(ui.static.icon.EDIT_CURSOR)
-        # button.setText(" 字体")
-        # button.setIcon(ui.static.icon.FONT_ICON)
-        # button.setStyleSheet("QPushButton {background: transparent; font: 8pt '华康方圆体W7';}"
-        #                      "QPushButton:hover {background-color: #83AAF9;}"
-        #                      "QPushButton:pressed {background-color: #4480F9;}")
-        # button.setToolTip("<b>设置字体样式</b>")
-        # # 字体样式菜单
-        # menu = QMenu(button)
-        # group = QActionGroup(menu)
-        # group.setExclusive(True)
-        # # 将下拉菜单设置为按钮的菜单
-        # button.setMenu(menu)
-        # group.triggered.connect(self.changeFont)
-        # utils.thread.createThread(self.createFontAction, menu, group)
 
         # 字体样式
         label = QLabel(self)
@@ -1646,9 +1628,9 @@ class TransEdit(QWidget) :
         label.setPixmap(ui.static.icon.FONT_PIXMAP)
         self.font_box = QComboBox(self)
         self.customSetGeometry(self.font_box, 28, 30, 185, 25)
-        self.font_box.setCursor(ui.static.icon.SELECT_CURSOR)
+        self.font_box.setCursor(ui.static.icon.EDIT_CURSOR)
         self.font_box.setToolTip("<b>设置字体样式</b>")
-        self.font_box.setStyleSheet("font: 8pt '华康方圆体W7';")
+        self.font_box.setStyleSheet("font: 9pt '华康方圆体W7';")
         utils.thread.createThread(self.createFontBox)
 
         # 私人彩云
@@ -1657,7 +1639,7 @@ class TransEdit(QWidget) :
         button.setCursor(ui.static.icon.EDIT_CURSOR)
         button.setText(" 彩云")
         button.setIcon(ui.static.icon.TRANSLATE_ICON)
-        button.setStyleSheet("QPushButton {background: transparent; font: 8pt '华康方圆体W7';}"
+        button.setStyleSheet("QPushButton {background: transparent; font: 9pt '华康方圆体W7';}"
                              "QPushButton:hover {background-color: #83AAF9;}"
                              "QPushButton:pressed {background-color: #4480F9;}")
         button.clicked.connect(lambda: self.refreshTrans("彩云"))
@@ -1669,7 +1651,7 @@ class TransEdit(QWidget) :
         button.setCursor(ui.static.icon.EDIT_CURSOR)
         button.setText(" 腾讯")
         button.setIcon(ui.static.icon.TRANSLATE_ICON)
-        button.setStyleSheet("QPushButton {background: transparent; font: 8pt '华康方圆体W7';}"
+        button.setStyleSheet("QPushButton {background: transparent; font: 9pt '华康方圆体W7';}"
                              "QPushButton:hover {background-color: #83AAF9;}"
                              "QPushButton:pressed {background-color: #4480F9;}")
         button.clicked.connect(lambda: self.refreshTrans("腾讯"))
@@ -1681,7 +1663,7 @@ class TransEdit(QWidget) :
         button.setCursor(ui.static.icon.EDIT_CURSOR)
         button.setText(" 百度")
         button.setIcon(ui.static.icon.TRANSLATE_ICON)
-        button.setStyleSheet("QPushButton {background: transparent; font: 8pt '华康方圆体W7';}"
+        button.setStyleSheet("QPushButton {background: transparent; font: 9pt '华康方圆体W7';}"
                              "QPushButton:hover {background-color: #83AAF9;}"
                              "QPushButton:pressed {background-color: #4480F9;}")
         button.clicked.connect(lambda: self.refreshTrans("百度"))
@@ -1693,7 +1675,7 @@ class TransEdit(QWidget) :
         button.setCursor(ui.static.icon.EDIT_CURSOR)
         button.setText(" ChatGPT")
         button.setIcon(ui.static.icon.TRANSLATE_ICON)
-        button.setStyleSheet("QPushButton {background: transparent; font: 8pt '华康方圆体W7'; border-radius: 6px}"
+        button.setStyleSheet("QPushButton {background: transparent; font: 9pt '华康方圆体W7'; border-radius: 6px}"
                              "QPushButton:hover {background-color: #83AAF9;}"
                              "QPushButton:pressed {background-color: #4480F9;}")
         button.clicked.connect(lambda: self.refreshTrans("ChatGPT"))
@@ -1702,15 +1684,15 @@ class TransEdit(QWidget) :
         # 原文编辑框
         self.original_text = QTextBrowser(self)
         self.customSetGeometry(self.original_text, 0, 60, 500, 100)
-        self.original_text.setCursor(ui.static.icon.PIXMAP_CURSOR)
         self.original_text.setReadOnly(False)
-        self.original_text.setStyleSheet("background-color: rgb(224, 224, 224); font: 10pt '%s';"%font_type)
+        self.original_text.setStyleSheet("font: 12pt '%s';"%font_type)
         self.original_text.setCursor(ui.static.icon.EDIT_CURSOR)
 
         # 原文复制按钮
         button = QPushButton(self)
         self.customSetGeometry(button, 480, 140, 20, 20)
         button.setIcon(ui.static.icon.COPY_ICON)
+        self.customSetIconSize(button, 20, 20)
         button.setStyleSheet("QPushButton {background: transparent; border-radius: 6px}"
                              "QPushButton:hover {background-color: #83AAF9;}"
                              "QPushButton:pressed {background-color: #4480F9;}")
@@ -1720,15 +1702,16 @@ class TransEdit(QWidget) :
         # 译文编辑框
         self.trans_text = QTextBrowser(self)
         self.customSetGeometry(self.trans_text, 0, 160, 500, 100)
-        self.trans_text.setCursor(ui.static.icon.PIXMAP_CURSOR)
+        self.trans_text.setCursor(ui.static.icon.EDIT_CURSOR)
         self.trans_text.setReadOnly(False)
-        self.trans_text.setStyleSheet("font: 10pt '%s';"%font_type)
+        self.trans_text.setStyleSheet("font: 12pt '%s';"%font_type)
         self.trans_text.setCursor(ui.static.icon.EDIT_CURSOR)
 
         # 译文复制按钮
         button = QPushButton(self)
         self.customSetGeometry(button, 480, 240, 20, 20)
         button.setIcon(ui.static.icon.COPY_ICON)
+        self.customSetIconSize(button, 20, 20)
         button.setStyleSheet("QPushButton {background: transparent; border-radius: 6px}"
                              "QPushButton:hover {background-color: #83AAF9;}"
                              "QPushButton:pressed {background-color: #4480F9;}")
@@ -1760,6 +1743,11 @@ class TransEdit(QWidget) :
         object.setGeometry(QRect(int(x * self.rate),
                                  int(y * self.rate), int(w * self.rate),
                                  int(h * self.rate)))
+
+    # 根据分辨率定义图标位置尺寸
+    def customSetIconSize(self, object, w, h) :
+
+        object.setIconSize(QSize(int(w * self.rate), int(h * self.rate)))
 
 
     # 重新渲染文字
@@ -1911,23 +1899,6 @@ class TransEdit(QWidget) :
             self.bg_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=self.bg_color))
         self.show()
 
-
-    # 创建字体按钮的下拉菜单
-    def createFontAction(self, menu, group) :
-
-        sign, resp = translator.ocr.dango.mangaFontList(self.object)
-        if not sign :
-            #@TODO 错误处理
-            return
-        font_list = resp.get("available_fonts", [])
-        for font in font_list :
-            action = QAction(font, menu)
-            action.setCheckable(True)
-            action.setData(font)
-            group.addAction(action)
-            menu.addAction(action)
-
-
     # 创建字体按钮的下拉菜单
     def createFontBox(self):
 
@@ -1940,12 +1911,6 @@ class TransEdit(QWidget) :
             self.font_box.addItem("")
             self.font_box.setItemText(index, font)
         self.font_box.setCurrentText("Noto_Sans_SC/NotoSansSC-Regular")
-
-
-    # 改变字体样式
-    def changeFont(self, action) :
-
-        print(action.data())
 
 
 # 根据文本块大小计算font_size
@@ -2249,8 +2214,7 @@ class Setting(QWidget) :
     # 根据分辨率定义图标位置尺寸
     def customSetIconSize(self, object, w, h) :
 
-        object.setIconSize(QSize(int(w * self.rate),
-                                 int(h * self.rate)))
+        object.setIconSize(QSize(int(w * self.rate), int(h * self.rate)))
 
 
     # 改变渲染缩放比例
