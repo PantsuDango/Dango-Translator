@@ -1024,6 +1024,15 @@ class Manga(QWidget) :
         else :
             return
 
+        # 切换图片的时候保持比例
+        init_image_rate = []
+        if self.show_image_widget :
+            init_image_rate = copy.deepcopy(self.show_image_widget.image_rate)
+            # horizontal_0 = self.show_image_scroll_area.horizontalScrollBar().value()
+            # vertical_0 = self.show_image_scroll_area.verticalScrollBar().value()
+            # horizontal_1 = self.show_image_widget.scroll_area.horizontalScrollBar().value()
+            # vertical_1 = self.show_image_widget.scroll_area.verticalScrollBar().value()
+
         w_rate = self.width() / self.window_width
         h_rate = self.height() / self.window_height
         self.show_image_scroll_area.setWidget(None)
@@ -1037,6 +1046,24 @@ class Manga(QWidget) :
         )
         self.show_image_scroll_area.setWidget(self.show_image_widget)
         self.show_image_scroll_area.show()
+
+        # 切换图片的时候保持比例
+        if init_image_rate :
+            self.show_image_widget.image_rate = init_image_rate
+            pixmap = self.show_image_widget.image_pixmap.scaled(
+                self.show_image_widget.image_pixmap.width() * self.show_image_widget.image_rate[0],
+                self.show_image_widget.image_pixmap.height() * self.show_image_widget.image_rate[1]
+            )
+            self.show_image_widget.image_label.setPixmap(pixmap)
+            self.show_image_widget.rate_label.setText("{}%".format(round(self.show_image_widget.image_rate[0] * 100)))
+            self.show_image_widget.matchButtonSize()
+            # # 轮动条
+            # self.show_image_scroll_area.horizontalScrollBar().setValue(horizontal_0)
+            # self.show_image_scroll_area.verticalScrollBar().setValue(vertical_0)
+            # self.show_image_widget.scroll_area.horizontalScrollBar().setValue(horizontal_1)
+            # self.show_image_widget.scroll_area.verticalScrollBar().setValue(vertical_1)
+
+            self.show_image_widget.update()
 
 
     # 翻译完成后刷新译图栏
@@ -1235,7 +1262,8 @@ class Manga(QWidget) :
 # 渲染文本块
 class RenderTextBlock(QWidget) :
 
-    def __init__(self, rate, image_path, original_image_path, ipt_image_path, json_data, edit_window) :
+    def __init__(self, rate, image_path, original_image_path,
+                 ipt_image_path, json_data, edit_window) :
 
         super(RenderTextBlock, self).__init__()
         self.rate = rate
