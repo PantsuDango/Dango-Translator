@@ -193,6 +193,7 @@ class Manga(QWidget) :
         self.original_image_widget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.original_image_widget.customContextMenuRequested.connect(self.showOriginalListWidgetMenu)
         self.original_image_widget.setSpacing(5)
+        self.setAcceptDrops(True)
 
         # 编辑图列表框
         self.edit_image_widget = QListWidget(self)
@@ -481,21 +482,21 @@ class Manga(QWidget) :
                                              "QPushButton:hover {background-color: #83AAF9;}")
         self.trans_image_button.setStyleSheet("QPushButton {background: transparent;}"
                                               "QPushButton:hover {background-color: #83AAF9;}")
-        if button_type == "original":
+        if button_type == "original" :
             self.original_image_widget.show()
             self.original_image_button.setStyleSheet("background-color: #83AAF9;")
             self.original_image_widget.verticalScrollBar().setValue(self.image_widget_scroll_bar_value)
             self.original_image_widget.setCurrentRow(self.image_widget_index)
             self.loadOriginalImage()
 
-        elif button_type == "edit":
+        elif button_type == "edit" :
             self.edit_image_widget.show()
             self.edit_image_button.setStyleSheet("background-color: #83AAF9;")
             self.edit_image_widget.verticalScrollBar().setValue(self.image_widget_scroll_bar_value)
             self.edit_image_widget.setCurrentRow(self.image_widget_index)
             self.loadEditImage()
 
-        elif button_type == "trans":
+        elif button_type == "trans" :
             self.trans_image_widget.show()
             self.trans_image_button.setStyleSheet("background-color: #83AAF9;")
             self.trans_image_widget.verticalScrollBar().setValue(self.image_widget_scroll_bar_value)
@@ -1243,6 +1244,51 @@ class Manga(QWidget) :
                     self.show_error_sign = False
                     return self.show_error_label.hide()
         utils.thread.createThread(waitThread)
+
+
+    # 拖拽文件信号
+    def dragEnterEvent(self, event) :
+        try :
+            if event.mimeData().hasUrls():
+                event.accept()
+            else:
+                event.ignore()
+        except Exception :
+            traceback.print_exc()
+
+
+    # 拖拽导入文件
+    def dropEvent(self, event) :
+
+        try :
+            image_list = []
+            for url in event.mimeData().urls():
+                file_path = url.toLocalFile()
+                # 过滤非图片文件
+                file_ext = os.path.splitext(file_path)[1].lower()
+                if file_ext != ".png" and file_ext != ".jpg" and file_ext != ".jpeg" :
+                    continue
+                image_list.append(file_path)
+            # 去重
+            image_list = list(set(image_list))
+
+            if image_list :
+                event.accept()
+                # 清除所有图片
+                self.clearAllImages()
+                # 根据文件名排序
+                image_list = self.dirFilesPathSort(image_list)
+                # 进度条窗口
+                self.input_images_progress_bar.modifyTitle("导入图片 -- 加载中请勿关闭此窗口")
+                self.input_images_progress_bar.show()
+                # 导入图片线程
+                thread = utils.thread.createInputImagesQThread(self, image_list)
+                thread.bar_signal.connect(self.input_images_progress_bar.paintProgressBar)
+                thread.image_widget_signal.connect(self.inputImage)
+                utils.thread.runQThread(thread)
+
+        except Exception :
+            traceback.print_exc()
 
 
     # 窗口关闭处理
