@@ -1028,10 +1028,6 @@ class Manga(QWidget) :
         init_image_rate = []
         if self.show_image_widget :
             init_image_rate = copy.deepcopy(self.show_image_widget.image_rate)
-            # horizontal_0 = self.show_image_scroll_area.horizontalScrollBar().value()
-            # vertical_0 = self.show_image_scroll_area.verticalScrollBar().value()
-            # horizontal_1 = self.show_image_widget.scroll_area.horizontalScrollBar().value()
-            # vertical_1 = self.show_image_widget.scroll_area.verticalScrollBar().value()
 
         w_rate = self.width() / self.window_width
         h_rate = self.height() / self.window_height
@@ -1049,21 +1045,20 @@ class Manga(QWidget) :
 
         # 切换图片的时候保持比例
         if init_image_rate :
-            self.show_image_widget.image_rate = init_image_rate
-            pixmap = self.show_image_widget.image_pixmap.scaled(
-                self.show_image_widget.image_pixmap.width() * self.show_image_widget.image_rate[0],
-                self.show_image_widget.image_pixmap.height() * self.show_image_widget.image_rate[1]
-            )
-            self.show_image_widget.image_label.setPixmap(pixmap)
-            self.show_image_widget.rate_label.setText("{}%".format(round(self.show_image_widget.image_rate[0] * 100)))
-            self.show_image_widget.matchButtonSize()
-            # # 轮动条
-            # self.show_image_scroll_area.horizontalScrollBar().setValue(horizontal_0)
-            # self.show_image_scroll_area.verticalScrollBar().setValue(vertical_0)
-            # self.show_image_widget.scroll_area.horizontalScrollBar().setValue(horizontal_1)
-            # self.show_image_widget.scroll_area.verticalScrollBar().setValue(vertical_1)
+            self.setImageInitRate(init_image_rate)
 
-            self.show_image_widget.update()
+
+    # 设置图片初始缩放比例
+    def setImageInitRate(self, init_image_rate) :
+
+        self.show_image_widget.image_rate = init_image_rate
+        pixmap = self.show_image_widget.image_pixmap.scaled(
+            self.show_image_widget.image_pixmap.width() * self.show_image_widget.image_rate[0],
+            self.show_image_widget.image_pixmap.height() * self.show_image_widget.image_rate[1]
+        )
+        self.show_image_widget.image_label.setPixmap(pixmap)
+        self.show_image_widget.rate_label.setText("{}%".format(round(self.show_image_widget.image_rate[0] * 100)))
+        self.show_image_widget.matchButtonSize()
 
 
     # 翻译完成后刷新译图栏
@@ -1272,6 +1267,7 @@ class RenderTextBlock(QWidget) :
         self.ipt_image_path = ipt_image_path
         self.json_data = json_data
         self.trans_edit_ui = edit_window
+        self.object = edit_window.object
         self.image_rate = []
         self.button_list = []
         self.ui()
@@ -1483,8 +1479,11 @@ class RenderTextBlock(QWidget) :
         # 刷新文本框按钮索引值
         for i, button in enumerate(self.button_list) :
             button.index = i
-        # 刷新图片
+        # 刷新大图
+        init_image_rate = copy.deepcopy(self.image_rate)
         self.loadImage()
+        self.matchButtonSize()
+        self.object.manga_ui.setImageInitRate(init_image_rate)
 
 
     # 移动文本块位置后重新渲染
@@ -1536,7 +1535,6 @@ class RenderTextBlock(QWidget) :
                 text_block=[text_block]
             )
             if not sign or not result.get("rendered_image", ""):
-                print(result)
                 # @TODO 错误处理
                 return
 
@@ -1581,8 +1579,11 @@ class RenderTextBlock(QWidget) :
             # 刷新按钮信息
             button.rect = (x_n, y_n, w_n, h_n)
             button.text_block = json_data["text_block"][button.index]
-            # 刷新图片
+            # 刷新大图
+            init_image_rate = copy.deepcopy(self.image_rate)
             self.loadImage()
+            self.matchButtonSize()
+            self.object.manga_ui.setImageInitRate(init_image_rate)
 
         except Exception :
             traceback.print_exc()
@@ -1753,7 +1754,6 @@ class TransEdit(QWidget) :
         button.setStyleSheet("font: 12pt '华康方圆体W7';")
         button.clicked.connect(self.renderTextBlock)
         button.setCursor(ui.static.icon.SELECT_CURSOR)
-        button.setCursor(ui.static.icon.EDIT_CURSOR)
 
         # 取消按钮
         button = QPushButton(self)
@@ -1762,7 +1762,6 @@ class TransEdit(QWidget) :
         button.setStyleSheet("font: 12pt '华康方圆体W7';")
         button.clicked.connect(self.close)
         button.setCursor(ui.static.icon.SELECT_CURSOR)
-        button.setCursor(ui.static.icon.EDIT_CURSOR)
 
 
     # 根据分辨率定义控件位置尺寸
@@ -1857,8 +1856,10 @@ class TransEdit(QWidget) :
             self.button.font_color = [f_r, f_g, f_b]
             self.button.bg_color = [b_r, b_g, b_b]
             # 刷新大图
+            init_image_rate = copy.deepcopy(self.object.manga_ui.show_image_widget.image_rate)
             self.object.manga_ui.show_image_widget.loadImage()
             self.object.manga_ui.show_image_widget.matchButtonSize()
+            self.object.manga_ui.setImageInitRate(init_image_rate)
 
         except Exception :
             traceback.print_exc()
