@@ -62,8 +62,8 @@ class Manga(QWidget) :
         self.setCursor(ui.static.icon.PIXMAP_CURSOR)
         # 设置字体
         self.setStyleSheet("font: %spt '%s';"%(self.font_size, self.font_type))
-        # 最大化
-        self.setWindowState(Qt.WindowMaximized)
+        # # 最大化
+        # self.setWindowState(Qt.WindowMaximized)
 
         # 底部状态栏
         self.status_label = QLabel(self)
