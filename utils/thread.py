@@ -140,7 +140,7 @@ class createMangaTransQThread(QThread) :
                 if self.window.trans_process_bar.stop_sign :
                     break
         except Exception :
-            self.logger.error(format_exc())
+            self.logger.error(traceback.format_exc())
             self.signal.emit(traceback.format_exc(), False)
         # 结束
         self.window.trans_process_bar.finish_sign = True

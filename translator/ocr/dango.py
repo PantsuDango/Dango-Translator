@@ -378,12 +378,15 @@ def offlineOCR(object) :
 # 漫画OCR
 def mangaOCR(object, filepath) :
 
+    token = object.config.get("DangoToken", "")
+    if token == "" :
+        return False, "图片文字识别失败: 未获取到token"
     # 获取配置
     with open(filepath, "rb") as file :
         data = file.read()
     image_base64 = base64.b64encode(data).decode("utf-8")
     body = {
-        "token": object.config.get("DangoToken", ""),
+        "token": token,
         "mask": True,
         "refine": True,
         "filtrate": True,
@@ -392,18 +395,16 @@ def mangaOCR(object, filepath) :
     }
     url = object.yaml["dict_info"].get("manga_ocr", "https://dl-dev.ap-sh.starivercs.cn/v2/manga_trans/advanced/manga_ocr")
     sign = False
-    result = "请求漫画OCR服务失败: "
+    result = "图片文字识别失败: "
     try :
-        res = utils.http.post(url=url, body=body, logger=object.logger, timeout=20)
+        resp = utils.http.post(url=url, body=body, logger=object.logger, timeout=20)
+        if resp.get("Code", -1) == 0 :
+            result = resp.get("Data", {})
+            sign = True
+        else:
+            result += resp.get("Message", "")
     except Exception as err :
         result += str(err)
-    else :
-        code = res.get("Code", -1)
-        if code == 0 :
-            result = res.get("Data", {})
-            sign = True
-        else :
-            result += res.get("Message", "")
     if not sign :
         object.logger.error(result)
 
@@ -415,6 +416,8 @@ def mangaIPT(object, filepath, mask) :
 
     # 获取配置
     token = object.config.get("DangoToken", "")
+    if token == "" :
+        return False, "图片文字消除失败: 未获取到token"
     url = object.yaml["dict_info"].get("manga_text_inpaint", "https://dl-dev.ap-sh.starivercs.com:10443/v2/manga_trans/advanced/text_inpaint")
     with open(filepath, "rb") as file :
         data = file.read()
@@ -425,18 +428,16 @@ def mangaIPT(object, filepath, mask) :
         "image": image_base64
     }
     sign = False
-    result = "请求漫画文本消除服务失败: "
+    result = "图片文字消除失败: "
     try :
-        res = utils.http.post(url=url, body=body, logger=object.logger, timeout=20)
-    except Exception as err :
-        result += str(err)
-    else :
-        code = res.get("Code", -1)
-        if code == 0:
-            result = res.get("Data", {})
+        resp = utils.http.post(url=url, body=body, logger=object.logger, timeout=20)
+        if resp.get("Code", -1) == 0 :
+            result = resp.get("Data", {})
             sign = True
         else:
-            result += res.get("Message", "")
+            result += resp.get("Message", "")
+    except Exception as err :
+        result += str(err)
     if not sign :
         object.logger.error(result)
 
@@ -448,6 +449,8 @@ def mangaRDR(object, trans_list, inpainted_image, text_block, font="Noto_Sans_SC
 
     # 获取配置
     token = object.config.get("DangoToken", "")
+    if token == "" :
+        return False, "图片文字渲染失败: 未获取到token"
     url = object.yaml["dict_info"].get("manga_text_render", "https://dl-dev.ap-sh.starivercs.com:10443/v2/manga_trans/advanced/text_render")
     body = {
         "token": token,
@@ -458,21 +461,17 @@ def mangaRDR(object, trans_list, inpainted_image, text_block, font="Noto_Sans_SC
         "fast_render": True
     }
     sign = False
-    result = "请求漫画文本渲染服务失败: "
+    result = "图片文字渲染失败: "
     try :
-        with open("req.json", "w", encoding="utf-8") as file:
-            json.dump(body, file, indent=4)
-        res = utils.http.post(url=url, body=body, logger=object.logger, timeout=20)
-    except Exception as err :
-        result += str(err)
-    else :
-        code = res.get("Code", -1)
-        if code == 0:
-            result = res.get("Data", {})
+        resp = utils.http.post(url=url, body=body, logger=object.logger, timeout=20)
+        if resp.get("Code", -1) == 0 :
+            result = resp.get("Data", {})
             sign = True
         else:
-            result += res.get("Message", "")
-    if not sign:
+            result += resp.get("Message", "")
+    except Exception as err :
+        result += str(err)
+    if not sign :
         object.logger.error(result)
 
     return sign, result
@@ -483,21 +482,58 @@ def mangaFontList(object) :
 
     token = object.config.get("DangoToken", "")
     if token == "" :
-        return False, "获取漫画可用字体列表失败: 未设置DangoToken"
+        return False, "获取字体列表失败: 未获取到token"
+
     url = object.yaml["dict_info"].get("manga_font_list", "https://dl-dev.ap-sh.starivercs.cn/v2/manga_trans/advanced/get_available_fonts")
     body = {"token": token}
+
+    sign = False
+    result = "获取字体列表失败: "
     try :
-        result = utils.http.post(url=url, body=body, logger=object.logger, timeout=5)
-    except Exception as err :
-        response += str(err)
-    else :
-        code = result.get("Code", -1)
-        if code == 0 :
-            response = result.get("Data", {})
+        resp = utils.http.post(url=url, body=body, logger=object.logger, timeout=5)
+        if resp.get("Code", -1) == 0 :
+            result = resp.get("Data", {})
             sign = True
         else :
-            response += result.get("Message", "")
+            result += resp.get("Message", "")
+    except Exception as err :
+        result += str(err)
     if not sign :
-        object.logger.error(response)
+        object.logger.error(result)
 
-    return sign, response
+    return sign, result
+
+
+# 私人团子翻译
+def dangoTrans(object, sentence, language="auto") :
+
+    token = object.config.get("DangoToken", "")
+    if token == "":
+        return False, "私人团子失败: 未获取到token"
+    if not sentence :
+        return True, ""
+
+    url = object.yaml["dict_info"].get("dango_trans", "https://dl-dev.ap-sh.starivercs.cn/v2/translate/sync_task")
+    body = {
+        "token": token,
+        "texts": sentence.split("\n"),
+        "from": language,
+        "to": "CHS"
+    }
+
+    sign = False
+    result = "私人团子: "
+    try :
+        resp = utils.http.post(url=url, body=body, logger=object.logger, timeout=5)
+        if resp.get("Code", -1) == 0 :
+            result = resp.get("Data", {}).get("texts", [])
+            result = "\n".join(result)
+            sign = True
+        else :
+            result += res.get("Message", "我抽风啦, 请尝试重新翻译!")
+    except Exception as err :
+        result += str(err)
+    if not sign :
+        object.logger.error(result)
+
+    return sign, result

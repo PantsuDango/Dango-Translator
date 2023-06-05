@@ -123,6 +123,7 @@ class Manga(QWidget) :
         self.trans_menu = QMenu(self.select_trans_button)
         self.trans_action_group = QActionGroup(self.trans_menu)
         self.trans_action_group.setExclusive(True)
+        self.createTransAction("私人团子")
         self.createTransAction("私人彩云")
         self.createTransAction("私人腾讯")
         self.createTransAction("私人百度")
@@ -877,6 +878,13 @@ class Manga(QWidget) :
 
         # 调用翻译
         result = ""
+        if manga_trans == "私人团子" :
+            sign, result = translator.ocr.dango.dangoTrans(object=self.object,
+                                                           sentence=original,
+                                                           language="auto")
+            if not sign :
+                return False, result
+
         if manga_trans == "私人彩云" :
             result = translator.api.caiyun(sentence=original,
                                            token=self.object.config["caiyunAPI"],
@@ -1712,6 +1720,18 @@ class TransEdit(QWidget) :
         button = QPushButton(self)
         self.customSetGeometry(button, 140, 0, 70, 30)
         button.setCursor(ui.static.icon.EDIT_CURSOR)
+        button.setText(" 团子")
+        button.setIcon(ui.static.icon.TRANSLATE_ICON)
+        button.setStyleSheet("QPushButton {background: transparent; font: 9pt '华康方圆体W7';}"
+                             "QPushButton:hover {background-color: #83AAF9;}"
+                             "QPushButton:pressed {background-color: #4480F9;}")
+        button.clicked.connect(lambda: self.refreshTrans("团子"))
+        button.setToolTip("<b>使用私人团子重新翻译</b>")
+
+        # 私人彩云
+        button = QPushButton(self)
+        self.customSetGeometry(button, 210, 0, 70, 30)
+        button.setCursor(ui.static.icon.EDIT_CURSOR)
         button.setText(" 彩云")
         button.setIcon(ui.static.icon.TRANSLATE_ICON)
         button.setStyleSheet("QPushButton {background: transparent; font: 9pt '华康方圆体W7';}"
@@ -1722,7 +1742,7 @@ class TransEdit(QWidget) :
 
         # 私人腾讯
         button = QPushButton(self)
-        self.customSetGeometry(button, 210, 0, 70, 30)
+        self.customSetGeometry(button, 280, 0, 70, 30)
         button.setCursor(ui.static.icon.EDIT_CURSOR)
         button.setText(" 腾讯")
         button.setIcon(ui.static.icon.TRANSLATE_ICON)
@@ -1734,7 +1754,7 @@ class TransEdit(QWidget) :
 
         # 私人百度
         button = QPushButton(self)
-        self.customSetGeometry(button, 280, 0, 70, 30)
+        self.customSetGeometry(button, 350, 0, 70, 30)
         button.setCursor(ui.static.icon.EDIT_CURSOR)
         button.setText(" 百度")
         button.setIcon(ui.static.icon.TRANSLATE_ICON)
@@ -1746,7 +1766,7 @@ class TransEdit(QWidget) :
 
         # 私人ChatGPT
         button = QPushButton(self)
-        self.customSetGeometry(button, 350, 0, 70, 30)
+        self.customSetGeometry(button, 420, 0, 70, 30)
         button.setCursor(ui.static.icon.EDIT_CURSOR)
         button.setText(" ChatGPT")
         button.setIcon(ui.static.icon.TRANSLATE_ICON)
@@ -1915,7 +1935,11 @@ class TransEdit(QWidget) :
     def refreshTrans(self, trans_type) :
 
         original = self.original_text.toPlainText()
-        if trans_type == "彩云":
+        if trans_type == "团子" :
+            sign, result = translator.ocr.dango.dangoTrans(object=self.object,
+                                                           sentence=original,
+                                                           language="auto")
+        elif trans_type == "彩云" :
             result = translator.api.caiyun(sentence=original,
                                            token=self.object.config["caiyunAPI"],
                                            logger=self.logger)
