@@ -247,6 +247,15 @@ class MangaProgressBar(QWidget) :
         self.rdr_time_label.setText("耗时 - s")
         layout.addWidget(self.rdr_time_label, 3, 2, 1, 2)
 
+        # 翻译进度消息窗口
+        self.message_text = QTextBrowser(self)
+        self.customSetGeometry(self.message_text, 10, 240, 280, 150)
+        self.message_text.setReadOnly(True)
+        self.message_text.setStyleSheet("background-color: rgb(224, 224, 224);"
+                                        "font: 10pt '华康方圆体W7';"
+                                        "border: 1px solid black;")
+        self.message_text.setCursor(ui.static.icon.SELECT_CURSOR)
+
         self.paintProgressBar(0, "0/0")
 
 
@@ -272,7 +281,7 @@ class MangaProgressBar(QWidget) :
         self.color_2 = "#5B8FF9"
         # 界面尺寸
         self.window_width = int(300 * self.rate)
-        self.window_height = int(250 * self.rate)
+        self.window_height = int(400 * self.rate)
         # 结束信号
         self.finish_sign = False
         # 中止信号
@@ -327,6 +336,16 @@ class MangaProgressBar(QWidget) :
         elif status_type == "rdr" :
             self.rdr_icon_label.setPixmap(ui.static.icon.FINISH_PIXMAP)
             self.rdr_time_label.setText("耗时 {} s".format(status_time))
+
+
+    # 设置消息窗文本
+    def setMessageText(self, text, color) :
+
+        if not text :
+            self.message_text.clear()
+        else :
+            self.message_text.insertHtml("<span style='color:{};'>{}</span>".format(color, text))
+            self.message_text.insertHtml("<br>")
 
 
     # 窗口关闭处理

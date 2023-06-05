@@ -796,6 +796,7 @@ class Manga(QWidget) :
         thread = utils.thread.createMangaTransQThread(self, image_paths, reload_sign)
         thread.signal.connect(self.finishTransProcessRefresh)
         thread.bar_signal.connect(self.trans_process_bar.paintProgressBar)
+        thread.add_message_signal.connect(self.trans_process_bar.setMessageText)
         utils.thread.runQThread(thread)
 
 
@@ -1092,6 +1093,7 @@ class Manga(QWidget) :
         thread = utils.thread.createMangaTransQThread(self, self.image_path_list)
         thread.signal.connect(self.finishTransProcessRefresh)
         thread.bar_signal.connect(self.trans_process_bar.paintProgressBar)
+        thread.add_message_signal.connect(self.trans_process_bar.setMessageText)
         utils.thread.runQThread(thread)
 
 

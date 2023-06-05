@@ -109,6 +109,7 @@ class createMangaTransQThread(QThread) :
 
     signal = pyqtSignal(str, bool)
     bar_signal = pyqtSignal(int, str)
+    add_message_signal = pyqtSignal(str, str)
 
     def __init__(self, window, image_paths, reload_sign=False):
 
@@ -124,13 +125,18 @@ class createMangaTransQThread(QThread) :
 
         # 初始化进度条
         self.bar_signal.emit(0, "0/%d"%len(self.image_paths))
+        self.add_message_signal.emit("", "")
         try :
             for index, image_path in enumerate(self.image_paths) :
                 # 翻译进程
                 result = self.window.transProcess(image_path, self.reload_sign)
                 # 如果失败记录日志
+                image_name = os.path.basename(image_path)
                 if result :
                     self.logger.error(result)
+                    self.add_message_signal.emit("{}. {}翻译失败: {}".format(index+1, image_name, result), "red")
+                else :
+                    self.add_message_signal.emit("{}. {}翻译成功".format(index + 1, image_name), "green")
                 # 进度条
                 self.bar_signal.emit(
                     int((index + 1) / len(self.image_paths) * 100),
