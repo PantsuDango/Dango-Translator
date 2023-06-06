@@ -273,7 +273,8 @@ def configConvert(object) :
     # 自动朗读开关
     object.config["autoPlaysoundUse"] = object.config.get("autoPlaysoundUse", False)
     # 图片翻译所使用的翻译源
-    object.config["mangaTrans"] = object.config.get("mangaTrans", "")
+    object.config["mangaTrans"] = object.config.get("mangaTrans", "私人团子")
+    object.config["mangaLanguage"] = object.config.get("mangaLanguage", "JAP")
 
 
 # 保存配置至服务器

@@ -112,6 +112,23 @@ class Manga(QWidget) :
         self.output_image_button.setMenu(self.output_menu)
         self.output_action_group.triggered.connect(self.outputImages)
 
+        # 选择语种按钮
+        self.select_language_button = QPushButton(self)
+        self.select_language_button.setText(" 选择语种")
+        self.select_language_button.setStyleSheet("QPushButton {background: transparent;}"
+                                                  "QPushButton:hover {background-color: #83AAF9;}"
+                                                  "QPushButton:pressed {background-color: #4480F9;}")
+        self.select_language_button.setIcon(ui.static.icon.LANGUAGE_ICON)
+        # 选择语种菜单
+        self.language_menu = QMenu(self.select_language_button)
+        self.language_action_group = QActionGroup(self.language_menu)
+        self.language_action_group.setExclusive(True)
+        self.createLanguageAction("日语(Japanese)")
+        self.createLanguageAction("英语(English)")
+        # 将下拉菜单设置为按钮的菜单
+        self.select_language_button.setMenu(self.language_menu)
+        self.language_action_group.triggered.connect(self.changeSelectLanguage)
+
         # 选择翻译源按钮
         self.select_trans_button = QPushButton(self)
         self.select_trans_button.setText(" 选择翻译源")
@@ -263,6 +280,13 @@ class Manga(QWidget) :
         self.image_widget_scroll_bar_value = 0
         # 渲染文本块的组件列表
         self.render_text_block_label = []
+        # 语种映射表
+        self.language_map = {
+            "JAP": "日语(Japanese)",
+            "ENG": "英语(English)",
+            "RUS": "韩语(Korean)",
+            "KOR": "俄语(Russian)",
+        }
 
 
     # 根据分辨率定义控件位置尺寸
@@ -525,6 +549,18 @@ class Manga(QWidget) :
         self.output_menu.addAction(action)
 
 
+    # 创建语种按钮的下拉菜单
+    def createLanguageAction(self, label) :
+
+        action = QAction(label, self.language_menu)
+        action.setCheckable(True)
+        action.setData(label)
+        self.language_action_group.addAction(action)
+        self.language_menu.addAction(action)
+        if self.language_map[self.object.config["mangaLanguage"]] == label :
+            action.setChecked(True)
+
+
     # 创建翻译源按钮的下拉菜单
     def createTransAction(self, label) :
 
@@ -535,14 +571,32 @@ class Manga(QWidget) :
         self.trans_menu.addAction(action)
         if self.object.config["mangaTrans"] == label :
             action.setChecked(True)
-            self.status_label.setText("正在使用: {}".format(label))
+
+
+    # 改变所使用的语种
+    def changeSelectLanguage(self, action) :
+
+        tmp_map = {}
+        for k, v in self.language_map.items() :
+            tmp_map[v] = k
+        self.object.config["mangaLanguage"] = tmp_map[action.data()]
+        self.refreshStatusLabel()
 
 
     # 改变所使用的翻译源
     def changeSelectTrans(self, action) :
 
         self.object.config["mangaTrans"] = action.data()
-        self.status_label.setText("正在使用: {}".format(action.data()))
+        self.refreshStatusLabel()
+
+
+    # 刷新底部状态栏信息
+    def refreshStatusLabel(self) :
+
+        self.status_label.setText(
+            "原文语种: {}     翻译源: {}"
+            .format(self.language_map[self.object.config["mangaLanguage"]],
+                    self.object.config["mangaTrans"]))
 
 
     # 设置原图列表框右键菜单
@@ -1136,12 +1190,17 @@ class Manga(QWidget) :
             self.trans_all_button.x() + self.input_image_button.width(), 0,
             self.input_image_button.width(), self.input_image_button.height()
         )
-        # 选择翻译源按钮
-        self.select_trans_button.setGeometry(
+        # 选择语种
+        self.select_language_button.setGeometry(
             self.output_image_button.x() + self.input_image_button.width(), 0,
             self.input_image_button.width(), self.input_image_button.height()
         )
         # 选择翻译源按钮
+        self.select_trans_button.setGeometry(
+            self.select_language_button.x() + self.input_image_button.width(), 0,
+            self.input_image_button.width(), self.input_image_button.height()
+        )
+        # 高级设置按钮
         self.setting_button.setGeometry(
             self.select_trans_button.x() + self.input_image_button.width(), 0,
             self.input_image_button.width(), self.input_image_button.height()
