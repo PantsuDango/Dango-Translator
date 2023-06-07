@@ -257,6 +257,8 @@ class Manga(QWidget) :
         # 图片翻译进度条
         self.trans_process_bar = ui.progress_bar.MangaProgressBar(self.object.yaml["screen_scale_rate"])
 
+        self.refreshStatusLabel()
+
 
     # 初始化配置
     def getInitConfig(self):
@@ -936,7 +938,7 @@ class Manga(QWidget) :
         if manga_trans == "私人团子" :
             sign, result = translator.ocr.dango.dangoTrans(object=self.object,
                                                            sentence=original,
-                                                           language="auto")
+                                                           language=self.object.config["mangaLanguage"])
             if not sign :
                 return False, result
 
@@ -1999,7 +2001,7 @@ class TransEdit(QWidget) :
         if trans_type == "团子" :
             sign, result = translator.ocr.dango.dangoTrans(object=self.object,
                                                            sentence=original,
-                                                           language="auto")
+                                                           language=self.object.config["mangaLanguage"])
         elif trans_type == "彩云" :
             result = translator.api.caiyun(sentence=original,
                                            token=self.object.config["caiyunAPI"],

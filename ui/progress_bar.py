@@ -252,7 +252,7 @@ class MangaProgressBar(QWidget) :
         self.customSetGeometry(self.message_text, 10, 240, 280, 150)
         self.message_text.setReadOnly(True)
         self.message_text.setStyleSheet("background-color: rgb(224, 224, 224);"
-                                        "font: 10pt '华康方圆体W7';"
+                                        "font: 9pt '华康方圆体W7';"
                                         "border: 1px solid black;")
         self.message_text.setCursor(ui.static.icon.SELECT_CURSOR)
 
