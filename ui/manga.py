@@ -2294,6 +2294,9 @@ class Setting(QWidget) :
         self.color_1 = "#595959"  # 灰色
         self.color_2 = "#5B8FF9"  # 蓝色
         self.detect_scale = self.object.config.get("mangaDetectScale", 1)
+        self.font_color = self.object.config.get("mangaFontColor", "#83AAF9")
+        self.bg_color = self.object.config.get("mangaBgColor", "#83AAF9")
+        self.font_color_use = self.object.config.get("mangaBgColor", "#83AAF9")
         self.ui()
 
 
@@ -2364,6 +2367,34 @@ class Setting(QWidget) :
         button.setStyleSheet("QPushButton { background: transparent;}"
                              "QPushButton:hover { background-color: #83AAF9; }"
                              "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
+
+        # 修改字体颜色
+        self.font_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.font_color), "", self)
+        self.customSetGeometry(self.font_color_button, 100, 70, 120, 30)
+        self.font_color_button.setCursor(ui.static.icon.EDIT_CURSOR)
+        self.font_color_button.setText(" 全局字体色")
+        #self.font_color_button.clicked.connect(self.changeTranslateColor)
+        self.font_color_button.setStyleSheet("QPushButton {background: transparent;}"
+                                             "QPushButton:hover {background-color: #83AAF9;}"
+                                             "QPushButton:pressed {background-color: #4480F9;}")
+        self.font_color_button.setToolTip("<b>修改显示的字体颜色</b>")
+
+        # 字体颜色开关
+        self.font_color_switch = ui.switch.SwitchOCR(self, self.font_color_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.baidu_ocr_high_precision_switch, 20, 170, 65, 20)
+        self.baidu_ocr_high_precision_switch.checkedChanged.connect(self.changeBaiduOcrHighPrecisionSwitch)
+        self.baidu_ocr_high_precision_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+
+        # # 修改轮廓颜色
+        # self.bg_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.bg_color), "", self)
+        # self.customSetGeometry(self.bg_color_button, 70, 0, 70, 30)
+        # self.bg_color_button.setCursor(ui.static.icon.EDIT_CURSOR)
+        # self.bg_color_button.setText(" 轮廓色")
+        # self.bg_color_button.clicked.connect(self.changeBackgroundColor)
+        # self.bg_color_button.setStyleSheet("QPushButton {background: transparent; font: 9pt '华康方圆体W7';}"
+        #                                    "QPushButton:hover {background-color: #83AAF9;}"
+        #                                    "QPushButton:pressed {background-color: #4480F9;}")
+        # self.bg_color_button.setToolTip("<b>修改显示的轮廓颜色</b>")
 
 
     # 根据分辨率定义控件位置尺寸
