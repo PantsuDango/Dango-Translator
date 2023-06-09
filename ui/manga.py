@@ -865,6 +865,7 @@ class Manga(QWidget) :
             with open(self.getMaskFilePath(image_path), "wb") as file :
                 file.write(base64.b64decode(result["mask"]))
             del result["mask"]
+
             # 过滤错误的文本块
             new_text_block = []
             for index, val in enumerate(result.get("text_block", [])) :
@@ -878,7 +879,21 @@ class Manga(QWidget) :
                         break
                 if skip_sign :
                     continue
+                # 使用全局字体色
+                if self.object.config["mangaFontColorUse"] and val.get("foreground_color", []) :
+                    color = QColor(self.object.config["mangaFontColor"])
+                    f_r, f_g, f_b, f_a = color.getRgb()
+                    val["foreground_color"] = [f_r, f_g, f_b]
+                # 使用全局轮廓色
+                if self.object.config["mangaBgColorUse"] and val.get("background_color", []):
+                    color = QColor(self.object.config["mangaBgColor"])
+                    b_r, b_g, b_b, b_a = color.getRgb()
+                    val["background_color"] = [b_r, b_g, b_b]
+                # 使用全局字体
+                val["font_selector"] = self.object.config["mangaFontType"]
+
                 new_text_block.append(val)
+
             # 过滤屏蔽词和替换词
             for index, val in enumerate(new_text_block) :
                 new_texts = []
@@ -992,7 +1007,7 @@ class Manga(QWidget) :
 
 
     # 漫画文字渲染
-    def mangaTextRdr(self, image_path):
+    def mangaTextRdr(self, image_path) :
 
         # 从缓存文件中获取json结果
         with open(self.getJsonFilePath(image_path), "r", encoding="utf-8") as file :
@@ -1005,7 +1020,8 @@ class Manga(QWidget) :
             object=self.object,
             trans_list=json_data["translated_text"],
             inpainted_image=ipt,
-            text_block=json_data["text_block"]
+            text_block=json_data["text_block"],
+            font=self.object.config["mangaFontType"]
         )
         if sign :
             # 缓存ipt图片
@@ -1446,7 +1462,8 @@ class RenderTextBlock(QWidget) :
                 index=index,
                 original_image_path=self.original_image_path,
                 ipt_image_path=self.ipt_image_path,
-                rdr_image_path=self.image_path
+                rdr_image_path=self.image_path,
+                font_type=text_block.get("font_selector", "Noto_Sans_SC/NotoSansSC-Regular")
             )
             # 打开文本框编辑信号
             button.click_signal.connect(self.clickTextBlock)
@@ -1492,6 +1509,8 @@ class RenderTextBlock(QWidget) :
         # 译文
         self.trans_edit_ui.trans_text.clear()
         self.trans_edit_ui.trans_text.insertPlainText(button.trans)
+        # 字体样式
+        self.trans_edit_ui.font_box.setCurrentText(button.font_type)
 
         self.trans_edit_ui.show()
 
@@ -1768,17 +1787,6 @@ class TransEdit(QWidget) :
                                            "QPushButton:pressed {background-color: #4480F9;}")
         self.bg_color_button.setToolTip("<b>修改显示的轮廓颜色</b>")
 
-        # 字体样式
-        label = QLabel(self)
-        self.customSetGeometry(label, 7, 32, 20, 20)
-        label.setPixmap(ui.static.icon.FONT_PIXMAP)
-        self.font_box = QComboBox(self)
-        self.customSetGeometry(self.font_box, 28, 30, 185, 25)
-        self.font_box.setCursor(ui.static.icon.EDIT_CURSOR)
-        self.font_box.setToolTip("<b>设置字体样式</b>")
-        self.font_box.setStyleSheet("font: 9pt '华康方圆体W7';")
-        utils.thread.createThread(self.createFontBox)
-
         # 私人彩云
         button = QPushButton(self)
         self.customSetGeometry(button, 140, 0, 70, 30)
@@ -1838,6 +1846,17 @@ class TransEdit(QWidget) :
                              "QPushButton:pressed {background-color: #4480F9;}")
         button.clicked.connect(lambda: self.refreshTrans("ChatGPT"))
         button.setToolTip("<b>使用私人ChatGPT重新翻译</b>")
+
+        # 字体样式
+        label = QLabel(self)
+        self.customSetGeometry(label, 7, 32, 20, 20)
+        label.setPixmap(ui.static.icon.FONT_PIXMAP)
+        self.font_box = QComboBox(self)
+        self.customSetGeometry(self.font_box, 28, 30, 185, 25)
+        self.font_box.setCursor(ui.static.icon.EDIT_CURSOR)
+        self.font_box.setToolTip("<b>设置字体样式</b>")
+        self.font_box.setStyleSheet("font: 9pt '华康方圆体W7';")
+        utils.thread.createThread(self.createFontBox)
 
         # 原文编辑框
         self.original_text = QTextBrowser(self)
@@ -1974,6 +1993,7 @@ class TransEdit(QWidget) :
             json_data["translated_text"][self.button.index] = self.trans_text.toPlainText()
             json_data["text_block"][self.button.index]["foreground_color"] = [f_r, f_g, f_b]
             json_data["text_block"][self.button.index]["background_color"] = [b_r, b_g, b_b]
+            json_data["text_block"][self.button.index]["font_selector"] = self.font_box.currentText()
 
             # 缓存ocr结果
             with open(json_file_path, "w", encoding="utf-8") as file :
@@ -1984,6 +2004,7 @@ class TransEdit(QWidget) :
             self.button.trans = self.trans_text.toPlainText()
             self.button.font_color = [f_r, f_g, f_b]
             self.button.bg_color = [b_r, b_g, b_b]
+            self.button.font_type = self.font_box.currentText()
             # 刷新大图
             init_image_rate = copy.deepcopy(self.object.manga_ui.show_image_widget.image_rate)
             self.object.manga_ui.show_image_widget.loadImage()
@@ -2061,6 +2082,7 @@ class TransEdit(QWidget) :
             self.bg_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=self.bg_color))
         self.show()
 
+
     # 创建字体按钮的下拉菜单
     def createFontBox(self):
 
@@ -2072,7 +2094,6 @@ class TransEdit(QWidget) :
         for index, font in enumerate(font_list) :
             self.font_box.addItem("")
             self.font_box.setItemText(index, font)
-        self.font_box.setCurrentText("Noto_Sans_SC/NotoSansSC-Regular")
 
 
 # 根据文本块大小计算font_size
@@ -2224,7 +2245,7 @@ class CustomTextBlockButton(QPushButton) :
 
 
     # 参数初始化
-    def initConfig(self, text_block, trans, rect, index, original_image_path, ipt_image_path, rdr_image_path) :
+    def initConfig(self, text_block, trans, rect, index, original_image_path, ipt_image_path, rdr_image_path, font_type) :
 
         self.trans = trans
         self.text_block = text_block
@@ -2233,6 +2254,7 @@ class CustomTextBlockButton(QPushButton) :
         self.original_image_path = original_image_path
         self.ipt_image_path = ipt_image_path
         self.rdr_image_path = rdr_image_path
+        self.font_type = font_type
 
         # 文本块信息
         self.original = ""
@@ -2296,7 +2318,8 @@ class Setting(QWidget) :
         self.detect_scale = self.object.config.get("mangaDetectScale", 1)
         self.font_color = self.object.config.get("mangaFontColor", "#83AAF9")
         self.bg_color = self.object.config.get("mangaBgColor", "#83AAF9")
-        self.font_color_use = self.object.config.get("mangaBgColor", "#83AAF9")
+        self.font_color_use = self.object.config.get("mangaFontColorUse", False)
+        self.bg_color_use = self.object.config.get("mangaBgColorUse", False)
         self.ui()
 
 
@@ -2311,13 +2334,13 @@ class Setting(QWidget) :
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowCloseButtonHint)
 
         # 窗口标题
-        self.setWindowTitle("图片翻译-高级设置")
+        self.setWindowTitle("高级设置（关闭自动保存）")
         # 窗口图标
         self.setWindowIcon(ui.static.icon.APP_LOGO_ICON)
         # 鼠标样式
         self.setCursor(ui.static.icon.PIXMAP_CURSOR)
         # 设置字体
-        self.setStyleSheet("font: 10pt '华康方圆体W7';")
+        self.setStyleSheet("font: 10pt '华康方圆体W7'; background: #FFFFFF;")
 
         # 渲染缩放比例标签
         label = QLabel(self)
@@ -2368,33 +2391,75 @@ class Setting(QWidget) :
                              "QPushButton:hover { background-color: #83AAF9; }"
                              "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
 
-        # 修改字体颜色
+        # 全局字体色开关
+        self.font_color_switch = ui.switch.SwitchOCR(self, self.font_color_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.font_color_switch, 20, 70, 65, 20)
+        self.font_color_switch.checkedChanged.connect(self.changeMangaFontColorSwitch)
+        self.font_color_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 修改全局字体色
         self.font_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.font_color), "", self)
-        self.customSetGeometry(self.font_color_button, 100, 70, 120, 30)
+        self.customSetGeometry(self.font_color_button, 100, 70, 100, 20)
         self.font_color_button.setCursor(ui.static.icon.EDIT_CURSOR)
         self.font_color_button.setText(" 全局字体色")
-        #self.font_color_button.clicked.connect(self.changeTranslateColor)
+        self.font_color_button.clicked.connect(self.changeFontColor)
         self.font_color_button.setStyleSheet("QPushButton {background: transparent;}"
                                              "QPushButton:hover {background-color: #83AAF9;}"
                                              "QPushButton:pressed {background-color: #4480F9;}")
-        self.font_color_button.setToolTip("<b>修改显示的字体颜色</b>")
+        self.font_color_button.setToolTip("<b>全局修改显示的字体颜色</b>")
+        # 全局字体色?号图标
+        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self)
+        self.customSetIconSize(button, 20, 20)
+        self.customSetGeometry(button, 210, 70, 20, 20)
+        button.clicked.connect(lambda: self.showDesc("font_color"))
+        button.setCursor(ui.static.icon.QUESTION_CURSOR)
+        button.setStyleSheet("QPushButton { background: transparent;}"
+                             "QPushButton:hover { background-color: #83AAF9; }"
+                             "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
 
-        # 字体颜色开关
-        self.font_color_switch = ui.switch.SwitchOCR(self, self.font_color_use, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.baidu_ocr_high_precision_switch, 20, 170, 65, 20)
-        self.baidu_ocr_high_precision_switch.checkedChanged.connect(self.changeBaiduOcrHighPrecisionSwitch)
-        self.baidu_ocr_high_precision_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 全局轮廓色开关
+        self.bg_color_switch = ui.switch.SwitchOCR(self, self.bg_color_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.bg_color_switch, 250, 70, 65, 20)
+        self.bg_color_switch.checkedChanged.connect(self.changeMangaBgColorUseSwitch)
+        self.bg_color_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 修改轮廓颜色
+        self.bg_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.bg_color), "", self)
+        self.customSetGeometry(self.bg_color_button, 330, 70, 100, 20)
+        self.bg_color_button.setCursor(ui.static.icon.EDIT_CURSOR)
+        self.bg_color_button.setText(" 全局轮廓色")
+        self.bg_color_button.clicked.connect(self.changeBackgroundColor)
+        self.bg_color_button.setStyleSheet("QPushButton {background: transparent;}"
+                                           "QPushButton:hover {background-color: #83AAF9;}"
+                                           "QPushButton:pressed {background-color: #4480F9;}")
+        self.bg_color_button.setToolTip("<b>全局修改显示的轮廓颜色</b>")
+        # 全局字体色?号图标
+        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self)
+        self.customSetIconSize(button, 20, 20)
+        self.customSetGeometry(button, 440, 70, 20, 20)
+        button.clicked.connect(lambda: self.showDesc("bg_color"))
+        button.setCursor(ui.static.icon.QUESTION_CURSOR)
+        button.setStyleSheet("QPushButton { background: transparent;}"
+                             "QPushButton:hover { background-color: #83AAF9; }"
+                             "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
 
-        # # 修改轮廓颜色
-        # self.bg_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.bg_color), "", self)
-        # self.customSetGeometry(self.bg_color_button, 70, 0, 70, 30)
-        # self.bg_color_button.setCursor(ui.static.icon.EDIT_CURSOR)
-        # self.bg_color_button.setText(" 轮廓色")
-        # self.bg_color_button.clicked.connect(self.changeBackgroundColor)
-        # self.bg_color_button.setStyleSheet("QPushButton {background: transparent; font: 9pt '华康方圆体W7';}"
-        #                                    "QPushButton:hover {background-color: #83AAF9;}"
-        #                                    "QPushButton:pressed {background-color: #4480F9;}")
-        # self.bg_color_button.setToolTip("<b>修改显示的轮廓颜色</b>")
+        # 全局字体样式标签
+        label = QLabel(self)
+        label.setText("全局字体样式: ")
+        self.customSetGeometry(label, 20, 120, 500, 20)
+        # 全局字体样式
+        self.font_box = QComboBox(self)
+        self.customSetGeometry(self.font_box, 120, 120, 300, 25)
+        self.font_box.setCursor(ui.static.icon.EDIT_CURSOR)
+        self.font_box.setToolTip("<b>设置全局字体样式</b>")
+        utils.thread.createThread(self.createFontBox)
+        # 全局字体样式?号图标
+        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self)
+        self.customSetIconSize(button, 20, 20)
+        self.customSetGeometry(button, 430, 120, 20, 20)
+        button.clicked.connect(lambda: self.showDesc("font_type"))
+        button.setCursor(ui.static.icon.QUESTION_CURSOR)
+        button.setStyleSheet("QPushButton { background: transparent;}"
+                             "QPushButton:hover { background-color: #83AAF9; }"
+                             "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
 
 
     # 根据分辨率定义控件位置尺寸
@@ -2427,10 +2492,80 @@ class Setting(QWidget) :
             self.desc_ui.setWindowTitle("文字缩放比例说明")
             self.desc_ui.desc_text.append("\n会对图片进行放大后再进行识别, 对于字体较小的图片可以调大此参数, 调大可能会增加文字识别耗时"
                                           "\n\n日文默认值为1, \n英文默认值为3")
+        elif message_type == "font_color" :
+            self.desc_ui.setWindowTitle("全局字体色说明")
+            self.desc_ui.desc_text.append("\n开启开关, 会使所有图片, 翻译后渲染的文字使用此颜色"
+                                          "\n开关关闭, 则由系统自动判断渲染颜色")
+        elif message_type == "bg_color" :
+            self.desc_ui.setWindowTitle("全局轮廓色说明")
+            self.desc_ui.desc_text.append("\n开启开关后, 会使所有图片, 翻译后渲染的文字轮廓使用此颜色"
+                                          "\n开关关闭, 则由系统自动判断渲染颜色")
+        elif message_type == "font_type" :
+            self.desc_ui.setWindowTitle("全局字体样式说明")
+            self.desc_ui.desc_text.append("\n使所有图片, 翻译后渲染的字体使用此样式"
+                                          "\n\n默认值为 Noto_Sans_SC/NotoSansSC-Regular")
         else :
             return
 
         self.desc_ui.show()
+
+
+    # 改变全局字体色开关状态
+    def changeMangaFontColorSwitch(self, checked) :
+
+        self.object.config["mangaFontColorUse"] = checked
+
+
+    # 改变全局轮廓色开关状态
+    def changeMangaBgColorUseSwitch(self, checked) :
+
+        self.object.config["mangaBgColorUse"] = checked
+
+
+    # 修改字体颜色
+    def changeFontColor(self) :
+
+        self.hide()
+        color = QColorDialog.getColor(QColor(self.font_color), None, "修改全局字体颜色")
+        if color.isValid() :
+            self.font_color = color.name()
+            self.font_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=self.font_color))
+            self.object.config["mangaFontColor"] = self.font_color
+        self.show()
+
+
+    # 修改轮廓颜色
+    def changeBackgroundColor(self) :
+
+        self.hide()
+        color = QColorDialog.getColor(QColor(self.bg_color), None, "修改全局轮廓颜色")
+        if color.isValid():
+            self.bg_color = color.name()
+            self.bg_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=self.bg_color))
+            self.object.config["mangaBgColor"] = self.bg_color
+        self.show()
+
+
+    # 全局字体样式下拉菜单
+    def createFontBox(self) :
+
+        sign, resp = translator.ocr.dango.mangaFontList(self.object)
+        if not sign:
+            # @TODO 错误处理
+            return
+        font_list = resp.get("available_fonts", [])
+        for index, font in enumerate(font_list):
+            self.font_box.addItem("")
+            self.font_box.setItemText(index, font)
+        self.font_box.setCurrentText(self.object.config["mangaFontType"])
+        self.font_box.currentTextChanged.connect(self.changeMangaFontType)
+
+
+    # 改变全局字体样式
+    def changeMangaFontType(self) :
+
+        self.object.config["mangaFontType"] = self.font_box.currentText()
+
 
 
     # 窗口关闭处理
