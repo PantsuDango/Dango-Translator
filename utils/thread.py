@@ -149,6 +149,7 @@ class createMangaTransQThread(QThread) :
             self.logger.error(traceback.format_exc())
             self.signal.emit(traceback.format_exc(), False)
         # 结束
+        self.add_message_signal.emit("\n全部图片翻译完成~", "green")
         self.window.trans_process_bar.finish_sign = True
         self.signal.emit("", False)
 

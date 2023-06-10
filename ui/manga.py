@@ -57,7 +57,7 @@ class Manga(QWidget) :
         # 窗口尺寸
         self.resize(self.window_width*self.rate, self.window_height*self.rate)
         # 窗口标题
-        self.setWindowTitle("图片翻译")
+        self.setWindowTitle("图片翻译 Ver{}         当前登录用户: {}".format(self.object.yaml["version"], self.object.yaml["user"]))
         # 窗口图标
         self.setWindowIcon(ui.static.icon.APP_LOGO_ICON)
         # 鼠标样式
@@ -1173,7 +1173,6 @@ class Manga(QWidget) :
             if value:
                 # @TODO 缺少错误处理
                 pass
-            self.trans_process_bar.close()
             self.trans_all_button.setEnabled(True)
 
 
