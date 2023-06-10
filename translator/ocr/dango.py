@@ -457,9 +457,13 @@ def mangaRDR(object, trans_list, inpainted_image, text_block, font="Noto_Sans_SC
         "inpainted_image": inpainted_image,
         "translated_text": trans_list,
         "text_block": text_block,
-        "font_selector": [{font: None}],
         "fast_render": True
     }
+    if len(text_block) > 0 :
+        body["font_selector"] = []
+        for val in text_block :
+            body["font_selector"].append({font: None})
+
     sign = False
     result = "图片文字渲染失败: "
     try :
