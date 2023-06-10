@@ -376,7 +376,7 @@ def offlineOCR(object) :
 
 
 # 漫画OCR
-def mangaOCR(object, filepath) :
+def mangaOCR(object, filepath, check_permission) :
 
     token = object.config.get("DangoToken", "")
     if token == "" :
@@ -394,6 +394,10 @@ def mangaOCR(object, filepath) :
         "image": image_base64
     }
     url = object.yaml["dict_info"].get("manga_ocr", "https://dl-dev.ap-sh.starivercs.cn/v2/manga_trans/advanced/manga_ocr")
+    # 试用
+    if check_permission :
+        url = object.yaml["dict_info"].get("manga_probate_ocr", "https://dl-dev.ap-sh.starivercs.cn/v2/manga_probate/advanced/manga_ocr")
+
     sign = False
     result = "图片文字识别失败: "
     try :
@@ -412,13 +416,17 @@ def mangaOCR(object, filepath) :
 
 
 # 漫画文本消除
-def mangaIPT(object, filepath, mask) :
+def mangaIPT(object, filepath, mask, check_permission) :
 
     # 获取配置
     token = object.config.get("DangoToken", "")
     if token == "" :
         return False, "图片文字消除失败: 未获取到token"
+
     url = object.yaml["dict_info"].get("manga_text_inpaint", "https://dl-dev.ap-sh.starivercs.com:10443/v2/manga_trans/advanced/text_inpaint")
+    # 试用
+    if check_permission :
+        url = object.yaml["dict_info"].get("manga_probate_text_inpaint", "https://dl-dev.ap-sh.starivercs.cn/v2/manga_probate/advanced/text_inpaint")
     with open(filepath, "rb") as file :
         data = file.read()
     image_base64 = base64.b64encode(data).decode("utf-8")
@@ -445,13 +453,16 @@ def mangaIPT(object, filepath, mask) :
 
 
 # 漫画文本渲染
-def mangaRDR(object, trans_list, inpainted_image, text_block, font="Noto_Sans_SC/NotoSansSC-Regular") :
+def mangaRDR(object, trans_list, inpainted_image, text_block, font, check_permission) :
 
     # 获取配置
     token = object.config.get("DangoToken", "")
     if token == "" :
         return False, "图片文字渲染失败: 未获取到token"
     url = object.yaml["dict_info"].get("manga_text_render", "https://dl-dev.ap-sh.starivercs.com:10443/v2/manga_trans/advanced/text_render")
+    # 试用
+    if check_permission :
+        url = object.yaml["dict_info"].get("manga_probate_text_render", "https://dl-dev.ap-sh.starivercs.cn/v2/manga_probate/advanced/text_render")
     body = {
         "token": token,
         "inpainted_image": inpainted_image,
@@ -459,7 +470,7 @@ def mangaRDR(object, trans_list, inpainted_image, text_block, font="Noto_Sans_SC
         "text_block": text_block,
         "fast_render": True
     }
-    if len(text_block) > 0 :
+    if font and len(text_block) > 0 :
         body["font_selector"] = []
         for val in text_block :
             body["font_selector"].append({font: None})

@@ -26,6 +26,7 @@ import utils.thread
 import utils.message
 import ui.progress_bar
 import utils.zip
+import utils.http
 
 
 FONT_PATH_1 = "./config/other/NotoSansSC-Regular.otf"
@@ -48,6 +49,7 @@ class Manga(QWidget) :
         self.trans_edit_ui = TransEdit(object)
         self.show_image_widget = None
         self.show_error_sign = False
+        utils.thread.createThread(self.checkPermission)
 
 
     def ui(self) :
@@ -158,6 +160,15 @@ class Manga(QWidget) :
         self.setting_button.setIcon(ui.static.icon.SETTING_ICON)
         self.setting_button.clicked.connect(self.setting_ui.show)
 
+        # 购买按钮
+        self.buy_button = QPushButton(self)
+        self.buy_button.setText(" 购买")
+        self.buy_button.setStyleSheet("QPushButton {background: transparent;}"
+                                      "QPushButton:hover {background-color: #83AAF9;}"
+                                      "QPushButton:pressed {background-color: #4480F9;}")
+        self.buy_button.setIcon(ui.static.icon.GO_BUY_ICON)
+        self.buy_button.clicked.connect(self.object.settin_ui.openDangoBuyPage)
+
         # 教程按钮
         self.tutorial_button = QPushButton(self)
         self.tutorial_button.setText(" 使用教程")
@@ -257,11 +268,12 @@ class Manga(QWidget) :
         # 图片翻译进度条
         self.trans_process_bar = ui.progress_bar.MangaProgressBar(self.object.yaml["screen_scale_rate"])
 
+        # 刷新底部状态栏
         self.refreshStatusLabel()
 
 
     # 初始化配置
-    def getInitConfig(self):
+    def getInitConfig(self) :
 
         # 界面缩放比例
         self.rate = self.object.yaml["screen_scale_rate"]
@@ -289,6 +301,10 @@ class Manga(QWidget) :
             "RUS": "韩语(Korean)",
             "KOR": "俄语(Russian)",
         }
+        # 试用开关
+        self.check_permission = False
+        # 接口试用次数
+        self.manga_read_count = -1
 
 
     # 根据分辨率定义控件位置尺寸
@@ -595,10 +611,16 @@ class Manga(QWidget) :
     # 刷新底部状态栏信息
     def refreshStatusLabel(self) :
 
+        if self.check_permission :
+            probate_switch = "打开"
+        else :
+            probate_switch = "关闭"
         self.status_label.setText(
-            "原文语种: {}     翻译源: {}"
+            "原文语种: {}     翻译源: {}     试用开关: {}     剩余试用次数: {}"
             .format(self.language_map[self.object.config["mangaLanguage"]],
-                    self.object.config["mangaTrans"]))
+                    self.object.config["mangaTrans"],
+                    probate_switch,
+                    self.manga_read_count))
 
 
     # 设置原图列表框右键菜单
@@ -859,7 +881,7 @@ class Manga(QWidget) :
     # 漫画OCR
     def mangaOCR(self, image_path) :
 
-        sign, result = translator.ocr.dango.mangaOCR(self.object, image_path)
+        sign, result = translator.ocr.dango.mangaOCR(self.object, image_path, self.check_permission)
         if sign :
             # 缓存mask图片
             with open(self.getMaskFilePath(image_path), "wb") as file :
@@ -920,7 +942,7 @@ class Manga(QWidget) :
         with open(self.getMaskFilePath(image_path), "rb") as file:
             mask = base64.b64encode(file.read()).decode("utf-8")
         # 请求漫画ipt
-        sign, result = translator.ocr.dango.mangaIPT(self.object, image_path, mask)
+        sign, result = translator.ocr.dango.mangaIPT(self.object, image_path, mask, self.check_permission)
         if sign :
             # 缓存inpaint图片
             with open(self.getIptFilePath(image_path), "wb") as file :
@@ -990,7 +1012,7 @@ class Manga(QWidget) :
                 return False, result
 
         # 根据屏蔽词过滤
-        for filter in self.object.config["Filter"]:
+        for filter in self.object.config["Filter"] :
             if not filter[0]:
                 continue
             result = result.replace(filter[0], filter[1])
@@ -1021,7 +1043,8 @@ class Manga(QWidget) :
             trans_list=json_data["translated_text"],
             inpainted_image=ipt,
             text_block=json_data["text_block"],
-            font=self.object.config["mangaFontType"]
+            font=self.object.config["mangaFontType"],
+            check_permission=self.check_permission
         )
         if sign :
             # 缓存ipt图片
@@ -1228,6 +1251,11 @@ class Manga(QWidget) :
             w-self.input_image_button.width(), 0,
             self.input_image_button.width(), self.input_image_button.height()
         )
+        # 购买按钮
+        self.buy_button.setGeometry(
+            w-self.input_image_button.width()*2, 0,
+            self.input_image_button.width(), self.input_image_button.height()
+        )
         # 工具栏横向分割线
         self.cut_line_label1.setGeometry(
             0, self.input_image_button.height(),
@@ -1312,9 +1340,9 @@ class Manga(QWidget) :
         text = ""
         for message in messages :
             if message == messages[-1] :
-                text += "     " + message
+                text += "   " + message
             else :
-                text += "     " + message + "\n"
+                text += "   " + message + "\n"
         self.show_error_label.setText(text)
         self.show_error_label.show()
 
@@ -1376,6 +1404,70 @@ class Manga(QWidget) :
 
         except Exception :
             traceback.print_exc()
+
+
+    # 校验图片翻译接口权限
+    def checkPermission(self) :
+
+        token = self.object.config.get("DangoToken", "")
+        if not token:
+            # 登录OCR服务获取token
+            utils.http.loginDangoOCR(self.object)
+
+        url = self.object.yaml.get("dango_check_permission", "https://capiv1.ap-sh.starivercs.cn/OCR/Admin/CheckPermission")
+        url += "?Token={}".format(token)
+        body = {"Type": 1}
+
+        while True :
+
+
+            resp = utils.http.post(url=url, body=body, logger=self.logger, headers=None, timeout=5)
+            if not resp :
+                continue
+            code = resp.get("Code", -1)
+            # 有使用权限
+            if code == 0 :
+                self.check_permission = False
+                break
+            # 无使用权限
+            elif code == -900 :
+                if len(self.image_path_list) == 0 :
+                    self.show_error_label.setText("   图片翻译服务为付费功能, 可以购买后再使用, 购买按钮在界面右上角\n"
+                                                  "   当前已自动打开试用, 可以直接试用看看效果, 试用次数详见底部状态栏\n"
+                                                  "   如您已购买但仍处于试用状态, 请直接通过交流群联系任何管理和客服")
+                    self.show_error_label.show()
+                    self.check_permission = True
+                else :
+                    self.show_error_label.hide()
+                    continue
+            else :
+                continue
+
+            # 试用次数
+            self.mangaReadCount()
+            # 刷新底部状态栏
+            self.refreshStatusLabel()
+            # 延时
+            time.sleep(5)
+
+        self.mangaReadCount()
+        self.refreshStatusLabel()
+        self.show_error_label.hide()
+
+
+    # 查询图片翻译接口试用次数
+    def mangaReadCount(self) :
+
+        url = self.object.yaml.get("manga_read_count", "https://dl-dev.ap-sh.starivercs.cn/v2/probate/manga_read_count")
+        body = {"Username": self.object.yaml["user"]}
+        resp = utils.http.post(url=url, body=body, logger=self.logger, headers=None, timeout=5)
+        if not resp :
+            self.manga_read_count = -1
+            return
+        if resp.get("Code", -1) != 0 :
+            self.manga_read_count = -1
+            return
+        self.manga_read_count = resp.get("Data", -1)
 
 
     # 窗口关闭处理
@@ -1665,10 +1757,11 @@ class RenderTextBlock(QWidget) :
 
             # 调用漫画rdr
             sign, result = translator.ocr.dango.mangaRDR(
-                object=self.trans_edit_ui.object,
+                object=self.object,
                 trans_list=[button.trans],
                 inpainted_image=image_base64,
-                text_block=[text_block]
+                text_block=[text_block],
+                check_permission=self.object.manga_ui.check_permission
             )
             if not sign or not result.get("rendered_image", ""):
                 # @TODO 错误处理
@@ -1972,7 +2065,8 @@ class TransEdit(QWidget) :
                 trans_list=[self.trans_text.toPlainText()],
                 inpainted_image=image_base64,
                 text_block=[text_block],
-                font=self.font_box.currentText()
+                font=self.font_box.currentText(),
+                check_permission=self.object.manga_ui.check_permission
             )
             if not sign or not result.get("rendered_image", "") :
                 #@TODO 错误处理
@@ -2087,10 +2181,13 @@ class TransEdit(QWidget) :
     def createFontBox(self):
 
         sign, resp = translator.ocr.dango.mangaFontList(self.object)
-        if not sign:
-            # @TODO 错误处理
-            return
-        font_list = resp.get("available_fonts", [])
+        if sign :
+            font_list = resp.get("available_fonts", [])
+        else:
+            font_list = copy.deepcopy(self.object.manga_ui.setting_ui.font_list)
+        if not font_list :
+            font_list = copy.deepcopy(self.object.manga_ui.setting_ui.font_list)
+
         for index, font in enumerate(font_list) :
             self.font_box.addItem("")
             self.font_box.setItemText(index, font)
@@ -2320,6 +2417,91 @@ class Setting(QWidget) :
         self.bg_color = self.object.config.get("mangaBgColor", "#83AAF9")
         self.font_color_use = self.object.config.get("mangaFontColorUse", False)
         self.bg_color_use = self.object.config.get("mangaBgColorUse", False)
+        self.font_list = [
+            "鸿蒙/HarmonyOS_Sans/HarmonyOS_Sans_Regular",
+            "阿里/东方大楷/Alimama_DongFangDaKai_Regular",
+            "鸿蒙/HarmonyOS_Sans/HarmonyOS_Sans_Thin",
+            "阿里/普惠体/Alibaba_PuHuiTi_2.0_55_Regular_55_Regular",
+            "鸿蒙/HarmonyOS_Sans/HarmonyOS_Sans_Bold",
+            "鸿蒙/HarmonyOS_Sans_Condensed_Italic/HarmonyOS_Sans_Condensed_Medium_Italic",
+            "鸿蒙/HarmonyOS_Sans_Italic/HarmonyOS_Sans_Regular_Italic",
+            "鸿蒙/HarmonyOS_Sans_Naskh_Arabic_UI/HarmonyOS_Sans_Naskh_Arabic_UI_Regular",
+            "书法/庞门正道真贵楷体",
+            "书法/钟齐志莽行书",
+            "鸿蒙/HarmonyOS_Sans/HarmonyOS_Sans_Black",
+            "阿里/数黑体/Alimama_ShuHeiTi_Bold",
+            "鸿蒙/HarmonyOS_Sans_Condensed_Italic/HarmonyOS_Sans_Condensed_Regular_Italic",
+            "Noto_Sans_SC/NotoSansSC-Black",
+            "黑体/Leefont蒙黑体",
+            "鸿蒙/HarmonyOS_Sans_TC/HarmonyOS_Sans_TC_Black",
+            "鸿蒙/HarmonyOS_Sans_SC/HarmonyOS_Sans_SC_Bold",
+            "Noto_Sans_SC/NotoSansSC-Light",
+            "阿里/普惠体/Alibaba_PuHuiTi_2.0_105_Heavy_105_Heavy",
+            "鸿蒙/HarmonyOS_Sans_Naskh_Arabic/HarmonyOS_Sans_Naskh_Arabic_Light",
+            "书法/演示秋鸿楷",
+            "鸿蒙/HarmonyOS_Sans_Naskh_Arabic/HarmonyOS_Sans_Naskh_Arabic_Thin",
+            "鸿蒙/HarmonyOS_Sans_Condensed_Italic/HarmonyOS_Sans_Condensed_Bold_Italic",
+            "鸿蒙/HarmonyOS_Sans_Condensed/HarmonyOS_Sans_Condensed_Light",
+            "阿里/普惠体/Alibaba_PuHuiTi_2.0_55_Regular_85_Bold",
+            "鸿蒙/HarmonyOS_Sans_SC/HarmonyOS_Sans_SC_Medium",
+            "鸿蒙/HarmonyOS_Sans_SC/HarmonyOS_Sans_SC_Thin",
+            "鸿蒙/HarmonyOS_Sans_SC/HarmonyOS_Sans_SC_Regular",
+            "鸿蒙/HarmonyOS_Sans_SC/HarmonyOS_Sans_SC_Light",
+            "Emoji/NotoColorEmoji",
+            "书法/仓耳周珂正大榜书",
+            "鸿蒙/HarmonyOS_Sans_Italic/HarmonyOS_Sans_Medium_Italic",
+            "阿里/普惠体/Alibaba_PuHuiTi_2.0_35_Thin_35_Thin",
+            "书法/鸿雷板书简体-Regular",
+            "鸿蒙/HarmonyOS_Sans_Naskh_Arabic/HarmonyOS_Sans_Naskh_Arabic_Regular",
+            "黑体/千图厚黑体",
+            "鸿蒙/HarmonyOS_Sans_Condensed/HarmonyOS_Sans_Condensed_Black",
+            "鸿蒙/HarmonyOS_Sans_Italic/HarmonyOS_Sans_Bold_Italic",
+            "鸿蒙/HarmonyOS_Sans_Naskh_Arabic_UI/HarmonyOS_Sans_Naskh_Arabic_UI_Medium",
+            "鸿蒙/HarmonyOS_Sans/HarmonyOS_Sans_Light",
+            "书法/庞门正道粗书体",
+            "书法/钟齐流江毛草",
+            "阿里/普惠体/Alibaba_PuHuiTi_2.0_115_Black_115_Black",
+            "鸿蒙/HarmonyOS_Sans_TC/HarmonyOS_Sans_TC_Bold",
+            "黑体/标小智无界黑",
+            "书法/演示夏行楷",
+            "阿里/普惠体/Alibaba_PuHuiTi_2.0_45_Light_45_Light",
+            "鸿蒙/HarmonyOS_Sans_Naskh_Arabic/HarmonyOS_Sans_Naskh_Arabic_Medium",
+            "鸿蒙/HarmonyOS_Sans_Naskh_Arabic_UI/HarmonyOS_Sans_Naskh_Arabic_UI_Black",
+            "黑体/Aa厚底黑",
+            "鸿蒙/HarmonyOS_Sans_Italic/HarmonyOS_Sans_Black_Italic",
+            "鸿蒙/HarmonyOS_Sans_Naskh_Arabic/HarmonyOS_Sans_Naskh_Arabic_Bold",
+            "鸿蒙/HarmonyOS_Sans_Italic/HarmonyOS_Sans_Light_Italic",
+            "鸿蒙/HarmonyOS_Sans_Naskh_Arabic_UI/HarmonyOS_Sans_Naskh_Arabic_UI_Light",
+            "鸿蒙/HarmonyOS_Sans_Italic/HarmonyOS_Sans_Thin_Italic",
+            "书法/演示佛系体",
+            "Noto_Sans_SC/NotoSansSC-Regular",
+            "鸿蒙/HarmonyOS_Sans_TC/HarmonyOS_Sans_TC_Light",
+            "鸿蒙/HarmonyOS_Sans/HarmonyOS_Sans_Medium",
+            "书法/演示春风楷",
+            "鸿蒙/HarmonyOS_Sans_TC/HarmonyOS_Sans_TC_Thin",
+            "鸿蒙/HarmonyOS_Sans_Condensed_Italic/HarmonyOS_Sans_Condensed_Black_Italic",
+            "鸿蒙/HarmonyOS_Sans_TC/HarmonyOS_Sans_TC_Regular",
+            "鸿蒙/HarmonyOS_Sans_Condensed/HarmonyOS_Sans_Condensed_Medium",
+            "鸿蒙/HarmonyOS_Sans_Condensed/HarmonyOS_Sans_Condensed_Regular",
+            "鸿蒙/HarmonyOS_Sans_TC/HarmonyOS_Sans_TC_Medium",
+            "Noto_Sans_SC/NotoSansSC-Thin",
+            "阿里/普惠体/Alibaba_PuHuiTi_2.0_65_Medium_65_Medium",
+            "阿里/普惠体/Alibaba_PuHuiTi_2.0_75_SemiBold_75_SemiBold",
+            "鸿蒙/HarmonyOS_Sans_Naskh_Arabic_UI/HarmonyOS_Sans_Naskh_Arabic_UI_Thin",
+            "Noto_Sans_SC/NotoSansSC-Bold",
+            "Noto_Sans_SC/NotoSansSC-Medium",
+            "鸿蒙/HarmonyOS_Sans_SC/HarmonyOS_Sans_SC_Black",
+            "书法/江西拙楷2.0",
+            "鸿蒙/HarmonyOS_Sans_Condensed_Italic/HarmonyOS_Sans_Condensed_Thin_Italic",
+            "鸿蒙/HarmonyOS_Sans_Naskh_Arabic_UI/HarmonyOS_Sans_Naskh_Arabic_UI_Bold",
+            "阿里/钉钉进步体/DingTalk_JinBuTi_Regular",
+            "书法/演示悠然小楷",
+            "鸿蒙/HarmonyOS_Sans_Condensed/HarmonyOS_Sans_Condensed_Thin",
+            "阿里/普惠体/Alibaba_PuHuiTi_2.0_95_ExtraBold_95_ExtraBold",
+            "鸿蒙/HarmonyOS_Sans_Naskh_Arabic/HarmonyOS_Sans_Naskh_Arabic_Black",
+            "鸿蒙/HarmonyOS_Sans_Condensed_Italic/HarmonyOS_Sans_Condensed_Light_Italic",
+            "鸿蒙/HarmonyOS_Sans_Condensed/HarmonyOS_Sans_Condensed_Bold"
+        ]
         self.ui()
 
 
@@ -2550,10 +2732,13 @@ class Setting(QWidget) :
     def createFontBox(self) :
 
         sign, resp = translator.ocr.dango.mangaFontList(self.object)
-        if not sign:
-            # @TODO 错误处理
-            return
-        font_list = resp.get("available_fonts", [])
+        if sign :
+            font_list = resp.get("available_fonts", [])
+        else :
+            font_list = copy.deepcopy(self.font_list)
+        if not font_list :
+            font_list = copy.deepcopy(self.font_list)
+
         for index, font in enumerate(font_list):
             self.font_box.addItem("")
             self.font_box.setItemText(index, font)
@@ -2565,7 +2750,6 @@ class Setting(QWidget) :
     def changeMangaFontType(self) :
 
         self.object.config["mangaFontType"] = self.font_box.currentText()
-
 
 
     # 窗口关闭处理
