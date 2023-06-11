@@ -120,6 +120,8 @@ class createMangaTransQThread(QThread) :
         self.reload_sign = reload_sign
         self.window.trans_process_bar.stop_sign = False
         self.window.trans_process_bar.finish_sign = False
+        self.success_count = 0
+        self.fail_count = 0
 
     def run(self) :
 
@@ -133,10 +135,12 @@ class createMangaTransQThread(QThread) :
                 # 如果失败记录日志
                 image_name = os.path.basename(image_path)
                 if result :
+                    self.fail_count += 1
                     self.logger.error(result)
-                    self.add_message_signal.emit("{}. {}翻译失败: {}".format(index+1, image_name, result), "red")
+                    self.add_message_signal.emit("{}. {} 翻译失败: {}".format(index+1, image_name, result), "red")
                 else :
-                    self.add_message_signal.emit("{}. {}翻译成功".format(index + 1, image_name), "green")
+                    self.success_count += 1
+                    self.add_message_signal.emit("{}. {} 翻译成功".format(index+1, image_name), "green")
                 # 进度条
                 self.bar_signal.emit(
                     int((index + 1) / len(self.image_paths) * 100),
@@ -149,7 +153,8 @@ class createMangaTransQThread(QThread) :
             self.logger.error(traceback.format_exc())
             self.signal.emit(traceback.format_exc(), False)
         # 结束
-        self.add_message_signal.emit("\n全部图片翻译完成~", "green")
+        self.add_message_signal.emit(" ", "green")
+        self.add_message_signal.emit("成功{}张, 失败{}张, 全部图片翻译完成~".format(self.success_count, self.fail_count), "green")
         self.window.trans_process_bar.finish_sign = True
         self.signal.emit("", False)
 

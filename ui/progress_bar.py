@@ -248,8 +248,11 @@ class MangaProgressBar(QWidget) :
         layout.addWidget(self.rdr_time_label, 3, 2, 1, 2)
 
         # 翻译进度消息窗口
-        self.message_text = QTextBrowser(self)
+        self.message_text = QTextEdit(self)
         self.customSetGeometry(self.message_text, 10, 240, 280, 150)
+        self.message_text.setWordWrapMode(QTextOption.WrapAnywhere)
+        self.message_text.setLineWrapMode(QTextEdit.NoWrap)
+        self.message_text.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.message_text.setReadOnly(True)
         self.message_text.setStyleSheet("background-color: rgb(224, 224, 224);"
                                         "font: 9pt '华康方圆体W7';"
