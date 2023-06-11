@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import time
 
 from tencentcloud.common import credential
 from tencentcloud.common.profile.client_profile import ClientProfile
@@ -224,9 +225,9 @@ def chatgpt(api_key, language, proxy, content, logger) :
         "RU": "russian",
     }
     messages = [
-        {"role": "system","content": "You are a translation engine that can only translate text and cannot interpret it. If line break exists in the sentence, must reserve line break"},
+        {"role": "system","content": "You are a translation engine that can only translate text and cannot interpret it. Must reserve line break amd json format!"},
         {"role": "user", "content": "translate from {} to chinese".format(language_map[language])},
-        {"role": "user", "content": content}
+        {"role": "user", "content": str(content.split("\n"))}
     ]
     data = {
         "model": "gpt-3.5-turbo",
@@ -259,20 +260,32 @@ def chatgpt(api_key, language, proxy, content, logger) :
         result = json.loads(response.text)
         response.close()
         try :
-            text = result["choices"][0]["message"]["content"]
-        except Exception:
+            if result.get("error", {}).get("message", "") :
+                # 翻译出错
+                error = result.get("error", {}).get("message", "")
+                if "Rate limit reached" in error :
+                    text = "私人ChatGPT: 请求次数超限制, 请稍后重试, 或使用不带QPS限制的密钥"
+                else :
+                    text = "私人ChatGPT: 翻译出错: {}, 请排查完错误后重试".format(error)
+            else :
+                # 翻译成功
+                text = result["choices"][0]["message"]["content"]
+                regex = re.findall("\(Translated from .+? to .+?\)", text)
+                if len(regex) == 1:
+                    text = text.replace(regex[0], "")
+                regex = re.findall("\(Note.+?\)", text)
+                if len(regex) == 1:
+                    text = text.replace(regex[0], "")
+                text = eval(text)
+                if type(text) == list :
+                    text = "\n".join(text)
+
+        except Exception :
             return str(result)
-    except requests.exceptions.ReadTimeout:
+    except requests.exceptions.ReadTimeout :
         text = "私人ChatGPT: 翻译超时, ChatGPT需要挂载代理才可使用, 请点击[代理]按钮, 正确配置好代理后重试"
-    except Exception as err:
+    except Exception as err :
         logger.error(format_exc())
         text = "私人ChatGPT: 翻译出错: {}, 请排查完错误后重试".format(err)
-
-    regex = re.findall("\(Translated from .+? to .+?\)", text)
-    if len(regex) == 1 :
-        text = text.replace(regex[0], "")
-    regex = re.findall("\(Note.+?\)", text)
-    if len(regex) == 1:
-        text = text.replace(regex[0], "")
 
     return text

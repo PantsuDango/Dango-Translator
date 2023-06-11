@@ -810,6 +810,8 @@ class Manga(QWidget) :
                 # 直接将原图加入译图列表框
                 self.transImageWidgetRefreshImage(image_path)
                 return
+        else :
+            self.trans_process_bar.paintStatus("ocr", 0, True)
 
         # 翻译
         self.trans_result = ""
@@ -834,6 +836,8 @@ class Manga(QWidget) :
                     self.trans_process_bar.paintStatus("rdr", 0, False)
                     self.trans_result = "翻译过程失败: %s"%trans_result
                     return
+            else :
+                self.trans_process_bar.paintStatus("trans", 0, True)
         # 翻译和文字消除并发执行
         trans_thread = utils.thread.createThread(transThread)
 
@@ -848,6 +852,8 @@ class Manga(QWidget) :
                 message = "文字消除过程失败: %s"%ipt_result
                 self.show_error_signal.emit([image_path, message])
                 return message
+        else:
+            self.trans_process_bar.paintStatus("ipt", 0, True)
 
         # 阻塞, 等待翻译完成再执行文字渲染
         trans_thread.join()
@@ -868,6 +874,8 @@ class Manga(QWidget) :
             self.editImageWidgetRefreshImage(image_path)
             # 渲染好的图片加入译图列表框
             self.transImageWidgetRefreshImage(image_path)
+        else:
+            self.trans_process_bar.paintStatus("rdr", 0, True)
 
 
     # 单图翻译
@@ -988,53 +996,40 @@ class Manga(QWidget) :
 
         # 调用翻译
         result = ""
-        if manga_trans == "私人团子" :
-            sign, result = translator.ocr.dango.dangoTrans(object=self.object,
-                                                           sentence=original,
-                                                           language=self.object.config["mangaLanguage"])
-            if not sign :
-                return False, result
+        if original.strip() :
+            if manga_trans == "私人团子" :
+                sign, result = translator.ocr.dango.dangoTrans(self.object, original, self.object.config["mangaLanguage"])
+                if not sign :
+                    return False, result
 
-        if manga_trans == "私人彩云" :
-            result = translator.api.caiyun(sentence=original,
-                                           token=self.object.config["caiyunAPI"],
-                                           logger=self.logger)
-            if result[:6] == "私人彩云: " :
-                return False, result
+            if manga_trans == "私人彩云" :
+                result = translator.api.caiyun(original, self.object.config["caiyunAPI"], self.logger)
+                if result[:6] == "私人彩云: " :
+                    return False, result
 
-        elif manga_trans == "私人腾讯" :
-            result = translator.api.tencent(sentence=original,
-                                            secret_id=self.object.config["tencentAPI"]["Key"],
-                                            secret_key=self.object.config["tencentAPI"]["Secret"],
-                                            logger=self.logger)
-            if result[:6] == "私人腾讯: " :
-                return False, result
+            elif manga_trans == "私人腾讯" :
+                result = translator.api.tencent(original, self.object.config["tencentAPI"]["Key"], self.object.config["tencentAPI"]["Secret"], self.logger)
+                if result[:6] == "私人腾讯: " :
+                    return False, result
 
-        elif manga_trans == "私人百度" :
-            result = translator.api.baidu(sentence=original,
-                                          app_id=self.object.config["baiduAPI"]["Key"],
-                                          secret_key=self.object.config["baiduAPI"]["Secret"],
-                                          logger=self.logger)
-            if result[:6] == "私人百度: " :
-                return False, result
+            elif manga_trans == "私人百度" :
+                result = translator.api.baidu(original, self.object.config["baiduAPI"]["Key"], self.object.config["baiduAPI"]["Secret"], self.logger)
+                if result[:6] == "私人百度: " :
+                    return False, result
 
-        elif manga_trans == "私人ChatGPT" :
-            result = translator.api.chatgpt(api_key=self.object.config["chatgptAPI"],
-                                            language=self.object.config["language"],
-                                            proxy=self.object.config["chatgptProxy"],
-                                            content=original,
-                                            logger=self.logger)
-            if result[:11] == "私人ChatGPT: " :
-                return False, result
+            elif manga_trans == "私人ChatGPT" :
+                result = translator.api.chatgpt(self.object.config["chatgptAPI"], self.object.config["language"], self.object.config["chatgptProxy"], original, self.logger)
+                if result[:11] == "私人ChatGPT: " :
+                    return False, result
 
-        # 根据屏蔽词过滤
-        for filter in self.object.config["Filter"] :
-            if not filter[0]:
-                continue
-            result = result.replace(filter[0], filter[1])
+            # 根据屏蔽词过滤
+            for filter in self.object.config["Filter"] :
+                if not filter[0]:
+                    continue
+                result = result.replace(filter[0], filter[1])
 
-        for index, word in enumerate(result.split("\n")[:len(json_data["text_block"])]) :
-            translated_text.append(word)
+            for index, word in enumerate(result.split("\n")[:len(json_data["text_block"])]) :
+                translated_text.append(word)
 
         json_data["translated_text"] = translated_text
         # 缓存翻译结果
@@ -2132,6 +2127,8 @@ class TransEdit(QWidget) :
     def refreshTrans(self, trans_type) :
 
         original = self.original_text.toPlainText()
+        if not original.strip() :
+            return
         if trans_type == "团子" :
             sign, result = translator.ocr.dango.dangoTrans(object=self.object,
                                                            sentence=original,

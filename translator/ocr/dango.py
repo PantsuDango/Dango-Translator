@@ -401,6 +401,9 @@ def mangaOCR(object, filepath, check_permission) :
     sign = False
     result = "图片文字识别失败: "
     try :
+        # 测试版本保留
+        with open("ocr.json", "w", encoding="utf-8") as file:
+            json.dump(body, file, indent=4)
         resp = utils.http.post(url=url, body=body, logger=object.logger, timeout=20)
         if resp.get("Code", -1) == 0 :
             result = resp.get("Data", {})
@@ -438,6 +441,9 @@ def mangaIPT(object, filepath, mask, check_permission) :
     sign = False
     result = "图片文字消除失败: "
     try :
+        # 测试版本保留
+        with open("ipt.json", "w", encoding="utf-8") as file :
+            json.dump(body, file, indent=4)
         resp = utils.http.post(url=url, body=body, logger=object.logger, timeout=20)
         if resp.get("Code", -1) == 0 :
             result = resp.get("Data", {})
@@ -478,7 +484,8 @@ def mangaRDR(object, trans_list, inpainted_image, text_block, font, check_permis
     sign = False
     result = "图片文字渲染失败: "
     try :
-        with open("req.json", "w", encoding="utf-8") as file:
+        # 测试版本保留
+        with open("rdr.json", "w", encoding="utf-8") as file:
             json.dump(body, file, indent=4)
         resp = utils.http.post(url=url, body=body, logger=object.logger, timeout=20)
         if resp.get("Code", -1) == 0 :
