@@ -455,15 +455,34 @@ class Manga(QWidget) :
                 if not os.path.exists(folder_path) :
                     os.mkdir(folder_path)
                 # 复制完成的rdr图片
-                for image_path in output_image_list :
-                    new_image_path = os.path.join(folder_path, os.path.basename(image_path))
+                for index, image_path in enumerate(output_image_list) :
+                    if self.object.config.get("mangaOutputRenameUse", False) :
+                        new_image_path = os.path.join(folder_path, "%d.png"%(index+1))
+                    else :
+                        new_image_path = os.path.join(folder_path, os.path.basename(image_path))
                     shutil.copy(image_path, new_image_path)
                 os.startfile(folder_path)
 
             elif action.data() == "导出为压缩包" :
+                # 压缩包名称
                 zip_name = "{}.zip".format(os.path.basename(self.object.yaml["manga_dir_path"]))
                 zip_path = os.path.join(folder_path, zip_name)
-                utils.zip.zipFiles(output_image_list, zip_path)
+                # 是否重命名文件
+                if self.object.config.get("mangaOutputRenameUse", False) :
+                    # 新建导出文件夹
+                    folder_path = os.path.join(folder_path, os.path.basename(self.object.yaml["manga_dir_path"]))
+                    if not os.path.exists(folder_path):
+                        os.mkdir(folder_path)
+                    # 复制完成的rdr图片
+                    new_image_list = []
+                    for index, image_path in enumerate(output_image_list):
+                        new_image_path = os.path.join(folder_path, "%d.png"%(index+1))
+                        new_image_list.append(new_image_path)
+                        shutil.copy(image_path, new_image_path)
+                    utils.zip.zipFiles(new_image_list, zip_path)
+                    shutil.rmtree(folder_path)
+                else :
+                    utils.zip.zipFiles(output_image_list, zip_path)
                 os.startfile(folder_path)
 
             else :
@@ -1495,7 +1514,6 @@ class Manga(QWidget) :
     # 左右切换图片列表框
     def switchImageWidget(self, sign) :
 
-        print(sign)
         if self.original_image_widget.isVisible() and sign == "right" :
             self.clickImageButton("edit")
             return
@@ -2460,6 +2478,7 @@ class Setting(QWidget) :
         self.bg_color = self.object.config.get("mangaBgColor", "#83AAF9")
         self.font_color_use = self.object.config.get("mangaFontColorUse", False)
         self.bg_color_use = self.object.config.get("mangaBgColorUse", False)
+        self.output_rename_use = self.object.config.get("mangaOutputRenameUse", False)
         self.font_list = [
             "鸿蒙/HarmonyOS_Sans/HarmonyOS_Sans_Regular",
             "阿里/东方大楷/Alimama_DongFangDaKai_Regular",
@@ -2686,6 +2705,25 @@ class Setting(QWidget) :
                              "QPushButton:hover { background-color: #83AAF9; }"
                              "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
 
+        # 导出图片时重命名
+        self.output_rename_switch = ui.switch.SwitchOCR(self, self.output_rename_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.output_rename_switch, 20, 170, 65, 20)
+        self.output_rename_switch.checkedChanged.connect(self.changeOutputRenameUseSwitch)
+        self.output_rename_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 导出图片时重命名标签
+        label = QLabel(self)
+        label.setText("导出图片时重命名")
+        self.customSetGeometry(label, 100, 170, 500, 20)
+        # 导出图片时重命名?号图标
+        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self)
+        self.customSetIconSize(button, 20, 20)
+        self.customSetGeometry(button, 220, 170, 20, 20)
+        button.clicked.connect(lambda: self.showDesc("input_rename"))
+        button.setCursor(ui.static.icon.QUESTION_CURSOR)
+        button.setStyleSheet("QPushButton { background: transparent;}"
+                             "QPushButton:hover { background-color: #83AAF9; }"
+                             "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
+
 
     # 根据分辨率定义控件位置尺寸
     def customSetGeometry(self, object, x, y, w, h) :
@@ -2719,16 +2757,20 @@ class Setting(QWidget) :
                                           "\n\n日文默认值为1, \n英文默认值为3")
         elif message_type == "font_color" :
             self.desc_ui.setWindowTitle("全局字体色说明")
-            self.desc_ui.desc_text.append("\n开启开关, 会使所有图片, 翻译后渲染的文字使用此颜色"
+            self.desc_ui.desc_text.append("\n开启开启, 会使所有图片, 翻译后渲染的文字使用此颜色"
                                           "\n开关关闭, 则由系统自动判断渲染颜色")
         elif message_type == "bg_color" :
             self.desc_ui.setWindowTitle("全局轮廓色说明")
-            self.desc_ui.desc_text.append("\n开启开关后, 会使所有图片, 翻译后渲染的文字轮廓使用此颜色"
+            self.desc_ui.desc_text.append("\n开启开启, 会使所有图片, 翻译后渲染的文字轮廓使用此颜色"
                                           "\n开关关闭, 则由系统自动判断渲染颜色")
         elif message_type == "font_type" :
             self.desc_ui.setWindowTitle("全局字体样式说明")
             self.desc_ui.desc_text.append("\n使所有图片, 翻译后渲染的字体使用此样式"
                                           "\n\n默认值为 Noto_Sans_SC/NotoSansSC-Regular")
+        elif message_type == "input_rename" :
+            self.desc_ui.setWindowTitle("导出图片时重命名说明")
+            self.desc_ui.desc_text.append("\n开启开启, 导出译图时会自动将所有图片, 按照图片列表框的序号重命名"
+                                          "\n\n开关关闭, 则保留图片原名称")
         else :
             return
 
@@ -2793,6 +2835,12 @@ class Setting(QWidget) :
     def changeMangaFontType(self) :
 
         self.object.config["mangaFontType"] = self.font_box.currentText()
+
+
+    # 改变导出图片时重命名开关状态
+    def changeOutputRenameUseSwitch(self, checked) :
+
+        self.object.config["mangaOutputRenameUse"] = checked
 
 
     # 窗口关闭处理

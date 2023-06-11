@@ -282,7 +282,7 @@ def configConvert(object) :
     object.config["mangaFontColorUse"] = object.config.get("mangaFontColorUse", False)
     object.config["mangaBgColorUse"] = object.config.get("mangaBgColorUse", False)
     object.config["mangaFontType"] = object.config.get("mangaFontType", "Noto_Sans_SC/NotoSansSC-Regular")
-
+    object.config["mangaOutputRenameUse"] = object.config.get("mangaOutputRenameUse", False)
 
 # 保存配置至服务器
 def postSaveSettin(object) :
