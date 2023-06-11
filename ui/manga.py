@@ -162,7 +162,7 @@ class Manga(QWidget) :
 
         # 购买按钮
         self.buy_button = QPushButton(self)
-        self.buy_button.setText(" 购买")
+        self.buy_button.setText(" 去购买使用")
         self.buy_button.setStyleSheet("QPushButton {background: transparent;}"
                                       "QPushButton:hover {background-color: #83AAF9;}"
                                       "QPushButton:pressed {background-color: #4480F9;}")
@@ -256,12 +256,20 @@ class Manga(QWidget) :
         # 上一页按钮
         self.last_page_button = CustomButton(self)
         self.last_page_button.setIcon(ui.static.icon.LAST_PAGE_ICON)
+        self.last_page_button.setShortcut(QKeySequence(Qt.Key_Up))
         self.last_page_button.clicked.connect(lambda: self.changeImageListPosition("last"))
 
         # 下一页按钮
         self.next_page_button = CustomButton(self)
         self.next_page_button.setIcon(ui.static.icon.NEXT_PAGE_ICON)
+        self.next_page_button.setShortcut(QKeySequence(Qt.Key_Down))
         self.next_page_button.clicked.connect(lambda: self.changeImageListPosition("next"))
+
+        # 左右切换原图/编辑图/译图快捷键
+        shortcut = QShortcut(QKeySequence(Qt.Key_Left), self)
+        shortcut.activated.connect(lambda: self.switchImageWidget("left"))
+        shortcut = QShortcut(QKeySequence(Qt.Key_Right), self)
+        shortcut.activated.connect(lambda: self.switchImageWidget("right"))
 
         # 导入图片进度条
         self.input_images_progress_bar = ui.progress_bar.ProgressBar(self.object.yaml["screen_scale_rate"], "input_images")
@@ -1482,6 +1490,24 @@ class Manga(QWidget) :
             self.manga_read_count = -1
             return
         self.manga_read_count = resp.get("Data", -1)
+
+
+    # 左右切换图片列表框
+    def switchImageWidget(self, sign) :
+
+        print(sign)
+        if self.original_image_widget.isVisible() and sign == "right" :
+            self.clickImageButton("edit")
+            return
+        if self.edit_image_widget.isVisible() :
+            if sign == "left" :
+                self.clickImageButton("original")
+            elif sign == "right" :
+                self.clickImageButton("trans")
+            return
+        if self.trans_image_widget.isVisible() and sign == "left" :
+            self.clickImageButton("edit")
+            return
 
 
     # 窗口关闭处理
