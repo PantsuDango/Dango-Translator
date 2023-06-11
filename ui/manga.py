@@ -1562,8 +1562,9 @@ class RenderTextBlock(QWidget) :
         self.scroll_area.setWidget(widget)
 
         # 显示图片缩放比例
-        self.rate_label = QLabel(self)
-        self.rate_label.setGeometry(950*self.rate[0], 590*self.rate[1], 30*self.rate[0], 30*self.rate[1])
+        self.rate_label = TransparentButton(self)
+        self.rate_label.setIcon(ui.static.icon.MAGNIFYING_GLASS_ICON)
+        self.rate_label.setGeometry(930*self.rate[0], 590*self.rate[1], 60*self.rate[0], 30*self.rate[1])
         # 载入大图
         self.loadImage()
 
@@ -1706,7 +1707,7 @@ class RenderTextBlock(QWidget) :
         self.scroll_area.setGeometry(0, 0, w, h)
         self.matchImageSize()
         self.matchButtonSize()
-        self.rate_label.setGeometry(950*w_rate, 590*h_rete, 30*w_rate, 30*h_rete)
+        self.rate_label.setGeometry(930*w_rate, 590*h_rete, 60*w_rate, 30*h_rete)
 
 
     # 文字块按钮右键菜单
@@ -2800,3 +2801,11 @@ class Setting(QWidget) :
         self.hide()
         self.object.manga_ui.show()
 
+
+# 背景完全透明且不可被点击的按钮
+class TransparentButton(QPushButton):
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setFlat(True)
+        self.setStyleSheet("QPushButton { background-color: transparent; border:none; }")
