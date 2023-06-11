@@ -224,7 +224,7 @@ def chatgpt(api_key, language, proxy, content, logger) :
         "RU": "russian",
     }
     messages = [
-        {"role": "system","content": "You are a translation engine that can only translate text and cannot interpret it."},
+        {"role": "system","content": "You are a translation engine that can only translate text and cannot interpret it. If line break exists in the sentence, must reserve line break"},
         {"role": "user", "content": "translate from {} to chinese".format(language_map[language])},
         {"role": "user", "content": content}
     ]
@@ -274,6 +274,5 @@ def chatgpt(api_key, language, proxy, content, logger) :
     regex = re.findall("\(Note.+?\)", text)
     if len(regex) == 1:
         text = text.replace(regex[0], "")
-
 
     return text
