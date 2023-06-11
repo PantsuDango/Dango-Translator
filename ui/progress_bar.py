@@ -139,6 +139,7 @@ class MangaProgressBar(QWidget) :
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
         # 窗口尺寸及不可拉伸
         self.resize(self.window_width, self.window_height)
+        self.setMaximumSize(QSize(self.window_width, self.window_height))
         self.setMinimumSize(QSize(self.window_width, self.window_height))
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowMinimizeButtonHint | Qt.WindowCloseButtonHint)
         # 窗口图标
