@@ -859,7 +859,6 @@ class Manga(QWidget) :
                 self.trans_process_bar.paintStatus("trans", round(time.time()-start, 1), sign)
                 # 翻译失败
                 if not sign :
-                    self.trans_process_bar.paintStatus("ipt", 0, False)
                     self.trans_process_bar.paintStatus("rdr", 0, False)
                     self.trans_result = "翻译过程失败: %s"%trans_result
                     return

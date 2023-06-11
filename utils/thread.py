@@ -1,3 +1,5 @@
+import time
+
 from PyQt5.QtCore import *
 import threading
 import os
@@ -128,6 +130,7 @@ class createMangaTransQThread(QThread) :
         # 初始化进度条
         self.bar_signal.emit(0, "0/%d"%len(self.image_paths))
         self.add_message_signal.emit("", "")
+        time.sleep(0.1)
         try :
             for index, image_path in enumerate(self.image_paths) :
                 # 翻译进程
@@ -146,6 +149,7 @@ class createMangaTransQThread(QThread) :
                     int((index + 1) / len(self.image_paths) * 100),
                     "%d/%d"%(index + 1, len(self.image_paths))
                 )
+                time.sleep(0.1)
                 # 如果停止
                 if self.window.trans_process_bar.stop_sign :
                     break
