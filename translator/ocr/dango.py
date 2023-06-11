@@ -554,7 +554,7 @@ def dangoTrans(object, sentence, language="auto") :
             result = "\n".join(result)
             sign = True
         else :
-            result += res.get("Message", "我抽风啦, 请尝试重新翻译!")
+            result += resp.get("Message", "我抽风啦, 请尝试重新翻译!")
     except Exception as err :
         result += str(err)
     if not sign :
