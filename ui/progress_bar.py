@@ -295,15 +295,16 @@ class MangaProgressBar(QWidget) :
         self.progress_bar.setValue(int_val)
         self.file_size_label.setText(str_val)
 
-        self.ocr_icon_label.setMovie(self.loading_movie)
-        self.trans_icon_label.setMovie(self.loading_movie)
-        self.ipt_icon_label.setMovie(self.loading_movie)
-        self.rdr_icon_label.setMovie(self.loading_movie)
+        if int_val < 100 :
+            self.ocr_icon_label.setMovie(self.loading_movie)
+            self.trans_icon_label.setMovie(self.loading_movie)
+            self.ipt_icon_label.setMovie(self.loading_movie)
+            self.rdr_icon_label.setMovie(self.loading_movie)
 
-        self.ocr_time_label.setText("耗时 - s")
-        self.trans_time_label.setText("耗时 - s")
-        self.ipt_time_label.setText("耗时 - s")
-        self.rdr_time_label.setText("耗时 - s")
+            self.ocr_time_label.setText("耗时 - s")
+            self.trans_time_label.setText("耗时 - s")
+            self.ipt_time_label.setText("耗时 - s")
+            self.rdr_time_label.setText("耗时 - s")
 
 
     # 修改窗口标题
@@ -319,22 +320,34 @@ class MangaProgressBar(QWidget) :
 
 
     # 绘制当前翻译状态
-    def paintStatus(self, status_type, status_time) :
+    def paintStatus(self, status_type, status_time, success_status) :
 
         if status_type == "ocr" :
-            self.ocr_icon_label.setPixmap(ui.static.icon.FINISH_PIXMAP)
+            if success_status:
+                self.ocr_icon_label.setPixmap(ui.static.icon.FINISH_PIXMAP)
+            else:
+                self.ocr_icon_label.setPixmap(ui.static.icon.FAIL_PIXMAP)
             self.ocr_time_label.setText("耗时 {} s".format(status_time))
 
         elif status_type == "trans" :
-            self.trans_icon_label.setPixmap(ui.static.icon.FINISH_PIXMAP)
+            if success_status:
+                self.trans_icon_label.setPixmap(ui.static.icon.FINISH_PIXMAP)
+            else:
+                self.trans_icon_label.setPixmap(ui.static.icon.FAIL_PIXMAP)
             self.trans_time_label.setText("耗时 {} s".format(status_time))
 
         elif status_type == "ipt" :
-            self.ipt_icon_label.setPixmap(ui.static.icon.FINISH_PIXMAP)
+            if success_status:
+                self.ipt_icon_label.setPixmap(ui.static.icon.FINISH_PIXMAP)
+            else:
+                self.ipt_icon_label.setPixmap(ui.static.icon.FAIL_PIXMAP)
             self.ipt_time_label.setText("耗时 {} s".format(status_time))
 
         elif status_type == "rdr" :
-            self.rdr_icon_label.setPixmap(ui.static.icon.FINISH_PIXMAP)
+            if success_status:
+                self.rdr_icon_label.setPixmap(ui.static.icon.FINISH_PIXMAP)
+            else :
+                self.rdr_icon_label.setPixmap(ui.static.icon.FAIL_PIXMAP)
             self.rdr_time_label.setText("耗时 {} s".format(status_time))
 
 
@@ -346,6 +359,9 @@ class MangaProgressBar(QWidget) :
         else :
             self.message_text.insertHtml("<span style='color:{};'>{}</span>".format(color, text))
             self.message_text.insertHtml("<br>")
+            cursor = self.message_text.textCursor()
+            cursor.movePosition(QTextCursor.End)
+            self.message_text.setTextCursor(cursor)
 
 
     # 窗口关闭处理

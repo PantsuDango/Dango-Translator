@@ -787,53 +787,69 @@ class Manga(QWidget) :
         start = time.time()
         if not os.path.exists(self.getJsonFilePath(image_path)) or reload_sign :
             sign, ocr_result = self.mangaOCR(image_path)
+            self.trans_process_bar.paintStatus("ocr", round(time.time()-start, 1), sign)
+            # OCR失败
             if not sign :
                 message = "OCR过程失败: %s"%ocr_result
                 self.show_error_signal.emit([image_path, message])
+                # OCR失败, 后续进度全部标记为失败
+                self.trans_process_bar.paintStatus("trans", 0, False)
+                self.trans_process_bar.paintStatus("ipt", 0, False)
+                self.trans_process_bar.paintStatus("rdr", 0, False)
                 return message
-            else :
-                # 没有文字的图
-                if len(ocr_result.get("text_block", [])) == 0 :
-                    shutil.copy(image_path, self.getIptFilePath(image_path))
-                    shutil.copy(image_path, self.getRdrFilePath(image_path))
-                    # 直接将原图加入编辑图列表框
-                    self.editImageWidgetRefreshImage(image_path)
-                    # 直接将原图加入译图列表框
-                    self.transImageWidgetRefreshImage(image_path)
-                    return
-        self.trans_process_bar.paintStatus("ocr", round(time.time()-start, 1))
+            # 没有文字的图
+            if len(ocr_result.get("text_block", [])) == 0 :
+                # 无文字的图OCR完成后后面均视为完成
+                self.trans_process_bar.paintStatus("trans", 0, True)
+                self.trans_process_bar.paintStatus("ipt", 0, True)
+                self.trans_process_bar.paintStatus("rdr", 0, True)
+                shutil.copy(image_path, self.getIptFilePath(image_path))
+                shutil.copy(image_path, self.getRdrFilePath(image_path))
+                # 直接将原图加入编辑图列表框
+                self.editImageWidgetRefreshImage(image_path)
+                # 直接将原图加入译图列表框
+                self.transImageWidgetRefreshImage(image_path)
+                return
 
         # 翻译
         self.trans_result = ""
         def transThread() :
             start = time.time()
             trans_sign = False
+            # 判断是否需要翻译
             if not os.path.exists(self.getJsonFilePath(image_path)) or reload_sign :
                 trans_sign = True
-            else:
-                with open(self.getJsonFilePath(image_path), "r", encoding="utf-8") as file:
+            else :
+                with open(self.getJsonFilePath(image_path), "r", encoding="utf-8") as file :
                     json_data = json.load(file)
                 if "translated_text" not in json_data:
                     trans_sign = True
+            # 需要翻译
             if trans_sign :
                 sign, trans_result = self.mangaTrans(image_path)
+                self.trans_process_bar.paintStatus("trans", round(time.time()-start, 1), sign)
+                # 翻译失败
                 if not sign :
+                    self.trans_process_bar.paintStatus("ipt", 0, False)
+                    self.trans_process_bar.paintStatus("rdr", 0, False)
                     self.trans_result = "翻译过程失败: %s"%trans_result
                     return
-            self.trans_process_bar.paintStatus("trans", round(time.time()-start, 1))
+        # 翻译和文字消除并发执行
         trans_thread = utils.thread.createThread(transThread)
 
         # 文字消除
         start = time.time()
         if not os.path.exists(self.getIptFilePath(image_path)) or reload_sign :
             sign, ipt_result = self.mangaTextInpaint(image_path)
+            self.trans_process_bar.paintStatus("ipt", round(time.time()-start, 1), sign)
+            # 文字消除失败
             if not sign :
+                self.trans_process_bar.paintStatus("rdr", 0, False)
                 message = "文字消除过程失败: %s"%ipt_result
                 self.show_error_signal.emit([image_path, message])
                 return message
-        self.trans_process_bar.paintStatus("ipt", round(time.time()-start, 1))
 
-        # 阻塞, 等待翻译完成
+        # 阻塞, 等待翻译完成再执行文字渲染
         trans_thread.join()
         if self.trans_result :
             self.show_error_signal.emit([image_path, self.trans_result])
@@ -843,6 +859,7 @@ class Manga(QWidget) :
         start = time.time()
         if not os.path.exists(self.getRdrFilePath(image_path)) or reload_sign :
             sign, rdr_result = self.mangaTextRdr(image_path)
+            self.trans_process_bar.paintStatus("rdr", round(time.time()-start, 1), sign)
             if not sign :
                 message = "文字渲染过程失败: %s"%rdr_result
                 self.show_error_signal.emit([image_path, message])
@@ -851,7 +868,6 @@ class Manga(QWidget) :
             self.editImageWidgetRefreshImage(image_path)
             # 渲染好的图片加入译图列表框
             self.transImageWidgetRefreshImage(image_path)
-        self.trans_process_bar.paintStatus("rdr", round(time.time()-start, 1))
 
 
     # 单图翻译
@@ -866,7 +882,7 @@ class Manga(QWidget) :
         image_paths = []
         image_paths.append(image_path)
         # 进度条窗口
-        self.trans_process_bar.modifyTitle("图片翻译 -- 执行中请勿关闭此窗口")
+        self.trans_process_bar.modifyTitle("翻译中...请勿关闭此窗口")
         self.trans_process_bar.show()
         # 创建执行线程
         self.trans_all_button.setEnabled(False)
@@ -1173,15 +1189,19 @@ class Manga(QWidget) :
             if value:
                 # @TODO 缺少错误处理
                 pass
+            self.trans_process_bar.modifyTitle("翻译完成")
             self.trans_all_button.setEnabled(True)
 
 
     # 一键翻译
     def clickTransAllButton(self) :
 
+        if len(self.image_path_list) == 0 :
+            return utils.message.MessageBox("翻译失败", "请先导入要翻译的图片      ")
+
         self.trans_all_button.setEnabled(False)
         # 进度条窗口
-        self.trans_process_bar.modifyTitle("图片翻译 -- 执行中请勿关闭此窗口")
+        self.trans_process_bar.modifyTitle("翻译中...请勿关闭此窗口")
         self.trans_process_bar.show()
         # 创建执行线程
         thread = utils.thread.createMangaTransQThread(self, self.image_path_list)
