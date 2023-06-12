@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import time
+import traceback
 
 from tencentcloud.common import credential
 from tencentcloud.common.profile.client_profile import ClientProfile
@@ -219,18 +220,27 @@ def chatgpt(api_key, language, proxy, content, logger) :
         return "私人ChatGPT: 还未填入私人ChatGPT密钥, 不可使用"
 
     language_map = {
-        "JAP": "japanese",
-        "ENG": "english",
-        "KOR": "korean",
-        "RU": "russian",
+        "JAP": "日语",
+        "ENG": "英文",
+        "KOR": "韩语",
+        "RU": "俄语",
     }
-    messages = [
-        {"role": "system","content": "你是一个翻译引擎, 只能翻译文本, 不要解释文本, 将我后面给你的所有内容都翻译成中文. 注意按照原结构的json格式返给我"},
-        {"role": "user", "content": "translate from {} to chinese".format(language_map[language])},
-        {"role": "user", "content": str(content.split("\n"))}
-    ]
-    for val in content.split("\n") :
-        messages.append({"role": "user", "content": val})
+    content_list = content.split("\n")
+    # 多句子情况的处理, 转为map
+    if len(content_list) > 1 :
+        content_map = {}
+        for val in content_list :
+            content_map[val] = ""
+        messages = [
+            {"role": "system", "content": "你是一个翻译引擎, 只需要翻译内容而不要解释它, 我需要你完成{}翻译为中文. 我会给你一个json结构的内容, 键是需要翻译的文本, 值是空字符串, 你需要逐个翻译每个键的内容, 并将翻译结果补充至对应的键值里, 并按照json格式返回给我".format(language_map[language])},
+            {"role": "user", "content": str(content_map)}
+        ]
+    else :
+        # 单个句子的情况
+        messages = [
+            {"role": "system", "content": "你是一个翻译引擎, 只需要翻译内容而不要解释它, 我需要你完成{}翻译为中文.".format(language_map[language])},
+            {"role": "user", "content": content}
+        ]
     data = {
         "model": "gpt-3.5-turbo",
         "messages": messages,
@@ -257,7 +267,7 @@ def chatgpt(api_key, language, proxy, content, logger) :
         }
     url = "https://api.openai.com/v1/chat/completions"
     try :
-        response = requests.post(url, headers=headers, data=json.dumps(data), proxies=proxies, timeout=20)
+        response = requests.post(url, headers=headers, data=json.dumps(data), proxies=proxies, timeout=30)
         response.encoding = "utf-8"
         result = json.loads(response.text)
         response.close()
@@ -280,8 +290,11 @@ def chatgpt(api_key, language, proxy, content, logger) :
                     text = text.replace(regex[0], "")
                 try :
                     tmp = eval(text)
-                    if type(tmp) == list :
-                        text = "\n".join(tmp)
+                    if type(tmp) == dict :
+                        tmp_list = []
+                        for val in tmp.values() :
+                            tmp_list.append(val)
+                        text = "\n".join(tmp_list)
                 except Exception :
                     pass
         except Exception :

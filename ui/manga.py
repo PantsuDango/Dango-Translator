@@ -1044,7 +1044,7 @@ class Manga(QWidget) :
                     return False, result
 
             elif manga_trans == "私人ChatGPT" :
-                result = translator.api.chatgpt(self.object.config["chatgptAPI"], self.object.config["language"], self.object.config["chatgptProxy"], original, self.logger)
+                result = translator.api.chatgpt(self.object.config["chatgptAPI"], self.object.config["mangaLanguage"], self.object.config["chatgptProxy"], original, self.logger)
                 if result[:11] == "私人ChatGPT: " :
                     return False, result
 
@@ -2199,7 +2199,7 @@ class TransEdit(QWidget) :
                                           logger=self.logger)
         elif trans_type == "ChatGPT":
             result = translator.api.chatgpt(api_key=self.object.config["chatgptAPI"],
-                                            language=self.object.config["language"],
+                                            language=self.object.config["mangaLanguage"],
                                             proxy=self.object.config["chatgptProxy"],
                                             content=original,
                                             logger=self.logger)
