@@ -278,11 +278,14 @@ def chatgpt(api_key, language, proxy, content, logger) :
                 regex = re.findall("\(Note.+?\)", text)
                 if len(regex) == 1:
                     text = text.replace(regex[0], "")
-                tmp = eval(text)
-                if type(tmp) == list :
-                    text = "\n".join(tmp)
-
+                try :
+                    tmp = eval(text)
+                    if type(tmp) == list :
+                        text = "\n".join(tmp)
+                except Exception :
+                    pass
         except Exception :
+            logger.error(format_exc())
             return str(result)
     except requests.exceptions.ReadTimeout :
         text = "私人ChatGPT: 翻译超时, ChatGPT需要挂载代理才可使用, 请点击[代理]按钮, 正确配置好代理后重试"
