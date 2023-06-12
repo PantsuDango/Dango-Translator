@@ -121,6 +121,8 @@ def onlineOCRQueryQuota(object) :
             return "您尚未购买过在线OCR, 请先购买后再查询有效期"
         max_end_time = ""
         for val in res["Result"] :
+            if "文字识别" not in val["PackName"] :
+                continue
             if val["EndTime"] > max_end_time :
                 max_end_time = val["EndTime"]
         now_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
