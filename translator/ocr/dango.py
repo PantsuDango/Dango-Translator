@@ -476,9 +476,9 @@ def mangaRDR(object, trans_list, inpainted_image, text_block, font, check_permis
         "text_block": text_block,
         "fast_render": True
     }
-    if font and len(text_block) > 0 :
+    if font and len(trans_list) > 0 :
         body["font_selector"] = []
-        for val in text_block :
+        for _ in range(len(trans_list)) :
             body["font_selector"].append({font: None})
 
     sign = False

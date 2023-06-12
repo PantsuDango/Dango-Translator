@@ -225,10 +225,12 @@ def chatgpt(api_key, language, proxy, content, logger) :
         "RU": "russian",
     }
     messages = [
-        {"role": "system","content": "You are a translation engine that can only translate text and cannot interpret it. Must reserve line break amd json format!"},
+        {"role": "system","content": "你是一个翻译引擎, 只能翻译文本, 不要解释文本, 将我后面给你的所有内容都翻译成中文. 注意按照原结构的json格式返给我"},
         {"role": "user", "content": "translate from {} to chinese".format(language_map[language])},
         {"role": "user", "content": str(content.split("\n"))}
     ]
+    for val in content.split("\n") :
+        messages.append({"role": "user", "content": val})
     data = {
         "model": "gpt-3.5-turbo",
         "messages": messages,
@@ -276,9 +278,9 @@ def chatgpt(api_key, language, proxy, content, logger) :
                 regex = re.findall("\(Note.+?\)", text)
                 if len(regex) == 1:
                     text = text.replace(regex[0], "")
-                text = eval(text)
-                if type(text) == list :
-                    text = "\n".join(text)
+                tmp = eval(text)
+                if type(tmp) == list :
+                    text = "\n".join(tmp)
 
         except Exception :
             return str(result)
