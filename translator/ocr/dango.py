@@ -474,7 +474,7 @@ def mangaRDR(object, trans_list, inpainted_image, text_block, font, check_permis
         "inpainted_image": inpainted_image,
         "translated_text": trans_list,
         "text_block": text_block,
-        "fast_render": True
+        "fast_render": object.config.get("mangaFastRenderUse", False)
     }
     if font and len(trans_list) > 0 :
         body["font_selector"] = []

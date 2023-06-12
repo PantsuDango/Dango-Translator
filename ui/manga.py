@@ -2484,6 +2484,7 @@ class Setting(QWidget) :
         self.font_color_use = self.object.config.get("mangaFontColorUse", False)
         self.bg_color_use = self.object.config.get("mangaBgColorUse", False)
         self.output_rename_use = self.object.config.get("mangaOutputRenameUse", False)
+        self.fast_render_use = self.object.config.get("mangaFastRenderUse", False)
         self.font_list = [
             "鸿蒙/HarmonyOS_Sans/HarmonyOS_Sans_Regular",
             "阿里/东方大楷/Alimama_DongFangDaKai_Regular",
@@ -2710,20 +2711,39 @@ class Setting(QWidget) :
                              "QPushButton:hover { background-color: #83AAF9; }"
                              "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
 
-        # 导出图片时重命名
+        # 导出图片时重命名开关
         self.output_rename_switch = ui.switch.SwitchOCR(self, self.output_rename_use, startX=(65-20)*self.rate)
         self.customSetGeometry(self.output_rename_switch, 20, 170, 65, 20)
         self.output_rename_switch.checkedChanged.connect(self.changeOutputRenameUseSwitch)
         self.output_rename_switch.setCursor(ui.static.icon.SELECT_CURSOR)
         # 导出图片时重命名标签
         label = QLabel(self)
-        label.setText("导出图片时重命名")
+        label.setText("导出时重命名")
         self.customSetGeometry(label, 100, 170, 500, 20)
         # 导出图片时重命名?号图标
         button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self)
         self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 220, 170, 20, 20)
+        self.customSetGeometry(button, 190, 170, 20, 20)
         button.clicked.connect(lambda: self.showDesc("input_rename"))
+        button.setCursor(ui.static.icon.QUESTION_CURSOR)
+        button.setStyleSheet("QPushButton { background: transparent;}"
+                             "QPushButton:hover { background-color: #83AAF9; }"
+                             "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
+
+        # 快速渲染开关
+        self.fast_render_switch = ui.switch.SwitchOCR(self, self.fast_render_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.fast_render_switch, 250, 170, 65, 20)
+        self.fast_render_switch.checkedChanged.connect(self.changeFastRenderUseSwitch)
+        self.fast_render_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 快速渲染标签
+        label = QLabel(self)
+        label.setText("快速渲染")
+        self.customSetGeometry(label, 330, 170, 500, 20)
+        # 快速渲染?号图标
+        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self)
+        self.customSetIconSize(button, 20, 20)
+        self.customSetGeometry(button, 400, 170, 20, 20)
+        button.clicked.connect(lambda: self.showDesc("fast_render"))
         button.setCursor(ui.static.icon.QUESTION_CURSOR)
         button.setStyleSheet("QPushButton { background: transparent;}"
                              "QPushButton:hover { background-color: #83AAF9; }"
@@ -2776,6 +2796,9 @@ class Setting(QWidget) :
             self.desc_ui.setWindowTitle("导出图片时重命名说明")
             self.desc_ui.desc_text.append("\n开启开启, 导出译图时会自动将所有图片, 按照图片列表框的序号重命名"
                                           "\n\n开关关闭, 则保留图片原名称")
+        elif message_type == "fast_render" :
+            self.desc_ui.setWindowTitle("快速渲染说明")
+            self.desc_ui.desc_text.append("\n开启开启, 可以加快部分极端情况下的文字渲染速度, 但是大多数情况下会导致图片文字质量下降，请慎重启用")
         else :
             return
 
@@ -2846,6 +2869,11 @@ class Setting(QWidget) :
     def changeOutputRenameUseSwitch(self, checked) :
 
         self.object.config["mangaOutputRenameUse"] = checked
+
+
+    def changeFastRenderUseSwitch(self, checked) :
+
+        self.object.config["mangaFastRenderUse"] = checked
 
 
     # 窗口关闭处理
