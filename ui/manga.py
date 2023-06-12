@@ -1700,11 +1700,16 @@ class RenderTextBlock(QWidget) :
     def wheelEvent(self, event) :
 
         if event.angleDelta().y() > 0 :
+            if (self.image_rate[0] > 3 or self.image_rate[1] > 3) :
+                return
             self.image_rate[0] += 0.1
             self.image_rate[1] += 0.1
         else :
+            if (self.image_rate[0] < 0.1 or self.image_rate[1] < 0.1) :
+                return
             self.image_rate[0] -= 0.1
             self.image_rate[1] -= 0.1
+
         pixmap = self.image_pixmap.scaled(
             self.image_pixmap.width() * self.image_rate[0],
             self.image_pixmap.height() * self.image_rate[1]
