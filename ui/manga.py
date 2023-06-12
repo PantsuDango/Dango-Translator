@@ -290,7 +290,7 @@ class Manga(QWidget) :
         # 字体颜色
         self.color = "#595959"
         # 界面字体大小
-        self.font_size = 6
+        self.font_size = 8
         # 界面尺寸
         self.window_width = 1200
         self.window_height = 700
