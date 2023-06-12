@@ -1819,6 +1819,7 @@ class RenderTextBlock(QWidget) :
                 trans_list=[button.trans],
                 inpainted_image=image_base64,
                 text_block=[text_block],
+                font=button.font_type,
                 check_permission=self.object.manga_ui.check_permission
             )
             if not sign or not result.get("rendered_image", ""):
