@@ -284,6 +284,7 @@ def configConvert(object) :
     object.config["mangaFontType"] = object.config.get("mangaFontType", "Noto_Sans_SC/NotoSansSC-Regular")
     object.config["mangaOutputRenameUse"] = object.config.get("mangaOutputRenameUse", False)
     object.config["mangaFastRenderUse"] = object.config.get("mangaFastRenderUse", False)
+    object.config["mangaShadowSize"] = object.config.get("mangaShadowSize", 4)
 
 # 保存配置至服务器
 def postSaveSettin(object) :

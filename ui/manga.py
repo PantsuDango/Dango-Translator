@@ -290,7 +290,7 @@ class Manga(QWidget) :
         # 字体颜色
         self.color = "#595959"
         # 界面字体大小
-        self.font_size = 8
+        self.font_size = 7
         # 界面尺寸
         self.window_width = 1200
         self.window_height = 700
@@ -1613,7 +1613,8 @@ class RenderTextBlock(QWidget) :
                 original_image_path=self.original_image_path,
                 ipt_image_path=self.ipt_image_path,
                 rdr_image_path=self.image_path,
-                font_type=text_block.get("font_selector", "Noto_Sans_SC/NotoSansSC-Regular")
+                font_type=text_block.get("font_selector", "Noto_Sans_SC/NotoSansSC-Regular"),
+                shadow_size=text_block.get("shadow_size", 4),
             )
             # 打开文本框编辑信号
             button.click_signal.connect(self.clickTextBlock)
@@ -1661,6 +1662,8 @@ class RenderTextBlock(QWidget) :
         self.trans_edit_ui.trans_text.insertPlainText(button.trans)
         # 字体样式
         self.trans_edit_ui.font_box.setCurrentText(button.font_type)
+        # 轮廓宽度
+        self.trans_edit_ui.shadow_size_spinbox.setValue(button.shadow_size)
 
         self.trans_edit_ui.show()
 
@@ -1922,31 +1925,9 @@ class TransEdit(QWidget) :
         except Exception :
             pass
 
-        # 修改字体颜色
-        self.font_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.font_color), "", self)
-        self.customSetGeometry(self.font_color_button, 0, 0, 70, 30)
-        self.font_color_button.setCursor(ui.static.icon.EDIT_CURSOR)
-        self.font_color_button.setText(" 字体色")
-        self.font_color_button.clicked.connect(self.changeTranslateColor)
-        self.font_color_button.setStyleSheet("QPushButton {background: transparent; font: 9pt '华康方圆体W7';}"
-                                             "QPushButton:hover {background-color: #83AAF9;}"
-                                             "QPushButton:pressed {background-color: #4480F9;}")
-        self.font_color_button.setToolTip("<b>修改显示的字体颜色</b>")
-
-        # 修改轮廓颜色
-        self.bg_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.bg_color), "", self)
-        self.customSetGeometry(self.bg_color_button, 70, 0, 70, 30)
-        self.bg_color_button.setCursor(ui.static.icon.EDIT_CURSOR)
-        self.bg_color_button.setText(" 轮廓色")
-        self.bg_color_button.clicked.connect(self.changeBackgroundColor)
-        self.bg_color_button.setStyleSheet("QPushButton {background: transparent; font: 9pt '华康方圆体W7';}"
-                                           "QPushButton:hover {background-color: #83AAF9;}"
-                                           "QPushButton:pressed {background-color: #4480F9;}")
-        self.bg_color_button.setToolTip("<b>修改显示的轮廓颜色</b>")
-
-        # 私人彩云
+        # 私人团子
         button = QPushButton(self)
-        self.customSetGeometry(button, 140, 0, 70, 30)
+        self.customSetGeometry(button, 0, 0, 70, 30)
         button.setCursor(ui.static.icon.EDIT_CURSOR)
         button.setText(" 团子")
         button.setIcon(ui.static.icon.TRANSLATE_ICON)
@@ -1958,7 +1939,7 @@ class TransEdit(QWidget) :
 
         # 私人彩云
         button = QPushButton(self)
-        self.customSetGeometry(button, 210, 0, 70, 30)
+        self.customSetGeometry(button, 70, 0, 70, 30)
         button.setCursor(ui.static.icon.EDIT_CURSOR)
         button.setText(" 彩云")
         button.setIcon(ui.static.icon.TRANSLATE_ICON)
@@ -1970,7 +1951,7 @@ class TransEdit(QWidget) :
 
         # 私人腾讯
         button = QPushButton(self)
-        self.customSetGeometry(button, 280, 0, 70, 30)
+        self.customSetGeometry(button, 140, 0, 70, 30)
         button.setCursor(ui.static.icon.EDIT_CURSOR)
         button.setText(" 腾讯")
         button.setIcon(ui.static.icon.TRANSLATE_ICON)
@@ -1982,7 +1963,7 @@ class TransEdit(QWidget) :
 
         # 私人百度
         button = QPushButton(self)
-        self.customSetGeometry(button, 350, 0, 70, 30)
+        self.customSetGeometry(button, 210, 0, 70, 30)
         button.setCursor(ui.static.icon.EDIT_CURSOR)
         button.setText(" 百度")
         button.setIcon(ui.static.icon.TRANSLATE_ICON)
@@ -1994,7 +1975,7 @@ class TransEdit(QWidget) :
 
         # 私人ChatGPT
         button = QPushButton(self)
-        self.customSetGeometry(button, 420, 0, 70, 30)
+        self.customSetGeometry(button, 280, 0, 70, 30)
         button.setCursor(ui.static.icon.EDIT_CURSOR)
         button.setText(" ChatGPT")
         button.setIcon(ui.static.icon.TRANSLATE_ICON)
@@ -2004,12 +1985,49 @@ class TransEdit(QWidget) :
         button.clicked.connect(lambda: self.refreshTrans("ChatGPT"))
         button.setToolTip("<b>使用私人ChatGPT重新翻译</b>")
 
+        # 修改字体颜色
+        self.font_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.font_color), "", self)
+        self.customSetGeometry(self.font_color_button, 0, 30, 70, 30)
+        self.font_color_button.setCursor(ui.static.icon.EDIT_CURSOR)
+        self.font_color_button.setText(" 字体色")
+        self.font_color_button.clicked.connect(self.changeTranslateColor)
+        self.font_color_button.setStyleSheet("QPushButton {background: transparent; font: 9pt '华康方圆体W7';}"
+                                             "QPushButton:hover {background-color: #83AAF9;}"
+                                             "QPushButton:pressed {background-color: #4480F9;}")
+        self.font_color_button.setToolTip("<b>修改显示的字体颜色</b>")
+
+        # 修改轮廓颜色
+        self.bg_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.bg_color), "", self)
+        self.customSetGeometry(self.bg_color_button, 70, 30, 70, 30)
+        self.bg_color_button.setCursor(ui.static.icon.EDIT_CURSOR)
+        self.bg_color_button.setText(" 轮廓色")
+        self.bg_color_button.clicked.connect(self.changeBackgroundColor)
+        self.bg_color_button.setStyleSheet("QPushButton {background: transparent; font: 9pt '华康方圆体W7';}"
+                                           "QPushButton:hover {background-color: #83AAF9;}"
+                                           "QPushButton:pressed {background-color: #4480F9;}")
+        self.bg_color_button.setToolTip("<b>修改显示的轮廓颜色</b>")
+
+        # 轮廓宽度设定
+        self.shadow_size_spinbox = QDoubleSpinBox(self)
+        self.customSetGeometry(self.shadow_size_spinbox, 150, 35, 40, 20)
+        self.shadow_size_spinbox.setDecimals(1)
+        self.shadow_size_spinbox.setSingleStep(0.1)
+        self.shadow_size_spinbox.setMinimum(0)
+        self.shadow_size_spinbox.setMaximum(16)
+        self.shadow_size_spinbox.setValue(4)
+        self.shadow_size_spinbox.setCursor(ui.static.icon.SELECT_CURSOR)
+        self.shadow_size_spinbox.setStyleSheet("font: 9pt '华康方圆体W7';")
+        label = QLabel(self)
+        self.customSetGeometry(label, 200, 37, 100, 20)
+        label.setText("轮廓宽度")
+        label.setStyleSheet("font: 9pt '华康方圆体W7';")
+
         # 字体样式
         label = QLabel(self)
-        self.customSetGeometry(label, 7, 32, 20, 20)
+        self.customSetGeometry(label, 260, 35, 20, 20)
         label.setPixmap(ui.static.icon.FONT_PIXMAP)
         self.font_box = QComboBox(self)
-        self.customSetGeometry(self.font_box, 28, 30, 185, 25)
+        self.customSetGeometry(self.font_box, 280, 32, 185, 25)
         self.font_box.setCursor(ui.static.icon.EDIT_CURSOR)
         self.font_box.setToolTip("<b>设置字体样式</b>")
         self.font_box.setStyleSheet("font: 9pt '华康方圆体W7';")
@@ -2123,6 +2141,9 @@ class TransEdit(QWidget) :
                     coordinate[k] = [val[k][0] - x, val[k][1] - y]
                 text_block["coordinate"][i] = coordinate
 
+            # 轮廓宽度
+            text_block["shadow_size"] = self.shadow_size_spinbox.value()
+
             # 漫画rdr
             sign, result = translator.ocr.dango.mangaRDR(
                 object=self.object,
@@ -2212,7 +2233,7 @@ class TransEdit(QWidget) :
 
 
     # 修改字体颜色
-    def changeTranslateColor(self):
+    def changeTranslateColor(self) :
 
         self.hide()
         color = QColorDialog.getColor(QColor(self.font_color), None, "修改字体颜色")
@@ -2408,7 +2429,7 @@ class CustomTextBlockButton(QPushButton) :
 
 
     # 参数初始化
-    def initConfig(self, text_block, trans, rect, index, original_image_path, ipt_image_path, rdr_image_path, font_type) :
+    def initConfig(self, text_block, trans, rect, index, original_image_path, ipt_image_path, rdr_image_path, font_type, shadow_size) :
 
         self.trans = trans
         self.text_block = text_block
@@ -2418,6 +2439,7 @@ class CustomTextBlockButton(QPushButton) :
         self.ipt_image_path = ipt_image_path
         self.rdr_image_path = rdr_image_path
         self.font_type = font_type
+        self.shadow_size = shadow_size
 
         # 文本块信息
         self.original = ""
@@ -2485,6 +2507,7 @@ class Setting(QWidget) :
         self.bg_color_use = self.object.config.get("mangaBgColorUse", False)
         self.output_rename_use = self.object.config.get("mangaOutputRenameUse", False)
         self.fast_render_use = self.object.config.get("mangaFastRenderUse", False)
+        self.shadow_size = self.object.config.get("mangaShadowSize", 4)
         self.font_list = [
             "鸿蒙/HarmonyOS_Sans/HarmonyOS_Sans_Regular",
             "阿里/东方大楷/Alimama_DongFangDaKai_Regular",
@@ -2749,6 +2772,29 @@ class Setting(QWidget) :
                              "QPushButton:hover { background-color: #83AAF9; }"
                              "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
 
+        # 全局轮廓宽度设定
+        self.shadow_size_spinbox = QDoubleSpinBox(self)
+        self.customSetGeometry(self.shadow_size_spinbox, 25, 220, 60, 20)
+        self.shadow_size_spinbox.setDecimals(1)
+        self.shadow_size_spinbox.setSingleStep(0.1)
+        self.shadow_size_spinbox.setMinimum(0)
+        self.shadow_size_spinbox.setMaximum(16)
+        self.shadow_size_spinbox.setValue(self.shadow_size)
+        self.shadow_size_spinbox.setCursor(ui.static.icon.SELECT_CURSOR)
+        self.shadow_size_spinbox.valueChanged.connect(self.changeShadowSize)
+        label = QLabel(self)
+        self.customSetGeometry(label, 100, 220, 100, 20)
+        label.setText("轮廓宽度")
+        # 快速渲染?号图标
+        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self)
+        self.customSetIconSize(button, 20, 20)
+        self.customSetGeometry(button, 160, 220, 20, 20)
+        button.clicked.connect(lambda: self.showDesc("shadow_size"))
+        button.setCursor(ui.static.icon.QUESTION_CURSOR)
+        button.setStyleSheet("QPushButton { background: transparent;}"
+                             "QPushButton:hover { background-color: #83AAF9; }"
+                             "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
+
 
     # 根据分辨率定义控件位置尺寸
     def customSetGeometry(self, object, x, y, w, h) :
@@ -2799,6 +2845,9 @@ class Setting(QWidget) :
         elif message_type == "fast_render" :
             self.desc_ui.setWindowTitle("快速渲染说明")
             self.desc_ui.desc_text.append("\n开启开启, 可以加快部分极端情况下的文字渲染速度, 但是大多数情况下会导致图片文字质量下降，请慎重启用")
+        elif message_type == "shadow_size" :
+            self.desc_ui.setWindowTitle("全局轮廓宽度说明")
+            self.desc_ui.desc_text.append("\n影响文字渲染后的阴影轮廓宽度, 默认值为4.0")
         else :
             return
 
@@ -2871,9 +2920,16 @@ class Setting(QWidget) :
         self.object.config["mangaOutputRenameUse"] = checked
 
 
+    # 改变快速渲染开关状态
     def changeFastRenderUseSwitch(self, checked) :
 
         self.object.config["mangaFastRenderUse"] = checked
+
+
+    # 改变全局轮廓宽度
+    def changeShadowSize(self, value) :
+
+        self.object.config["mangaShadowSize"] = value
 
 
     # 窗口关闭处理
