@@ -963,6 +963,8 @@ class Manga(QWidget) :
                     val["background_color"] = [b_r, b_g, b_b]
                 # 使用全局字体
                 val["font_selector"] = self.object.config["mangaFontType"]
+                # 使用全局轮廓宽度
+                val["shadow_size"] = self.object.config["mangaShadowSize"]
 
                 new_text_block.append(val)
 
