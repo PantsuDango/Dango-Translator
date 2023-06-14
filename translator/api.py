@@ -233,7 +233,7 @@ def chatgpt(api_key, language, proxy, content, logger) :
             content_map[val] = ""
         messages = [
             {"role": "system", "content": "你是一个翻译引擎, 只需要翻译内容而不要解释它, 我需要你完成{}翻译为中文. 我会给你一个json结构的内容, 键是需要翻译的文本, 值是空字符串, 你需要逐个翻译每个键的内容, 并将翻译结果补充至对应的键值里, 并按照json格式返回给我".format(language_map[language])},
-            {"role": "user", "content": str(content_map)}
+            {"role": "user", "content": json.dumps(content_map)}
         ]
     else :
         # 单个句子的情况
@@ -295,7 +295,7 @@ def chatgpt(api_key, language, proxy, content, logger) :
                         for val in tmp.values() :
                             tmp_list.append(val)
                         text = "\n".join(tmp_list)
-                except Exception :
+                except Exception as e :
                     pass
         except Exception :
             logger.error(format_exc())
