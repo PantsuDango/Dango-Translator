@@ -230,6 +230,7 @@ class Manga(QWidget) :
         self.edit_image_widget.itemSelectionChanged.connect(self.loadEditImage)
         self.edit_image_widget.hide()
         self.edit_image_widget.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.edit_image_widget.customContextMenuRequested.connect(self.showEditListWidgetMenu)
         self.edit_image_widget.setSpacing(5)
 
         # 译图列表框
@@ -658,9 +659,25 @@ class Manga(QWidget) :
             menu = QMenu(self)
             # 添加菜单项
             translater_action = menu.addAction("翻译当前图片")
-            translater_action.triggered.connect(lambda: self.translaterItemWidget(item))
+            translater_action.triggered.connect(lambda: self.translaterItemWidget(item, "original"))
             delete_action = menu.addAction("移除当前图片")
-            delete_action.triggered.connect(lambda: self.removeItemWidget(item))
+            delete_action.triggered.connect(lambda: self.removeItemWidget(item, "original"))
+            # 显示菜单
+            cursorPos = QCursor.pos()
+            menu.exec_(cursorPos)
+
+
+    # 设置编辑列表框右键菜单
+    def showEditListWidgetMenu(self, pos) :
+
+        item = self.edit_image_widget.itemAt(pos)
+        if item is not None:
+            menu = QMenu(self)
+            # 添加菜单项
+            translater_action = menu.addAction("翻译当前图片")
+            translater_action.triggered.connect(lambda: self.translaterItemWidget(item, "edit"))
+            delete_action = menu.addAction("移除当前图片")
+            delete_action.triggered.connect(lambda: self.removeItemWidget(item, "edit"))
             # 显示菜单
             cursorPos = QCursor.pos()
             menu.exec_(cursorPos)
@@ -697,9 +714,12 @@ class Manga(QWidget) :
 
 
     # 列表框右键菜单删除子项
-    def removeItemWidget(self, item) :
+    def removeItemWidget(self, item, item_type) :
 
-        row = self.original_image_widget.indexFromItem(item).row()
+        if item_type == "edit" :
+            row = self.edit_image_widget.indexFromItem(item).row()
+        else :
+            row = self.original_image_widget.indexFromItem(item).row()
         if row > (len(self.image_path_list) - 1) :
             return
         # 列表框删除图片
@@ -897,13 +917,16 @@ class Manga(QWidget) :
 
 
     # 单图翻译
-    def translaterItemWidget(self, item) :
+    def translaterItemWidget(self, item, item_type) :
 
         # 校验是否选择了翻译源
         if not self.object.config["mangaTrans"] :
             return utils.message.MessageBox("翻译失败", "请先选择要使用的翻译源     ", self.rate)
         # 获取图片路径
-        row = self.original_image_widget.indexFromItem(item).row()
+        if item_type == "edit" :
+            row = self.edit_image_widget.indexFromItem(item).row()
+        else :
+            row = self.original_image_widget.indexFromItem(item).row()
         image_path = self.image_path_list[row]
         image_paths = []
         image_paths.append(image_path)
