@@ -216,57 +216,61 @@ def caiyun(sentence, token, logger) :
 # ChatGPT翻译
 def chatgpt(api_key, language, proxy, content, logger) :
 
-    if not api_key :
-        return "私人ChatGPT: 还未填入私人ChatGPT密钥, 不可使用"
-
-    language_map = {
-        "JAP": "日语",
-        "ENG": "英文",
-        "KOR": "韩语",
-        "RU": "俄语",
-    }
-    content_list = content.split("\n")
-    # 多句子情况的处理, 转为map
-    if len(content_list) > 1 :
-        content_map = {}
-        for val in content_list :
-            content_map[val] = ""
-        messages = [
-            {"role": "system", "content": "你是一个翻译引擎, 只需要翻译内容而不要解释它, 我需要你完成{}翻译为中文. 我会给你一个json结构的内容, 键是需要翻译的文本, 值是空字符串, 你需要逐个翻译每个键的内容, 并将翻译结果补充至对应的键值里, 并按照json格式返回给我".format(language_map[language])},
-            {"role": "user", "content": str(content_map)}
-        ]
-    else :
-        # 单个句子的情况
-        messages = [
-            {"role": "system", "content": "你是一个翻译引擎, 只需要翻译内容而不要解释它, 我需要你完成{}翻译为中文.".format(language_map[language])},
-            {"role": "user", "content": content}
-        ]
-    data = {
-        "model": "gpt-3.5-turbo-0613",
-        "messages": messages,
-        "temperature": 0,
-        "max_tokens": 1000,
-        "top_p": 1,
-        "n": 1,
-        "frequency_penalty": 1,
-        "presence_penalty": 1,
-        "stream": False,
-    }
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer {}".format(api_key)
-    }
-    proxies = {
-        "http": None,
-        "https": None
-    }
-    if proxy :
-        proxies = {
-            "http": "http://{}".format(proxy),
-            "https": "https://{}".format(proxy)
-        }
-    url = "https://api.openai.com/v1/chat/completions"
     try :
+        if not api_key:
+            return "私人ChatGPT: 还未填入私人ChatGPT密钥, 不可使用"
+
+        language_map = {
+            "JAP": "日语",
+            "ENG": "英文",
+            "KOR": "韩语",
+            "RU": "俄语",
+        }
+        content_list = content.split("\n")
+        # 多句子情况的处理, 转为map
+        if len(content_list) > 1:
+            content_map = {}
+            for val in content_list:
+                content_map[val] = ""
+            messages = [
+                {"role": "system",
+                 "content": "你是一个翻译引擎, 只需要翻译内容而不要解释它, 我需要你完成{}翻译为中文. 我会给你一个json结构的内容, 键是需要翻译的文本, 值是空字符串, 你需要逐个翻译每个键的内容, 并将翻译结果补充至对应的键值里, 并按照json格式返回给我".format(
+                     language_map[language])},
+                {"role": "user", "content": str(content_map)}
+            ]
+        else:
+            # 单个句子的情况
+            messages = [
+                {"role": "system",
+                 "content": "你是一个翻译引擎, 只需要翻译内容而不要解释它, 我需要你完成{}翻译为中文.".format(
+                     language_map[language])},
+                {"role": "user", "content": content}
+            ]
+        data = {
+            "model": "gpt-3.5-turbo-0613",
+            "messages": messages,
+            "temperature": 0,
+            "max_tokens": 1000,
+            "top_p": 1,
+            "n": 1,
+            "frequency_penalty": 1,
+            "presence_penalty": 1,
+            "stream": False,
+        }
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer {}".format(api_key)
+        }
+        proxies = {
+            "http": None,
+            "https": None
+        }
+        if proxy:
+            proxies = {
+                "http": "http://{}".format(proxy),
+                "https": "https://{}".format(proxy)
+            }
+        url = "https://api.openai.com/v1/chat/completions"
         response = requests.post(url, headers=headers, data=json.dumps(data), proxies=proxies, timeout=30)
         response.encoding = "utf-8"
         result = json.loads(response.text)

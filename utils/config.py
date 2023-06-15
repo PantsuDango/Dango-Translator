@@ -171,7 +171,7 @@ def configConvert(object) :
     # 公共彩云翻译开关
     object.config["caiyunUse"] = object.config.get("caiyunUse", "False")
     # 私人团子翻译开关
-    object.config["dangoUse"] = object.config.get("dangoUse", True)
+    object.config["dangoUse"] = object.config.get("dangoUse", False)
     # 私人腾讯翻译开关
     object.config["tencentUse"] = object.config.get("tencentUse", "False")
     # 私人百度翻译开关
