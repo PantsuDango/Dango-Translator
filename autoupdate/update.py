@@ -53,6 +53,8 @@ def getVersion() :
 
     res, err = post("https://trans.dango.cloud/DangoTranslate/ShowDict", {})
     if not res :
+        res, err = post("https://43.154.0.93/DangoTranslate/ShowDict", {})
+    if not res :
         res, err = post("https://dango.c4a15wh.cn/DangoTranslate/ShowDict", {})
     if err :
         return None, None, "获取最新版本号失败: %s"%err
