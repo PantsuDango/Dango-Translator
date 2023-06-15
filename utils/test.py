@@ -163,3 +163,20 @@ def testChatGPT(object) :
         object.settin_ui.desc_ui.desc_text.append("\n耗时: {:.2f}s".format(time.time()-start))
         object.settin_ui.desc_ui.desc_text.append("测试结束!")
     utils.thread.createThread(func)
+
+
+# 测试私人团子
+def testDango(object) :
+
+    # 测试信息显示窗
+    object.settin_ui.desc_ui = ui.desc.Desc(object)
+    object.settin_ui.desc_ui.setWindowTitle("私人团子翻译测试")
+    object.settin_ui.desc_ui.desc_text.append("\n开始测试...")
+    object.settin_ui.desc_ui.show()
+
+    original = "もし、今の状況が自分らしくないことの連続で、好きになれないなら、どうすれば、変えられるかを真剣に考えてみよう。そしないと問題はちっとも解決しない。"
+    object.settin_ui.desc_ui.desc_text.append("\n原文: \n{}".format(original))
+    QApplication.processEvents()
+    sign, result = translator.ocr.dango.dangoTrans(object, original, "JAP")
+    object.settin_ui.desc_ui.desc_text.append("\n译文: \n{}".format(result))
+    object.settin_ui.desc_ui.desc_text.append("\n测试结束!")

@@ -145,6 +145,8 @@ def configConvert(object) :
     object.config["fontColor"]["bing"] = object.config["fontColor"].get("bing", "#5B8FF9")
     # 字体颜色 公共彩云
     object.config["fontColor"]["caiyun"] = object.config["fontColor"].get("caiyun", "#5B8FF9")
+    # 字体颜色 私人团子
+    object.config["fontColor"]["dango"] = object.config["fontColor"].get("dango", "#5B8FF9")
     # 字体颜色 私人腾讯
     object.config["fontColor"]["tencent"] = object.config["fontColor"].get("tencent", "#5B8FF9")
     # 字体颜色 私人百度
@@ -168,6 +170,8 @@ def configConvert(object) :
     object.config["bingUse"] = object.config.get("bingUse", "False")
     # 公共彩云翻译开关
     object.config["caiyunUse"] = object.config.get("caiyunUse", "False")
+    # 私人团子翻译开关
+    object.config["dangoUse"] = object.config.get("dangoUse", True)
     # 私人腾讯翻译开关
     object.config["tencentUse"] = object.config.get("tencentUse", "False")
     # 私人百度翻译开关
@@ -325,6 +329,8 @@ def saveTransHisTory(text, translate_type) :
         content = "[公共腾讯]\n%s\n"%text
     elif translate_type == "bing" :
         content = "[公共Bing]\n%s\n"%text
+    elif translate_type == "dango_private" :
+        content = "[私人团子]\n%s\n"%text
     elif translate_type == "baidu_private" :
         content = "[私人百度]\n%s\n"%text
     elif translate_type == "tencent_private" :

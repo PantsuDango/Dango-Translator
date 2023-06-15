@@ -844,6 +844,9 @@ class Translation(QMainWindow) :
             color = self.object.config["fontColor"][self.translater_yaml_map[self.webdriver3.web_type]]
             trans_type = self.webdriver3.web_type
         # 私人百度
+        elif trans_type == "dango_private" :
+            color = self.object.config["fontColor"]["dango"]
+        # 私人百度
         elif trans_type == "baidu_private" :
             color = self.object.config["fontColor"]["baidu"]
         # 私人腾讯

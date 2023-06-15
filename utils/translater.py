@@ -182,11 +182,15 @@ class TranslaterProcess(QThread) :
             else:
                 result = "%s翻译: 我抽风啦, 请尝试重新翻译! 如果频繁出现, 建议直接注册使用私人翻译" % self.object.translation_ui.webdriver3.translater_map[self.object.translation_ui.webdriver3.web_type]
 
+        # 私人团子
+        elif self.trans_type == "dango_private":
+            sign, result = translator.ocr.dango.dangoTrans(self.object, self.object.translation_ui.original, self.object.config["language"])
+
         # 私人百度
         elif self.trans_type == "baidu_private" :
-            secret_id = self.object.config["baiduAPI"]["Key"]
+            app_id = self.object.config["baiduAPI"]["Key"]
             secret_key = self.object.config["baiduAPI"]["Secret"]
-            result = translator.api.baidu(self.object.translation_ui.original, secret_id, secret_key, self.logger)
+            result = translator.api.baidu(self.object.translation_ui.original, app_id, secret_key, self.logger)
 
         # 私人腾讯
         elif self.trans_type == "tencent_private" :
@@ -448,6 +452,11 @@ class Translater(QThread) :
         # 公共翻译三
         if self.object.translation_ui.webdriver3.web_type:
             utils.thread.createThread(self.creatTranslaterThread, "webdriver_3")
+            nothing_sign = True
+
+        # 私人团子
+        if self.object.config["dangoUse"] == True :
+            utils.thread.createThread(self.creatTranslaterThread, "dango_private")
             nothing_sign = True
 
         # 私人百度
