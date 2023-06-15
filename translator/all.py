@@ -37,10 +37,11 @@ def bing(language, content, logger) :
         strUrl = url + data.decode() + "&appId=%223DAEE5B978BA031557E739EE1E2A68CB1FAD5909%22"
         response = urllib.request.urlopen(strUrl)
         str_data = response.read().decode('utf-8')
+        print(str_data)
         tmp, str_data = str_data.split('"TranslatedText":')
         translate_data = str_data[1:str_data.find('"', 1)]
 
-    except Exception:
+    except Exception :
         logger.error(format_exc())
         return "公共Bing: 我抽风啦, 请尝试重新翻译! 如果频繁出现, 建议直接注册使用私人翻译"
 
@@ -277,6 +278,9 @@ class Webdriver(QObject) :
             # 打开网页
             self.browser.get(self.url_map[web_type])
             self.browser.maximize_window()
+            # 去掉广告
+            self.browserClickTimeout('/html/body/div[4]/div/img[2]')
+            self.browserClickTimeout('//*[@id="inner-box"]/div/div[2]/span')
             # 原文选择
             self.browserClickTimeout('//*[@id="TextTranslate"]/div[1]/div[1]/div/div/div/div[2]')
             if language == "JAP" :
@@ -287,8 +291,6 @@ class Webdriver(QObject) :
                 self.browserClickTimeout('//*[@id="TextTranslate"]/div[1]/div[1]/div/div/div[2]/div/div/div/div/div[3]/div/div/div/div[5]')
             elif language == "RU" :
                 self.browserClickTimeout('//*[@id="TextTranslate"]/div[1]/div[1]/div/div/div[2]/div/div/div/div/div[3]/div/div/div/div[3]')
-            # 点击去掉 我知道了 广告弹窗
-            self.browserClickTimeout('/html/body/div[1]/div/ul/li[4]/div/a[2]')
 
         # 百度
         if web_type == "baidu" :
@@ -300,10 +302,11 @@ class Webdriver(QObject) :
                 self.browser.get(self.url_map[web_type].replace("auto", "kor"))
             elif language == "RU" :
                 self.browser.get(self.url_map[web_type].replace("auto", "ru"))
-            # 去弹窗广告
-            #self.browser.refresh()
+
             self.browserClickTimeout(self.object.yaml["dict_info"]["%s_xpath"%web_type])
             self.browser.maximize_window()
+            # 去掉广告
+            self.browserClickTimeout('//*[@id="desktop-guide-wrapper"]/div/div/div/a[2]')
 
         # 腾讯
         if web_type == "tencent" :
@@ -402,7 +405,7 @@ class Webdriver(QObject) :
                 self.browserClickTimeout('//*[@id="main-outer"]/div/div/div[1]/div[1]/div[1]/a[2]/span')
             # 清空翻译框
             if self.content :
-                self.browserClickTimeout('//*[@id="main-outer"]/div/div/div[1]/div[2]/div[1]/div[1]/div/div[2]/a')
+                self.browserClickTimeout('//*[@id="main-outer"]/div/div/div[1]/div[2]/div[1]/div[1]/div/div[3]/a')
             # 输入要翻译的文本
             self.browser.find_element_by_xpath('//*[@id="baidu_translate_input"]').send_keys(content)
             self.browser.find_element_by_xpath('//*[@id="translate-button"]').click()
@@ -546,14 +549,12 @@ class Webdriver(QObject) :
                 # 提取翻译信息
                 try :
                     # 提取翻译信息
-                    text = self.browser.find_element_by_id("target-dummydiv").get_attribute("textContent")
-                    if not text.isspace() \
-                            and text.strip() \
-                            and "[...]" not in "".join(text.split()) \
-                            and (len(content) > 5 and len("".join(text.split())) > 3 ) :
-                        self.content = text.strip()
+                    text = self.browser.find_element_by_xpath('//*[@id="panelTranslateText"]/div[1]/div[2]/section[2]/div[3]/div[1]/d-textarea/div').text
+                    if text :
+                        self.content = text
                         return self.content
                 except Exception :
+                    print(format_exc())
                     pass
                 # 判断超时
                 end = time.time()
