@@ -228,18 +228,17 @@ def chatgpt(api_key, language, proxy, content, logger) :
     content_list = content.split("\n")
     # 多句子情况的处理, 转为map
     if len(content_list) > 1 :
-        new_content = "@@".join(content_list)
+        content_map = {}
+        for val in content_list :
+            content_map[val] = ""
         messages = [
-            {"role": "system", "content": "你是一个翻译引擎, 只需要翻译内容而不要解释它."
-                                          "我会给你多组句子, 每组句子用字符@@分割. "
-                                          "你不需要联系上下文, 只需要遵守逐句翻译, 并按照原结构返回. "
-                                          "我需要你将{}翻译为中文.".format(language_map[language])},
-            {"role": "user", "content": new_content}
+            {"role": "system", "content": "你是一个翻译引擎, 只需要翻译内容而不要解释它, 我需要你完成{}翻译为中文. 我会给你一个json结构的内容, 键是需要翻译的文本, 值是空字符串, 你需要逐个翻译每个键的内容, 并将翻译结果补充至对应的键值里, 并按照json格式返回给我".format(language_map[language])},
+            {"role": "user", "content": str(content_map)}
         ]
     else :
         # 单个句子的情况
         messages = [
-            {"role": "system", "content": "你是一个翻译引擎, 只需要翻译内容而不要解释它, 我需要你将{}翻译为中文.".format(language_map[language])},
+            {"role": "system", "content": "你是一个翻译引擎, 只需要翻译内容而不要解释它, 我需要你完成{}翻译为中文.".format(language_map[language])},
             {"role": "user", "content": content}
         ]
     data = {
@@ -289,8 +288,15 @@ def chatgpt(api_key, language, proxy, content, logger) :
                 regex = re.findall("\(Note.+?\)", text)
                 if len(regex) == 1:
                     text = text.replace(regex[0], "")
-                if len(content_list) > 1 :
-                 text = "\n".join(text.split("@@"))
+                try :
+                    tmp = eval(text)
+                    if type(tmp) == dict :
+                        tmp_list = []
+                        for val in tmp.values() :
+                            tmp_list.append(val)
+                        text = "\n".join(tmp_list)
+                except Exception :
+                    pass
         except Exception :
             logger.error(format_exc())
             return str(result)
