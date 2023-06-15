@@ -393,10 +393,10 @@ def mangaOCR(object, filepath, check_permission) :
         "detect_scale": object.config.get("mangaDetectScale", 1),
         "image": image_base64
     }
-    url = object.yaml["dict_info"].get("manga_ocr", "https://dl-dev.ap-sh.starivercs.cn/v2/manga_trans/advanced/manga_ocr")
+    url = object.yaml["dict_info"].get("manga_ocr", "https://dl.ap-sh.starivercs.cn/v2/manga_trans/advanced/manga_ocr")
     # 试用
     if check_permission :
-        url = object.yaml["dict_info"].get("manga_probate_ocr", "https://dl-dev.ap-sh.starivercs.cn/v2/manga_probate/advanced/manga_ocr")
+        url = object.yaml["dict_info"].get("manga_probate_ocr", "https://dl.ap-sh.starivercs.cn/v2/manga_probate/advanced/manga_ocr")
 
     sign = False
     result = "图片文字识别失败: "
@@ -426,10 +426,10 @@ def mangaIPT(object, filepath, mask, check_permission) :
     if token == "" :
         return False, "图片文字消除失败: 未获取到token"
 
-    url = object.yaml["dict_info"].get("manga_text_inpaint", "https://dl-dev.ap-sh.starivercs.com:10443/v2/manga_trans/advanced/text_inpaint")
+    url = object.yaml["dict_info"].get("manga_text_inpaint", "https://dl.ap-sh.starivercs.cn/v2/manga_trans/advanced/text_inpaint")
     # 试用
     if check_permission :
-        url = object.yaml["dict_info"].get("manga_probate_text_inpaint", "https://dl-dev.ap-sh.starivercs.cn/v2/manga_probate/advanced/text_inpaint")
+        url = object.yaml["dict_info"].get("manga_probate_text_inpaint", "https://dl.ap-sh.starivercs.cn/v2/manga_probate/advanced/text_inpaint")
     with open(filepath, "rb") as file :
         data = file.read()
     image_base64 = base64.b64encode(data).decode("utf-8")
@@ -465,10 +465,10 @@ def mangaRDR(object, trans_list, inpainted_image, text_block, font, check_permis
     token = object.config.get("DangoToken", "")
     if token == "" :
         return False, "图片文字渲染失败: 未获取到token"
-    url = object.yaml["dict_info"].get("manga_text_render", "https://dl-dev.ap-sh.starivercs.com:10443/v2/manga_trans/advanced/text_render")
+    url = object.yaml["dict_info"].get("manga_text_render", "https://dl.ap-sh.starivercs.cn/v2/manga_trans/advanced/text_render")
     # 试用
     if check_permission :
-        url = object.yaml["dict_info"].get("manga_probate_text_render", "https://dl-dev.ap-sh.starivercs.cn/v2/manga_probate/advanced/text_render")
+        url = object.yaml["dict_info"].get("manga_probate_text_render", "https://dl.ap-sh.starivercs.cn/v2/manga_probate/advanced/text_render")
     body = {
         "token": token,
         "inpainted_image": inpainted_image,
@@ -508,7 +508,7 @@ def mangaFontList(object) :
     if token == "" :
         return False, "获取字体列表失败: 未获取到token"
 
-    url = object.yaml["dict_info"].get("manga_font_list", "https://dl-dev.ap-sh.starivercs.cn/v2/manga_trans/advanced/get_available_fonts")
+    url = object.yaml["dict_info"].get("manga_font_list", "https://dl.ap-sh.starivercs.cn/v2/manga_trans/advanced/get_available_fonts")
     body = {"token": token}
 
     sign = False
@@ -537,7 +537,7 @@ def dangoTrans(object, sentence, language="auto") :
     if not sentence :
         return True, ""
 
-    url = object.yaml["dict_info"].get("dango_trans", "https://dl-dev.ap-sh.starivercs.cn/v2/translate/sync_task")
+    url = object.yaml["dict_info"].get("dango_trans", "https://dl.ap-sh.starivercs.cn/v2/translate/sync_task")
     body = {
         "token": token,
         "texts": sentence.split("\n"),

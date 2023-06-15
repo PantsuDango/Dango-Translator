@@ -1515,7 +1515,7 @@ class Manga(QWidget) :
     # 查询图片翻译接口试用次数
     def mangaReadCount(self) :
 
-        url = self.object.yaml.get("manga_read_count", "https://dl-dev.ap-sh.starivercs.cn/v2/probate/manga_read_count")
+        url = self.object.yaml["dict_info"].get("manga_read_count", "https://dl.ap-sh.starivercs.cn/v2/probate/manga_read_count")
         body = {"Username": self.object.yaml["user"]}
         resp = utils.http.post(url=url, body=body, logger=self.logger, headers=None, timeout=5)
         if not resp :
