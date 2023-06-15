@@ -668,6 +668,11 @@ class Settin(QMainWindow) :
         button.clicked.connect(lambda: utils.test.testDango(self.object))
         button.setCursor(ui.static.icon.SELECT_CURSOR)
 
+        # 私人团子翻译标签
+        label = QLabel(private_translater_tab)
+        self.customSetGeometry(label, 280, 70, 500, 20)
+        label.setText("免费内测中, 不保证稳定性")
+
         # 私人腾讯翻译标签
         label = QLabel(private_translater_tab)
         self.customSetGeometry(label, 20, 120, 35, 20)
