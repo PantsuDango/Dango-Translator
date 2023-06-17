@@ -190,5 +190,5 @@ def ocrProbationReadCount(object) :
         return
     if resp.get("Code", -1) != 0 :
         return
-    count = resp.get("Result", 0)
+    count = resp.get("Data", 0)
     object.settin_ui.online_ocr_probation_label.setText("试用在线OCR, 剩余%d次"%count)
