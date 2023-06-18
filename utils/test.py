@@ -119,6 +119,7 @@ def testOnlineOCR(object) :
     ocr_sign, original = translator.ocr.dango.dangoOCR(object, test=True)
     object.settin_ui.desc_ui.desc_text.append("\n识别结果: \n{}".format(original))
     object.settin_ui.desc_ui.desc_text.append("\n测试结束!")
+    utils.thread.createThread(utils.http.ocrProbationReadCount, object)
 
 
 # 测试百度OCR

@@ -239,7 +239,7 @@ def dangoOCR(object, test=False) :
     }
 
     # 是否为试用在线ocr
-    if object.settin_ui.online_ocr_probation_use == True and test == False :
+    if object.settin_ui.online_ocr_probation_use == True :
         url = object.yaml["dict_info"]["ocr_probation"]
     res = utils.http.post(url=url, body=body, logger=object.logger, headers=headers)
     if not res :
