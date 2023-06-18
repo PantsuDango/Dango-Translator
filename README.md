@@ -31,7 +31,7 @@
 
 - 群文件下载：[![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-19%E7%BE%A4691201730-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/19%E7%BE%A4.png)  
 - 官网下载：[下载地址](https://translator.dango.cloud)
-- Github Releases：[Ver4.5.2](https://github.com/PantsuDango/Dango-Translator/releases/tag/Ver4.5.2)
+- Github Releases：[Ver4.5.3](https://github.com/PantsuDango/Dango-Translator/releases/tag/Ver4.5.3)
 
   
 ## 更新日志
