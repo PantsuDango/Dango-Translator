@@ -604,9 +604,9 @@ class Translation(QMainWindow) :
     def enterEvent(self, QEvent) :
 
         if self.lock_sign == True :
+            self.switch_button.show()
             self.lock_button.show()
             return
-
 
         # 显示所有顶部工具栏控件
         self.switch_button.show()
