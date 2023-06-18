@@ -5,6 +5,7 @@ import os
 import hashlib
 from traceback import format_exc
 import json
+import io
 
 import utils.http
 import utils.range
@@ -381,10 +382,16 @@ def mangaOCR(object, filepath, check_permission) :
     token = object.config.get("DangoToken", "")
     if token == "" :
         return False, "图片文字识别失败: 未获取到token"
-    # 获取配置
-    with open(filepath, "rb") as file :
-        data = file.read()
+
+    # 如果是webp格式就转换为png
+    _, ext = os.path.splitext(filepath)
+    if ext.lower() == ".webp":
+        data = imageWebpToPng(filepath)
+    else :
+        with open(filepath, "rb") as file :
+            data = file.read()
     image_base64 = base64.b64encode(data).decode("utf-8")
+
     body = {
         "token": token,
         "mask": True,
@@ -430,9 +437,16 @@ def mangaIPT(object, filepath, mask, check_permission) :
     # 试用
     if check_permission :
         url = object.yaml["dict_info"].get("manga_probate_text_inpaint", "https://dl.ap-sh.starivercs.cn/v2/manga_probate/advanced/text_inpaint")
-    with open(filepath, "rb") as file :
-        data = file.read()
+
+    # 如果是webp格式就转换为png
+    _, ext = os.path.splitext(filepath)
+    if ext.lower() == ".webp" :
+        data = imageWebpToPng(filepath)
+    else:
+        with open(filepath, "rb") as file :
+            data = file.read()
     image_base64 = base64.b64encode(data).decode("utf-8")
+
     body = {
         "token": token,
         "mask": mask,
@@ -561,3 +575,14 @@ def dangoTrans(object, sentence, language="auto") :
         object.logger.error(result)
 
     return sign, result
+
+
+# webp格式图片转png
+def imageWebpToPng(filepath) :
+
+    with Image.open(filepath) as im :
+        im = im.convert('RGBA')
+        img_bytes = io.BytesIO()
+        im.save(img_bytes, format="png")
+        img_bytes.seek(0)
+        return img_bytes.read()

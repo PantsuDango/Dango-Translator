@@ -368,7 +368,7 @@ class Manga(QWidget) :
             images, _ = QFileDialog.getOpenFileNames(self,
                                                      "选择要翻译的生肉漫画原图（可多选）",
                                                      dir_path,
-                                                     "图片类型(*.png *.jpg *.jpeg);;所有类型 (*)",
+                                                     "图片类型(*.png *.jpg *.jpeg *.webp);;所有类型 (*)",
                                                      options=options)
             if not images :
                 return
@@ -382,7 +382,7 @@ class Manga(QWidget) :
                 return
             for file in os.listdir(folder_path) :
                 file_ext = os.path.splitext(file)[1].lower()
-                if file_ext != ".png" and file_ext != ".jpg" and file_ext != ".jpeg" :
+                if file_ext != ".png" and file_ext != ".jpg" and file_ext != ".jpeg" and file_ext != ".webp" :
                     continue
                 images.append(os.path.join(folder_path, file))
 
@@ -405,7 +405,7 @@ class Manga(QWidget) :
                         continue
                     for file in os.listdir(folder_path) :
                         file_ext = os.path.splitext(file)[1].lower()
-                        if file_ext != ".png" and file_ext != ".jpg" and file_ext != ".jpeg":
+                        if file_ext != ".png" and file_ext != ".jpg" and file_ext != ".jpeg" and file_ext != ".webp" :
                             continue
                         images.append(os.path.join(folder_path, file))
 
@@ -1438,7 +1438,7 @@ class Manga(QWidget) :
                 file_path = url.toLocalFile()
                 # 过滤非图片文件
                 file_ext = os.path.splitext(file_path)[1].lower()
-                if file_ext != ".png" and file_ext != ".jpg" and file_ext != ".jpeg" :
+                if file_ext != ".png" and file_ext != ".jpg" and file_ext != ".jpeg" and file_ext != ".webp" :
                     continue
                 image_list.append(file_path)
             # 去重
