@@ -1608,7 +1608,10 @@ class RenderTextBlock(QWidget) :
             return
         # 渲染文本框
         index = 0
-        for text_block, trans_text in zip(self.json_data["text_block"], self.json_data["translated_text"]) :
+        for i, text_block in enumerate(self.json_data["text_block"]) :
+            trans_text = ""
+            if i < len(self.json_data["translated_text"]) :
+                trans_text = self.json_data["translated_text"][i]
             # 计算文本坐标
             x_0 = text_block["block_coordinate"]["upper_left"][0]
             y_0 = text_block["block_coordinate"]["upper_left"][1]

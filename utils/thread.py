@@ -184,6 +184,7 @@ class createInputImagesQThread(QThread) :
 
         # 初始化进度条
         self.bar_signal.emit(0, 0, "0/%d"%len(self.images))
+        time.sleep(0.1)
         # 遍历文件列表, 将每个文件路径添加到列表框中
         for index, image_path in enumerate(self.images) :
             if image_path in self.window.image_path_list :
@@ -195,6 +196,7 @@ class createInputImagesQThread(QThread) :
                 int((index + 1) / len(self.images) * 100),
                 "%d/%d" % (index + 1, len(self.images))
             )
+            time.sleep(0.1)
             # 如果停止
             if self.window.input_images_progress_bar.stop_sign :
                 break
