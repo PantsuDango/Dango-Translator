@@ -1914,6 +1914,91 @@ class TransEdit(QWidget) :
         self.font_color = "#83AAF9"
         self.bg_color = "#83AAF9"
         self.button = None
+        self.font_list = [
+            "鸿蒙/HarmonyOS_Sans/HarmonyOS_Sans_Regular",
+            "阿里/东方大楷/Alimama_DongFangDaKai_Regular",
+            "鸿蒙/HarmonyOS_Sans/HarmonyOS_Sans_Thin",
+            "阿里/普惠体/Alibaba_PuHuiTi_2.0_55_Regular_55_Regular",
+            "鸿蒙/HarmonyOS_Sans/HarmonyOS_Sans_Bold",
+            "鸿蒙/HarmonyOS_Sans_Condensed_Italic/HarmonyOS_Sans_Condensed_Medium_Italic",
+            "鸿蒙/HarmonyOS_Sans_Italic/HarmonyOS_Sans_Regular_Italic",
+            "鸿蒙/HarmonyOS_Sans_Naskh_Arabic_UI/HarmonyOS_Sans_Naskh_Arabic_UI_Regular",
+            "书法/庞门正道真贵楷体",
+            "书法/钟齐志莽行书",
+            "鸿蒙/HarmonyOS_Sans/HarmonyOS_Sans_Black",
+            "阿里/数黑体/Alimama_ShuHeiTi_Bold",
+            "鸿蒙/HarmonyOS_Sans_Condensed_Italic/HarmonyOS_Sans_Condensed_Regular_Italic",
+            "Noto_Sans_SC/NotoSansSC-Black",
+            "黑体/Leefont蒙黑体",
+            "鸿蒙/HarmonyOS_Sans_TC/HarmonyOS_Sans_TC_Black",
+            "鸿蒙/HarmonyOS_Sans_SC/HarmonyOS_Sans_SC_Bold",
+            "Noto_Sans_SC/NotoSansSC-Light",
+            "阿里/普惠体/Alibaba_PuHuiTi_2.0_105_Heavy_105_Heavy",
+            "鸿蒙/HarmonyOS_Sans_Naskh_Arabic/HarmonyOS_Sans_Naskh_Arabic_Light",
+            "书法/演示秋鸿楷",
+            "鸿蒙/HarmonyOS_Sans_Naskh_Arabic/HarmonyOS_Sans_Naskh_Arabic_Thin",
+            "鸿蒙/HarmonyOS_Sans_Condensed_Italic/HarmonyOS_Sans_Condensed_Bold_Italic",
+            "鸿蒙/HarmonyOS_Sans_Condensed/HarmonyOS_Sans_Condensed_Light",
+            "阿里/普惠体/Alibaba_PuHuiTi_2.0_55_Regular_85_Bold",
+            "鸿蒙/HarmonyOS_Sans_SC/HarmonyOS_Sans_SC_Medium",
+            "鸿蒙/HarmonyOS_Sans_SC/HarmonyOS_Sans_SC_Thin",
+            "鸿蒙/HarmonyOS_Sans_SC/HarmonyOS_Sans_SC_Regular",
+            "鸿蒙/HarmonyOS_Sans_SC/HarmonyOS_Sans_SC_Light",
+            "Emoji/NotoColorEmoji",
+            "书法/仓耳周珂正大榜书",
+            "鸿蒙/HarmonyOS_Sans_Italic/HarmonyOS_Sans_Medium_Italic",
+            "阿里/普惠体/Alibaba_PuHuiTi_2.0_35_Thin_35_Thin",
+            "书法/鸿雷板书简体-Regular",
+            "鸿蒙/HarmonyOS_Sans_Naskh_Arabic/HarmonyOS_Sans_Naskh_Arabic_Regular",
+            "黑体/千图厚黑体",
+            "鸿蒙/HarmonyOS_Sans_Condensed/HarmonyOS_Sans_Condensed_Black",
+            "鸿蒙/HarmonyOS_Sans_Italic/HarmonyOS_Sans_Bold_Italic",
+            "鸿蒙/HarmonyOS_Sans_Naskh_Arabic_UI/HarmonyOS_Sans_Naskh_Arabic_UI_Medium",
+            "鸿蒙/HarmonyOS_Sans/HarmonyOS_Sans_Light",
+            "书法/庞门正道粗书体",
+            "书法/钟齐流江毛草",
+            "阿里/普惠体/Alibaba_PuHuiTi_2.0_115_Black_115_Black",
+            "鸿蒙/HarmonyOS_Sans_TC/HarmonyOS_Sans_TC_Bold",
+            "黑体/标小智无界黑",
+            "书法/演示夏行楷",
+            "阿里/普惠体/Alibaba_PuHuiTi_2.0_45_Light_45_Light",
+            "鸿蒙/HarmonyOS_Sans_Naskh_Arabic/HarmonyOS_Sans_Naskh_Arabic_Medium",
+            "鸿蒙/HarmonyOS_Sans_Naskh_Arabic_UI/HarmonyOS_Sans_Naskh_Arabic_UI_Black",
+            "黑体/Aa厚底黑",
+            "鸿蒙/HarmonyOS_Sans_Italic/HarmonyOS_Sans_Black_Italic",
+            "鸿蒙/HarmonyOS_Sans_Naskh_Arabic/HarmonyOS_Sans_Naskh_Arabic_Bold",
+            "鸿蒙/HarmonyOS_Sans_Italic/HarmonyOS_Sans_Light_Italic",
+            "鸿蒙/HarmonyOS_Sans_Naskh_Arabic_UI/HarmonyOS_Sans_Naskh_Arabic_UI_Light",
+            "鸿蒙/HarmonyOS_Sans_Italic/HarmonyOS_Sans_Thin_Italic",
+            "书法/演示佛系体",
+            "Noto_Sans_SC/NotoSansSC-Regular",
+            "鸿蒙/HarmonyOS_Sans_TC/HarmonyOS_Sans_TC_Light",
+            "鸿蒙/HarmonyOS_Sans/HarmonyOS_Sans_Medium",
+            "书法/演示春风楷",
+            "鸿蒙/HarmonyOS_Sans_TC/HarmonyOS_Sans_TC_Thin",
+            "鸿蒙/HarmonyOS_Sans_Condensed_Italic/HarmonyOS_Sans_Condensed_Black_Italic",
+            "鸿蒙/HarmonyOS_Sans_TC/HarmonyOS_Sans_TC_Regular",
+            "鸿蒙/HarmonyOS_Sans_Condensed/HarmonyOS_Sans_Condensed_Medium",
+            "鸿蒙/HarmonyOS_Sans_Condensed/HarmonyOS_Sans_Condensed_Regular",
+            "鸿蒙/HarmonyOS_Sans_TC/HarmonyOS_Sans_TC_Medium",
+            "Noto_Sans_SC/NotoSansSC-Thin",
+            "阿里/普惠体/Alibaba_PuHuiTi_2.0_65_Medium_65_Medium",
+            "阿里/普惠体/Alibaba_PuHuiTi_2.0_75_SemiBold_75_SemiBold",
+            "鸿蒙/HarmonyOS_Sans_Naskh_Arabic_UI/HarmonyOS_Sans_Naskh_Arabic_UI_Thin",
+            "Noto_Sans_SC/NotoSansSC-Bold",
+            "Noto_Sans_SC/NotoSansSC-Medium",
+            "鸿蒙/HarmonyOS_Sans_SC/HarmonyOS_Sans_SC_Black",
+            "书法/江西拙楷2.0",
+            "鸿蒙/HarmonyOS_Sans_Condensed_Italic/HarmonyOS_Sans_Condensed_Thin_Italic",
+            "鸿蒙/HarmonyOS_Sans_Naskh_Arabic_UI/HarmonyOS_Sans_Naskh_Arabic_UI_Bold",
+            "阿里/钉钉进步体/DingTalk_JinBuTi_Regular",
+            "书法/演示悠然小楷",
+            "鸿蒙/HarmonyOS_Sans_Condensed/HarmonyOS_Sans_Condensed_Thin",
+            "阿里/普惠体/Alibaba_PuHuiTi_2.0_95_ExtraBold_95_ExtraBold",
+            "鸿蒙/HarmonyOS_Sans_Naskh_Arabic/HarmonyOS_Sans_Naskh_Arabic_Black",
+            "鸿蒙/HarmonyOS_Sans_Condensed_Italic/HarmonyOS_Sans_Condensed_Light_Italic",
+            "鸿蒙/HarmonyOS_Sans_Condensed/HarmonyOS_Sans_Condensed_Bold"
+        ]
         self.ui()
 
 
@@ -2288,9 +2373,9 @@ class TransEdit(QWidget) :
         if sign :
             font_list = resp.get("available_fonts", [])
         else:
-            font_list = copy.deepcopy(self.object.manga_ui.setting_ui.font_list)
+            font_list = copy.deepcopy(self.font_list)
         if not font_list :
-            font_list = copy.deepcopy(self.object.manga_ui.setting_ui.font_list)
+            font_list = copy.deepcopy(self.font_list)
 
         for index, font in enumerate(font_list) :
             self.font_box.addItem("")
