@@ -95,7 +95,16 @@ class Manga(QWidget) :
                                             "QPushButton:hover {background-color: #83AAF9;}"
                                             "QPushButton:pressed {background-color: #4480F9;}")
         self.trans_all_button.setIcon(ui.static.icon.RUN_ICON)
-        self.trans_all_button.clicked.connect(self.clickTransAllButton)
+        #self.trans_all_button.clicked.connect(self.clickTransAllButton)
+        # 一键翻译菜单
+        self.trans_all_menu = QMenu(self.trans_all_button)
+        self.trans_all_action_group = QActionGroup(self.trans_all_menu)
+        self.trans_all_action_group.setExclusive(True)
+        self.createTransAllAction("跳过已翻译的")
+        self.createTransAllAction("全部重新翻译")
+        # 将下拉菜单设置为按钮的菜单
+        self.trans_all_button.setMenu(self.trans_all_menu)
+        self.trans_all_action_group.triggered.connect(self.TransAllImages)
 
         # 译图导出按钮
         self.output_image_button = QPushButton(self)
@@ -432,6 +441,17 @@ class Manga(QWidget) :
             break
 
 
+    # 一键翻译
+    def TransAllImages(self, action) :
+
+        if action.data() == "跳过已翻译的" :
+            self.clickTransAllButton(False)
+        elif action.data() == "全部重新翻译" :
+            self.clickTransAllButton(True)
+        else :
+            return
+
+
     # 导出译图文件
     def outputImages(self, action) :
 
@@ -583,6 +603,16 @@ class Manga(QWidget) :
         action.setData(label)
         self.input_action_group.addAction(action)
         self.input_menu.addAction(action)
+
+
+    # 创建一键翻译按钮的下拉菜单
+    def createTransAllAction(self, label) :
+
+        action = QAction(label, self.trans_all_menu)
+        action.setCheckable(True)
+        action.setData(label)
+        self.trans_all_action_group.addAction(action)
+        self.trans_all_menu.addAction(action)
 
 
     # 创建译图导出按钮的下拉菜单
@@ -1244,7 +1274,7 @@ class Manga(QWidget) :
 
 
     # 一键翻译
-    def clickTransAllButton(self) :
+    def clickTransAllButton(self, reload_sign) :
 
         if len(self.image_path_list) == 0 :
             return utils.message.MessageBox("翻译失败", "请先导入要翻译的图片      ")
@@ -1254,7 +1284,7 @@ class Manga(QWidget) :
         self.trans_process_bar.modifyTitle("翻译中...请勿关闭此窗口")
         self.trans_process_bar.show()
         # 创建执行线程
-        thread = utils.thread.createMangaTransQThread(self, self.image_path_list)
+        thread = utils.thread.createMangaTransQThread(self, self.image_path_list, reload_sign)
         thread.signal.connect(self.finishTransProcessRefresh)
         thread.bar_signal.connect(self.trans_process_bar.paintProgressBar)
         thread.add_message_signal.connect(self.trans_process_bar.setMessageText)
