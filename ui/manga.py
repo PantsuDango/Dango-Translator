@@ -958,19 +958,21 @@ class Manga(QWidget) :
             for index, val in enumerate(result.get("text_block", [])) :
                 texts = val.get("texts", [])
                 # 过滤<skip>
+                skip_sign = False
                 for i, text in enumerate(texts) :
                     if not text or text == "<skip>" :
+                        skip_sign = True
                         del val["coordinate"][i]
                         del val["texts"][i]
                 if not texts :
                     continue
                 # 如果过滤过<skip>的情况就重新计算文本块的坐标
-                if len(val["texts"]) != len(result["text_block"][index]["texts"]) :
+                if skip_sign :
                     x_list, y_list = [], []
                     for coordinate in val["coordinate"] :
-                        for coord in coordinate :
-                            x_list.append(coord[0])
-                            y_list.append(coord[1])
+                        for k in coordinate.keys() :
+                            x_list.append(coordinate[k][0])
+                            y_list.append(coordinate[k][1])
                     val["block_coordinate"]["upper_left"] = [min(x_list), min(y_list)]
                     val["block_coordinate"]["upper_right"] = [max(x_list), min(y_list)]
                     val["block_coordinate"]["lower_right"] = [max(x_list), max(y_list)]

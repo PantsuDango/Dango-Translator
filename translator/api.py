@@ -234,7 +234,6 @@ def chatgpt(api_key, language, proxy, content, logger) :
                     new_content += "{%s}\n"%val
                 else :
                     new_content += "{%s}"%val
-            print(new_content)
             messages = [
                 {"role": "system", "content": "你是一个翻译引擎, 只需要翻译内容而不要解释它, 请将以下{ }内的内容翻译成中文，并且将答案以{翻译结果}分行答复"},
                 {"role": "user", "content": new_content}
@@ -319,12 +318,6 @@ def chatgpt(api_key, language, proxy, content, logger) :
                     # 过滤双倍句子的情况, 双倍句子下前部分都会是原文
                     if len(text.split("\n")) == len(content_list) * 2 :
                         text = "\n".join(text.split("\n")[len(content_list):])
-
-                    # debug
-                    if len(text.split("\n")) != len(content_list) :
-                        print(result)
-                print(text)
-                print()
 
         except Exception :
             logger.error(format_exc())
