@@ -289,6 +289,7 @@ def configConvert(object) :
     object.config["mangaOutputRenameUse"] = object.config.get("mangaOutputRenameUse", False)
     object.config["mangaFastRenderUse"] = object.config.get("mangaFastRenderUse", False)
     object.config["mangaShadowSize"] = object.config.get("mangaShadowSize", 4)
+    object.config["mangaFiltrateUse"] = object.config.get("mangaFiltrateUse", True)
 
 # 保存配置至服务器
 def postSaveSettin(object) :

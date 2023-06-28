@@ -383,7 +383,7 @@ def mangaOCR(object, filepath, check_permission) :
         "token": token,
         "mask": True,
         "refine": True,
-        "filtrate": True,
+        "filtrate": object.config.get("mangaFiltrateUse", True),
         "detect_scale": object.config.get("mangaDetectScale", 1),
         "image": image_base64
     }

@@ -2624,6 +2624,7 @@ class Setting(QWidget) :
         self.bg_color_use = self.object.config.get("mangaBgColorUse", False)
         self.output_rename_use = self.object.config.get("mangaOutputRenameUse", False)
         self.fast_render_use = self.object.config.get("mangaFastRenderUse", False)
+        self.filtrate_use = self.object.config.get("mangaFiltrateUse", True)
         self.shadow_size = self.object.config.get("mangaShadowSize", 4)
         self.font_list = [
             "鸿蒙/HarmonyOS_Sans/HarmonyOS_Sans_Regular",
@@ -2738,7 +2739,7 @@ class Setting(QWidget) :
         self.customSetGeometry(label, 20, 20, 500, 20)
         # 渲染缩放比例滑块
         self.detect_scale_slider = QSlider(self)
-        self.customSetGeometry(self.detect_scale_slider, 120, 20, 280, 25)
+        self.customSetGeometry(self.detect_scale_slider, 120, 20, 290, 25)
         self.detect_scale_slider.setRange(1, 4)
         self.detect_scale_slider.setSingleStep(1)
         self.detect_scale_slider.setOrientation(Qt.Horizontal)
@@ -2769,12 +2770,12 @@ class Setting(QWidget) :
                                                 10*self.rate, self.color_2))
         # 渲染缩放比例滑块数值标签
         self.detect_scale_slider_label = QLabel(self)
-        self.customSetGeometry(self.detect_scale_slider_label, 400, 20, 30, 20)
+        self.customSetGeometry(self.detect_scale_slider_label, 410, 20, 30, 20)
         self.detect_scale_slider_label.setText("x%s"%self.detect_scale)
         # 渲染缩放比例?号图标
         button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self)
         self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 430, 20, 20, 20)
+        self.customSetGeometry(button, 440, 20, 20, 20)
         button.clicked.connect(lambda: self.showDesc("detect_scale"))
         button.setCursor(ui.static.icon.QUESTION_CURSOR)
         button.setStyleSheet("QPushButton { background: transparent;}"
@@ -2837,14 +2838,14 @@ class Setting(QWidget) :
         self.customSetGeometry(label, 20, 120, 500, 20)
         # 全局字体样式
         self.font_box = QComboBox(self)
-        self.customSetGeometry(self.font_box, 120, 120, 300, 25)
+        self.customSetGeometry(self.font_box, 125, 120, 305, 25)
         self.font_box.setCursor(ui.static.icon.EDIT_CURSOR)
         self.font_box.setToolTip("<b>设置全局字体样式</b>")
         utils.thread.createThread(self.createFontBox)
         # 全局字体样式?号图标
         button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self)
         self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 430, 120, 20, 20)
+        self.customSetGeometry(button, 440, 120, 20, 20)
         button.clicked.connect(lambda: self.showDesc("font_type"))
         button.setCursor(ui.static.icon.QUESTION_CURSOR)
         button.setStyleSheet("QPushButton { background: transparent;}"
@@ -2872,17 +2873,17 @@ class Setting(QWidget) :
 
         # 快速渲染开关
         self.fast_render_switch = ui.switch.SwitchOCR(self, self.fast_render_use, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.fast_render_switch, 250, 170, 65, 20)
+        self.customSetGeometry(self.fast_render_switch, 280, 170, 65, 20)
         self.fast_render_switch.checkedChanged.connect(self.changeFastRenderUseSwitch)
         self.fast_render_switch.setCursor(ui.static.icon.SELECT_CURSOR)
         # 快速渲染标签
         label = QLabel(self)
         label.setText("快速渲染")
-        self.customSetGeometry(label, 330, 170, 500, 20)
+        self.customSetGeometry(label, 360, 170, 500, 20)
         # 快速渲染?号图标
         button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self)
         self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 400, 170, 20, 20)
+        self.customSetGeometry(button, 440, 170, 20, 20)
         button.clicked.connect(lambda: self.showDesc("fast_render"))
         button.setCursor(ui.static.icon.QUESTION_CURSOR)
         button.setStyleSheet("QPushButton { background: transparent;}"
@@ -2901,12 +2902,31 @@ class Setting(QWidget) :
         self.shadow_size_spinbox.valueChanged.connect(self.changeShadowSize)
         label = QLabel(self)
         self.customSetGeometry(label, 100, 220, 100, 20)
-        label.setText("轮廓宽度")
-        # 快速渲染?号图标
+        label.setText("字体轮廓宽度")
+        # 全局轮廓宽度?号图标
         button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self)
         self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 160, 220, 20, 20)
+        self.customSetGeometry(button, 190, 220, 20, 20)
         button.clicked.connect(lambda: self.showDesc("shadow_size"))
+        button.setCursor(ui.static.icon.QUESTION_CURSOR)
+        button.setStyleSheet("QPushButton { background: transparent;}"
+                             "QPushButton:hover { background-color: #83AAF9; }"
+                             "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
+
+        # 过滤拟声词开关
+        self.filtrate_switch = ui.switch.SwitchOCR(self, self.filtrate_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.filtrate_switch, 280, 220, 65, 20)
+        self.filtrate_switch.checkedChanged.connect(self.changeFiltrateUseSwitch)
+        self.filtrate_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 过滤拟声词标签
+        label = QLabel(self)
+        label.setText("过滤拟声词")
+        self.customSetGeometry(label, 360, 220, 500, 20)
+        # 过滤拟声词?号图标
+        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self)
+        self.customSetIconSize(button, 20, 20)
+        self.customSetGeometry(button, 440, 220, 20, 20)
+        button.clicked.connect(lambda: self.showDesc("filtrate"))
         button.setCursor(ui.static.icon.QUESTION_CURSOR)
         button.setStyleSheet("QPushButton { background: transparent;}"
                              "QPushButton:hover { background-color: #83AAF9; }"
@@ -2962,9 +2982,14 @@ class Setting(QWidget) :
         elif message_type == "fast_render" :
             self.desc_ui.setWindowTitle("快速渲染说明")
             self.desc_ui.desc_text.append("\n开启开启, 可以加快部分极端情况下的文字渲染速度, 但是大多数情况下会导致图片文字质量下降，请慎重启用")
+
         elif message_type == "shadow_size" :
             self.desc_ui.setWindowTitle("全局轮廓宽度说明")
             self.desc_ui.desc_text.append("\n影响文字渲染后的阴影轮廓宽度, 默认值为4.0")
+
+        elif message_type == "filtrate" :
+            self.desc_ui.setWindowTitle("过滤拟声词说明")
+            self.desc_ui.desc_text.append("\n开启后, 不会识别和翻译拟声词, 默认值打开")
         else :
             return
 
@@ -3047,6 +3072,12 @@ class Setting(QWidget) :
     def changeShadowSize(self, value) :
 
         self.object.config["mangaShadowSize"] = value
+
+
+    # 过滤拟声词开关状态
+    def changeFiltrateUseSwitch(self, checked) :
+
+        self.object.config["mangaFiltrateUse"] = checked
 
 
     # 窗口关闭处理
