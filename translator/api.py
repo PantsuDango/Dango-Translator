@@ -219,7 +219,6 @@ def chatgpt(api_key, language, proxy, content, logger) :
     try :
         if not api_key:
             return "私人ChatGPT: 还未填入私人ChatGPT密钥, 不可使用"
-
         language_map = {
             "JAP": "日语",
             "ENG": "英文",
@@ -229,21 +228,21 @@ def chatgpt(api_key, language, proxy, content, logger) :
         content_list = content.split("\n")
         # 多句子情况的处理, 转为map
         if len(content_list) > 1:
-            content_map = {}
-            for val in content_list:
-                content_map[val] = ""
+            new_content = ""
+            for i, val in enumerate(content_list) :
+                if (i + 1) != len(content_list) :
+                    new_content += "{%s}\n"%val
+                else :
+                    new_content += "{%s}"%val
+            print(new_content)
             messages = [
-                {"role": "system",
-                 "content": "你是一个翻译引擎, 只需要翻译内容而不要解释它, 我需要你完成{}翻译为中文. 我会给你一个json结构的内容, 键是需要翻译的文本, 值是空字符串, 你需要逐个翻译每个键的内容, 并将翻译结果补充至对应的键值里, 并按照json格式返回给我".format(
-                     language_map[language])},
-                {"role": "user", "content": str(content_map)}
+                {"role": "system", "content": "你是一个翻译引擎, 只需要翻译内容而不要解释它, 请将以下{ }内的内容翻译成中文，并且将答案以{翻译结果}分行答复"},
+                {"role": "user", "content": new_content}
             ]
         else:
             # 单个句子的情况
             messages = [
-                {"role": "system",
-                 "content": "你是一个翻译引擎, 只需要翻译内容而不要解释它, 我需要你完成{}翻译为中文.".format(
-                     language_map[language])},
+                {"role": "system", "content": "你是一个翻译引擎, 只需要翻译内容而不要解释它, 我需要你完成{}翻译为中文.".format(language_map[language])},
                 {"role": "user", "content": content}
             ]
         data = {
@@ -286,24 +285,50 @@ def chatgpt(api_key, language, proxy, content, logger) :
             else :
                 # 翻译成功
                 text = result["choices"][0]["message"]["content"]
-                regex = re.findall("\(Translated from .+? to .+?\)", text)
-                if len(regex) == 1:
-                    text = text.replace(regex[0], "")
-                regex = re.findall("\(Note.+?\)", text)
-                if len(regex) == 1:
-                    text = text.replace(regex[0], "")
-                try :
-                    tmp = eval(text)
-                    if type(tmp) == dict :
+                text = re.sub("\(Translated from .+? to .+?\)", "", text)
+                text = re.sub("\(Note.+?\)", "", text)
+
+                # 多句子翻译的情况
+                if len(content_list) > 1 :
+                    text = text.replace("{", "").replace("}", "")
+                    # 过滤多余的换行符
+                    if "\n\n" in text :
+                        text = re.sub("\n{2,}", "\n", text)
+                    # 过滤带有 -> 的翻译结果
+                    if "->" in text :
                         tmp_list = []
-                        for val in tmp.values() :
+                        for val in text.split("\n") :
+                            if "->" in val :
+                                regex = re.findall("->(.+)", val)
+                                if len(regex) == 1 :
+                                    val = regex[0]
                             tmp_list.append(val)
                         text = "\n".join(tmp_list)
-                except Exception :
-                    pass
+
+                    # 过滤带有 - 的翻译结果
+                    if "-" in text :
+                        tmp_list = []
+                        for i, val in enumerate(text.split("\n")) :
+                            if "-" in val and "-" not in content_list[i] :
+                                regex = re.findall("-(.+)", val)
+                                if len(regex) == 1 :
+                                    val = regex[0]
+                            tmp_list.append(val)
+                        text = "\n".join(tmp_list)
+
+                    # 过滤双倍句子的情况, 双倍句子下前部分都会是原文
+                    if len(text.split("\n")) == len(content_list) * 2 :
+                        text = "\n".join(text.split("\n")[len(content_list):])
+
+                    # debug
+                    if len(text.split("\n")) != len(content_list) :
+                        print(result)
+                print(text)
+                print()
+
         except Exception :
             logger.error(format_exc())
-            return str(result)
+            return "私人ChatGPT: 翻译出错: {}".format(str(result))
     except requests.exceptions.ReadTimeout :
         text = "私人ChatGPT: 翻译超时, ChatGPT需要挂载代理才可使用, 请点击[代理]按钮, 正确配置好代理后重试"
     except Exception as err :

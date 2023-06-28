@@ -147,7 +147,7 @@ class createMangaTransQThread(QThread) :
                     int((index + 1) / len(self.image_paths) * 100),
                     "%d/%d"%(index + 1, len(self.image_paths))
                 )
-                time.sleep(0.1)
+                time.sleep(0.05)
                 # 如果停止
                 if self.window.trans_process_bar.stop_sign :
                     break

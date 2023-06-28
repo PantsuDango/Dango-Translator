@@ -957,15 +957,25 @@ class Manga(QWidget) :
             new_text_block = []
             for index, val in enumerate(result.get("text_block", [])) :
                 texts = val.get("texts", [])
+                # 过滤<skip>
+                for i, text in enumerate(texts) :
+                    if not text or text == "<skip>" :
+                        del val["coordinate"][i]
+                        del val["texts"][i]
                 if not texts :
                     continue
-                skip_sign = False
-                for text in texts :
-                    if not text or text == "<skip>" :
-                        skip_sign = True
-                        break
-                if skip_sign :
-                    continue
+                # 如果过滤过<skip>的情况就重新计算文本块的坐标
+                if len(val["texts"]) != len(result["text_block"][index]["texts"]) :
+                    x_list, y_list = [], []
+                    for coordinate in val["coordinate"] :
+                        for coord in coordinate :
+                            x_list.append(coord[0])
+                            y_list.append(coord[1])
+                    val["block_coordinate"]["upper_left"] = [min(x_list), min(y_list)]
+                    val["block_coordinate"]["upper_right"] = [max(x_list), min(y_list)]
+                    val["block_coordinate"]["lower_right"] = [max(x_list), max(y_list)]
+                    val["block_coordinate"]["lower_left"] = [min(x_list), max(y_list)]
+
                 # 使用全局字体色
                 if self.object.config["mangaFontColorUse"] and val.get("foreground_color", []) :
                     color = QColor(self.object.config["mangaFontColor"])
