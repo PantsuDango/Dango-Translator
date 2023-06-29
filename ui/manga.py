@@ -2197,10 +2197,17 @@ class TransEdit(QWidget) :
         self.customSetGeometry(label, 10, 65, 20, 20)
         label.setPixmap(ui.static.icon.FONT_PIXMAP)
         self.font_box = QComboBox(self)
-        self.customSetGeometry(self.font_box, 30, 62, 185, 25)
+        self.customSetGeometry(self.font_box, 30, 62, 390, 25)
         self.font_box.setCursor(ui.static.icon.EDIT_CURSOR)
         self.font_box.setToolTip("<b>设置字体样式</b>")
-        self.font_box.setStyleSheet("font: 9pt '华康方圆体W7';")
+        self.font_box.setStyleSheet("font: 9pt '华康方圆体W7';"
+                                    "QComboBox QAbstractItemView::item { min-height:40px; }")
+        # 支持编辑和搜索
+        self.font_box.setEditable(True)
+        line_edit = QLineEdit()
+        completer = self.font_box.completer()
+        line_edit.setCompleter(completer)
+        self.font_box.setItemDelegate(QStyledItemDelegate())
         utils.thread.createThread(self.createFontBox)
 
         # 原文编辑框
@@ -2914,6 +2921,13 @@ class Setting(QWidget) :
         self.customSetGeometry(self.font_box, 125, 120, 305, 25)
         self.font_box.setCursor(ui.static.icon.EDIT_CURSOR)
         self.font_box.setToolTip("<b>设置全局字体样式</b>")
+        self.font_box.setStyleSheet("QComboBox QAbstractItemView::item { min-height:40px; }")
+        # 支持编辑和搜索
+        self.font_box.setEditable(True)
+        line_edit = QLineEdit()
+        completer = self.font_box.completer()
+        line_edit.setCompleter(completer)
+        self.font_box.setItemDelegate(QStyledItemDelegate())
         utils.thread.createThread(self.createFontBox)
         # 全局字体样式?号图标
         button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self)
