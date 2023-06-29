@@ -1677,6 +1677,7 @@ class RenderTextBlock(QWidget) :
                 rdr_image_path=self.image_path,
                 font_type=text_block.get("font_selector", "Noto_Sans_SC/NotoSansSC-Regular"),
                 shadow_size=text_block.get("shadow_size", 4),
+                text_size=text_block.get("text_size", 40)
             )
             # 打开文本框编辑信号
             button.click_signal.connect(self.clickTextBlock)
@@ -1726,6 +1727,8 @@ class RenderTextBlock(QWidget) :
         self.trans_edit_ui.font_box.setCurrentText(button.font_type)
         # 轮廓宽度
         self.trans_edit_ui.shadow_size_spinbox.setValue(button.shadow_size)
+        # 字体大小
+        self.trans_edit_ui.text_size_spinbox.setValue(button.text_size)
 
         self.trans_edit_ui.show()
 
@@ -2051,7 +2054,7 @@ class TransEdit(QWidget) :
 
         # 窗口尺寸及不可拉伸
         self.window_width = int(500*self.rate)
-        self.window_height = int(330*self.rate)
+        self.window_height = int(360*self.rate)
         self.resize(self.window_width, self.window_height)
         self.setMinimumSize(QSize(self.window_width, self.window_height))
         self.setMaximumSize(QSize(self.window_width, self.window_height))
@@ -2169,12 +2172,25 @@ class TransEdit(QWidget) :
         label.setText("轮廓宽度")
         label.setStyleSheet("font: 9pt '华康方圆体W7';")
 
+        # 字体大小设定
+        self.text_size_spinbox = QSpinBox(self)
+        self.customSetGeometry(self.text_size_spinbox, 270, 35, 40, 20)
+        self.text_size_spinbox.setMinimum(16)
+        self.text_size_spinbox.setMaximum(512)
+        self.text_size_spinbox.setValue(40)
+        self.text_size_spinbox.setCursor(ui.static.icon.SELECT_CURSOR)
+        self.text_size_spinbox.setStyleSheet("font: 9pt '华康方圆体W7';")
+        label = QLabel(self)
+        self.customSetGeometry(label, 320, 37, 100, 20)
+        label.setText("字体大小")
+        label.setStyleSheet("font: 9pt '华康方圆体W7';")
+
         # 字体样式
         label = QLabel(self)
-        self.customSetGeometry(label, 260, 35, 20, 20)
+        self.customSetGeometry(label, 10, 65, 20, 20)
         label.setPixmap(ui.static.icon.FONT_PIXMAP)
         self.font_box = QComboBox(self)
-        self.customSetGeometry(self.font_box, 280, 32, 185, 25)
+        self.customSetGeometry(self.font_box, 30, 62, 185, 25)
         self.font_box.setCursor(ui.static.icon.EDIT_CURSOR)
         self.font_box.setToolTip("<b>设置字体样式</b>")
         self.font_box.setStyleSheet("font: 9pt '华康方圆体W7';")
@@ -2182,14 +2198,14 @@ class TransEdit(QWidget) :
 
         # 原文编辑框
         self.original_text = QTextBrowser(self)
-        self.customSetGeometry(self.original_text, 0, 60, 500, 100)
+        self.customSetGeometry(self.original_text, 0, 90, 500, 100)
         self.original_text.setReadOnly(False)
         self.original_text.setStyleSheet("font: 12pt '%s';"%font_type)
         self.original_text.setCursor(ui.static.icon.EDIT_CURSOR)
 
         # 原文复制按钮
         button = QPushButton(self)
-        self.customSetGeometry(button, 480, 140, 20, 20)
+        self.customSetGeometry(button, 480, 170, 20, 20)
         button.setIcon(ui.static.icon.COPY_ICON)
         self.customSetIconSize(button, 20, 20)
         button.setStyleSheet("QPushButton {background: transparent; border-radius: 6px}"
@@ -2200,7 +2216,7 @@ class TransEdit(QWidget) :
 
         # 译文编辑框
         self.trans_text = QTextBrowser(self)
-        self.customSetGeometry(self.trans_text, 0, 160, 500, 100)
+        self.customSetGeometry(self.trans_text, 0, 190, 500, 100)
         self.trans_text.setCursor(ui.static.icon.EDIT_CURSOR)
         self.trans_text.setReadOnly(False)
         self.trans_text.setStyleSheet("font: 12pt '%s';"%font_type)
@@ -2208,7 +2224,7 @@ class TransEdit(QWidget) :
 
         # 译文复制按钮
         button = QPushButton(self)
-        self.customSetGeometry(button, 480, 240, 20, 20)
+        self.customSetGeometry(button, 480, 270, 20, 20)
         button.setIcon(ui.static.icon.COPY_ICON)
         self.customSetIconSize(button, 20, 20)
         button.setStyleSheet("QPushButton {background: transparent; border-radius: 6px}"
@@ -2219,7 +2235,7 @@ class TransEdit(QWidget) :
 
         # 重新贴字按钮
         button = QPushButton(self)
-        self.customSetGeometry(button, 125, 270, 100, 50)
+        self.customSetGeometry(button, 125, 300, 100, 50)
         button.setText("重新贴字")
         button.setStyleSheet("font: 12pt '华康方圆体W7';")
         button.clicked.connect(self.renderTextBlock)
@@ -2227,7 +2243,7 @@ class TransEdit(QWidget) :
 
         # 取消按钮
         button = QPushButton(self)
-        self.customSetGeometry(button, 275, 270, 100, 50)
+        self.customSetGeometry(button, 275, 300, 100, 50)
         button.setText("取消")
         button.setStyleSheet("font: 12pt '华康方圆体W7';")
         button.clicked.connect(self.close)
@@ -2290,6 +2306,8 @@ class TransEdit(QWidget) :
 
             # 轮廓宽度
             text_block["shadow_size"] = self.shadow_size_spinbox.value()
+            # 字体大小
+            text_block["text_size"] = self.text_size_spinbox.value()
 
             # 漫画rdr
             sign, result = translator.ocr.dango.mangaRDR(
@@ -2301,6 +2319,7 @@ class TransEdit(QWidget) :
                 check_permission=self.object.manga_ui.check_permission
             )
             if not sign or not result.get("rendered_image", "") :
+                print(result)
                 #@TODO 错误处理
                 return
 
@@ -2320,6 +2339,8 @@ class TransEdit(QWidget) :
             json_data["text_block"][self.button.index]["foreground_color"] = [f_r, f_g, f_b]
             json_data["text_block"][self.button.index]["background_color"] = [b_r, b_g, b_b]
             json_data["text_block"][self.button.index]["font_selector"] = self.font_box.currentText()
+            json_data["text_block"][self.button.index]["shadow_size"] = self.shadow_size_spinbox.value()
+            json_data["text_block"][self.button.index]["text_size"] = self.text_size_spinbox.value()
 
             # 缓存ocr结果
             with open(json_file_path, "w", encoding="utf-8") as file :
@@ -2331,6 +2352,9 @@ class TransEdit(QWidget) :
             self.button.font_color = [f_r, f_g, f_b]
             self.button.bg_color = [b_r, b_g, b_b]
             self.button.font_type = self.font_box.currentText()
+            self.button.shadow_size = self.shadow_size_spinbox.value()
+            self.button.text_size = self.text_size_spinbox.value()
+
             # 刷新大图
             init_image_rate = copy.deepcopy(self.object.manga_ui.show_image_widget.image_rate)
             self.object.manga_ui.show_image_widget.loadImage()
@@ -2576,7 +2600,8 @@ class CustomTextBlockButton(QPushButton) :
 
 
     # 参数初始化
-    def initConfig(self, text_block, trans, rect, index, original_image_path, ipt_image_path, rdr_image_path, font_type, shadow_size) :
+    def initConfig(self, text_block, trans, rect, index, original_image_path,
+                   ipt_image_path, rdr_image_path, font_type, shadow_size, text_size) :
 
         self.trans = trans
         self.text_block = text_block
@@ -2587,6 +2612,7 @@ class CustomTextBlockButton(QPushButton) :
         self.rdr_image_path = rdr_image_path
         self.font_type = font_type
         self.shadow_size = shadow_size
+        self.text_size = text_size
 
         # 文本块信息
         self.original = ""
