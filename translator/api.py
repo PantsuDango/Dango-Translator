@@ -14,8 +14,13 @@ from hashlib import md5
 from urllib import parse
 from random import randint
 from traceback import format_exc
+from importlib import reload
 import json
 import re
+import uuid
+import sys
+
+
 
 
 # 私人百度翻译
@@ -311,3 +316,58 @@ def chatgpt(api_key, language, proxy, content, logger) :
         text = "私人ChatGPT: 翻译出错: {}, 请排查完错误后重试".format(err)
 
     return text
+
+
+def youdao(sentence, APP_KEY, APP_SCERET, logger):
+    YOUDAO_URL = 'https://openapi.youdao.com/api'
+    reload(sys)
+    
+    if (not APP_KEY) or (not APP_SECRET) :
+        return "私人有道: 还未注册私人有道API, 不可使用"
+
+    def encrypt(signStr):
+        hash_algorithm = hashlib.sha256()
+        hash_algorithm.update(signStr.encode('utf-8'))
+        return hash_algorithm.hexdigest()
+
+
+    def truncate(q):
+        if q is None:
+            return None
+        size = len(q)
+        return q if size <= 20 else q[0:10] + str(size) + q[size - 10:size]
+
+
+    def do_request(data):
+        headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+        return requests.post(YOUDAO_URL, data=data, headers=headers)
+
+
+    def connect(q):
+
+        data = {}
+        data['from'] = 'ja'
+        data['to'] = 'zh-CHS'
+        data['signType'] = 'v3'
+        curtime = str(int(time.time()))
+        data['curtime'] = curtime
+        salt = str(uuid.uuid1())
+        signStr = APP_KEY + truncate(q) + salt + curtime + APP_SECRET
+        sign = encrypt(signStr)
+        data['appKey'] = APP_KEY
+        data['q'] = q
+        data['salt'] = salt
+        data['sign'] = sign
+        data['vocabId'] = ""
+
+        response = do_request(data)
+        text = response.json()['translation'][0]
+        return text
+    
+    try:
+        text = connect(sentence)
+        return text
+    except
+        logger.error(format_exc())
+        text = "私人有道: 我抽风啦, 请尝试重新翻译!"
+    
