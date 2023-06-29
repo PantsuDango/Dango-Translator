@@ -329,3 +329,37 @@ def chatgpt(api_key, language, proxy, url, model, content, logger) :
         text = "私人ChatGPT: 翻译出错: {}, 请排查完错误后重试".format(err)
 
     return text
+
+
+# 获取ChatGPT模型列表
+def getChatgptModels(api_key, proxy, logger) :
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {}".format(api_key)
+    }
+    proxies = {
+        "http": None,
+        "https": None
+    }
+    if proxy:
+        proxies = {
+            "http": "http://{}".format(proxy),
+            "https": "https://{}".format(proxy)
+        }
+    url = "https://api.openai.com/v1/models"
+    models = []
+    try :
+        response = requests.get(url, headers=headers, proxies=proxies, timeout=30)
+        response.encoding = "utf-8"
+        result = json.loads(response.text)
+        response.close()
+        data = result.get("data", [])
+        for val in data :
+            model = val.get("id", "")
+            if model :
+                models.append(model)
+    except Exception :
+        logger.error(format_exc())
+
+    return models

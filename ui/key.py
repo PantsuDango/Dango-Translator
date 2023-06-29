@@ -4,7 +4,9 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
+import translator.api
 import ui.static.icon
+import utils.thread
 
 
 # 密钥界面
@@ -258,16 +260,30 @@ class ChatGPTKey(QWidget) :
         line_edit.setCompleter(completer)
         # 设置Item支持编辑样式
         self.model_box.setItemDelegate(QStyledItemDelegate())
-        # 添加下拉框选项
-        for i, model in enumerate(self.model_list) :
-            self.model_box.addItem("")
-            self.model_box.setItemText(i, model)
-        self.model_box.setCurrentText(self.object.config["chatgptModel"])
+        utils.thread.createThread(self.getChatgptModels)
         label = QLabel(self)
         self.customSetGeometry(label, 20, 250, 330, 20)
         label.setText("默认为: gpt-3.5-turbo-0613")
         label.setTextFormat(Qt.RichText)
         label.setTextInteractionFlags(Qt.TextSelectableByMouse)
+
+
+    # 获取ChatGPT模型列表
+    def getChatgptModels(self) :
+
+        models = translator.api.getChatgptModels(
+            api_key=self.object.config["chatgptAPI"],
+            proxy=self.object.config["chatgptProxy"],
+            logger=self.object.logger
+        )
+        if models :
+            self.model_list = models
+        # 添加下拉框选项
+        for i, model in enumerate(self.model_list):
+            self.model_box.addItem("")
+            self.model_box.setItemText(i, model)
+        if self.object.config["chatgptModel"] in self.model_list :
+            self.model_box.setCurrentText(self.object.config["chatgptModel"])
 
 
     # 初始化配置
