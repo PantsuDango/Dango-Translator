@@ -88,6 +88,7 @@ class Settin(QMainWindow) :
 
         # 初始化界面
         self.key_ui = ui.key.Key(self.object)
+        self.chatgpt_key_ui = ui.key.ChatGPTKey(self.object)
         self.desc_ui = ui.desc.Desc(self.object)
         self.hotkey_ui = ui.hotkey.HotKey(self.object)
 
@@ -2652,12 +2653,11 @@ class Settin(QMainWindow) :
             self.key_ui.chatgpt_private_key_textEdit.show()
 
         # 私人ChatGPT代理-代理设置
-        elif key_type == "chatgptProxy":
-            self.key_ui.setWindowTitle("私人ChatGPT翻译 - 代理编辑 - 退出会自动保存")
-            self.key_ui.chatgpt_private_proxy_textEdit.show()
-            self.key_ui.chatgpt_private_proxy_label.show()
+        elif key_type == "chatgptProxy" :
+            self.chatgpt_key_ui.show()
 
-        self.key_ui.show()
+        if key_type != "chatgptProxy" :
+            self.key_ui.show()
 
 
     # 翻译框透明度

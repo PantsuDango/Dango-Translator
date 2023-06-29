@@ -1103,7 +1103,14 @@ class Manga(QWidget) :
                     return False, result
 
             elif manga_trans == "私人ChatGPT" :
-                result = translator.api.chatgpt(self.object.config["chatgptAPI"], self.object.config["mangaLanguage"], self.object.config["chatgptProxy"], original, self.logger)
+                result = translator.api.chatgpt(
+                    api_key=self.object.config["chatgptAPI"],
+                    language=self.object.config["mangaLanguage"],
+                    proxy=self.object.config["chatgptProxy"],
+                    url=self.object.config["chatgptApiAddr"],
+                    model=self.object.config["chatgptModel"],
+                    content=original,
+                    logger=self.logger)
                 if result[:11] == "私人ChatGPT: " :
                     return False, result
 
@@ -2376,25 +2383,35 @@ class TransEdit(QWidget) :
                                                            sentence=original,
                                                            language=self.object.config["mangaLanguage"])
         elif trans_type == "彩云" :
-            result = translator.api.caiyun(sentence=original,
-                                           token=self.object.config["caiyunAPI"],
-                                           logger=self.logger)
+            result = translator.api.caiyun(
+                sentence=original,
+                token=self.object.config["caiyunAPI"],
+                logger=self.logger
+            )
         elif trans_type == "腾讯":
-            result = translator.api.tencent(sentence=original,
-                                            secret_id=self.object.config["tencentAPI"]["Key"],
-                                            secret_key=self.object.config["tencentAPI"]["Secret"],
-                                            logger=self.logger)
+            result = translator.api.tencent(
+                sentence=original,
+                secret_id=self.object.config["tencentAPI"]["Key"],
+                secret_key=self.object.config["tencentAPI"]["Secret"],
+                logger=self.logger
+            )
         elif trans_type == "百度":
-            result = translator.api.baidu(sentence=original,
-                                          app_id=self.object.config["baiduAPI"]["Key"],
-                                          secret_key=self.object.config["baiduAPI"]["Secret"],
-                                          logger=self.logger)
+            result = translator.api.baidu(
+                sentence=original,
+                app_id=self.object.config["baiduAPI"]["Key"],
+                secret_key=self.object.config["baiduAPI"]["Secret"],
+                logger=self.logger
+            )
         elif trans_type == "ChatGPT":
-            result = translator.api.chatgpt(api_key=self.object.config["chatgptAPI"],
-                                            language=self.object.config["mangaLanguage"],
-                                            proxy=self.object.config["chatgptProxy"],
-                                            content=original,
-                                            logger=self.logger)
+            result = translator.api.chatgpt(
+                api_key=self.object.config["chatgptAPI"],
+                language=self.object.config["mangaLanguage"],
+                proxy=self.object.config["chatgptProxy"],
+                url=self.object.config["chatgptApiAddr"],
+                model=self.object.config["chatgptModel"],
+                content=original,
+                logger=self.logger
+            )
         else :
             return
 

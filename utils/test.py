@@ -157,6 +157,8 @@ def testChatGPT(object) :
             api_key=object.config["chatgptAPI"],
             language="JAP",
             proxy=object.config["chatgptProxy"],
+            url=object.config["chatgptApiAddr"],
+            model=object.config["chatgptModel"],
             content=original,
             logger=object.logger,
         )

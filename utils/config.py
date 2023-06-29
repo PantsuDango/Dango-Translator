@@ -209,6 +209,10 @@ def configConvert(object) :
     object.config["chatgptAPI"] = object.config.get("chatgptAPI", "")
     # 私人ChatGPT翻译代理
     object.config["chatgptProxy"] = object.config.get("chatgptProxy", "")
+    # 私人ChatGPT接口地址
+    object.config["chatgptApiAddr"] = object.config.get("chatgptApiAddr", "https://api.openai.com/v1/chat/completions")
+    # 私人ChatGPT模型
+    object.config["chatgptModel"] = object.config.get("chatgptModel", "gpt-3.5-turbo-0613")
 
     ################### 其他设定 ###################
     # 翻译界面透明度

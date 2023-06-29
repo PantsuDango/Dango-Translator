@@ -214,7 +214,7 @@ def caiyun(sentence, token, logger) :
 
 
 # ChatGPT翻译
-def chatgpt(api_key, language, proxy, content, logger) :
+def chatgpt(api_key, language, proxy, url, model, content, logger) :
 
     try :
         if not api_key:
@@ -245,7 +245,7 @@ def chatgpt(api_key, language, proxy, content, logger) :
                 {"role": "user", "content": content}
             ]
         data = {
-            "model": "gpt-3.5-turbo-0613",
+            "model": model,
             "messages": messages,
             "temperature": 0,
             "max_tokens": 1000,
@@ -268,7 +268,7 @@ def chatgpt(api_key, language, proxy, content, logger) :
                 "http": "http://{}".format(proxy),
                 "https": "https://{}".format(proxy)
             }
-        url = "https://api.openai.com/v1/chat/completions"
+
         response = requests.post(url, headers=headers, data=json.dumps(data), proxies=proxies, timeout=30)
         response.encoding = "utf-8"
         result = json.loads(response.text)
