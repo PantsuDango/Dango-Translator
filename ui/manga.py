@@ -119,6 +119,7 @@ class Manga(QWidget) :
         self.output_action_group.setExclusive(True)
         self.createOutputAction("导出到指定目录")
         self.createOutputAction("导出为压缩包")
+        self.createOutputAction("导出工程文件压缩包")
         # 将下拉菜单设置为按钮的菜单
         self.output_image_button.setMenu(self.output_menu)
         self.output_action_group.triggered.connect(self.outputImages)
@@ -467,7 +468,14 @@ class Manga(QWidget) :
 
             # 选择指定位置
             options = QFileDialog.Options()
-            folder_path = QFileDialog.getExistingDirectory(self, "选择要导出的位置", "", options=options)
+            dialog = QFileDialog()
+            try :
+                # 默认桌面
+                dialog.setDirectory(QStandardPaths.standardLocations(QStandardPaths.DesktopLocation)[0])
+            except Exception :
+                # 默认用户目录
+                dialog.setDirectory(QDir.homePath())
+            folder_path = dialog.getExistingDirectory(self, "选择要导出的位置", "", options=options)
             if not os.path.exists(folder_path):
                 return utils.message.MessageBox("导出失败", "无效的目录      ")
 
@@ -483,7 +491,6 @@ class Manga(QWidget) :
                     else :
                         new_image_path = os.path.join(folder_path, os.path.basename(image_path))
                     shutil.copy(image_path, new_image_path)
-                os.startfile(folder_path)
 
             elif action.data() == "导出为压缩包" :
                 # 压缩包名称
@@ -505,12 +512,19 @@ class Manga(QWidget) :
                     shutil.rmtree(folder_path)
                 else :
                     utils.zip.zipFiles(output_image_list, zip_path)
-                os.startfile(folder_path)
+
+            elif action.data() == "导出工程文件压缩包" :
+                zip_name = "{}.zip".format(os.path.basename(self.object.yaml["manga_dir_path"]))
+                zip_path = os.path.join(folder_path, zip_name)
+                utils.zip.zipDirectory(self.object.yaml["manga_dir_path"], zip_path)
 
             else :
                 return
+
         except Exception :
-            traceback.print_exc()
+            self.logger.error(traceback.print_exc())
+
+        os.startfile(folder_path)
 
 
     # 导入图片
