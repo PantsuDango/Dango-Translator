@@ -155,6 +155,8 @@ def configConvert(object) :
     object.config["fontColor"]["caiyunPrivate"] = object.config["fontColor"].get("caiyunPrivate", "#5B8FF9")
     # 字体颜色 私人ChatGPT
     object.config["fontColor"]["chatgptPrivate"] = object.config["fontColor"].get("chatgptPrivate", "#5B8FF9")
+    # 字体颜色 私人阿里云
+    object.config["fontColor"]["aliyunPrivate"] = object.config["fontColor"].get("aliyunPrivate", "#5B8FF9")
     # 原文颜色
     object.config["fontColor"]["original"] = object.config["fontColor"].get("original", "#5B8FF9")
 
@@ -180,6 +182,8 @@ def configConvert(object) :
     object.config["caiyunPrivateUse"] = object.config.get("caiyunPrivateUse", "False")
     # 私人ChatGPT翻译开关
     object.config["chatgptPrivateUse"] = object.config.get("chatgptPrivateUse", "False")
+    # 私人阿里云翻译开关
+    object.config["aliyunPrivateUse"] = object.config.get("aliyunPrivateUse", False)
 
     # 确保版本转换后至多只有2个翻译源能被同时开始
     tmp = []
@@ -197,16 +201,21 @@ def configConvert(object) :
 
     # 私人腾讯翻译密钥
     object.config["tencentAPI"] = object.config.get("tencentAPI", {})
-    object.config["tencentAPI"]["Secret"] = object.config["tencentAPI"].get("Secret", "")
     object.config["tencentAPI"]["Key"] = object.config["tencentAPI"].get("Key", "")
+    object.config["tencentAPI"]["Secret"] = object.config["tencentAPI"].get("Secret", "")
     # 私人百度翻译密钥
     object.config["baiduAPI"] = object.config.get("baiduAPI", {})
-    object.config["baiduAPI"]["Secret"] = object.config["baiduAPI"].get("Secret", "")
     object.config["baiduAPI"]["Key"] = object.config["baiduAPI"].get("Key", "")
+    object.config["baiduAPI"]["Secret"] = object.config["baiduAPI"].get("Secret", "")
     # 私人彩云翻译密钥
     object.config["caiyunAPI"] = object.config.get("caiyunAPI", "")
     # 私人ChatGPT翻译密钥
     object.config["chatgptAPI"] = object.config.get("chatgptAPI", "")
+    # 私人阿里云翻译密钥
+    object.config["aliyunAPI"] = object.config.get("aliyunAPI", {})
+    object.config["aliyunAPI"]["Key"] = object.config["aliyunAPI"].get("Key", "")
+    object.config["aliyunAPI"]["Secret"] = object.config["aliyunAPI"].get("Secret", "")
+
     # 私人ChatGPT翻译代理
     object.config["chatgptProxy"] = object.config.get("chatgptProxy", "")
     # 私人ChatGPT接口地址
@@ -344,6 +353,8 @@ def saveTransHisTory(text, translate_type) :
         content = "[私人彩云]\n%s\n"%text
     elif translate_type == "chatgpt_private" :
         content = "[私人ChatGPT]\n%s\n"%text
+    elif translate_type == "aliyun_private" :
+        content = "[私人阿里云]\n%s\n"%text
     else:
         return
 

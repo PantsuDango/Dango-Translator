@@ -183,7 +183,7 @@ class TranslaterProcess(QThread) :
                 result = "%s翻译: 我抽风啦, 请尝试重新翻译! 如果频繁出现, 建议直接注册使用私人翻译" % self.object.translation_ui.webdriver3.translater_map[self.object.translation_ui.webdriver3.web_type]
 
         # 私人团子
-        elif self.trans_type == "dango_private":
+        elif self.trans_type == "dango_private" :
             sign, result = translator.ocr.dango.dangoTrans(self.object, self.object.translation_ui.original, self.object.config["language"])
 
         # 私人百度
@@ -204,7 +204,7 @@ class TranslaterProcess(QThread) :
             result = translator.api.caiyun(self.object.translation_ui.original, secret_key, self.logger)
 
         # 私人ChatGPT
-        elif self.trans_type == "chatgpt_private":
+        elif self.trans_type == "chatgpt_private" :
             result = translator.api.chatgpt(
                 api_key=self.object.config["chatgptAPI"],
                 language=self.object.config["language"],
@@ -212,6 +212,16 @@ class TranslaterProcess(QThread) :
                 url=self.object.config["chatgptApiAddr"],
                 model=self.object.config["chatgptModel"],
                 content=self.object.translation_ui.original,
+                logger=self.logger,
+            )
+
+        # 私人阿里云
+        elif self.trans_type == "aliyun_private" :
+            sign, result = translator.api.aliyun(
+                access_key_id=self.object.config["aliyunAPI"]["Key"],
+                access_key_secret=self.object.config["aliyunAPI"]["Secret"],
+                source_language=self.object.config["language"],
+                text_to_translate=self.object.translation_ui.original,
                 logger=self.logger,
             )
 
@@ -466,7 +476,7 @@ class Translater(QThread) :
             utils.thread.createThread(self.creatTranslaterThread, "baidu_private")
             nothing_sign = True
 
-        # 私人百度
+        # 私人腾讯
         if self.object.config["tencentUse"] == "True" :
             utils.thread.createThread(self.creatTranslaterThread, "tencent_private")
             nothing_sign = True
@@ -479,6 +489,11 @@ class Translater(QThread) :
         # 私人ChatGPT
         if self.object.config["chatgptPrivateUse"] == "True":
             utils.thread.createThread(self.creatTranslaterThread, "chatgpt_private")
+            nothing_sign = True
+
+        # 私人阿里云
+        if self.object.config["aliyunPrivateUse"] == True:
+            utils.thread.createThread(self.creatTranslaterThread, "aliyun_private")
             nothing_sign = True
 
         # 显示原文
@@ -520,12 +535,17 @@ class Translater(QThread) :
             utils.thread.createThread(self.creatTranslaterThread, "webdriver_3")
             nothing_sign = True
 
+        # 私人团子
+        if self.object.config["dangoUse"] == True :
+            utils.thread.createThread(self.creatTranslaterThread, "dango_private")
+            nothing_sign = True
+
         # 私人百度
         if self.object.config["baiduUse"] == "True":
             utils.thread.createThread(self.creatTranslaterThread, "baidu_private")
             nothing_sign = True
 
-        # 私人百度
+        # 私人腾讯
         if self.object.config["tencentUse"] == "True":
             utils.thread.createThread(self.creatTranslaterThread, "tencent_private")
             nothing_sign = True
@@ -538,6 +558,11 @@ class Translater(QThread) :
         # 私人ChatGPT
         if self.object.config["chatgptPrivateUse"] == "True":
             utils.thread.createThread(self.creatTranslaterThread, "chatgpt_private")
+            nothing_sign = True
+
+        # 私人阿里云
+        if self.object.config["aliyunPrivateUse"] == True :
+            utils.thread.createThread(self.creatTranslaterThread, "aliyun_private")
             nothing_sign = True
 
         # 显示原文

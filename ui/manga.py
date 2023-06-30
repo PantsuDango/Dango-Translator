@@ -156,6 +156,7 @@ class Manga(QWidget) :
         self.createTransAction("私人腾讯")
         self.createTransAction("私人百度")
         self.createTransAction("私人ChatGPT")
+        self.createTransAction("私人阿里云")
         # 将下拉菜单设置为按钮的菜单
         self.select_trans_button.setMenu(self.trans_menu)
         self.trans_action_group.triggered.connect(self.changeSelectTrans)
@@ -1112,6 +1113,17 @@ class Manga(QWidget) :
                     content=original,
                     logger=self.logger)
                 if result[:11] == "私人ChatGPT: " :
+                    return False, result
+
+            elif manga_trans == "私人阿里云" :
+                sign, result = translator.api.aliyun(
+                    access_key_id=self.object.config["aliyunAPI"]["Key"],
+                    access_key_secret=self.object.config["aliyunAPI"]["Secret"],
+                    source_language=self.object.config["mangaLanguage"],
+                    text_to_translate=original,
+                    logger=self.object.logger
+                )
+                if not sign :
                     return False, result
 
             # 根据屏蔽词过滤
@@ -2142,6 +2154,18 @@ class TransEdit(QWidget) :
         button.clicked.connect(lambda: self.refreshTrans("ChatGPT"))
         button.setToolTip("<b>使用私人ChatGPT重新翻译</b>")
 
+        # 私人阿里云
+        button = QPushButton(self)
+        self.customSetGeometry(button, 350, 0, 70, 30)
+        button.setCursor(ui.static.icon.EDIT_CURSOR)
+        button.setText(" 阿里云")
+        button.setIcon(ui.static.icon.ALIYUN_ICON)
+        button.setStyleSheet("QPushButton {background: transparent; font: 9pt '华康方圆体W7'; border-radius: 6px}"
+                             "QPushButton:hover {background-color: #83AAF9;}"
+                             "QPushButton:pressed {background-color: #4480F9;}")
+        button.clicked.connect(lambda: self.refreshTrans("阿里云"))
+        button.setToolTip("<b>使用私人阿里云重新翻译</b>")
+
         # 修改字体颜色
         self.font_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.font_color), "", self)
         self.customSetGeometry(self.font_color_button, 0, 30, 70, 30)
@@ -2418,6 +2442,14 @@ class TransEdit(QWidget) :
                 model=self.object.config["chatgptModel"],
                 content=original,
                 logger=self.logger
+            )
+        elif trans_type == "阿里云":
+            sign, result = translator.api.aliyun(
+                access_key_id=self.object.config["aliyunAPI"]["Key"],
+                access_key_secret=self.object.config["aliyunAPI"]["Secret"],
+                source_language=self.object.config["mangaLanguage"],
+                text_to_translate=original,
+                logger=self.object.logger
             )
         else :
             return

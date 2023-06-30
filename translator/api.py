@@ -17,6 +17,11 @@ from traceback import format_exc
 import json
 import re
 
+import urllib.parse
+import hashlib
+import base64
+import hmac
+
 
 # 私人百度翻译
 def baidu(sentence, app_id, secret_key, logger):
@@ -363,3 +368,73 @@ def getChatgptModels(api_key, proxy, logger) :
         logger.error(format_exc())
 
     return models
+
+
+# 阿里云翻译
+def aliyun(access_key_id, access_key_secret, source_language, text_to_translate, logger) :
+
+    if access_key_id == "" or access_key_secret == "" :
+        return False, "私人阿里: 还未填入私人密钥, 不可使用. 请在设置-翻译设定-私人翻译中注册阿里云并填入密钥后重试"
+
+    source_language_map = {
+        "JAP": "ja",
+        "ENG": "en",
+        "KOR": "ko",
+        "RU": "ru",
+    }
+    # 语种解释适配
+    if source_language in source_language_map :
+        source_language = source_language_map[source_language]
+
+    # 请求参数
+    api_url = "https://mt.aliyuncs.com"
+    api_version = "2018-10-12"
+    format_type = "text"
+    # 构建请求参数
+    params = {
+        "AccessKeyId": access_key_id,
+        "Action": "Translate",
+        "FormatType": format_type,
+        "Version": api_version,
+        "SourceLanguage": source_language,
+        "TargetLanguage": "zh",
+        "SourceText": text_to_translate,
+        "Scene": "general",
+        "Format": "JSON",
+        "Timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "SignatureMethod": "HMAC-SHA1",
+        "SignatureVersion": "1.0",
+        "SignatureNonce": str(time.time()),
+    }
+    try :
+        # 对请求参数按照字母顺序进行排序
+        sorted_params = sorted(params.items(), key=lambda x: x[0])
+        # 构建待签名的字符串
+        canonicalized_query_string = ""
+        for k, v in sorted_params :
+            canonicalized_query_string += "&" + urllib.parse.quote(k, safe="") + "=" + urllib.parse.quote(v, safe="")
+        # 构建待签名的字符串
+        string_to_sign = "GET&%2F&" + urllib.parse.quote(canonicalized_query_string[1:], safe="")
+        # 计算签名
+        hmac_sha1 = hmac.new((access_key_secret + "&").encode("utf-8"), string_to_sign.encode("utf-8"), hashlib.sha1)
+        signature = base64.b64encode(hmac_sha1.digest()).decode("utf-8")
+        # 添加签名到请求参数中
+        params["Signature"] = signature
+    except Exception as err :
+        logger.error(format_exc())
+        return False, "私人阿里: 生成签名出错-{}, 请排查完错误后重试".format(err)
+
+    try :
+        # 发送HTTP请求
+        response = requests.get(api_url, params=params)
+        # 读取响应内容
+        response_content = response.json()
+        if response_content.get("Code", "") == "200" :
+            response_content = response_content.get("Data", {}).get("Translated", "")
+        else :
+            return False, "私人阿里: 翻译出错-{}, 请排查完错误后重试".format(response_content.get("Message", "我抽风啦, 请尝试重新翻译!"))
+    except Exception as err :
+        logger.error(format_exc())
+        return False, "私人阿里: 翻译出错-{}, 请排查完错误后重试".format(err)
+
+    return True, response_content

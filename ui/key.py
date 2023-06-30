@@ -51,78 +51,94 @@ class Key(QWidget) :
         self.customSetGeometry(self.baidu_ocr_key_textEdit, 20, 10, 330, 25)
         self.baidu_ocr_key_textEdit.setPlaceholderText("百度OCR API Key")
         self.baidu_ocr_key_textEdit.setText(self.object.config["OCR"]["Key"])
-        self.baidu_ocr_key_textEdit.hide()
         self.baidu_ocr_key_textEdit.setCursor(ui.static.icon.EDIT_CURSOR)
+        self.baidu_ocr_key_textEdit.hide()
 
         # 百度OCR Secret Key 输入框
         self.baidu_ocr_secret_textEdit = QLineEdit(self)
         self.customSetGeometry(self.baidu_ocr_secret_textEdit, 20, 45, 330, 25)
         self.baidu_ocr_secret_textEdit.setPlaceholderText("百度OCR Secret Key")
         self.baidu_ocr_secret_textEdit.setText(self.object.config["OCR"]["Secret"])
-        self.baidu_ocr_secret_textEdit.hide()
         self.baidu_ocr_secret_textEdit.setCursor(ui.static.icon.EDIT_CURSOR)
+        self.baidu_ocr_secret_textEdit.hide()
 
         # 私人腾讯 SecretId 输入框
         self.tencent_private_key_textEdit = QLineEdit(self)
         self.customSetGeometry(self.tencent_private_key_textEdit, 20, 10, 330, 25)
         self.tencent_private_key_textEdit.setPlaceholderText("私人腾讯 SecretId")
         self.tencent_private_key_textEdit.setText(self.object.config["tencentAPI"]["Key"])
-        self.tencent_private_key_textEdit.hide()
         self.tencent_private_key_textEdit.setCursor(ui.static.icon.EDIT_CURSOR)
+        self.tencent_private_key_textEdit.hide()
 
         # 私人腾讯 SecretKey 输入框
         self.tencent_private_secret_textEdit = QLineEdit(self)
         self.customSetGeometry(self.tencent_private_secret_textEdit, 20, 45, 330, 25)
         self.tencent_private_secret_textEdit.setPlaceholderText("私人腾讯 SecretKey")
         self.tencent_private_secret_textEdit.setText(self.object.config["tencentAPI"]["Secret"])
-        self.tencent_private_secret_textEdit.hide()
         self.tencent_private_secret_textEdit.setCursor(ui.static.icon.EDIT_CURSOR)
+        self.tencent_private_secret_textEdit.hide()
 
         # 私人百度 APP ID 输入框
         self.baidu_private_key_textEdit = QLineEdit(self)
         self.customSetGeometry(self.baidu_private_key_textEdit, 20, 10, 330, 25)
         self.baidu_private_key_textEdit.setPlaceholderText("私人百度 APP ID")
         self.baidu_private_key_textEdit.setText(self.object.config["baiduAPI"]["Key"])
-        self.baidu_private_key_textEdit.hide()
         self.baidu_private_key_textEdit.setCursor(ui.static.icon.EDIT_CURSOR)
+        self.baidu_private_key_textEdit.hide()
 
         # 私人百度 密钥 输入框
         self.baidu_private_secret_textEdit = QLineEdit(self)
         self.customSetGeometry(self.baidu_private_secret_textEdit, 20, 45, 330, 25)
         self.baidu_private_secret_textEdit.setPlaceholderText("私人百度 密钥")
         self.baidu_private_secret_textEdit.setText(self.object.config["baiduAPI"]["Secret"])
-        self.baidu_private_secret_textEdit.hide()
         self.baidu_private_secret_textEdit.setCursor(ui.static.icon.EDIT_CURSOR)
+        self.baidu_private_secret_textEdit.hide()
 
         # 私人彩云 APP ID 输入框
         self.caiyun_private_key_textEdit = QLineEdit(self)
         self.customSetGeometry(self.caiyun_private_key_textEdit, 20, 20, 330, 25)
         self.caiyun_private_key_textEdit.setPlaceholderText("私人彩云 令牌")
         self.caiyun_private_key_textEdit.setText(self.object.config["caiyunAPI"])
-        self.caiyun_private_key_textEdit.hide()
         self.caiyun_private_key_textEdit.setCursor(ui.static.icon.EDIT_CURSOR)
+        self.caiyun_private_key_textEdit.hide()
 
         # 私人ChatGPT api_key 输入框
         self.chatgpt_private_key_textEdit = QLineEdit(self)
         self.customSetGeometry(self.chatgpt_private_key_textEdit, 20, 20, 330, 25)
         self.chatgpt_private_key_textEdit.setPlaceholderText("私人ChatGPT api_key")
         self.chatgpt_private_key_textEdit.setText(self.object.config["chatgptAPI"])
-        self.chatgpt_private_key_textEdit.hide()
         self.chatgpt_private_key_textEdit.setCursor(ui.static.icon.EDIT_CURSOR)
+        self.chatgpt_private_key_textEdit.hide()
 
         # 私人ChatGPT 代理 输入框
         self.chatgpt_private_proxy_textEdit = QLineEdit(self)
         self.customSetGeometry(self.chatgpt_private_proxy_textEdit, 20, 20, 330, 25)
         self.chatgpt_private_proxy_textEdit.setPlaceholderText("私人ChatGPT 代理")
         self.chatgpt_private_proxy_textEdit.setText(self.object.config["chatgptProxy"])
-        self.chatgpt_private_proxy_textEdit.hide()
         self.chatgpt_private_proxy_textEdit.setCursor(ui.static.icon.EDIT_CURSOR)
+        self.chatgpt_private_proxy_textEdit.hide()
 
         # 私人ChatGPT 代理标签
         self.chatgpt_private_proxy_label = QLabel(self)
         self.customSetGeometry(self.chatgpt_private_proxy_label, 20, 55, 330, 20)
         self.chatgpt_private_proxy_label.setText("填入格式示例: 127.0.0.1:7890")
         self.chatgpt_private_proxy_label.hide()
+
+        # 私人阿里云 APP ID 输入框
+        self.aliyun_private_key_textEdit = QLineEdit(self)
+        self.customSetGeometry(self.aliyun_private_key_textEdit, 20, 10, 330, 25)
+        self.aliyun_private_key_textEdit.setPlaceholderText("私人阿里云 AccessKeyId")
+        self.aliyun_private_key_textEdit.setText(self.object.config["aliyunAPI"]["Key"])
+        self.aliyun_private_key_textEdit.setCursor(ui.static.icon.EDIT_CURSOR)
+        self.aliyun_private_key_textEdit.hide()
+
+        # 私人阿里云 密钥 输入框
+        self.aliyun_private_secret_textEdit = QLineEdit(self)
+        self.customSetGeometry(self.aliyun_private_secret_textEdit, 20, 45, 330, 25)
+        self.aliyun_private_secret_textEdit.setPlaceholderText("私人阿里云 AccessKeySecret")
+        self.aliyun_private_secret_textEdit.setText(self.object.config["aliyunAPI"]["Secret"])
+        self.aliyun_private_secret_textEdit.setCursor(ui.static.icon.EDIT_CURSOR)
+        self.aliyun_private_secret_textEdit.hide()
 
 
     # 初始化配置
@@ -165,6 +181,8 @@ class Key(QWidget) :
         self.object.config["caiyunAPI"] = self.filterNullWord(self.caiyun_private_key_textEdit)
         self.object.config["chatgptAPI"] = self.filterNullWord(self.chatgpt_private_key_textEdit)
         self.object.config["chatgptProxy"] = self.filterNullWord(self.chatgpt_private_proxy_textEdit)
+        self.object.config["aliyunAPI"]["Key"] = self.filterNullWord(self.aliyun_private_key_textEdit)
+        self.object.config["aliyunAPI"]["Secret"] = self.filterNullWord(self.aliyun_private_secret_textEdit)
 
         self.baidu_ocr_key_textEdit.hide()
         self.baidu_ocr_secret_textEdit.hide()
@@ -176,6 +194,8 @@ class Key(QWidget) :
         self.chatgpt_private_key_textEdit.hide()
         self.chatgpt_private_proxy_textEdit.hide()
         self.chatgpt_private_proxy_label.hide()
+        self.aliyun_private_key_textEdit.hide()
+        self.aliyun_private_secret_textEdit.hide()
 
 
 # ChatGPT编辑界面
