@@ -37,6 +37,7 @@ FONT_PATH_2 = "./config/other/华康方圆体W7.TTC"
 class Manga(QWidget) :
 
     show_error_signal = pyqtSignal(list)
+    flushed_render_image_and_text_block_signal = pyqtSignal(str)
 
     def __init__(self, object) :
 
@@ -50,6 +51,7 @@ class Manga(QWidget) :
         self.show_image_widget = None
         self.show_error_sign = False
         utils.thread.createThread(self.checkPermission)
+        self.flushed_render_image_and_text_block_signal.connect(self.transProcessFlushedRenderImageAndTextBlock)
 
 
     def ui(self) :
@@ -959,6 +961,20 @@ class Manga(QWidget) :
             self.transImageWidgetRefreshImage(image_path)
         else:
             self.trans_process_bar.paintStatus("rdr", 0, True)
+
+        # 刷新当前正在浏览的编辑图或译图
+        if self.show_image_widget :
+            if self.show_image_widget.original_image_path == image_path :
+                if self.edit_image_widget.isVisible() :
+                    self.flushed_render_image_and_text_block_signal.emit("edit")
+                elif self.trans_image_widget.isVisible() :
+                    self.flushed_render_image_and_text_block_signal.emit("trans")
+
+
+    # 刷新当前正在浏览的编辑图或译图
+    def transProcessFlushedRenderImageAndTextBlock(self, type) :
+
+        self.renderImageAndTextBlock(self.show_image_widget.original_image_path, type)
 
 
     # 单图翻译
