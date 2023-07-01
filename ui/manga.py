@@ -328,6 +328,17 @@ class Manga(QWidget) :
         self.check_permission = False
         # 接口试用次数
         self.manga_read_count = -1
+        # 对于Image库format格式类型映射
+        self.image_ext_map = {
+            "jpg": "JPEG",
+            "JPG": "JPEG",
+            "jpeg": "JPEG",
+            "JPEG": "JPEG",
+            "png": "PNG",
+            "PNG": "PNG",
+            "webp": "WEBP",
+            "WEBP": "WEBP"
+        }
 
 
     # 根据分辨率定义控件位置尺寸
@@ -1632,6 +1643,41 @@ class Manga(QWidget) :
         if self.trans_image_widget.isVisible() and sign == "left" :
             self.clickImageButton("edit")
             return
+
+
+    # 判断文件大小(MB)
+    def getFileSize(self, file_path) :
+
+        size_in_bytes = os.path.getsize(file_path)
+        size_in_mb = size_in_bytes / (1024 * 1024)
+        return size_in_mb
+
+
+    # 调整图片大小
+    def adjustImageSize(self, image_path, target_size):
+
+        ext = pathlib.Path(image_path).suffix.replace(".", "")
+        format = self.image_ext_map[ext]
+
+        # 打开原始图片
+        image = Image.open(image_path)
+        # 创建一个缓冲区，用于保存调整后的图片
+        image_data = io.BytesIO()
+        # 调整图片尺寸
+        factor = 0.9  # 调整因子，可以适当调整以满足目标大小
+        image.save(image_data, format=format, quality=85)
+        while image_data.tell() > target_size :
+            image_data.seek(0)
+            image_data.truncate()
+            image.save(image_data, format=format, quality=85)
+            if factor < 0.1 :
+                break
+            image = image.resize((int(image.width*factor), int(image.height*factor)))
+            factor -= 0.1
+        # 保存调整后的图片
+        image_data.seek(0)
+        adjusted_image = Image.open(image_data)
+        adjusted_image.save(image_path, format)
 
 
     # 窗口关闭处理
