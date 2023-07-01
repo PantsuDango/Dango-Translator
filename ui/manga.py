@@ -17,6 +17,7 @@ import qtawesome
 from PIL import Image
 import traceback
 import pyperclip
+import pathlib
 
 import ui.static.icon
 import utils.translater
@@ -1567,8 +1568,6 @@ class Manga(QWidget) :
         body = {"Type": 1}
 
         while True :
-
-
             resp = utils.http.post(url=url, body=body, logger=self.logger, headers=None, timeout=5)
             if not resp :
                 continue
@@ -1658,6 +1657,7 @@ class RenderTextBlock(QWidget) :
         self.json_data = json_data
         self.trans_edit_ui = edit_window
         self.object = edit_window.object
+        self.logger = self.object.logger
         self.image_rate = []
         self.button_list = []
         self.ui()
@@ -1749,7 +1749,21 @@ class RenderTextBlock(QWidget) :
             return
         with open(self.image_path, "rb") as file :
             image = QImage.fromData(file.read())
+
+        # 如果图片太大就裁剪一半
+        if image.width() == 0 or image.height() == 0:
+            image = Image.open(self.image_path)
+            # 等比例缩放为原来的一半
+            width, height = image.size
+            new_width = width // 2
+            new_height = height // 2
+            resized_image = image.resize((new_width, new_height))
+            resized_image.save(self.image_path)
+            # 重新读取图片
+            with open(self.image_path, "rb") as file :
+                image = QImage.fromData(file.read())
         self.image_pixmap = QPixmap.fromImage(image)
+
         self.matchImageSize()
 
 
@@ -1798,7 +1812,7 @@ class RenderTextBlock(QWidget) :
             pixmap.width() / self.image_pixmap.width(),
             pixmap.height() / self.image_pixmap.height()
         ]
-        self.rate_label.setText("{}%".format(round(self.image_rate[0]*100)))
+        self.rate_label.setText("{}%".format(round(self.image_rate[0] * 100)))
 
 
     # 文本框按钮自适配比例
