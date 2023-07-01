@@ -1065,6 +1065,9 @@ class Manga(QWidget) :
                 val["font_selector"] = self.object.config["mangaFontType"]
                 # 使用全局轮廓宽度
                 val["shadow_size"] = self.object.config["mangaShadowSize"]
+                # 使用全局字体大小
+                if self.object.config["mangaFontSizeUse"] :
+                    val["text_size"] = self.object.config.get("mangaFontSize", 36)
 
                 new_text_block.append(val)
 
@@ -2828,6 +2831,8 @@ class Setting(QWidget) :
         self.fast_render_use = self.object.config.get("mangaFastRenderUse", False)
         self.filtrate_use = self.object.config.get("mangaFiltrateUse", True)
         self.shadow_size = self.object.config.get("mangaShadowSize", 4)
+        self.font_size_use = self.object.config.get("mangaFontSizeUse", False)
+        self.font_size = self.object.config.get("mangaFontSize", 36)
         self.font_list = [
             "鸿蒙/HarmonyOS_Sans/HarmonyOS_Sans_Regular",
             "阿里/东方大楷/Alimama_DongFangDaKai_Regular",
@@ -2920,7 +2925,7 @@ class Setting(QWidget) :
 
         # 窗口尺寸及不可拉伸
         self.window_width = int(500*self.rate)
-        self.window_height = int(300*self.rate)
+        self.window_height = int(320*self.rate)
         self.resize(self.window_width, self.window_height)
         self.setMinimumSize(QSize(self.window_width, self.window_height))
         self.setMaximumSize(QSize(self.window_width, self.window_height))
@@ -3141,6 +3146,33 @@ class Setting(QWidget) :
                              "QPushButton:hover { background-color: #83AAF9; }"
                              "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
 
+        # 全局字体大小开关
+        self.font_size_switch = ui.switch.SwitchOCR(self, self.font_size_use, startX=(65-20) * self.rate)
+        self.customSetGeometry(self.font_size_switch, 20, 270, 65, 20)
+        self.font_size_switch.checkedChanged.connect(self.changeFontSizeUseSwitch)
+        self.font_size_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 全局字体大小数值设定
+        self.font_size_spinbox = QSpinBox(self)
+        self.customSetGeometry(self.font_size_spinbox, 100, 270, 60, 20)
+        self.font_size_spinbox.setMinimum(16)
+        self.font_size_spinbox.setMaximum(512)
+        self.font_size_spinbox.setValue(self.font_size)
+        self.font_size_spinbox.setCursor(ui.static.icon.SELECT_CURSOR)
+        self.font_size_spinbox.valueChanged.connect(self.changeFontSize)
+        # 全局字体大小标签
+        label = QLabel(self)
+        self.customSetGeometry(label, 175, 270, 100, 20)
+        label.setText("字体大小")
+        # 全局字体大小?号图标
+        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self)
+        self.customSetIconSize(button, 20, 20)
+        self.customSetGeometry(button, 240, 270, 20, 20)
+        button.clicked.connect(lambda: self.showDesc("font_size"))
+        button.setCursor(ui.static.icon.QUESTION_CURSOR)
+        button.setStyleSheet("QPushButton { background: transparent;}"
+                             "QPushButton:hover { background-color: #83AAF9; }"
+                             "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
+
 
     # 根据分辨率定义控件位置尺寸
     def customSetGeometry(self, object, x, y, w, h) :
@@ -3199,6 +3231,14 @@ class Setting(QWidget) :
         elif message_type == "filtrate" :
             self.desc_ui.setWindowTitle("过滤拟声词说明")
             self.desc_ui.desc_text.append("\n开启后, 不会识别和翻译拟声词, 默认值打开")
+
+        elif message_type == "font_size" :
+            self.desc_ui.setWindowTitle("字体大小说明")
+            self.desc_ui.desc_text.append("\n开关开启, 会将所有图片渲染的文字大小按照此数值"
+                                          "\n\n开关关闭, 则由系统自动判断渲染的文字大小"
+                                          "\n\n范围为16-512, 单位pt"
+                                          "\n\n默认值关闭")
+
         else :
             return
 
@@ -3287,6 +3327,17 @@ class Setting(QWidget) :
     def changeFiltrateUseSwitch(self, checked) :
 
         self.object.config["mangaFiltrateUse"] = checked
+
+    # 改变字体大小开关状态
+    def changeFontSizeUseSwitch(self, checked) :
+
+        self.object.config["mangaFontSizeUse"] = checked
+
+
+    # 改变字体大小
+    def changeFontSize(self, value) :
+
+        self.object.config["mangaFontSize"] = value
 
 
     # 窗口关闭处理
