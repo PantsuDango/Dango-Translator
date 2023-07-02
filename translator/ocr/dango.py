@@ -364,20 +364,21 @@ def offlineOCR(object) :
 
 
 # 漫画OCR
-def mangaOCR(object, filepath, check_permission) :
+def mangaOCR(object, filepath, image_base64=None, check_permission=False) :
 
     token = object.config.get("DangoToken", "")
     if token == "" :
         return False, "图片文字识别失败: 未获取到token"
 
-    # 如果是webp格式就转换为png
-    _, ext = os.path.splitext(filepath)
-    if ext.lower() == ".webp":
-        data = imageWebpToPng(filepath)
-    else :
-        with open(filepath, "rb") as file :
-            data = file.read()
-    image_base64 = base64.b64encode(data).decode("utf-8")
+    if not image_base64 :
+        # 如果是webp格式就转换为png
+        _, ext = os.path.splitext(filepath)
+        if ext.lower() == ".webp":
+            data = imageWebpToPng(filepath)
+        else :
+            with open(filepath, "rb") as file :
+                data = file.read()
+        image_base64 = base64.b64encode(data).decode("utf-8")
 
     body = {
         "token": token,
@@ -413,7 +414,7 @@ def mangaOCR(object, filepath, check_permission) :
 
 
 # 漫画文本消除
-def mangaIPT(object, filepath, mask, check_permission) :
+def mangaIPT(object, filepath, mask, image_base64=None, check_permission=False) :
 
     # 获取配置
     token = object.config.get("DangoToken", "")
@@ -425,14 +426,15 @@ def mangaIPT(object, filepath, mask, check_permission) :
     if check_permission :
         url = object.yaml["dict_info"].get("manga_probate_text_inpaint", "https://dl.ap-sh.starivercs.cn/v2/manga_probate/advanced/text_inpaint")
 
-    # 如果是webp格式就转换为png
-    _, ext = os.path.splitext(filepath)
-    if ext.lower() == ".webp" :
-        data = imageWebpToPng(filepath)
-    else:
-        with open(filepath, "rb") as file :
-            data = file.read()
-    image_base64 = base64.b64encode(data).decode("utf-8")
+    if not image_base64 :
+        # 如果是webp格式就转换为png
+        _, ext = os.path.splitext(filepath)
+        if ext.lower() == ".webp" :
+            data = imageWebpToPng(filepath)
+        else:
+            with open(filepath, "rb") as file :
+                data = file.read()
+        image_base64 = base64.b64encode(data).decode("utf-8")
 
     body = {
         "token": token,

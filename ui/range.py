@@ -49,11 +49,11 @@ class WScreenShot(QWidget) :
         self.index = index
 
 
-    # 绘制事情
-    def paintEvent(self, event):
+    # 绘制事件
+    def paintEvent(self, event) :
 
-        try:
-            if self.is_drawing:
+        try :
+            if self.is_drawing :
                 self.mask = self.black_mask.copy()
                 pp = QPainter(self.mask)
                 pen = QPen()
@@ -63,15 +63,15 @@ class WScreenShot(QWidget) :
                 pp.setBrush(brush)
                 pp.drawRect(QRect(self.start_point, self.end_point))
                 self.setMask(QBitmap(self.mask))
-        except Exception:
+        except Exception :
             pass
 
 
     # 鼠标按下事件
     def mousePressEvent(self, event) :
 
-        try:
-            if event.button() == Qt.LeftButton:
+        try :
+            if event.button() == Qt.LeftButton :
                 self.start_point = event.pos()
                 self.end_point = self.start_point
                 self.is_drawing = True
@@ -83,7 +83,7 @@ class WScreenShot(QWidget) :
     def mouseMoveEvent(self, event) :
 
         try:
-            if self.is_drawing:
+            if self.is_drawing :
                 self.end_point = event.pos()
                 self.update()
         except Exception:
@@ -127,10 +127,10 @@ class WScreenShot(QWidget) :
 
 
     # 鼠标松开事件
-    def mouseReleaseEvent(self, event):
+    def mouseReleaseEvent(self, event) :
 
         try:
-            if event.button() == Qt.LeftButton:
+            if event.button() == Qt.LeftButton :
                 self.end_point = event.pos()
                 self.getRange()
                 self.close()
@@ -146,7 +146,7 @@ class WScreenShot(QWidget) :
 # 范围框
 class Range(QMainWindow) :
 
-    def __init__(self, object):
+    def __init__(self, object) :
 
         super(Range, self).__init__()
 
@@ -163,7 +163,7 @@ class Range(QMainWindow) :
 
         x, y, w, h = 0, 0, 0, 0
         # 选择使用的范围
-        for index in range(1, 5):
+        for index in range(1, 5) :
             if self.object.config["switch{}Use".format(index)]:
                 x = self.object.yaml["range{}".format(index)]["x"]
                 y = self.object.yaml["range{}".format(index)]["y"]
@@ -240,7 +240,7 @@ class Range(QMainWindow) :
     def mouseReleaseEvent(self, e: QMouseEvent) :
 
         try :
-            if e.button() == Qt.LeftButton:
+            if e.button() == Qt.LeftButton :
                 self._isTracking = False
                 self._startPos = None
                 self._endPos = None
@@ -261,15 +261,15 @@ class Range(QMainWindow) :
 
 
     # 鼠标离开控件事件
-    def leaveEvent(self, QEvent):
+    def leaveEvent(self, QEvent) :
 
         self.drag_label.setStyleSheet("background-color:none")
         self.label.setGeometry(0, 0, self.width(), self.height())
         self.hide_button.hide()
 
         # 选择使用的范围
-        for index in range(1, 5):
-            if self.object.config["switch{}Use".format(index)]:
+        for index in range(1, 5) :
+            if self.object.config["switch{}Use".format(index)] :
                 self.object.yaml["range{}".format(index)]["x"] = self.x()
                 self.object.yaml["range{}".format(index)]["y"] = self.y()
                 self.object.yaml["range{}".format(index)]["w"] = self.width()
@@ -325,7 +325,7 @@ class Range(QMainWindow) :
 
 
 # 多范围参数页面
-class MultiRange(QWidget):
+class MultiRange(QWidget) :
 
     # 切换范围快捷键信号
     choice_range_hotkey_sign_1 = pyqtSignal(int)
@@ -333,7 +333,7 @@ class MultiRange(QWidget):
     choice_range_hotkey_sign_3 = pyqtSignal(int)
     choice_range_hotkey_sign_4 = pyqtSignal(int)
 
-    def __init__(self, object):
+    def __init__(self, object) :
 
         super(MultiRange, self).__init__()
         self.object = object
@@ -371,7 +371,7 @@ class MultiRange(QWidget):
         self.ui()
 
 
-    def ui(self):
+    def ui(self) :
 
         # 窗口尺寸及不可拉伸
         self.resize(self.window_width, self.window_height)

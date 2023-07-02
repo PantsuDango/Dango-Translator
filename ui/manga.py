@@ -28,6 +28,7 @@ import utils.message
 import ui.progress_bar
 import utils.zip
 import utils.http
+import ui.range
 
 
 FONT_PATH_1 = "./config/other/NotoSansSC-Regular.otf"
@@ -1016,73 +1017,83 @@ class Manga(QWidget) :
         utils.thread.runQThread(thread)
 
 
+    # 在线OCR配置过滤
+    def mangaOcrFilter(self, result) :
+
+        # 过滤错误的文本块
+        new_text_block = []
+        for index, val in enumerate(result.get("text_block", [])) :
+            texts = val.get("texts", [])
+            # 过滤<skip>
+            skip_sign = False
+            for i, text in enumerate(texts):
+                if not text or text == "<skip>":
+                    skip_sign = True
+                    del val["coordinate"][i]
+                    del val["texts"][i]
+            if not texts :
+                continue
+            # 如果过滤过<skip>的情况就重新计算文本块的坐标
+            if skip_sign :
+                x_list, y_list = [], []
+                for coordinate in val["coordinate"]:
+                    for k in coordinate.keys():
+                        x_list.append(coordinate[k][0])
+                        y_list.append(coordinate[k][1])
+                val["block_coordinate"]["upper_left"] = [min(x_list), min(y_list)]
+                val["block_coordinate"]["upper_right"] = [max(x_list), min(y_list)]
+                val["block_coordinate"]["lower_right"] = [max(x_list), max(y_list)]
+                val["block_coordinate"]["lower_left"] = [min(x_list), max(y_list)]
+
+            # 使用全局字体色
+            if self.object.config["mangaFontColorUse"] and val.get("foreground_color", []):
+                color = QColor(self.object.config["mangaFontColor"])
+                f_r, f_g, f_b, f_a = color.getRgb()
+                val["foreground_color"] = [f_r, f_g, f_b]
+            # 使用全局轮廓色
+            if self.object.config["mangaBgColorUse"] and val.get("background_color", []):
+                color = QColor(self.object.config["mangaBgColor"])
+                b_r, b_g, b_b, b_a = color.getRgb()
+                val["background_color"] = [b_r, b_g, b_b]
+            # 使用全局字体
+            val["font_selector"] = self.object.config["mangaFontType"]
+            # 使用全局轮廓宽度
+            val["shadow_size"] = self.object.config["mangaShadowSize"]
+            # 使用全局字体大小
+            if self.object.config["mangaFontSizeUse"]:
+                val["text_size"] = self.object.config.get("mangaFontSize", 36)
+
+            new_text_block.append(val)
+
+        # 过滤屏蔽词和替换词
+        for index, val in enumerate(new_text_block):
+            new_texts = []
+            for text in val["texts"]:
+                for filter in self.object.config["Filter"]:
+                    if not filter[0]:
+                        continue
+                    text = text.replace(filter[0], filter[1])
+                new_texts.append(text)
+            new_text_block[index]["texts"] = new_texts
+
+        result["text_block"] = new_text_block
+
+        return result
+
+
     # 漫画OCR
     def mangaOCR(self, image_path) :
 
-        sign, result = translator.ocr.dango.mangaOCR(self.object, image_path, self.check_permission)
+        sign, result = translator.ocr.dango.mangaOCR(self.object, image_path, None, self.check_permission)
         if sign :
             # 缓存mask图片
             with open(self.getMaskFilePath(image_path), "wb") as file :
                 file.write(base64.b64decode(result["mask"]))
             del result["mask"]
 
-            # 过滤错误的文本块
-            new_text_block = []
-            for index, val in enumerate(result.get("text_block", [])) :
-                texts = val.get("texts", [])
-                # 过滤<skip>
-                skip_sign = False
-                for i, text in enumerate(texts) :
-                    if not text or text == "<skip>" :
-                        skip_sign = True
-                        del val["coordinate"][i]
-                        del val["texts"][i]
-                if not texts :
-                    continue
-                # 如果过滤过<skip>的情况就重新计算文本块的坐标
-                if skip_sign :
-                    x_list, y_list = [], []
-                    for coordinate in val["coordinate"] :
-                        for k in coordinate.keys() :
-                            x_list.append(coordinate[k][0])
-                            y_list.append(coordinate[k][1])
-                    val["block_coordinate"]["upper_left"] = [min(x_list), min(y_list)]
-                    val["block_coordinate"]["upper_right"] = [max(x_list), min(y_list)]
-                    val["block_coordinate"]["lower_right"] = [max(x_list), max(y_list)]
-                    val["block_coordinate"]["lower_left"] = [min(x_list), max(y_list)]
+            # 在线OCR配置过滤
+            result = self.mangaOcrFilter(result)
 
-                # 使用全局字体色
-                if self.object.config["mangaFontColorUse"] and val.get("foreground_color", []) :
-                    color = QColor(self.object.config["mangaFontColor"])
-                    f_r, f_g, f_b, f_a = color.getRgb()
-                    val["foreground_color"] = [f_r, f_g, f_b]
-                # 使用全局轮廓色
-                if self.object.config["mangaBgColorUse"] and val.get("background_color", []):
-                    color = QColor(self.object.config["mangaBgColor"])
-                    b_r, b_g, b_b, b_a = color.getRgb()
-                    val["background_color"] = [b_r, b_g, b_b]
-                # 使用全局字体
-                val["font_selector"] = self.object.config["mangaFontType"]
-                # 使用全局轮廓宽度
-                val["shadow_size"] = self.object.config["mangaShadowSize"]
-                # 使用全局字体大小
-                if self.object.config["mangaFontSizeUse"] :
-                    val["text_size"] = self.object.config.get("mangaFontSize", 36)
-
-                new_text_block.append(val)
-
-            # 过滤屏蔽词和替换词
-            for index, val in enumerate(new_text_block) :
-                new_texts = []
-                for text in val["texts"] :
-                    for filter in self.object.config["Filter"]:
-                        if not filter[0]:
-                            continue
-                        text = text.replace(filter[0], filter[1])
-                    new_texts.append(text)
-                new_text_block[index]["texts"] = new_texts
-
-            result["text_block"] = new_text_block
             # 缓存ocr结果
             with open(self.getJsonFilePath(image_path), "w", encoding="utf-8") as file:
                 json.dump(result, file, indent=4)
@@ -1097,7 +1108,7 @@ class Manga(QWidget) :
         with open(self.getMaskFilePath(image_path), "rb") as file:
             mask = base64.b64encode(file.read()).decode("utf-8")
         # 请求漫画ipt
-        sign, result = translator.ocr.dango.mangaIPT(self.object, image_path, mask, self.check_permission)
+        sign, result = translator.ocr.dango.mangaIPT(self.object, image_path, mask, None, self.check_permission)
         if sign :
             # 缓存inpaint图片
             with open(self.getIptFilePath(image_path), "wb") as file :
@@ -1106,12 +1117,9 @@ class Manga(QWidget) :
         return sign, result
 
 
-    # 图片翻译
-    def mangaTrans(self, image_path) :
+    # 漫画翻译配置过滤
+    def mangaTransFilter(self, json_data) :
 
-        # 从缓存文件中获取json结果
-        with open(self.getJsonFilePath(image_path), "r", encoding="utf-8") as file:
-            json_data = json.load(file)
         # 翻译源
         manga_trans = self.object.config["mangaTrans"]
         # 存译文列表
@@ -1120,7 +1128,7 @@ class Manga(QWidget) :
         original = []
         for val in json_data["text_block"] :
             tmp = ""
-            for text in val["texts"]:
+            for text in val["texts"] :
                 tmp += text
             original.append(tmp)
         original = "\n".join(original)
@@ -1129,8 +1137,9 @@ class Manga(QWidget) :
         result = ""
         if original.strip() :
             if manga_trans == "私人团子" :
-                sign, result = translator.ocr.dango.dangoTrans(self.object, original, self.object.config["mangaLanguage"])
-                if not sign :
+                sign, result = translator.ocr.dango.dangoTrans(self.object, original,
+                                                               self.object.config["mangaLanguage"])
+                if not sign:
                     return False, result
 
             if manga_trans == "私人彩云" :
@@ -1139,12 +1148,14 @@ class Manga(QWidget) :
                     return False, result
 
             elif manga_trans == "私人腾讯" :
-                result = translator.api.tencent(original, self.object.config["tencentAPI"]["Key"], self.object.config["tencentAPI"]["Secret"], self.logger)
+                result = translator.api.tencent(original, self.object.config["tencentAPI"]["Key"],
+                                                self.object.config["tencentAPI"]["Secret"], self.logger)
                 if result[:6] == "私人腾讯: " :
                     return False, result
 
             elif manga_trans == "私人百度" :
-                result = translator.api.baidu(original, self.object.config["baiduAPI"]["Key"], self.object.config["baiduAPI"]["Secret"], self.logger)
+                result = translator.api.baidu(original, self.object.config["baiduAPI"]["Key"],
+                                              self.object.config["baiduAPI"]["Secret"], self.logger)
                 if result[:6] == "私人百度: " :
                     return False, result
 
@@ -1172,18 +1183,34 @@ class Manga(QWidget) :
                     return False, result
 
             # 根据屏蔽词过滤
-            for filter in self.object.config["Filter"] :
-                if not filter[0]:
+            for filter in self.object.config["Filter"]:
+                if not filter[0] :
                     continue
                 result = result.replace(filter[0], filter[1])
 
-            for index, word in enumerate(result.split("\n")[:len(json_data["text_block"])]) :
+            for index, word in enumerate(result.split("\n")[:len(json_data["text_block"])]):
                 translated_text.append(word)
 
         json_data["translated_text"] = translated_text
+
+        return True, json_data
+
+
+    # 图片翻译
+    def mangaTrans(self, image_path) :
+
+        # 从缓存文件中获取json结果
+        with open(self.getJsonFilePath(image_path), "r", encoding="utf-8") as file:
+            json_data = json.load(file)
+
+        # 漫画翻译配置过滤
+        sign, result = self.mangaTransFilter(json_data)
+        if not sign :
+            return sign, result
+
         # 缓存翻译结果
         with open(self.getJsonFilePath(image_path), "w", encoding="utf-8") as file :
-            json.dump(json_data, file, indent=4)
+            json.dump(result, file, indent=4)
 
         return True, result
 
@@ -1709,6 +1736,8 @@ class RenderTextBlock(QWidget) :
         self.logger = self.object.logger
         self.image_rate = []
         self.button_list = []
+        self.paint_status = False
+        self.paint_button = None
         self.ui()
 
 
@@ -1728,12 +1757,26 @@ class RenderTextBlock(QWidget) :
         self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.scroll_area.setCursor(Qt.OpenHandCursor)
-        self.image_label = QLabel(self)
+
+        self.image_label = CustomPaintLabel(self)
+        self.image_label.setCursor(Qt.OpenHandCursor)
+        self.image_label.paint_sign.connect(self.paintTextBlockButton)
+        self.image_label.paint_reset_sign.connect(self.paintTextBlockButtonReset)
         widget = QWidget()
         layout = QVBoxLayout()
         layout.addWidget(self.image_label, alignment=Qt.AlignCenter)
         widget.setLayout(layout)
         self.scroll_area.setWidget(widget)
+
+        # 手动OCR按钮
+        self.manual_ocr_button = QPushButton(self)
+        self.manual_ocr_button.setText(" 手动绘制")
+        self.manual_ocr_button.setIcon(ui.static.icon.TEXT_BLOCK_ICON)
+        self.manual_ocr_button.setToolTip("<b>手动绘制文字识别框, 点击后可通过长按鼠标左键在编辑图上拉取新的识别框, 再次点击按钮释放</b>")
+        self.manual_ocr_button.setGeometry(0, 590*self.rate[1], 100*self.rate[0], 30*self.rate[1])
+        self.manual_ocr_button.setStyleSheet("QPushButton:hover {background-color: #83AAF9;}")
+        self.manual_ocr_button.clicked.connect(self.manualOCR)
+        self.manual_ocr_button.hide()
 
         # 显示图片缩放比例
         self.rate_label = TransparentButton(self)
@@ -1742,10 +1785,11 @@ class RenderTextBlock(QWidget) :
         # 载入大图
         self.loadImage()
 
-        if not self.json_data or \
-                not self.json_data.get("text_block", []) or \
-                not self.json_data.get("translated_text", []) :
+        if not self.json_data or not self.json_data.get("text_block", []) or not self.json_data.get("translated_text", []) :
             return
+        else :
+            self.manual_ocr_button.show()
+
         # 渲染文本框
         index = 0
         for i, text_block in enumerate(self.json_data["text_block"]) :
@@ -1789,6 +1833,90 @@ class RenderTextBlock(QWidget) :
             button.customContextMenuRequested.connect(lambda _, b=button: self.showTextBlockButtonMenu(b))
             index += 1
             self.button_list.append(button)
+
+
+    # 绘制矩形框按钮信号槽
+    def paintTextBlockButton(self, x, y, w, h) :
+
+        if not self.paint_button :
+            self.paint_button = CustomTextBlockButton(self.image_label)
+            self.paint_button.setCursor(ui.static.icon.EDIT_CURSOR)
+            self.paint_button.setStyleSheet("QPushButton {background: transparent; border: 2px solid red;}"
+                                            "QPushButton:hover {background-color:rgba(62, 62, 62, 0.1)}")
+            self.paint_button.show()
+
+        self.paint_button.setGeometry(x, y, w, h)
+
+
+    # 结束绘制矩形框按钮信号槽
+    def paintTextBlockButtonReset(self, sign) :
+
+        # 如果框太小就直接删掉, 防止误操作绘制出错误的框
+        if self.paint_button :
+            if self.paint_button.width() > 10 and self.paint_button.height() > 10 :
+                # 计算坐标
+                x = int(self.paint_button.x() // self.image_rate[0])
+                y = int(self.paint_button.y() // self.image_rate[1])
+                w = int(self.paint_button.width() // self.image_rate[0])
+                h = int(self.paint_button.height() // self.image_rate[1])
+                # 打开原图, 按照坐标截图
+                image = Image.open(self.original_image_path)
+                cropped_image = image.crop((x, y, x+w, y+h))
+                # 截图转换为base64
+                buffered = io.BytesIO()
+                cropped_image.save(buffered, format="PNG")
+                image_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
+                # 请求mangaOCR
+                sign, ocr_result = translator.ocr.dango.mangaOCR(
+                    object=self.object,
+                    filepath=None,
+                    image_base64=image_base64,
+                    check_permission=self.object.manga_ui.check_permission
+                )
+                # OCR成功
+                if sign :
+                    ocr_result = self.object.manga_ui.mangaOcrFilter(ocr_result)
+                    # 请求漫画ipt
+                    sign, ipt_result = translator.ocr.dango.mangaIPT(
+                        object=self.object,
+                        filepath=None,
+                        mask=ocr_result["mask"],
+                        image_base64=image_base64,
+                        check_permission=self.object.manga_ui.check_permission
+                    )
+                    # ipt成功
+                    if sign :
+                        # ipt后的截图贴回rdr图上
+                        ipt_cut_image = Image.open(io.BytesIO(base64.b64decode(ipt_result["inpainted_image"])))
+                        rdr_image = Image.open(self.image_path)
+                        rdr_image.paste(ipt_cut_image, (x, y))
+                        rdr_image.save(self.image_path)
+                        # ipt后的截图贴回ipt图上
+                        ipt_image = Image.open(self.ipt_image_path)
+                        ipt_image.paste(ipt_cut_image, (x, y))
+                        ipt_image.save(self.ipt_image_path)
+
+                        # 请求翻译
+                        # sign, trans_result = self.object.manga_ui.mangaTransFilter(ocr_result)
+                        # if sign :
+
+                        # 刷新大图
+                        init_image_rate = copy.deepcopy(self.image_rate)
+                        self.loadImage()
+                        self.matchButtonSize()
+                        self.object.manga_ui.setImageInitRate(init_image_rate)
+
+
+                        self.paint_button.rect = (x, y, w, h)
+                        self.button_list.append(self.paint_button)
+                    else :
+                        self.paint_button.deleteLater()
+                else :
+                    self.paint_button.deleteLater()
+            else :
+                self.paint_button.deleteLater()
+
+        self.paint_button = None
 
 
     # 加载大图
@@ -1879,6 +2007,9 @@ class RenderTextBlock(QWidget) :
     # 鼠标滚轮信号
     def wheelEvent(self, event) :
 
+        if self.paint_status :
+            return event.ignore()
+
         if event.angleDelta().y() > 0 :
             if (self.image_rate[0] > 3 or self.image_rate[1] > 3) :
                 return
@@ -1910,6 +2041,7 @@ class RenderTextBlock(QWidget) :
         self.matchImageSize()
         self.matchButtonSize()
         self.rate_label.setGeometry(930*w_rate, 590*h_rete, 60*w_rate, 30*h_rete)
+        self.manual_ocr_button.setGeometry(0, 590*h_rete, 100*w_rate, 30*h_rete)
 
 
     # 文字块按钮右键菜单
@@ -2060,6 +2192,27 @@ class RenderTextBlock(QWidget) :
 
         except Exception :
             traceback.print_exc()
+
+
+    # 手动OCR
+    def manualOCR(self) :
+
+        self.paint_status = not self.paint_status
+
+        if self.paint_status :
+            # 按下手动OCR按钮
+            self.scroll_area.paint_status = True
+            self.image_label.paint_status = True
+            self.scroll_area.setCursor(Qt.CrossCursor)
+            self.image_label.setCursor(Qt.CrossCursor)
+            self.manual_ocr_button.setStyleSheet("background-color: #83AAF9;")
+        else :
+            # 释放手动OCR按钮
+            self.scroll_area.paint_status = False
+            self.image_label.paint_status = False
+            self.scroll_area.setCursor(Qt.OpenHandCursor)
+            self.image_label.setCursor(Qt.OpenHandCursor)
+            self.manual_ocr_button.setStyleSheet("QPushButton:hover {background-color: #83AAF9;}")
 
 
 # 译文编辑界面
@@ -2684,17 +2837,24 @@ class CustomButton(QPushButton) :
 class CustomScrollArea(QScrollArea) :
 
     def __init__(self, parent=None) :
+
         super().__init__(parent)
+        self.paint_status = False
 
 
     # 取消事件的传递，禁用滚轮控制滚动条
     def wheelEvent(self, event) :
+
         event.ignore()
 
 
     # 鼠标移动事件
     def mouseMoveEvent(self, e: QMouseEvent) :
+
         try :
+            if self.paint_status :
+                return e.ignore()
+
             self._endPos = e.pos() - self._startPos
             horizontal = self.horizontalScrollBar()
             if self._endPos.x() > 3 :
@@ -2706,32 +2866,38 @@ class CustomScrollArea(QScrollArea) :
                 vertical.setValue(vertical.value() -3)
             else :
                 vertical.setValue(vertical.value() +3)
-        except Exception :
-            traceback.print_exc()
+        except :
+            pass
 
 
     # 鼠标按下事件
     def mousePressEvent(self, e: QMouseEvent) :
+
         try :
+            if self.paint_status :
+                return e.ignore()
+
             if e.button() == Qt.LeftButton :
                 self._isTracking = True
                 self._startPos = QPoint(e.x(), e.y())
                 self.setCursor(Qt.ClosedHandCursor)
-        except Exception:
-            traceback.print_exc()
+        except :
+            pass
 
 
     # 鼠标松开事件
-    def mouseReleaseEvent(self, e: QMouseEvent):
+    def mouseReleaseEvent(self, e: QMouseEvent) :
+
         try :
+            if self.paint_status :
+                return e.ignore()
             if e.button() == Qt.LeftButton :
                 self._isTracking = False
                 self._startPos = None
                 self._endPos = None
                 self.setCursor(Qt.OpenHandCursor)
-
-        except Exception:
-            traceback.print_exc()
+        except :
+            pass
 
 
 # 自定义TextBlock的按钮
@@ -2779,7 +2945,7 @@ class CustomTextBlockButton(QPushButton) :
             self.move(self.pos() + self._endPos)
             self._move = True
         except Exception :
-            traceback.print_exc()
+            pass
 
 
     # 鼠标按下事件
@@ -2789,7 +2955,7 @@ class CustomTextBlockButton(QPushButton) :
                 self._isTracking = True
                 self._startPos = QPoint(e.x(), e.y())
         except Exception :
-            traceback.print_exc()
+            pass
 
 
     # 鼠标松开事件
@@ -2808,7 +2974,7 @@ class CustomTextBlockButton(QPushButton) :
                 self._move = False
 
         except Exception :
-            traceback.print_exc()
+            pass
 
 
 # 高级设置界面
@@ -3348,9 +3514,86 @@ class Setting(QWidget) :
 
 
 # 背景完全透明且不可被点击的按钮
-class TransparentButton(QPushButton):
+class TransparentButton(QPushButton) :
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None) :
+
         super().__init__(parent)
         self.setFlat(True)
         self.setStyleSheet("QPushButton { background-color: transparent; border:none; }")
+
+
+# 可绘制矩形框的QLabel
+class CustomPaintLabel(QLabel) :
+
+    paint_sign = pyqtSignal(int, int, int, int)
+    paint_reset_sign = pyqtSignal(bool)
+
+    def __init__(self, parent=None) :
+
+        super().__init__(parent)
+        self.paint_status = False
+        self.is_drawing = False
+        self.start_point = QPoint()
+        self.end_point = QPoint()
+
+
+    # 鼠标移动事件
+    def mouseMoveEvent(self, e: QMouseEvent) :
+
+        try :
+            if not self.paint_status :
+                return e.ignore()
+            if self.is_drawing :
+                self.end_point = e.pos()
+                if self.end_point != self.start_point :
+                    x, y, w, h = self.getRange()
+                    self.paint_sign.emit(x, y, w, h)
+        except:
+            pass
+
+
+    # 鼠标按下事件
+    def mousePressEvent(self, e: QMouseEvent) :
+
+        try :
+            if not self.paint_status :
+                return e.ignore()
+            if e.button() == Qt.LeftButton :
+                self.start_point = e.pos()
+                self.end_point = self.start_point
+                self.is_drawing = True
+        except:
+            pass
+
+
+    # 鼠标松开事件
+    def mouseReleaseEvent(self, e: QMouseEvent) :
+
+        try :
+            if not self.paint_status :
+                return e.ignore()
+            if e.button() == Qt.LeftButton :
+                self.end_point = e.pos()
+                if self.end_point != self.start_point :
+                    self.paint_reset_sign.emit(True)
+                self.is_drawing = False
+                self.start_point = QPoint()
+                self.end_point = QPoint()
+        except:
+            pass
+
+
+    # 获取鼠标起始点坐标
+    def getRange(self) :
+
+        x = self.start_point.x()
+        if self.start_point.x() > self.end_point.x() :
+            x = self.end_point.x()
+        y = self.start_point.y()
+        if self.start_point.y() > self.end_point.y() :
+            y = self.end_point.y()
+        w = abs(self.end_point.x() - self.start_point.x())
+        h = abs(self.end_point.y() - self.start_point.y())
+
+        return x, y, w, h
