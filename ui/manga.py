@@ -2322,6 +2322,8 @@ class RenderTextBlock(QWidget) :
             self.scroll_area.setCursor(Qt.CrossCursor)
             self.image_label.setCursor(Qt.CrossCursor)
             self.manual_ocr_button.setStyleSheet("background-color: #83AAF9;")
+            self.object.manga_ui.last_page_button.hide()
+            self.object.manga_ui.next_page_button.hide()
         else :
             # 释放手动OCR按钮
             self.scroll_area.paint_status = False
@@ -2329,6 +2331,8 @@ class RenderTextBlock(QWidget) :
             self.scroll_area.setCursor(Qt.OpenHandCursor)
             self.image_label.setCursor(Qt.OpenHandCursor)
             self.manual_ocr_button.setStyleSheet("QPushButton:hover {background-color: #83AAF9;}")
+            self.object.manga_ui.last_page_button.show()
+            self.object.manga_ui.next_page_button.show()
 
 
 # 译文编辑界面
