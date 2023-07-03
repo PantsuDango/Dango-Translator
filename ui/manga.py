@@ -390,7 +390,7 @@ class Manga(QWidget) :
         dir_path = self.object.yaml.get("manga_dir_path", os.getcwd())
         options = QFileDialog.Options()
         images = []
-        if action.data() == "从文件导入":
+        if action.data() == "从文件导入" :
             images, _ = QFileDialog.getOpenFileNames(self,
                                                      "选择要翻译的生肉漫画原图（可多选）",
                                                      dir_path,
@@ -437,6 +437,14 @@ class Manga(QWidget) :
 
         else :
             return
+
+        for file_path in images :
+            file_name = os.path.basename(file_path)
+            base_path = os.path.dirname(file_path)
+            check_file_path = os.path.join(base_path, "dango_manga", "tmp", file_name)
+            if len(check_file_path) >= 250 :
+                utils.message.MessageBox("导入图片失败", "文件地址过长:\n%s"%file_path)
+                return
 
         if images :
             # 清除所有图片
