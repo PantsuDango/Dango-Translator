@@ -1017,7 +1017,7 @@ class Manga(QWidget) :
         utils.thread.runQThread(thread)
 
 
-    # 在线OCR配置过滤
+    # 漫画OCR配置过滤
     def mangaOcrFilter(self, result) :
 
         # 过滤错误的文本块
@@ -1819,7 +1819,7 @@ class RenderTextBlock(QWidget) :
                 rdr_image_path=self.image_path,
                 font_type=text_block.get("font_selector", "Noto_Sans_SC/NotoSansSC-Regular"),
                 shadow_size=text_block.get("shadow_size", 4),
-                text_size=text_block.get("text_size", 40)
+                text_size=text_block.get("text_size", 36)
             )
             # 打开文本框编辑信号
             button.click_signal.connect(self.clickTextBlock)
@@ -1843,6 +1843,17 @@ class RenderTextBlock(QWidget) :
             self.paint_button.setCursor(ui.static.icon.EDIT_CURSOR)
             self.paint_button.setStyleSheet("QPushButton {background: transparent; border: 2px solid red;}"
                                             "QPushButton:hover {background-color:rgba(62, 62, 62, 0.1)}")
+            # 打开文本框编辑信号
+            self.paint_button.click_signal.connect(self.clickTextBlock)
+            # 移动文本框信号
+            self.paint_button.move_signal.connect(self.refreshTextBlockPosition)
+            self.paint_button.setGeometry(x, y, w, h)
+            self.paint_button.setStyleSheet("QPushButton {background: transparent; border: 2px solid red;}"
+                                            "QPushButton:hover {background-color:rgba(62, 62, 62, 0.1)}")
+            # 文本框右键菜单
+            self.paint_button.setContextMenuPolicy(Qt.CustomContextMenu)
+            self.paint_button.customContextMenuRequested.connect(lambda _, b=self.paint_button: self.showTextBlockButtonMenu(b))
+
             self.paint_button.show()
 
         self.paint_button.setGeometry(x, y, w, h)
@@ -1851,72 +1862,158 @@ class RenderTextBlock(QWidget) :
     # 结束绘制矩形框按钮信号槽
     def paintTextBlockButtonReset(self, sign) :
 
-        # 如果框太小就直接删掉, 防止误操作绘制出错误的框
-        if self.paint_button :
-            if self.paint_button.width() > 10 and self.paint_button.height() > 10 :
-                # 计算坐标
-                x = int(self.paint_button.x() // self.image_rate[0])
-                y = int(self.paint_button.y() // self.image_rate[1])
-                w = int(self.paint_button.width() // self.image_rate[0])
-                h = int(self.paint_button.height() // self.image_rate[1])
-                # 打开原图, 按照坐标截图
-                image = Image.open(self.original_image_path)
-                cropped_image = image.crop((x, y, x+w, y+h))
-                # 截图转换为base64
-                buffered = io.BytesIO()
-                cropped_image.save(buffered, format="PNG")
-                image_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
-                # 请求mangaOCR
-                sign, ocr_result = translator.ocr.dango.mangaOCR(
-                    object=self.object,
-                    filepath=None,
-                    image_base64=image_base64,
-                    check_permission=self.object.manga_ui.check_permission
-                )
-                # OCR成功
-                if sign :
-                    ocr_result = self.object.manga_ui.mangaOcrFilter(ocr_result)
-                    # 请求漫画ipt
-                    sign, ipt_result = translator.ocr.dango.mangaIPT(
-                        object=self.object,
-                        filepath=None,
-                        mask=ocr_result["mask"],
-                        image_base64=image_base64,
-                        check_permission=self.object.manga_ui.check_permission
-                    )
-                    # ipt成功
-                    if sign :
-                        # ipt后的截图贴回rdr图上
-                        ipt_cut_image = Image.open(io.BytesIO(base64.b64decode(ipt_result["inpainted_image"])))
-                        rdr_image = Image.open(self.image_path)
-                        rdr_image.paste(ipt_cut_image, (x, y))
-                        rdr_image.save(self.image_path)
-                        # ipt后的截图贴回ipt图上
-                        ipt_image = Image.open(self.ipt_image_path)
-                        ipt_image.paste(ipt_cut_image, (x, y))
-                        ipt_image.save(self.ipt_image_path)
-
-                        # 请求翻译
-                        # sign, trans_result = self.object.manga_ui.mangaTransFilter(ocr_result)
-                        # if sign :
-
-                        # 刷新大图
-                        init_image_rate = copy.deepcopy(self.image_rate)
-                        self.loadImage()
-                        self.matchButtonSize()
-                        self.object.manga_ui.setImageInitRate(init_image_rate)
-
-
-                        self.paint_button.rect = (x, y, w, h)
-                        self.button_list.append(self.paint_button)
-                    else :
-                        self.paint_button.deleteLater()
-                else :
-                    self.paint_button.deleteLater()
-            else :
+        try :
+            if not self.paint_button :
+                if self.paint_status :
+                    self.manualOCR()
+                return
+            # 如果框太小就直接删掉, 防止误操作绘制出错误的框
+            if self.paint_button.width() <= 10 and self.paint_button.height() <= 10 :
                 self.paint_button.deleteLater()
+                if self.paint_status :
+                    self.manualOCR()
+                return
 
-        self.paint_button = None
+            # 计算坐标
+            x = int(self.paint_button.x() / self.image_rate[0])
+            y = int(self.paint_button.y() / self.image_rate[1])
+            w = int(self.paint_button.width() / self.image_rate[0])
+            h = int(self.paint_button.height() / self.image_rate[1])
+            # 打开原图, 按照坐标截图
+            original_image = Image.open(self.original_image_path)
+            original_cut_image = original_image.crop((x, y, x+w, y+h))
+            # 截图转换为base64
+            buffered = io.BytesIO()
+            original_cut_image.save(buffered, format="PNG")
+            original_cut_image_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
+
+            # 请求OCR
+            sign, ocr_result = translator.ocr.dango.mangaOCR(
+                object=self.object,
+                filepath=None,
+                image_base64=original_cut_image_base64,
+                check_permission=self.object.manga_ui.check_permission
+            )
+            if not sign :
+                utils.message.MessageBox("文字识别失败", ocr_result, self.rate)
+                self.paint_button.deleteLater()
+                if self.paint_status :
+                    self.manualOCR()
+                return
+            if len(ocr_result["text_block"]) != 1 :
+                utils.message.MessageBox("手动识别失败", "无效的文本区域", self.rate)
+                self.paint_button.deleteLater()
+                if self.paint_status :
+                    self.manualOCR()
+                return
+
+            # OCR配置过滤
+            ocr_result = self.object.manga_ui.mangaOcrFilter(ocr_result)
+
+            # 请求ipt
+            sign, ipt_result = translator.ocr.dango.mangaIPT(
+                object=self.object,
+                filepath=None,
+                mask=ocr_result["mask"],
+                image_base64=original_cut_image_base64,
+                check_permission=self.object.manga_ui.check_permission
+            )
+            if not sign :
+                utils.message.MessageBox("文字消除失败", ipt_result, self.rate)
+                self.paint_button.deleteLater()
+                if self.paint_status :
+                    self.manualOCR()
+                return
+
+            # 请求翻译
+            sign, trans_result = self.object.manga_ui.mangaTransFilter(ocr_result)
+            if not sign :
+                utils.message.MessageBox("翻译失败", trans_result, self.rate)
+                self.paint_button.deleteLater()
+                if self.paint_status :
+                    self.manualOCR()
+                return
+            ocr_result = trans_result
+
+            # 请求rdr
+            sign, rdr_result = translator.ocr.dango.mangaRDR(
+                object=self.object,
+                trans_list=ocr_result["translated_text"],
+                inpainted_image=ipt_result["inpainted_image"],
+                text_block=ocr_result["text_block"],
+                font=self.object.config["mangaFontType"],
+                check_permission=self.object.manga_ui.check_permission
+            )
+            if not sign :
+                utils.message.MessageBox("文字渲染失败", rdr_result, self.rate)
+                self.paint_button.deleteLater()
+                if self.paint_status :
+                    self.manualOCR()
+                return
+
+            # 重新计算 block_coordinate
+            for k, v in ocr_result["text_block"][0]["block_coordinate"].items() :
+                v[0] += x
+                v[1] += y
+                ocr_result["text_block"][0]["block_coordinate"][k] = v
+            # 重新计算 coordinate
+            for i, coordinate in enumerate(ocr_result["text_block"][0]["coordinate"]) :
+                for k, v in coordinate.items() :
+                    v[0] += x
+                    v[1] += y
+                    ocr_result["text_block"][0]["coordinate"][i][k] = v
+
+            # 全部都成功, 刷新新的文本框按钮信息
+            del ocr_result["mask"]
+            self.paint_button.initConfig(
+                text_block=ocr_result["text_block"][0],
+                trans=ocr_result["translated_text"][0],
+                rect=(x, y, w, h),
+                index=len(self.button_list),
+                original_image_path=self.original_image_path,
+                ipt_image_path=self.ipt_image_path,
+                rdr_image_path=self.image_path,
+                font_type=ocr_result["text_block"][0].get("font_selector", "Noto_Sans_SC/NotoSansSC-Regular"),
+                shadow_size=ocr_result["text_block"][0].get("shadow_size", 4),
+                text_size=ocr_result["text_block"][0].get("text_size", 36)
+            )
+            self.button_list.append(self.paint_button)
+
+            # 渲染后的新图贴在大图上
+            rdr_cut_image = Image.open(io.BytesIO(base64.b64decode(rdr_result["rendered_image"])))
+            rdr_image = Image.open(self.image_path)
+            rdr_image.paste(rdr_cut_image, (x, y))
+            rdr_image.save(self.image_path)
+            # ipt后的截图贴回ipt图上
+            ipt_cut_image = Image.open(io.BytesIO(base64.b64decode(ipt_result["inpainted_image"])))
+            ipt_image = Image.open(self.ipt_image_path)
+            ipt_image.paste(ipt_cut_image, (x, y))
+            ipt_image.save(self.ipt_image_path)
+
+            # 刷新缓存文件中获取json结果
+            file_name = os.path.splitext(os.path.basename(self.original_image_path))[0]
+            json_file_path = os.path.join(os.path.dirname(self.ipt_image_path), "%s.json"%file_name)
+            with open(json_file_path, "r", encoding="utf-8") as file :
+                json_data = json.load(file)
+            json_data["translated_text"].append(self.paint_button.trans)
+            json_data["text_block"].append(self.paint_button.text_block)
+            # 缓存ocr结果
+            with open(json_file_path, "w", encoding="utf-8") as file :
+                json.dump(json_data, file, indent=4)
+
+            # 刷新大图
+            init_image_rate = copy.deepcopy(self.image_rate)
+            self.loadImage()
+            self.matchButtonSize()
+            self.object.manga_ui.setImageInitRate(init_image_rate)
+
+        except Exception as err :
+            self.logger.error(traceback.format_exc())
+            utils.message.MessageBox("手动识别失败", traceback.format_exc(), self.rate)
+            self.paint_button.deleteLater()
+        finally :
+            if self.paint_status :
+                self.manualOCR()
 
 
     # 加载大图
@@ -2057,36 +2154,40 @@ class RenderTextBlock(QWidget) :
     # 删除文本块
     def deleteTextBlock(self, button) :
 
-        # 打开原图, 按照文本块坐标截图
-        image = Image.open(self.original_image_path)
-        x, y, w, h = button.rect[0], button.rect[1], button.rect[2], button.rect[3]
-        cropped_image = image.crop((x, y, x + w, y + h))
-        # 打开rdr图片, 将截图贴图
-        rdr_image = Image.open(self.image_path)
-        rdr_image.paste(cropped_image, (x, y))
-        rdr_image.save(self.image_path)
+        try :
+            # 打开原图, 按照文本块坐标截图
+            image = Image.open(self.original_image_path)
+            x, y, w, h = button.rect[0], button.rect[1], button.rect[2], button.rect[3]
+            cropped_image = image.crop((x, y, x + w, y + h))
+            # 打开rdr图片, 将截图贴图
+            rdr_image = Image.open(self.image_path)
+            rdr_image.paste(cropped_image, (x, y))
+            rdr_image.save(self.image_path)
 
-        # 刷新缓存文件中获取json结果
-        file_name = os.path.splitext(os.path.basename(self.original_image_path))[0]
-        json_file_path = os.path.join(os.path.dirname(self.ipt_image_path), "%s.json"%file_name)
-        with open(json_file_path, "r", encoding="utf-8") as file :
-            json_data = json.load(file)
-        del json_data["translated_text"][button.index]
-        del json_data["text_block"][button.index]
-        # 缓存ocr结果
-        with open(json_file_path, "w", encoding="utf-8") as file :
-            json.dump(json_data, file, indent=4)
-        # 删除文本框按钮
-        button.close()
-        del self.button_list[button.index]
-        # 刷新文本框按钮索引值
-        for i, button in enumerate(self.button_list) :
-            button.index = i
-        # 刷新大图
-        init_image_rate = copy.deepcopy(self.image_rate)
-        self.loadImage()
-        self.matchButtonSize()
-        self.object.manga_ui.setImageInitRate(init_image_rate)
+            # 刷新缓存文件中获取json结果
+            file_name = os.path.splitext(os.path.basename(self.original_image_path))[0]
+            json_file_path = os.path.join(os.path.dirname(self.ipt_image_path), "%s.json"%file_name)
+            with open(json_file_path, "r", encoding="utf-8") as file :
+                json_data = json.load(file)
+            del json_data["translated_text"][button.index]
+            del json_data["text_block"][button.index]
+            # 缓存ocr结果
+            with open(json_file_path, "w", encoding="utf-8") as file :
+                json.dump(json_data, file, indent=4)
+            # 删除文本框按钮
+            button.close()
+            del self.button_list[button.index]
+            # 刷新文本框按钮索引值
+            for i, button in enumerate(self.button_list) :
+                button.index = i
+            # 刷新大图
+            init_image_rate = copy.deepcopy(self.image_rate)
+            self.loadImage()
+            self.matchButtonSize()
+            self.object.manga_ui.setImageInitRate(init_image_rate)
+        except Exception :
+            self.logger.error(traceback.format_exc())
+            utils.message.MessageBox("删除文本块失败", traceback.format_exc(), self.rate)
 
 
     # 移动文本块位置后重新渲染
@@ -2140,7 +2241,7 @@ class RenderTextBlock(QWidget) :
                 check_permission=self.object.manga_ui.check_permission
             )
             if not sign or not result.get("rendered_image", ""):
-                # @TODO 错误处理
+                utils.message.MessageBox("移动文本块失败", result, self.rate)
                 return
 
             # 渲染后的新图贴在rdr大图上
@@ -2191,13 +2292,14 @@ class RenderTextBlock(QWidget) :
             self.object.manga_ui.setImageInitRate(init_image_rate)
 
         except Exception :
-            traceback.print_exc()
-
+            self.logger.error(traceback.format_exc())
+            utils.message.MessageBox("移动文本块失败", traceback.format_exc(), self.rate)
 
     # 手动OCR
     def manualOCR(self) :
 
         self.paint_status = not self.paint_status
+        self.paint_button = None
 
         if self.paint_status :
             # 按下手动OCR按钮
@@ -2578,14 +2680,19 @@ class TransEdit(QWidget) :
             text_block["background_color"] = [b_r, b_g, b_b]
 
             # 重新计算截图后的坐标
+            diff_w = text_block["block_coordinate"]["upper_left"][0]
+            diff_h = text_block["block_coordinate"]["upper_left"][1]
             text_block["block_coordinate"]["upper_left"] = [0, 0]
-            text_block["block_coordinate"]["upper_right"] = [w, 0]
-            text_block["block_coordinate"]["lower_right"] = [w, h]
-            text_block["block_coordinate"]["lower_left"] = [0, h]
+            text_block["block_coordinate"]["upper_right"] = [text_block["block_coordinate"]["upper_right"][0]-diff_w, 0]
+            text_block["block_coordinate"]["lower_right"] = [
+                text_block["block_coordinate"]["lower_right"][0]-diff_w,
+                text_block["block_coordinate"]["lower_right"][1]-diff_h
+            ]
+            text_block["block_coordinate"]["lower_left"] = [0, text_block["block_coordinate"]["lower_left"][1]-diff_h]
             for i, val in enumerate(text_block["coordinate"]) :
                 coordinate = {}
                 for k in val.keys() :
-                    coordinate[k] = [val[k][0] - x, val[k][1] - y]
+                    coordinate[k] = [val[k][0]-diff_w, val[k][1]-diff_h]
                 text_block["coordinate"][i] = coordinate
 
             # 轮廓宽度
@@ -2603,8 +2710,7 @@ class TransEdit(QWidget) :
                 check_permission=self.object.manga_ui.check_permission
             )
             if not sign or not result.get("rendered_image", "") :
-                print(result)
-                #@TODO 错误处理
+                utils.message.MessageBox("重新贴字失败", result, self.rate)
                 return
 
             # 渲染后的新图贴在大图上
@@ -2646,7 +2752,8 @@ class TransEdit(QWidget) :
             self.object.manga_ui.setImageInitRate(init_image_rate)
 
         except Exception :
-            traceback.print_exc()
+            self.logger.error(traceback.print_exc())
+            utils.message.MessageBox("重新贴字失败", traceback.print_exc(), self.rate)
 
 
     # 刷新翻译结果
@@ -2656,15 +2763,23 @@ class TransEdit(QWidget) :
         if not original.strip() :
             return
         if trans_type == "团子" :
-            sign, result = translator.ocr.dango.dangoTrans(object=self.object,
-                                                           sentence=original,
-                                                           language=self.object.config["mangaLanguage"])
+            sign, result = translator.ocr.dango.dangoTrans(
+                object=self.object,
+                sentence=original,
+                language=self.object.config["mangaLanguage"]
+            )
+            if not sign :
+                utils.message.MessageBox("团子翻译失败", result, self.rate)
+                return
         elif trans_type == "彩云" :
             result = translator.api.caiyun(
                 sentence=original,
                 token=self.object.config["caiyunAPI"],
                 logger=self.logger
             )
+            if result[:6] == "私人彩云: ":
+                utils.message.MessageBox("彩云翻译失败", result, self.rate)
+                return
         elif trans_type == "腾讯":
             result = translator.api.tencent(
                 sentence=original,
@@ -2672,6 +2787,9 @@ class TransEdit(QWidget) :
                 secret_key=self.object.config["tencentAPI"]["Secret"],
                 logger=self.logger
             )
+            if result[:6] == "私人腾讯: ":
+                utils.message.MessageBox("腾讯翻译失败", result, self.rate)
+                return
         elif trans_type == "百度":
             result = translator.api.baidu(
                 sentence=original,
@@ -2679,6 +2797,9 @@ class TransEdit(QWidget) :
                 secret_key=self.object.config["baiduAPI"]["Secret"],
                 logger=self.logger
             )
+            if result[:6] == "私人百度: ":
+                utils.message.MessageBox("百度翻译失败", result, self.rate)
+                return
         elif trans_type == "ChatGPT":
             result = translator.api.chatgpt(
                 api_key=self.object.config["chatgptAPI"],
@@ -2689,6 +2810,9 @@ class TransEdit(QWidget) :
                 content=original,
                 logger=self.logger
             )
+            if result[:11] == "私人ChatGPT: ":
+                utils.message.MessageBox("ChatGPT翻译失败", result, self.rate)
+                return
         elif trans_type == "阿里云":
             sign, result = translator.api.aliyun(
                 access_key_id=self.object.config["aliyunAPI"]["Key"],
@@ -2697,6 +2821,9 @@ class TransEdit(QWidget) :
                 text_to_translate=original,
                 logger=self.object.logger
             )
+            if not sign :
+                utils.message.MessageBox("阿里云翻译失败", result, self.rate)
+                return
         else :
             return
 
@@ -2753,7 +2880,7 @@ class TransEdit(QWidget) :
             self.font_box.setItemText(index, font)
 
 
-# 根据文本块大小计算font_size
+# 根据文本块大小计算 font_size
 def getFontSize(coordinate, trans_text) :
 
     lines = []
