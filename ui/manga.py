@@ -2121,9 +2121,6 @@ class RenderTextBlock(QWidget) :
     # 鼠标滚轮信号
     def wheelEvent(self, event) :
 
-        if self.paint_status :
-            return event.ignore()
-
         if event.angleDelta().y() > 0 :
             if (self.image_rate[0] > 3 or self.image_rate[1] > 3) :
                 return
