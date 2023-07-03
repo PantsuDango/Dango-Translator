@@ -1443,19 +1443,29 @@ class Settin(QMainWindow) :
         self.customSetGeometry(label, 105, 230, 400, 20)
         label.setText("开启软件后自动登录账号")
 
+        # 自动打开图片翻译
+        self.auto_open_manga_switch = ui.switch.SwitchOCR(other_tab, sign=self.auto_open_manga_use, startX=(65-20) * self.rate)
+        self.customSetGeometry(self.auto_open_manga_switch, 20, 280, 65, 20)
+        self.auto_open_manga_switch.checkedChanged.connect(self.changeAutoOpenMangaSwitch)
+        self.auto_open_manga_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 自动打开图片翻译标签
+        label = QLabel(other_tab)
+        self.customSetGeometry(label, 105, 280, 400, 20)
+        label.setText("登录后自动打开图片翻译界面")
+
         # 同意收集翻译历史开关
         self.agree_collect_switch = ui.switch.SwitchOCR(other_tab, sign=self.agree_collect_use, startX=(65-20) * self.rate)
-        self.customSetGeometry(self.agree_collect_switch, 20, 280, 65, 20)
+        self.customSetGeometry(self.agree_collect_switch, 20, 330, 65, 20)
         self.agree_collect_switch.checkedChanged.connect(self.changeAgreeCollectSwitch)
         self.agree_collect_switch.setCursor(ui.static.icon.SELECT_CURSOR)
         # 同意收集翻译历史标签
         label = QLabel(other_tab)
-        self.customSetGeometry(label, 105, 280, 300, 20)
+        self.customSetGeometry(label, 105, 330, 300, 20)
         label.setText("加入用户体验改善计划")
         # 同意收集翻译历史?号图标
         button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", other_tab)
         self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 250, 280, 20, 20)
+        self.customSetGeometry(button, 250, 330, 20, 20)
         button.setStyleSheet("background: transparent;")
         button.clicked.connect(lambda: self.showDesc("agreeCollect"))
         button.setCursor(ui.static.icon.QUESTION_CURSOR)
@@ -1806,6 +1816,8 @@ class Settin(QMainWindow) :
         self.range_hotkey_use = eval(self.object.config["showHotKey2"])
         # 自动登录开关
         self.auto_login_use = self.object.yaml["auto_login"]
+        # 自动打开图片翻译界面
+        self.auto_open_manga_use = self.object.yaml["auto_open_manga_use"]
         # 自动翻译图片刷新相似度
         self.image_refresh_score = self.object.config["imageSimilarity"]
         # 自动翻译文字刷新相似度
@@ -2294,6 +2306,15 @@ class Settin(QMainWindow) :
             self.auto_login_use = True
         else:
             self.auto_login_use = False
+
+
+    # 改变自动打开图片翻译界面开关状态
+    def changeAutoOpenMangaSwitch(self, checked):
+
+        if checked:
+            self.auto_open_manga_use = True
+        else:
+            self.auto_open_manga_use = False
 
 
     # 改变同步翻译历史开关状态
@@ -3096,6 +3117,8 @@ class Settin(QMainWindow) :
         self.object.config["textSimilarity"] = self.text_refresh_spinBox.value()
         # 自动登录开关
         self.object.yaml["auto_login"] = self.auto_login_use
+        # 自动打开图片翻译界面开关
+        self.object.yaml["auto_open_manga_use"] = self.auto_open_manga_use
         # 百度OCR高精度开关
         self.object.config["OCR"]["highPrecision"] = self.baidu_ocr_high_precision_use
         # 显示消息栏

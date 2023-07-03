@@ -123,6 +123,9 @@ class DangoTranslator :
             self.hwndObj.run()
         # 清理历史日志缓存
         utils.thread.createThread(utils.logger.clearLog)
+        # 登录后自动打开图片翻译界面
+        if self.yaml["auto_open_manga_use"] :
+            self.clickManga()
 
 
     # 点击图片翻译键

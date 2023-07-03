@@ -50,6 +50,9 @@ def openConfig(logger) :
     # 2022.03.08 修改参数
     if "dict_info_url" in config.keys():
         config["dict_info_url"] = "https://trans.dango.cloud/DangoTranslate/ShowDict"
+    # 2023.07.03 添加新参数
+    if "auto_open_manga_use" not in config.keys():
+        config["auto_open_manga_use"] = False
 
     return config
 
