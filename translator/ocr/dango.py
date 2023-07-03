@@ -364,7 +364,7 @@ def offlineOCR(object) :
 
 
 # 漫画OCR
-def mangaOCR(object, filepath, image_base64=None, check_permission=False) :
+def mangaOCR(object, filepath, image_base64=None, filtrate=True, check_permission=False) :
 
     token = object.config.get("DangoToken", "")
     if token == "" :
@@ -384,7 +384,7 @@ def mangaOCR(object, filepath, image_base64=None, check_permission=False) :
         "token": token,
         "mask": True,
         "refine": True,
-        "filtrate": object.config.get("mangaFiltrateUse", True),
+        "filtrate": filtrate,
         "detect_scale": object.config.get("mangaDetectScale", 1),
         "image": image_base64
     }

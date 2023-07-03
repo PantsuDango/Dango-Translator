@@ -1092,7 +1092,8 @@ class Manga(QWidget) :
     # 漫画OCR
     def mangaOCR(self, image_path) :
 
-        sign, result = translator.ocr.dango.mangaOCR(self.object, image_path, None, self.check_permission)
+        filtrate = self.object.config.get("mangaFiltrateUse", True)
+        sign, result = translator.ocr.dango.mangaOCR(self.object, image_path, None, filtrate, self.check_permission)
         if sign :
             # 缓存mask图片
             with open(self.getMaskFilePath(image_path), "wb") as file :
@@ -1900,6 +1901,7 @@ class RenderTextBlock(QWidget) :
                 object=self.object,
                 filepath=None,
                 image_base64=original_cut_image_base64,
+                filtrate=False,
                 check_permission=self.object.manga_ui.check_permission
             )
             if not sign :
@@ -1914,7 +1916,6 @@ class RenderTextBlock(QWidget) :
                 if self.paint_status :
                     self.manualOCR()
                 return
-
             # OCR配置过滤
             ocr_result = self.object.manga_ui.mangaOcrFilter(ocr_result)
 
