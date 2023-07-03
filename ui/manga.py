@@ -700,15 +700,23 @@ class Manga(QWidget) :
     def refreshStatusLabel(self) :
 
         if self.check_permission :
-            probate_switch = "打开"
-        else :
-            probate_switch = "关闭"
-        self.status_label.setText(
-            "原文语种: {}     翻译源: {}     试用开关: {}     剩余试用次数: {}"
-            .format(self.language_map[self.object.config["mangaLanguage"]],
+            self.status_label.setText(
+                "原文语种: {}     翻译源: {}     试用开关: {}     剩余试用次数: {}"
+                .format(
+                    self.language_map[self.object.config["mangaLanguage"]],
                     self.object.config["mangaTrans"],
-                    probate_switch,
-                    self.manga_read_count))
+                    "打开",
+                    self.manga_read_count
+                ))
+        else :
+            self.status_label.setText(
+                "原文语种: {}     翻译源: {}     试用开关: {}"
+                .format(
+                    self.language_map[self.object.config["mangaLanguage"]],
+                    self.object.config["mangaTrans"],
+                    "关闭",
+                ))
+
 
 
     # 设置原图列表框右键菜单
