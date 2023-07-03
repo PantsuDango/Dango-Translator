@@ -1838,7 +1838,7 @@ class Settin(QMainWindow) :
         # Cypas_Nya‭个人主页
         self.cy_github_url = "https://blog.ayano.top"
         # PaddleOCR项目主页
-        self.PaddleOCR_github_url = "https://github.com/PaddlePaddle/PaddleOCR"
+        self.paddle_ocr_github_url = "https://github.com/PaddlePaddle/PaddleOCR"
         # 更新日志
         self.bilibili_video_url = self.object.yaml["dict_info"]["bilibili_video"]
         # 显示消息栏
@@ -2386,6 +2386,8 @@ class Settin(QMainWindow) :
             webbrowser.open(url, new=0, autoraise=True)
         except Exception :
             self.logger.error(format_exc())
+            utils.message.MessageBox("打开失败",
+                                     "请尝试手动打开此地址:\n%s     "%url)
 
 
     # 打开公共翻译教程
@@ -2396,6 +2398,8 @@ class Settin(QMainWindow) :
             webbrowser.open(url, new=0, autoraise=True)
         except Exception:
             self.logger.error(format_exc())
+            utils.message.MessageBox("打开失败",
+                                     "请尝试手动打开此地址:\n%s     "%url)
 
 
     # 打开私人百度翻译教程
@@ -2406,6 +2410,8 @@ class Settin(QMainWindow) :
             webbrowser.open(url, new=0, autoraise=True)
         except Exception:
             self.logger.error(format_exc())
+            utils.message.MessageBox("打开失败",
+                                     "请尝试手动打开此地址:\n%s     "%url)
 
 
     # 打开私人彩云翻译教程
@@ -2416,6 +2422,8 @@ class Settin(QMainWindow) :
             webbrowser.open(url, new=0, autoraise=True)
         except Exception:
             self.logger.error(format_exc())
+            utils.message.MessageBox("打开失败",
+                                     "请尝试手动打开此地址:\n%s     "%url)
 
 
     # 打开私人ChatGPT翻译教程
@@ -2426,6 +2434,8 @@ class Settin(QMainWindow) :
             webbrowser.open(url, new=0, autoraise=True)
         except Exception:
             self.logger.error(format_exc())
+            utils.message.MessageBox("打开失败",
+                                     "请尝试手动打开此地址:\n%s     "%url)
 
 
     # 打开私人阿里云翻译教程
@@ -2436,6 +2446,8 @@ class Settin(QMainWindow) :
             webbrowser.open(url, new=0, autoraise=True)
         except Exception :
             self.logger.error(format_exc())
+            utils.message.MessageBox("打开失败",
+                                     "请尝试手动打开此地址:\n%s    "%url)
 
 
     # 打开本地OCR教程
@@ -2446,6 +2458,8 @@ class Settin(QMainWindow) :
             webbrowser.open(url, new=0, autoraise=True)
         except Exception :
             self.logger.error(format_exc())
+            utils.message.MessageBox("打开失败",
+                                     "请尝试手动打开此地址:\n%s     "%url)
 
 
     # 打开github项目地址
@@ -2455,6 +2469,8 @@ class Settin(QMainWindow) :
             webbrowser.open(self.dango_translator_url, new=0, autoraise=True)
         except Exception :
             self.logger.error(format_exc())
+            utils.message.MessageBox("打开失败",
+                                     "请尝试手动打开此地址:\n%s     "%self.dango_translator_url)
 
 
     # 打开软件首页
@@ -2465,6 +2481,8 @@ class Settin(QMainWindow) :
             webbrowser.open(url, new=0, autoraise=True)
         except Exception :
             self.logger.error(format_exc())
+            utils.message.MessageBox("打开失败",
+                                     "请尝试手动打开此地址:\n%s     "%url)
 
 
     # 打开在线教程地址
@@ -2474,6 +2492,8 @@ class Settin(QMainWindow) :
             webbrowser.open(self.tutorial_url, new=0, autoraise=True)
         except Exception :
             self.logger.error(format_exc())
+            utils.message.MessageBox("打开失败",
+                                     "请尝试手动打开此地址:\n%s     "%self.tutorial_url)
 
 
     # 打开添加作者地址
@@ -2483,6 +2503,8 @@ class Settin(QMainWindow) :
             webbrowser.open(self.dango_bilibili_url, new=0, autoraise=True)
         except Exception :
             self.logger.error(format_exc())
+            utils.message.MessageBox("打开失败",
+                                     "请尝试手动打开此地址:\n%s     "%self.dango_bilibili_url)
 
 
     # 打开更新日志地址
@@ -2492,15 +2514,19 @@ class Settin(QMainWindow) :
             webbrowser.open(self.bilibili_video_url, new=0, autoraise=True)
         except Exception :
             self.logger.error(format_exc())
+            utils.message.MessageBox("打开失败",
+                                     "请尝试手动打开此地址:\n%s     "%self.bilibili_video_url)
 
 
     # 打开PaddleOCR项目地址
     def openPaddleOCR(self):
 
         try :
-            webbrowser.open(self.PaddleOCR_github_url, new=0, autoraise=True)
+            webbrowser.open(self.paddle_ocr_github_url, new=0, autoraise=True)
         except Exception :
             self.logger.error(format_exc())
+            utils.message.MessageBox("打开失败",
+                                     "请尝试手动打开此地址:\n%s     "%self.paddle_ocr_github_url)
 
 
     # 打开Gt-Zhang项目地址
@@ -2510,6 +2536,8 @@ class Settin(QMainWindow) :
             webbrowser.open(self.gt_github_url, new=0, autoraise=True)
         except Exception :
             self.logger.error(format_exc())
+            utils.message.MessageBox("打开失败",
+                                     "请尝试手动打开此地址:\n%s     "%self.gt_github_url)
 
 
     # 打开c44项目地址
@@ -2519,6 +2547,8 @@ class Settin(QMainWindow) :
             webbrowser.open(self.c44_github_url, new=0, autoraise=True)
         except Exception :
             self.logger.error(format_exc())
+            utils.message.MessageBox("打开失败",
+                                     "请尝试手动打开此地址:\n%s     "%self.c44_github_url)
 
 
     # 打开Cy项目地址
@@ -2528,6 +2558,8 @@ class Settin(QMainWindow) :
             webbrowser.open(self.cy_github_url, new=0, autoraise=True)
         except Exception :
             self.logger.error(format_exc())
+            utils.message.MessageBox("打开失败",
+                                     "请尝试手动打开此地址:\n%s     "%self.cy_github_url)
 
 
     # 打开在线OCR教程地址
@@ -2538,6 +2570,8 @@ class Settin(QMainWindow) :
             webbrowser.open(url, new=0, autoraise=True)
         except Exception:
             self.logger.error(format_exc())
+            utils.message.MessageBox("打开失败",
+                                     "请尝试手动打开此地址:\n%s     "%url)
 
 
     # 打开百度OCR教程地址
@@ -2548,6 +2582,8 @@ class Settin(QMainWindow) :
             webbrowser.open(url, new=0, autoraise=True)
         except Exception:
             self.logger.error(format_exc())
+            utils.message.MessageBox("打开失败",
+                                     "请尝试手动打开此地址:\n%s     "%url)
 
 
     # 打开百度OCR额度查询地址
@@ -2646,6 +2682,8 @@ class Settin(QMainWindow) :
             webbrowser.open(url, new=0, autoraise=True)
         except Exception :
             self.logger.error(format_exc())
+            utils.message.MessageBox("打开失败",
+                                     "请尝试手动打开此地址:\n%s     "%url)
 
 
     # 翻译源字体颜色

@@ -1407,8 +1407,8 @@ class Manga(QWidget) :
             webbrowser.open(url, new=0, autoraise=True)
         except Exception:
             self.logger.error(format_exc())
-            utils.message.MessageBox("图片翻译教程",
-                                     "打开失败, 请尝试手动打开此地址\n%s     "%url)
+            utils.message.MessageBox("打开失败",
+                                     "请尝试手动打开此地址:\n%s     "%url)
 
 
     # 窗口尺寸变化信号
