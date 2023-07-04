@@ -285,7 +285,7 @@ class Translation(QMainWindow) :
         self.lock_button.hide()
 
         # 翻译历史按钮
-        self.trans_history_button = QPushButton(qtawesome.icon("fa5s.book-open", color=self.icon_color), "", self)
+        self.trans_history_button = QPushButton(qtawesome.icon("fa5s.history", color=self.icon_color), "", self)
         self.customSetIconSize(self.trans_history_button, 20, 20)
         self.trans_history_button.setGeometry(QRect(
             width + 394 * self.rate,
