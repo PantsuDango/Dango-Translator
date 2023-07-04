@@ -269,6 +269,11 @@ class Manga(QWidget) :
         self.show_error_label.hide()
         self.show_error_signal.connect(self.showError)
 
+        # 隐藏图片列表框按钮
+        self.hide_image_widget_button = CustomButton(self)
+        self.hide_image_widget_button.setHideStatus(True, ui.static.icon.LAST_PAGE_ICON)
+        self.hide_image_widget_button.clicked.connect(self.hideImageWidget)
+
         # 上一页按钮
         self.last_page_button = CustomButton(self)
         self.last_page_button.setIcon(ui.static.icon.LAST_PAGE_ICON)
@@ -340,6 +345,8 @@ class Manga(QWidget) :
             "webp": "WEBP",
             "WEBP": "WEBP"
         }
+        # 隐藏图片列表框状态, True-隐藏, False-不隐藏
+        self.hide_image_widget_status = False
 
 
     # 根据分辨率定义控件位置尺寸
@@ -361,6 +368,50 @@ class Manga(QWidget) :
         label.setStyleSheet("border-width: 1px; "
                             "border-style: solid; "
                             "border-color: rgba(62, 62, 62, 0.2);")
+
+
+    # 点击隐藏图片列表框按钮信号槽
+    def hideImageWidget(self) :
+
+        self.hide_image_widget_status = not self.hide_image_widget_status
+        if self.hide_image_widget_status :
+            # 隐藏图片列表框
+            self.original_image_button.hide()
+            self.edit_image_button.hide()
+            self.trans_image_button.hide()
+            self.original_image_widget.hide()
+            self.edit_image_widget.hide()
+            self.trans_image_widget.hide()
+            self.cut_line_label2.hide()
+            self.cut_line_label3.hide()
+            self.cut_line_label4.hide()
+            self.hide_image_widget_button.move(0, self.hide_image_widget_button.y())
+            self.show_image_scroll_area.setGeometry(
+                0, self.show_image_scroll_area.y(), self.width(),
+                self.show_image_scroll_area.height()
+            )
+            self.last_page_button.move(self.last_page_button.x()-self.cut_line_label4.x(), self.last_page_button.y())
+            self.hide_image_widget_button.setHideStatus(True, ui.static.icon.NEXT_PAGE_ICON)
+            self.hide_image_widget_button.setIcon(ui.static.icon.NEXT_PAGE_ICON)
+        else :
+            # 显示图片列表框
+            self.original_image_button.show()
+            self.edit_image_button.show()
+            self.trans_image_button.show()
+            self.original_image_widget.show()
+            self.edit_image_widget.show()
+            self.trans_image_widget.show()
+            self.cut_line_label2.show()
+            self.cut_line_label3.show()
+            self.cut_line_label4.show()
+            self.show_image_scroll_area.setGeometry(
+                self.cut_line_label4.x(), self.show_image_scroll_area.y(),
+                self.width()-self.cut_line_label4.x(), self.show_image_scroll_area.height()
+            )
+            self.last_page_button.move(self.last_page_button.x()+self.cut_line_label4.x(), self.last_page_button.y())
+            self.hide_image_widget_button.move(self.cut_line_label4.x(), self.hide_image_widget_button.y())
+            self.hide_image_widget_button.setHideStatus(True, ui.static.icon.LAST_PAGE_ICON)
+            self.hide_image_widget_button.setIcon(ui.static.icon.LAST_PAGE_ICON)
 
 
     # 上一页下一页按钮信号槽
@@ -545,7 +596,7 @@ class Manga(QWidget) :
                 return
 
         except Exception :
-            self.logger.error(traceback.print_exc())
+            self.logger.error(traceback.format_exc())
 
         os.startfile(folder_path)
 
@@ -1501,7 +1552,7 @@ class Manga(QWidget) :
         # 原图列表框
         self.original_image_widget.setGeometry(
             0, self.input_image_button.height() + self.original_image_button.height(),
-            self.cut_line_label4.x(), self.status_label.y() - (self.input_image_button.height() + self.original_image_button.height())
+            self.cut_line_label4.x(), self.status_label.y() - (self.input_image_button.height()+self.original_image_button.height())
         )
         # 编辑列表框
         self.edit_image_widget.setGeometry(
@@ -1514,10 +1565,16 @@ class Manga(QWidget) :
             self.cut_line_label4.x(), self.original_image_widget.height()
         )
         # 图片大图展示
-        self.show_image_scroll_area.setGeometry(
-            self.cut_line_label4.x(), self.input_image_button.height(),
-            w-self.cut_line_label4.x(), self.status_label.y() - self.input_image_button.height()
-        )
+        if self.hide_image_widget_status :
+            self.show_image_scroll_area.setGeometry(
+                0, self.input_image_button.height(),
+                w, self.status_label.y()-self.input_image_button.height()
+            )
+        else :
+            self.show_image_scroll_area.setGeometry(
+                self.cut_line_label4.x(), self.input_image_button.height(),
+                w-self.cut_line_label4.x(), self.status_label.y()-self.input_image_button.height()
+            )
         # 错误展示提示窗
         self.show_error_label.setGeometry(
             self.show_image_scroll_area.x(), self.show_image_scroll_area.y(),
@@ -1525,11 +1582,28 @@ class Manga(QWidget) :
         )
         self.show_error_label.setStyleSheet("background-color: #98ff98;"
                                             "font: %spt '%s';"%((self.font_size+5*w_rate), self.font_type))
+        # 隐藏图片列表框按钮
+        if self.hide_image_widget_status :
+            self.hide_image_widget_button.setGeometry(
+                0, (self.show_image_scroll_area.height()-100*h_rate) // 2,
+                15 * w_rate, 100 * h_rate
+            )
+        else :
+            self.hide_image_widget_button.setGeometry(
+                self.cut_line_label4.x(), (self.show_image_scroll_area.height()-100*h_rate) // 2,
+                15*w_rate, 100*h_rate
+            )
         # 上一页按钮
-        self.last_page_button.setGeometry(
-            self.cut_line_label4.x()+20*w_rate, (self.show_image_scroll_area.height() - 300 * h_rate) // 2,
-            50 * w_rate, 300 * h_rate
-        )
+        if self.hide_image_widget_status :
+            self.last_page_button.setGeometry(
+                20*w_rate, (self.show_image_scroll_area.height()-300*h_rate) // 2,
+                50*w_rate, 300*h_rate
+            )
+        else :
+            self.last_page_button.setGeometry(
+                self.cut_line_label4.x()+20*w_rate, (self.show_image_scroll_area.height()-300*h_rate) // 2,
+                50*w_rate, 300*h_rate
+            )
         # 下一页按钮
         self.next_page_button.setGeometry(
             w-self.last_page_button.width()-20*w_rate, self.last_page_button.y(),
@@ -1576,7 +1650,7 @@ class Manga(QWidget) :
             else:
                 event.ignore()
         except Exception :
-            traceback.print_exc()
+            self.logger.error(traceback.format_exc())
 
 
     # 拖拽导入文件
@@ -1610,7 +1684,7 @@ class Manga(QWidget) :
                 utils.thread.runQThread(thread)
 
         except Exception :
-            traceback.print_exc()
+            self.logger.error(traceback.format_exc())
 
 
     # 校验图片翻译接口权限
@@ -2322,8 +2396,9 @@ class RenderTextBlock(QWidget) :
             self.scroll_area.setCursor(Qt.CrossCursor)
             self.image_label.setCursor(Qt.CrossCursor)
             self.manual_ocr_button.setStyleSheet("background-color: #83AAF9;")
-            self.object.manga_ui.last_page_button.hide()
-            self.object.manga_ui.next_page_button.hide()
+            if not self.object.manga_ui.hide_image_widget_status :
+                self.object.manga_ui.last_page_button.hide()
+                self.object.manga_ui.next_page_button.hide()
         else :
             # 释放手动OCR按钮
             self.scroll_area.paint_status = False
@@ -2331,8 +2406,9 @@ class RenderTextBlock(QWidget) :
             self.scroll_area.setCursor(Qt.OpenHandCursor)
             self.image_label.setCursor(Qt.OpenHandCursor)
             self.manual_ocr_button.setStyleSheet("QPushButton:hover {background-color: #83AAF9;}")
-            self.object.manga_ui.last_page_button.show()
-            self.object.manga_ui.next_page_button.show()
+            if not self.object.manga_ui.hide_image_widget_status :
+                self.object.manga_ui.last_page_button.show()
+                self.object.manga_ui.next_page_button.show()
 
 
 # 译文编辑界面
@@ -2770,8 +2846,8 @@ class TransEdit(QWidget) :
             self.object.manga_ui.setImageInitRate(init_image_rate)
 
         except Exception :
-            self.logger.error(traceback.print_exc())
-            utils.message.MessageBox("重新贴字失败", traceback.print_exc(), self.rate)
+            self.logger.error(traceback.format_exc())
+            utils.message.MessageBox("重新贴字失败", traceback.format_exc(), self.rate)
 
 
     # 刷新翻译结果
@@ -2965,15 +3041,34 @@ def getFontSize(coordinate, trans_text) :
 class CustomButton(QPushButton) :
 
     def __init__(self, text) :
+
         super().__init__(text)
+        self.hide_status = False
+        self.icon = QIcon()
         self.setStyleSheet("background: transparent;")
 
+
+    # 设置隐藏状态
+    def setHideStatus(self, hide_status, icon) :
+
+        self.hide_status = hide_status
+        self.icon = icon
+
+
+    # 鼠标进入事件
     def enterEvent(self, a0) :
+
+        if self.hide_status :
+            self.setIcon(self.icon)
         self.setStyleSheet("background-color:rgba(62, 62, 62, 0.3)")
         self.show()
         return super().enterEvent(a0)
 
+    # 鼠标移出事件
     def leaveEvent(self, a0) :
+
+        if self.hide_status :
+            self.setIcon(QIcon())
         self.setStyleSheet("background: transparent;")
         return super().leaveEvent(a0)
 
