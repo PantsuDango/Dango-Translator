@@ -2843,6 +2843,17 @@ class TransEdit(QWidget) :
             json_file_path = os.path.join(os.path.dirname(self.button.ipt_image_path), "%s.json"%file_name)
             with open(json_file_path, "r", encoding="utf-8") as file :
                 json_data = json.load(file)
+
+            # 过滤translated_text长度和text_block长度不一致的情况
+            if "translated_text" not in json_data :
+                json_data["translated_text"] = []
+                for _ in range(len(json_data["text_block"])) :
+                    json_data["translated_text"].append("")
+            if len(json_data["translated_text"]) < self.button.index+1 :
+                diff_index = self.button.index+1 - len(json_data["translated_text"])
+                for _ in range(diff_index) :
+                    json_data["translated_text"].append("")
+
             json_data["translated_text"][self.button.index] = self.trans_text.toPlainText()
             json_data["text_block"][self.button.index]["foreground_color"] = [f_r, f_g, f_b]
             json_data["text_block"][self.button.index]["background_color"] = [b_r, b_g, b_b]
