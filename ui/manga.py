@@ -1867,7 +1867,8 @@ class RenderTextBlock(QWidget) :
         self.manual_ocr_button.setGeometry(0, 590*self.rate[1], 100*self.rate[0], 30*self.rate[1])
         self.manual_ocr_button.setStyleSheet("QPushButton:hover {background-color: #83AAF9;}")
         self.manual_ocr_button.clicked.connect(self.manualOCR)
-        self.manual_ocr_button.hide()
+        if not self.json_data :
+            self.manual_ocr_button.hide()
 
         # 显示图片缩放比例
         self.rate_label = TransparentButton(self)
@@ -1878,8 +1879,6 @@ class RenderTextBlock(QWidget) :
 
         if not self.json_data or not self.json_data.get("text_block", []) or not self.json_data.get("translated_text", []) :
             return
-        else :
-            self.manual_ocr_button.show()
 
         # 渲染文本框
         index = 0
