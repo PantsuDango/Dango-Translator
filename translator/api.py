@@ -295,6 +295,7 @@ def chatgpt(api_key, language, proxy, url, model, content, logger) :
                 # 多句子翻译的情况
                 if len(content_list) > 1 :
                     text = text.replace("{", "").replace("}", "")
+                    text = text.replace("翻译结果：", "").replace("翻译结果:", "").replace("翻译结果", "")
                     # 过滤多余的换行符
                     if "\n\n" in text :
                         text = re.sub("\n{2,}", "\n", text)
