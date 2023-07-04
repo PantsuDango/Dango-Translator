@@ -2273,8 +2273,12 @@ class RenderTextBlock(QWidget) :
             json_file_path = os.path.join(os.path.dirname(self.ipt_image_path), "%s.json"%file_name)
             with open(json_file_path, "r", encoding="utf-8") as file :
                 json_data = json.load(file)
-            del json_data["translated_text"][button.index]
-            del json_data["text_block"][button.index]
+            if "translated_text" in json_data :
+                if len(json_data["translated_text"]) == button.index + 1 :
+                    del json_data["translated_text"][button.index]
+            if "text_block" in json_data :
+                if len(json_data["text_block"]) == button.index + 1 :
+                    del json_data["text_block"][button.index]
             # 缓存ocr结果
             with open(json_file_path, "w", encoding="utf-8") as file :
                 json.dump(json_data, file, indent=4)
