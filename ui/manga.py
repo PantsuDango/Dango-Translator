@@ -52,6 +52,7 @@ class Manga(QWidget) :
         self.trans_edit_ui = TransEdit(object)
         self.show_image_widget = None
         self.show_error_sign = False
+        self.click_button_type = "original"
         utils.thread.createThread(self.checkPermission)
         self.flushed_render_image_and_text_block_signal.connect(self.transProcessFlushedRenderImageAndTextBlock)
 
@@ -68,8 +69,6 @@ class Manga(QWidget) :
         self.setCursor(ui.static.icon.PIXMAP_CURSOR)
         # 设置字体
         self.setStyleSheet("font: %spt '%s';"%(self.font_size, self.font_type))
-        # # 最大化
-        # self.setWindowState(Qt.WindowMaximized)
 
         # 底部状态栏
         self.status_label = QLabel(self)
@@ -421,9 +420,9 @@ class Manga(QWidget) :
             return
 
         image_widget = self.original_image_widget
-        if self.edit_image_widget.isVisible() :
+        if self.click_button_type == "edit" :
             image_widget = self.edit_image_widget
-        elif self.trans_image_widget.isVisible() :
+        elif self.click_button_type == "trans" :
             image_widget = self.trans_image_widget
 
         row = image_widget.currentRow()
@@ -651,8 +650,9 @@ class Manga(QWidget) :
 
 
     # 点击 原图/编辑/译图 按钮
-    def clickImageButton(self, button_type):
+    def clickImageButton(self, button_type) :
 
+        self.click_button_type = button_type
         self.original_image_widget.hide()
         self.edit_image_widget.hide()
         self.trans_image_widget.hide()
@@ -1765,16 +1765,16 @@ class Manga(QWidget) :
     # 左右切换图片列表框
     def switchImageWidget(self, sign) :
 
-        if self.original_image_widget.isVisible() and sign == "right" :
+        if self.click_button_type == "original" and sign == "right" :
             self.clickImageButton("edit")
             return
-        if self.edit_image_widget.isVisible() :
+        if self.click_button_type == "edit" :
             if sign == "left" :
                 self.clickImageButton("original")
             elif sign == "right" :
                 self.clickImageButton("trans")
             return
-        if self.trans_image_widget.isVisible() and sign == "left" :
+        if self.click_button_type == "trans" and sign == "left" :
             self.clickImageButton("edit")
             return
 
