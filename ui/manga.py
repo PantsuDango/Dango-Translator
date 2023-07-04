@@ -2325,15 +2325,22 @@ class RenderTextBlock(QWidget) :
 
             # 重新计算截图后的坐标
             text_block = copy.deepcopy(button.text_block)
-            text_block["block_coordinate"]["upper_left"] = [0, 0]
-            text_block["block_coordinate"]["upper_right"] = [w_n, 0]
-            text_block["block_coordinate"]["lower_right"] = [w_n, h_n]
-            text_block["block_coordinate"]["lower_left"] = [0, h_n]
+            diff_w = text_block["block_coordinate"]["upper_left"][0]
+            diff_h = text_block["block_coordinate"]["upper_left"][1]
+
+            x_list, y_list = [], []
             for i, val in enumerate(text_block["coordinate"]):
                 coordinate = {}
-                for k in val.keys():
-                    coordinate[k] = [val[k][0] - x_0, val[k][1] - y_0]
+                for k in val.keys() :
+                    coordinate[k] = [val[k][0] - diff_w, val[k][1] - diff_h]
+                    x_list.append(coordinate[k][0])
+                    y_list.append(coordinate[k][1])
                 text_block["coordinate"][i] = coordinate
+
+            text_block["block_coordinate"]["upper_left"] = [min(x_list), min(y_list)]
+            text_block["block_coordinate"]["upper_right"] = [max(x_list), min(y_list)]
+            text_block["block_coordinate"]["lower_right"] = [max(x_list), max(y_list)]
+            text_block["block_coordinate"]["lower_left"] = [min(x_list), max(y_list)]
 
             # 调用漫画rdr
             sign, result = translator.ocr.dango.mangaRDR(
@@ -2792,18 +2799,19 @@ class TransEdit(QWidget) :
             # 重新计算截图后的坐标
             diff_w = text_block["block_coordinate"]["upper_left"][0]
             diff_h = text_block["block_coordinate"]["upper_left"][1]
-            text_block["block_coordinate"]["upper_left"] = [0, 0]
-            text_block["block_coordinate"]["upper_right"] = [text_block["block_coordinate"]["upper_right"][0]-diff_w, 0]
-            text_block["block_coordinate"]["lower_right"] = [
-                text_block["block_coordinate"]["lower_right"][0]-diff_w,
-                text_block["block_coordinate"]["lower_right"][1]-diff_h
-            ]
-            text_block["block_coordinate"]["lower_left"] = [0, text_block["block_coordinate"]["lower_left"][1]-diff_h]
-            for i, val in enumerate(text_block["coordinate"]) :
+            x_list, y_list = [], []
+            for i, val in enumerate(text_block["coordinate"]):
                 coordinate = {}
-                for k in val.keys() :
-                    coordinate[k] = [val[k][0]-diff_w, val[k][1]-diff_h]
+                for k in val.keys():
+                    coordinate[k] = [val[k][0] - diff_w, val[k][1] - diff_h]
+                    x_list.append(coordinate[k][0])
+                    y_list.append(coordinate[k][1])
                 text_block["coordinate"][i] = coordinate
+
+            text_block["block_coordinate"]["upper_left"] = [min(x_list), min(y_list)]
+            text_block["block_coordinate"]["upper_right"] = [max(x_list), min(y_list)]
+            text_block["block_coordinate"]["lower_right"] = [max(x_list), max(y_list)]
+            text_block["block_coordinate"]["lower_left"] = [min(x_list), max(y_list)]
 
             # 轮廓宽度
             text_block["shadow_size"] = self.shadow_size_spinbox.value()
