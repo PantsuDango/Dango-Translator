@@ -1205,25 +1205,38 @@ class Manga(QWidget) :
         result = ""
         if original.strip() :
             if manga_trans == "私人团子" :
-                sign, result = translator.ocr.dango.dangoTrans(self.object, original,
-                                                               self.object.config["mangaLanguage"])
-                if not sign:
+                sign, result = translator.ocr.dango.dangoTrans(
+                    self.object,
+                    original,
+                    self.object.config["mangaLanguage"]
+                )
+                if not sign :
                     return False, result
 
             if manga_trans == "私人彩云" :
-                result = translator.api.caiyun(original, self.object.config["caiyunAPI"], self.logger)
+                result = translator.api.caiyun(
+                    original,
+                    self.object.config["caiyunAPI"],
+                    self.logger
+                )
                 if result[:6] == "私人彩云: " :
                     return False, result
 
             elif manga_trans == "私人腾讯" :
-                result = translator.api.tencent(original, self.object.config["tencentAPI"]["Key"],
-                                                self.object.config["tencentAPI"]["Secret"], self.logger)
+                result = translator.api.tencent(
+                    original,
+                    self.object.config["tencentAPI"]["Key"],
+                    self.object.config["tencentAPI"]["Secret"], self.logger
+                )
                 if result[:6] == "私人腾讯: " :
                     return False, result
 
             elif manga_trans == "私人百度" :
-                result = translator.api.baidu(original, self.object.config["baiduAPI"]["Key"],
-                                              self.object.config["baiduAPI"]["Secret"], self.logger)
+                result = translator.api.baidu(
+                    original,
+                    self.object.config["baiduAPI"]["Key"],
+                    self.object.config["baiduAPI"]["Secret"], self.logger
+                )
                 if result[:6] == "私人百度: " :
                     return False, result
 
@@ -2085,7 +2098,11 @@ class RenderTextBlock(QWidget) :
             json_file_path = os.path.join(os.path.dirname(self.ipt_image_path), "%s.json"%file_name)
             with open(json_file_path, "r", encoding="utf-8") as file :
                 json_data = json.load(file)
+            if "translated_text" not in json_data :
+                json_data["translated_text"] = []
             json_data["translated_text"].append(self.paint_button.trans)
+            if "text_block" not in json_data :
+                json_data["translated_text"] = []
             json_data["text_block"].append(self.paint_button.text_block)
             # 缓存ocr结果
             with open(json_file_path, "w", encoding="utf-8") as file :
