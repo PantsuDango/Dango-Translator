@@ -3144,6 +3144,7 @@ class Setting(QWidget) :
         self.shadow_size = self.object.config.get("mangaShadowSize", 4)
         self.font_size_use = self.object.config.get("mangaFontSizeUse", False)
         self.font_size = self.object.config.get("mangaFontSize", 36)
+        self.auto_open_manga_use = self.object.yaml["auto_open_manga_use"]
         self.font_list = [
             "鸿蒙/HarmonyOS_Sans/HarmonyOS_Sans_Regular",
             "阿里/东方大楷/Alimama_DongFangDaKai_Regular",
@@ -3236,7 +3237,7 @@ class Setting(QWidget) :
 
         # 窗口尺寸及不可拉伸
         self.window_width = int(500*self.rate)
-        self.window_height = int(320*self.rate)
+        self.window_height = int(370*self.rate)
         self.resize(self.window_width, self.window_height)
         self.setMinimumSize(QSize(self.window_width, self.window_height))
         self.setMaximumSize(QSize(self.window_width, self.window_height))
@@ -3484,6 +3485,16 @@ class Setting(QWidget) :
                              "QPushButton:hover { background-color: #83AAF9; }"
                              "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
 
+        # 自动打开图片翻译
+        self.auto_open_manga_switch = ui.switch.SwitchOCR(self, sign=self.auto_open_manga_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.auto_open_manga_switch, 20, 320, 65, 20)
+        self.auto_open_manga_switch.checkedChanged.connect(self.changeAutoOpenMangaSwitch)
+        self.auto_open_manga_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 自动打开图片翻译标签
+        label = QLabel(self)
+        self.customSetGeometry(label, 105, 320, 400, 20)
+        label.setText("登录后自动打开图片翻译")
+
 
     # 根据分辨率定义控件位置尺寸
     def customSetGeometry(self, object, x, y, w, h) :
@@ -3496,6 +3507,16 @@ class Setting(QWidget) :
     def customSetIconSize(self, object, w, h) :
 
         object.setIconSize(QSize(int(w * self.rate), int(h * self.rate)))
+
+
+    # 改变自动打开图片翻译界面开关状态
+    def changeAutoOpenMangaSwitch(self, checked) :
+
+        if checked :
+            self.auto_open_manga_use = True
+        else:
+            self.auto_open_manga_use = False
+        self.object.yaml["auto_open_manga_use"] = self.auto_open_manga_use
 
 
     # 改变渲染缩放比例
