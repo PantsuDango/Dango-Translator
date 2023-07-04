@@ -1,8 +1,8 @@
 # 团子翻译器 - 基于OCR的生肉翻译软件
 
 
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.5.3-ff69b4)](https://github.com/PantsuDango/Dango-Translator)
-[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2023--06--18-ff69b4)]()
+[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.5.4-ff69b4)](https://github.com/PantsuDango/Dango-Translator)
+[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2023--07--03-ff69b4)]()
 [![操作系统](https://img.shields.io/badge/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-win7--10-ff69b4)]()
 [![GitHubStars](https://img.shields.io/github/stars/PantsuDango/Dango-Translator)]()
 [![GitHubForks](https://img.shields.io/github/forks/PantsuDango/Dango-Translator)]()
@@ -14,69 +14,64 @@
 
 团子翻译器是一款生肉翻译软件，通过OCR识别屏幕特定范围内的文字，然后将识别到的文字调取各种翻译源，并实时输出翻译结果。
 
-+ 搭载了离线OCR，项目地址：[DangoOCR](https://github.com/PantsuDango/DangoOCR) 
-+ 搭载了在线OCR，官网地址：[星河云OCR](https://cloud.stariver.org.cn/auth/login.html)
++ 搭载了离线OCR, 项目地址: [DangoOCR](https://github.com/PantsuDango/DangoOCR) 
++ 搭载了在线OCR和漫画OCR, 官网地址: [星河云OCR](https://cloud.stariver.org.cn/auth/login.html)
 + 实现自动模式，实时识别区域内的文本并翻译
-+ 配置了11种翻译源
-+ 账号系统，能够自动云端保存配置
++ 配置了12种翻译源
++ 账号系统, 能够自动云端保存配置
 + 另有图片翻译功能, 实现对生肉漫画图片自动识别、翻译、消字、嵌字
 
 
 ## 使用教程
-
 [翻译器使用文档教程](https://dango-docs.ap-sh.starivercs.cn/#/4.0/basic/dangotranslator)
 
   
 ## 安装版下载
-
 - 群文件下载：[![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-19%E7%BE%A4691201730-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/19%E7%BE%A4.png)  
 - 官网下载：[下载地址](https://translator.dango.cloud)
-- Github Releases：[Ver4.5.3](https://github.com/PantsuDango/Dango-Translator/releases/tag/Ver4.5.3)
+- Github Releases：[Ver4.5.4](https://github.com/PantsuDango/Dango-Translator/releases/tag/Ver4.5.4)
 
   
 ## 更新日志
+### 翻译器相关
+[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.5.4-ff69b4)]()
+[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2023--07--03-ff69b4)]()
 
-#### 翻译器相关 
+#### 版本号：4.5.4
+#### 更新时间 2023/07/03
+#### 新增
++ 漫画翻译, 高级设置新增可选[过滤拟声词]开关;
++ 漫画翻译, 一键翻译新增可选, [跳过已翻译的] 和 [全部重新翻译];
++ 漫画翻译, 新增可修改字体大小;
++ 漫画翻译, 导出时支持导出工程文件压缩包;
++ 漫画翻译, 编辑图时支持手动添加绘制文本块, 用于干预未识别到的文字区域;
++ 漫画翻译, 设置-功能设定-其他一栏新增, 可选登录后自动打开漫画翻译界面;
++ chatgpt新增可自定义请求的api地址和所使用的模型;
++ 私人翻译源新增了阿里云翻译, 每月免费额度100万字符, 次月会重置;
+#### 优化
++ 漫画翻译, 优化chatgpt会将翻译后的多句子合并在一个文本块的问题;
++ 漫画翻译, 字体选择框支持可输入和可搜索;
++ 漫画翻译, 修复重新翻译后，如果当前处于浏览编辑图状态，不会刷新大图信息的问题;
++ 漫画翻译, 修复导入翻译大尺寸图片时会崩溃的问题;
++ 漫画翻译, 修复导入翻译文件路径超长的图片时会崩溃的问题;
++ 漫画翻译, 如果试用开关关闭, 则不再下方状态栏显示试用次数;
 
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.5.3-ff69b4)]()
-[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2023--06--18-ff69b4)]()
+更多更新日志: [查看](https://github.com/PantsuDango/Dango-Translator/releases)  
 
-版本号：4.5.0 - 4.5.3  
-更新时间：2023/06/15 - 2023/06/18  
-#### 新增 
-+ 图片翻译, 支持webp格式的图片
-+ 全新上线漫画图片翻译功能, 支持对生肉图片进行识别、抠字、翻译后回填
-+ 私人翻译新增团子翻译, 目前完全免费, 可以随便使用
-#### 修复
-+ 修复在线OCR试用次数查询什么时候都是0
-+ 修复开启在线OCR试用后点测试按钮仍然失败
-+ 修复图片翻译, 识别文本框可能显示不全问题
-+ 修复图片翻译, 导入图片时可能发生崩溃问题
-+ 私人团子翻译改为默认关闭
-#### 优化 
-+ 在翻译框锁定时, 仍可以操作自动/手动模式切换按钮
-+ 优化公共翻译失效问题、文字堆叠问题
-+ 优化chatgpt翻译, 更新为0613模型
-
-更多更新日志：[查看](https://docs1.ayano.top/#/4.0/develop/changelog)  
-
-#### OCR相关
-
+### OCR相关
 [![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.3.6-ff69b4)]()
 [![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2022--11--26-ff69b4)]()
-
 + 添加俄语识别;
-
 + 更多更新日志：[查看](https://docs1.ayano.top/#/4.0/develop/changelog)  
 
 
 ## 原理说明
-
+### 实时翻译
 ![原理说明](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E6%B5%81%E7%A8%8B%E5%9B%BE.png)
-
+### 图片翻译
+![原理说明](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.5.4/%E6%BC%AB%E7%94%BB%E7%BF%BB%E8%AF%91%E8%AF%B4%E6%98%8E.png)
 
 ## 特别鸣谢
-
 [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)  在线&本地OCR均基于此框架搭建
 
 [QPT打包工具](https://github.com/GT-ZhangAcer/QPT)  本地OCR基于此工具打包
