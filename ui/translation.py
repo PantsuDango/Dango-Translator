@@ -347,8 +347,8 @@ class Translation(QMainWindow) :
         self.setStatusBar(self.statusbar)
         self.statusbar.setStyleSheet("font: 10pt %s;"
                                      "color: %s;"
-                                     "background-color: rgba(62, 62, 62, 0.1)"
-                                     %(self.font_type, self.icon_color))
+                                     "background-color: rgba(62, 62, 62, %s)"
+                                     %(self.font_type, self.icon_color, self.horizontal/100))
         if not self.statusbar_sign :
             self.statusbar.hide()
 
@@ -367,12 +367,13 @@ class Translation(QMainWindow) :
     # 改变锁状态
     def checkLockStatus(self) :
 
+        self.lock_sign = not self.lock_sign
         if self.lock_sign :
-            self.lock_sign = False
-            self.lock_button.setIcon(qtawesome.icon("fa.unlock", color=self.icon_color))
-        else :
-            self.lock_sign = True
             self.lock_button.setIcon(qtawesome.icon("fa.lock", color=self.icon_color))
+            #self.setWindowFlag(Qt.WindowTransparentForInput, True)
+        else :
+            self.lock_button.setIcon(qtawesome.icon("fa.unlock", color=self.icon_color))
+            #self.setWindowFlag(Qt.WindowTransparentForInput, False)
 
 
     # 注册隐藏范围框快捷键
@@ -606,6 +607,8 @@ class Translation(QMainWindow) :
         if self.lock_sign == True :
             self.switch_button.show()
             self.lock_button.show()
+            self.lock_button.setStyleSheet("background-color:rgba(62, 62, 62, 0.3)")
+            self.switch_button.setStyleSheet("background-color:rgba(62, 62, 62, 0.3)")
             return
 
         # 显示所有顶部工具栏控件
@@ -622,7 +625,7 @@ class Translation(QMainWindow) :
         self.trans_history_button.show()
         self.filter_word_button.show()
         self.manga_button.show()
-        self.setStyleSheet("QLabel#drag_label {background-color:rgba(62, 62, 62, 0.1)}")
+        self.setStyleSheet("QLabel#drag_label {background-color:rgba(62, 62, 62, 0.3)}")
         if self.statusbar_sign :
             self.statusbar.show()
 
@@ -630,6 +633,8 @@ class Translation(QMainWindow) :
     # 鼠标离开控件事件
     def leaveEvent(self, QEvent) :
 
+        self.lock_button.setStyleSheet("background: transparent;")
+        self.switch_button.setStyleSheet("background: transparent;")
         if self.statusbar_sign :
             self.statusbar.show()
 

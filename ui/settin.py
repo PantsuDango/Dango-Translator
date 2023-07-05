@@ -2823,7 +2823,8 @@ class Settin(QMainWindow) :
         # 重置状态栏界面
         self.object.translation_ui.statusbar.setStyleSheet("font: 10pt '华康方圆体W7';"
                                                            "color: white;"
-                                                           "background-color: rgba(62, 62, 62, 0.1)")
+                                                           "background-color:rgba(62, 62, 62, %s)"
+                                                           %(self.horizontal/100))
 
 
     # 翻译框透明度调整时同屏显示透明框
