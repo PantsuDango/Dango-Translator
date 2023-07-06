@@ -2979,6 +2979,12 @@ class TransEdit(QWidget) :
         else :
             return
 
+        # 根据屏蔽词过滤
+        for filter in self.object.config["Filter"]:
+            if not filter[0] :
+                continue
+            result = result.replace(filter[0], filter[1])
+
         if result :
             self.trans_text.clear()
             self.trans_text.insertPlainText(result)
