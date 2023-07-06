@@ -363,6 +363,55 @@ class Translation(QMainWindow) :
         if self.object.config["showHotKey3"] == "True" or self.object.config["showHotKey3"] == True :
             self.registerHideRangeHotkey()
 
+        # 设置一个定时器, 用于检测鼠标位置
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.checkMousePosition)
+        self.timer.start(300)
+
+
+    # 检测鼠标位置
+    def checkMousePosition(self) :
+
+        try :
+            if not self.isVisible() or self.isMinimized() :
+                return
+
+            # 获取鼠标位置
+            cursor_pos = self.mapFromGlobal(QCursor.pos())
+            # 如果是锁定状态
+            if self.lock_sign :
+                # 判断鼠标是否窗口区域内
+                if 0 <= cursor_pos.x() <= self.width() and 0 <= cursor_pos.y() <= self.height() :
+                    # 进入控件
+                    self.enterEvent(QEvent(QEvent.Enter))
+                    # 判断鼠标是否位于自动模式按钮区域内
+                    if self.switch_button.x() <= cursor_pos.x() <= self.switch_button.x() + self.switch_button.width() and \
+                            cursor_pos.y() <= self.switch_button.height() :
+                        self.setWindowFlag(Qt.WindowTransparentForInput, False)
+                    # 判断鼠标是否位于锁按钮区域内
+                    elif self.lock_button.x() <= cursor_pos.x() <= self.lock_button.x() + self.lock_button.width() and \
+                            cursor_pos.y() <= self.lock_button.height() :
+                        self.setWindowFlag(Qt.WindowTransparentForInput, False)
+                    else :
+                        self.setWindowFlag(Qt.WindowTransparentForInput, True)
+                else :
+                    # 离开控件
+                    self.setWindowFlag(Qt.WindowTransparentForInput, True)
+                    self.leaveEvent(QEvent(QEvent.Leave))
+
+                self.show()
+
+            # 如果非锁定状态
+            else :
+                # 判断鼠标是否窗口区域内
+                if 0 <= cursor_pos.x() <= self.width() and 0 <= cursor_pos.y() <= self.height() :
+                    self.enterEvent(QEvent(QEvent.Enter))
+                else :
+                    self.leaveEvent(QEvent(QEvent.Leave))
+
+        except Exception :
+            self.logger.error(format_exc())
+
 
     # 改变锁状态
     def checkLockStatus(self) :
@@ -370,10 +419,15 @@ class Translation(QMainWindow) :
         self.lock_sign = not self.lock_sign
         if self.lock_sign :
             self.lock_button.setIcon(qtawesome.icon("fa.lock", color=self.icon_color))
-            #self.setWindowFlag(Qt.WindowTransparentForInput, True)
+            self.lock_button.setStyleSheet("background-color:rgba(62, 62, 62, 0.3)")
+            self.setWindowFlag(Qt.WindowTransparentForInput, True)
+            self.leaveEvent(QEvent(QEvent.Leave))
         else :
             self.lock_button.setIcon(qtawesome.icon("fa.unlock", color=self.icon_color))
-            #self.setWindowFlag(Qt.WindowTransparentForInput, False)
+            self.lock_button.setStyleSheet("background: transparent;")
+            self.setWindowFlag(Qt.WindowTransparentForInput, False)
+
+        self.show()
 
 
     # 注册隐藏范围框快捷键
@@ -562,7 +616,7 @@ class Translation(QMainWindow) :
     # 鼠标移动事件
     def mouseMoveEvent(self, e: QMouseEvent) :
 
-        if self.lock_sign == True:
+        if self.lock_sign :
             return
 
         # 判断鼠标位置以适配特定位置可拉伸
@@ -582,7 +636,8 @@ class Translation(QMainWindow) :
 
     # 鼠标按下事件
     def mousePressEvent(self, e: QMouseEvent) :
-        try:
+
+        try :
             if e.button() == Qt.LeftButton :
                 self._isTracking = True
                 self._startPos = QPoint(e.x(), e.y())
@@ -592,7 +647,8 @@ class Translation(QMainWindow) :
 
     # 鼠标松开事件
     def mouseReleaseEvent(self, e: QMouseEvent) :
-        try:
+
+        try :
             if e.button() == Qt.LeftButton :
                 self._isTracking = False
                 self._startPos = None
@@ -604,11 +660,9 @@ class Translation(QMainWindow) :
     # 鼠标进入控件事件
     def enterEvent(self, QEvent) :
 
-        if self.lock_sign == True :
+        if self.lock_sign :
             self.switch_button.show()
             self.lock_button.show()
-            self.lock_button.setStyleSheet("background-color:rgba(62, 62, 62, 0.3)")
-            self.switch_button.setStyleSheet("background-color:rgba(62, 62, 62, 0.3)")
             return
 
         # 显示所有顶部工具栏控件
@@ -633,8 +687,6 @@ class Translation(QMainWindow) :
     # 鼠标离开控件事件
     def leaveEvent(self, QEvent) :
 
-        self.lock_button.setStyleSheet("background: transparent;")
-        self.switch_button.setStyleSheet("background: transparent;")
         if self.statusbar_sign :
             self.statusbar.show()
 
@@ -823,14 +875,8 @@ class Translation(QMainWindow) :
 
         # 记录翻译开始时间
         self.object.translation_ui.start_time = time.time()
-
         # 翻译界面清屏
         self.translate_text.clear()
-
-        # 设定翻译时的字体类型和大小
-        # self.font.setFamily(self.object.config["fontType"])
-        # self.font.setPointSize(self.object.config["fontSize"])
-        # self.translate_text.setFont(self.font)
 
 
     # 将翻译结果打印
