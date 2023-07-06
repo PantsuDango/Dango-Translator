@@ -82,8 +82,8 @@ class Translation(QMainWindow) :
 
         # 翻译框字体
         self.font = QFont()
-        self.font.setFamily(self.font_type)
-        self.font.setPointSize(self.font_size)
+        self.font.setFamily(self.object.config["fontType"])
+        self.font.setPointSize(self.object.config["fontSize"])
 
         # 翻译框
         self.translate_text = QTextBrowser(self)
