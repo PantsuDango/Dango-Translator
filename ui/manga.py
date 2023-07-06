@@ -873,8 +873,10 @@ class Manga(QWidget) :
     def editImageWidgetAddImage(self, index) :
 
         item = QListWidgetItem(self.edit_image_widget)
-        item.setSizeHint(QSize(0, 180*self.rate))
+        pixmap = self.createTransparentPixmap(180*self.rate, 180*self.rate)
         item.setText(index)
+        item.setIcon(QIcon(pixmap))
+        item.listWidget()
         self.edit_image_widget.addItem(item)
 
 
@@ -882,9 +884,26 @@ class Manga(QWidget) :
     def transImageWidgetAddImage(self, index) :
 
         item = QListWidgetItem(self.trans_image_widget)
-        item.setSizeHint(QSize(0, 180*self.rate))
+        pixmap = self.createTransparentPixmap(180 * self.rate, 180 * self.rate)
         item.setText(index)
+        item.setIcon(QIcon(pixmap))
+        item.listWidget()
         self.trans_image_widget.addItem(item)
+
+
+    # 创建透明Pixmap
+    def createTransparentPixmap(self, width, height) :
+
+        width, height = int(width), int(height)
+        img = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+        buffer = io.BytesIO()
+        img.save(buffer, format="PNG")
+        img_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
+        pixmap = QPixmap()
+        pixmap.loadFromData(base64.b64decode(img_base64))
+        pixmap = pixmap.scaled(width, height, aspectRatioMode=Qt.KeepAspectRatio)
+
+        return pixmap
 
 
     # 刷新编辑图列表框内item的图片
