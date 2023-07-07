@@ -3411,12 +3411,45 @@ class Setting(QWidget) :
         # 设置字体
         self.setStyleSheet("font: 10pt '华康方圆体W7'; background: #FFFFFF;")
 
+        # 顶部工具栏
+        tab_widget = QTabWidget(self)
+        tab_widget.setGeometry(QRect(0, 0, self.window_width, self.window_height))
+        tab_widget.setTabPosition(QTabWidget.North)
+        tab_widget.setStyleSheet("QTabBar:tab { min-height: %dpx; min-width: %dpx;"
+                                               "background: rgba(255, 255, 255, 1);}"
+                                               "QTabBar:tab:selected { background: rgba(62, 62, 62, 0.07); }"
+                                               "QTabWidget::pane { border-image: none; }"
+                                               %(35*self.rate, 120*self.rate))
+
+
+        # 文字样式页签
+        font_tab = QWidget()
+        tab_widget.addTab(font_tab, "")
+        tab_widget.setTabText(tab_widget.indexOf(font_tab), "样式设定")
+        tab_widget.setTabIcon(tab_widget.indexOf(font_tab), ui.static.icon.FONT_ICON)
+
+        # 功能设定页签
+        function_tab = QWidget()
+        tab_widget.addTab(function_tab, "")
+        tab_widget.setTabText(tab_widget.indexOf(function_tab), "功能设定")
+        tab_widget.setTabIcon(tab_widget.indexOf(function_tab), ui.static.icon.FUNCTION_ICON)
+
+        # 横向分割线
+        label = QLabel(tab_widget)
+        label.setGeometry(QRect(0, 35*self.rate, self.window_width, 1))
+        label.setFrameShadow(QFrame.Raised)
+        label.setFrameShape(QFrame.Box)
+        label.setStyleSheet("border-width: 1px; "
+                            "border-style: solid; "
+                            "border-color: rgba(62, 62, 62, 0.2);")
+
+
         # 渲染缩放比例标签
-        label = QLabel(self)
+        label = QLabel(function_tab)
         label.setText("渲染缩放比例: ")
         self.customSetGeometry(label, 20, 20, 500, 20)
         # 渲染缩放比例滑块
-        self.detect_scale_slider = QSlider(self)
+        self.detect_scale_slider = QSlider(function_tab)
         self.customSetGeometry(self.detect_scale_slider, 120, 20, 290, 25)
         self.detect_scale_slider.setRange(1, 4)
         self.detect_scale_slider.setSingleStep(1)
@@ -3447,11 +3480,11 @@ class Setting(QWidget) :
                                                 -13.33*self.rate, -13.33*self.rate, 8.66*self.rate, 4*self.rate,
                                                 10*self.rate, self.color_2))
         # 渲染缩放比例滑块数值标签
-        self.detect_scale_slider_label = QLabel(self)
+        self.detect_scale_slider_label = QLabel(function_tab)
         self.customSetGeometry(self.detect_scale_slider_label, 410, 20, 30, 20)
         self.detect_scale_slider_label.setText("x%s"%self.detect_scale)
         # 渲染缩放比例?号图标
-        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self)
+        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", function_tab)
         self.customSetIconSize(button, 20, 20)
         self.customSetGeometry(button, 440, 20, 20, 20)
         button.clicked.connect(lambda: self.showDesc("detect_scale"))
@@ -3461,13 +3494,13 @@ class Setting(QWidget) :
                              "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
 
         # 全局字体色开关
-        self.font_color_switch = ui.switch.SwitchOCR(self, self.font_color_use, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.font_color_switch, 20, 70, 65, 20)
+        self.font_color_switch = ui.switch.SwitchOCR(font_tab, self.font_color_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.font_color_switch, 20, 20, 65, 20)
         self.font_color_switch.checkedChanged.connect(self.changeMangaFontColorSwitch)
         self.font_color_switch.setCursor(ui.static.icon.SELECT_CURSOR)
         # 修改全局字体色
-        self.font_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.font_color), "", self)
-        self.customSetGeometry(self.font_color_button, 100, 70, 100, 20)
+        self.font_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.font_color), "", font_tab)
+        self.customSetGeometry(self.font_color_button, 100, 20, 100, 20)
         self.font_color_button.setCursor(ui.static.icon.EDIT_CURSOR)
         self.font_color_button.setText(" 全局字体色")
         self.font_color_button.clicked.connect(self.changeFontColor)
@@ -3476,9 +3509,9 @@ class Setting(QWidget) :
                                              "QPushButton:pressed {background-color: #4480F9;}")
         self.font_color_button.setToolTip("<b>全局修改显示的字体颜色</b>")
         # 全局字体色?号图标
-        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self)
+        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", font_tab)
         self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 210, 70, 20, 20)
+        self.customSetGeometry(button, 210, 20, 20, 20)
         button.clicked.connect(lambda: self.showDesc("font_color"))
         button.setCursor(ui.static.icon.QUESTION_CURSOR)
         button.setStyleSheet("QPushButton { background: transparent;}"
@@ -3486,13 +3519,13 @@ class Setting(QWidget) :
                              "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
 
         # 全局轮廓色开关
-        self.bg_color_switch = ui.switch.SwitchOCR(self, self.bg_color_use, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.bg_color_switch, 250, 70, 65, 20)
+        self.bg_color_switch = ui.switch.SwitchOCR(font_tab, self.bg_color_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.bg_color_switch, 250, 20, 65, 20)
         self.bg_color_switch.checkedChanged.connect(self.changeMangaBgColorUseSwitch)
         self.bg_color_switch.setCursor(ui.static.icon.SELECT_CURSOR)
         # 修改轮廓颜色
-        self.bg_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.bg_color), "", self)
-        self.customSetGeometry(self.bg_color_button, 330, 70, 100, 20)
+        self.bg_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.bg_color), "", font_tab)
+        self.customSetGeometry(self.bg_color_button, 330, 20, 100, 20)
         self.bg_color_button.setCursor(ui.static.icon.EDIT_CURSOR)
         self.bg_color_button.setText(" 全局轮廓色")
         self.bg_color_button.clicked.connect(self.changeBackgroundColor)
@@ -3501,9 +3534,9 @@ class Setting(QWidget) :
                                            "QPushButton:pressed {background-color: #4480F9;}")
         self.bg_color_button.setToolTip("<b>全局修改显示的轮廓颜色</b>")
         # 全局字体色?号图标
-        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self)
+        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", font_tab)
         self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 440, 70, 20, 20)
+        self.customSetGeometry(button, 440, 20, 20, 20)
         button.clicked.connect(lambda: self.showDesc("bg_color"))
         button.setCursor(ui.static.icon.QUESTION_CURSOR)
         button.setStyleSheet("QPushButton { background: transparent;}"
@@ -3511,12 +3544,12 @@ class Setting(QWidget) :
                              "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
 
         # 全局字体样式标签
-        label = QLabel(self)
+        label = QLabel(font_tab)
         label.setText("全局字体样式: ")
-        self.customSetGeometry(label, 20, 120, 500, 20)
+        self.customSetGeometry(label, 20, 70, 500, 20)
         # 全局字体样式
-        self.font_box = QComboBox(self)
-        self.customSetGeometry(self.font_box, 125, 120, 305, 25)
+        self.font_box = QComboBox(font_tab)
+        self.customSetGeometry(self.font_box, 125, 70, 305, 25)
         self.font_box.setCursor(ui.static.icon.EDIT_CURSOR)
         self.font_box.setToolTip("<b>设置全局字体样式</b>")
         self.font_box.setStyleSheet("QComboBox QAbstractItemView::item { min-height:40px; }")
@@ -3528,9 +3561,9 @@ class Setting(QWidget) :
         self.font_box.setItemDelegate(QStyledItemDelegate())
         utils.thread.createThread(self.createFontBox)
         # 全局字体样式?号图标
-        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self)
+        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", font_tab)
         self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 440, 120, 20, 20)
+        self.customSetGeometry(button, 440, 70, 20, 20)
         button.clicked.connect(lambda: self.showDesc("font_type"))
         button.setCursor(ui.static.icon.QUESTION_CURSOR)
         button.setStyleSheet("QPushButton { background: transparent;}"
@@ -3538,18 +3571,18 @@ class Setting(QWidget) :
                              "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
 
         # 导出图片时重命名开关
-        self.output_rename_switch = ui.switch.SwitchOCR(self, self.output_rename_use, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.output_rename_switch, 20, 170, 65, 20)
+        self.output_rename_switch = ui.switch.SwitchOCR(function_tab, self.output_rename_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.output_rename_switch, 20, 70, 65, 20)
         self.output_rename_switch.checkedChanged.connect(self.changeOutputRenameUseSwitch)
         self.output_rename_switch.setCursor(ui.static.icon.SELECT_CURSOR)
         # 导出图片时重命名标签
-        label = QLabel(self)
+        label = QLabel(function_tab)
         label.setText("导出时重命名")
-        self.customSetGeometry(label, 100, 170, 500, 20)
+        self.customSetGeometry(label, 100, 70, 500, 20)
         # 导出图片时重命名?号图标
-        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self)
+        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", function_tab)
         self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 190, 170, 20, 20)
+        self.customSetGeometry(button, 190, 70, 20, 20)
         button.clicked.connect(lambda: self.showDesc("input_rename"))
         button.setCursor(ui.static.icon.QUESTION_CURSOR)
         button.setStyleSheet("QPushButton { background: transparent;}"
@@ -3557,18 +3590,18 @@ class Setting(QWidget) :
                              "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
 
         # 快速渲染开关
-        self.fast_render_switch = ui.switch.SwitchOCR(self, self.fast_render_use, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.fast_render_switch, 280, 170, 65, 20)
+        self.fast_render_switch = ui.switch.SwitchOCR(function_tab, self.fast_render_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.fast_render_switch, 280, 70, 65, 20)
         self.fast_render_switch.checkedChanged.connect(self.changeFastRenderUseSwitch)
         self.fast_render_switch.setCursor(ui.static.icon.SELECT_CURSOR)
         # 快速渲染标签
-        label = QLabel(self)
+        label = QLabel(function_tab)
         label.setText("快速渲染")
-        self.customSetGeometry(label, 360, 170, 500, 20)
+        self.customSetGeometry(label, 360, 70, 500, 20)
         # 快速渲染?号图标
-        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self)
+        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", function_tab)
         self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 440, 170, 20, 20)
+        self.customSetGeometry(button, 440, 70, 20, 20)
         button.clicked.connect(lambda: self.showDesc("fast_render"))
         button.setCursor(ui.static.icon.QUESTION_CURSOR)
         button.setStyleSheet("QPushButton { background: transparent;}"
@@ -3576,8 +3609,8 @@ class Setting(QWidget) :
                              "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
 
         # 全局轮廓宽度设定
-        self.shadow_size_spinbox = QDoubleSpinBox(self)
-        self.customSetGeometry(self.shadow_size_spinbox, 25, 220, 60, 20)
+        self.shadow_size_spinbox = QDoubleSpinBox(font_tab)
+        self.customSetGeometry(self.shadow_size_spinbox, 25, 120, 60, 20)
         self.shadow_size_spinbox.setDecimals(1)
         self.shadow_size_spinbox.setSingleStep(0.1)
         self.shadow_size_spinbox.setMinimum(0)
@@ -3585,13 +3618,13 @@ class Setting(QWidget) :
         self.shadow_size_spinbox.setValue(self.shadow_size)
         self.shadow_size_spinbox.setCursor(ui.static.icon.SELECT_CURSOR)
         self.shadow_size_spinbox.valueChanged.connect(self.changeShadowSize)
-        label = QLabel(self)
-        self.customSetGeometry(label, 100, 220, 100, 20)
+        label = QLabel(font_tab)
+        self.customSetGeometry(label, 100, 120, 100, 20)
         label.setText("字体轮廓宽度")
         # 全局轮廓宽度?号图标
-        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self)
+        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", font_tab)
         self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 190, 220, 20, 20)
+        self.customSetGeometry(button, 190, 120, 20, 20)
         button.clicked.connect(lambda: self.showDesc("shadow_size"))
         button.setCursor(ui.static.icon.QUESTION_CURSOR)
         button.setStyleSheet("QPushButton { background: transparent;}"
@@ -3599,18 +3632,18 @@ class Setting(QWidget) :
                              "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
 
         # 过滤拟声词开关
-        self.filtrate_switch = ui.switch.SwitchOCR(self, self.filtrate_use, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.filtrate_switch, 280, 220, 65, 20)
+        self.filtrate_switch = ui.switch.SwitchOCR(function_tab, self.filtrate_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.filtrate_switch, 20, 120, 65, 20)
         self.filtrate_switch.checkedChanged.connect(self.changeFiltrateUseSwitch)
         self.filtrate_switch.setCursor(ui.static.icon.SELECT_CURSOR)
         # 过滤拟声词标签
-        label = QLabel(self)
+        label = QLabel(function_tab)
         label.setText("过滤拟声词")
-        self.customSetGeometry(label, 360, 220, 500, 20)
+        self.customSetGeometry(label, 100, 120, 500, 20)
         # 过滤拟声词?号图标
-        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self)
+        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", function_tab)
         self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 440, 220, 20, 20)
+        self.customSetGeometry(button, 180, 120, 20, 20)
         button.clicked.connect(lambda: self.showDesc("filtrate"))
         button.setCursor(ui.static.icon.QUESTION_CURSOR)
         button.setStyleSheet("QPushButton { background: transparent;}"
@@ -3618,26 +3651,26 @@ class Setting(QWidget) :
                              "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
 
         # 全局字体大小开关
-        self.font_size_switch = ui.switch.SwitchOCR(self, self.font_size_use, startX=(65-20) * self.rate)
-        self.customSetGeometry(self.font_size_switch, 20, 270, 65, 20)
+        self.font_size_switch = ui.switch.SwitchOCR(font_tab, self.font_size_use, startX=(65-20) * self.rate)
+        self.customSetGeometry(self.font_size_switch, 20, 170, 65, 20)
         self.font_size_switch.checkedChanged.connect(self.changeFontSizeUseSwitch)
         self.font_size_switch.setCursor(ui.static.icon.SELECT_CURSOR)
         # 全局字体大小数值设定
-        self.font_size_spinbox = QSpinBox(self)
-        self.customSetGeometry(self.font_size_spinbox, 100, 270, 60, 20)
+        self.font_size_spinbox = QSpinBox(font_tab)
+        self.customSetGeometry(self.font_size_spinbox, 100, 170, 60, 20)
         self.font_size_spinbox.setMinimum(16)
         self.font_size_spinbox.setMaximum(512)
         self.font_size_spinbox.setValue(self.font_size)
         self.font_size_spinbox.setCursor(ui.static.icon.SELECT_CURSOR)
         self.font_size_spinbox.valueChanged.connect(self.changeFontSize)
         # 全局字体大小标签
-        label = QLabel(self)
-        self.customSetGeometry(label, 175, 270, 100, 20)
+        label = QLabel(font_tab)
+        self.customSetGeometry(label, 175, 170, 100, 20)
         label.setText("字体大小")
         # 全局字体大小?号图标
-        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", self)
+        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", font_tab)
         self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 240, 270, 20, 20)
+        self.customSetGeometry(button, 240, 170, 20, 20)
         button.clicked.connect(lambda: self.showDesc("font_size"))
         button.setCursor(ui.static.icon.QUESTION_CURSOR)
         button.setStyleSheet("QPushButton { background: transparent;}"
@@ -3645,13 +3678,13 @@ class Setting(QWidget) :
                              "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
 
         # 自动打开图片翻译
-        self.auto_open_manga_switch = ui.switch.SwitchOCR(self, sign=self.auto_open_manga_use, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.auto_open_manga_switch, 20, 320, 65, 20)
+        self.auto_open_manga_switch = ui.switch.SwitchOCR(function_tab, sign=self.auto_open_manga_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.auto_open_manga_switch, 20, 170, 65, 20)
         self.auto_open_manga_switch.checkedChanged.connect(self.changeAutoOpenMangaSwitch)
         self.auto_open_manga_switch.setCursor(ui.static.icon.SELECT_CURSOR)
         # 自动打开图片翻译标签
-        label = QLabel(self)
-        self.customSetGeometry(label, 105, 320, 400, 20)
+        label = QLabel(function_tab)
+        self.customSetGeometry(label, 105, 170, 400, 20)
         label.setText("登录后自动打开图片翻译")
 
 
