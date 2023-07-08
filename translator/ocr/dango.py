@@ -386,6 +386,7 @@ def mangaOCR(object, filepath, image_base64=None, filtrate=True, check_permissio
         "refine": True,
         "filtrate": filtrate,
         "detect_scale": object.config.get("mangaDetectScale", 1),
+        "merge_threshold": object.config.get("mangaMergeThreshold", 5.0),
         "image": image_base64
     }
     url = object.yaml["dict_info"].get("manga_ocr", "https://dl.ap-sh.starivercs.cn/v2/manga_trans/advanced/manga_ocr")

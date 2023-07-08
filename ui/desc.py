@@ -4,6 +4,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import ui.static.icon
+import ui.manga
 
 
 # 说明界面
@@ -46,6 +47,15 @@ class Desc(QWidget) :
                                                     "color: #5B8FF9;"
                                                     "background: rgba(255, 255, 255, 0.7); }")
         self.desc_text.setCursor(ui.static.icon.PIXMAP_CURSOR)
+
+        # 加载背景图
+        pixmap = ui.static.icon.MANGA_SETTING_BG_PIXMAP.scaledToWidth(self.window_width)
+        # 样式设定页面背景
+        label = QLabel(self)
+        label.setAlignment(Qt.AlignCenter)
+        label.setGeometry(QRect(0, 0, self.window_width, self.window_height))
+        label.setPixmap(pixmap)
+        label.lower()
 
 
     # 初始化配置

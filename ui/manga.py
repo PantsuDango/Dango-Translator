@@ -18,17 +18,17 @@ from PIL import Image
 import traceback
 import pyperclip
 import pathlib
-
-import ui.static.icon
-import utils.translater
 import translator.ocr.dango
 import translator.api
-import utils.thread
-import utils.message
 import ui.progress_bar
+import ui.range
+import ui.desc
+import ui.static.icon
+import utils.translater
 import utils.zip
 import utils.http
-import ui.range
+import utils.thread
+import utils.message
 
 
 FONT_PATH_1 = "./config/other/NotoSansSC-Regular.otf"
@@ -3300,6 +3300,7 @@ class Setting(QWidget) :
         self.color_1 = "#595959"  # 灰色
         self.color_2 = "#5B8FF9"  # 蓝色
         self.detect_scale = self.object.config.get("mangaDetectScale", 1)
+        self.merge_threshold = self.object.config.get("mangaMergeThreshold", 5)
         self.font_color = self.object.config.get("mangaFontColor", "#83AAF9")
         self.bg_color = self.object.config.get("mangaBgColor", "#83AAF9")
         self.font_color_use = self.object.config.get("mangaFontColorUse", False)
@@ -3422,15 +3423,35 @@ class Setting(QWidget) :
         tab_widget = QTabWidget(self)
         tab_widget.setGeometry(QRect(0, 0, self.window_width, self.window_height))
         tab_widget.setTabPosition(QTabWidget.North)
-        tab_widget.setStyleSheet("QTabBar:tab { min-height: %dpx; min-width: %dpx;"
-                                               "background: rgba(255, 255, 255, 1);}"
+        tab_widget.setStyleSheet("QTabBar:tab { min-height: %dpx; min-width: %dpx; background: rgba(255, 255, 255, 1);}"
                                  "QTabBar:tab:selected { background: rgba(62, 62, 62, 0.07); }"
                                  "QTabWidget::pane { border-image: none; }"
                                  "QLabel { background: transparent; }"
                                  "QPushButton { background: %s; border-radius: %spx; color: rgb(255, 255, 255); }"
                                  "QPushButton:hover { background-color: #83AAF9; }"
                                  "QPushButton:pressed { background-color: #4480F9; padding-left: 3px; padding-top: 3px; }"
-                                 %(35*self.rate, 120*self.rate, self.color_2, 6.66*self.rate))
+                                 "QSlider { background: transparent; }"
+                                 "QSlider:groove:horizontal { height: %spx;"
+                                 "border-radius: %spx;"
+                                 "margin-left: %spx;"
+                                 "margin-right: %spx;"
+                                 "background: rgba(89, 89, 89, 0.3); }"
+                                 "QSlider:handle:horizontal { width: %spx;"
+                                 "height: %spx;"
+                                 "margin-top: %spx;"
+                                 "margin-left: %spx;"
+                                 "margin-bottom: %spx;"
+                                 "margin-right: %spx;"
+                                 "border-image: url(./config/icon/slider.png); }"
+                                 "QSlider::sub-page:horizontal { height: %spx;"
+                                 "border-radius: %spx;"
+                                 "margin-left: %spx;"
+                                 "background: %s; }"
+                                 %(35*self.rate, 120*self.rate, self.color_2, 6.66*self.rate,
+                                   8.66*self.rate, 4*self.rate, 13.33*self.rate, 13.33*self.rate,
+                                   33.33*self.rate, 33.33*self.rate, -13.33*self.rate, -13.33*self.rate,
+                                   -13.33*self.rate, -13.33*self.rate, 8.66*self.rate, 4*self.rate,
+                                   10*self.rate, self.color_2))
 
         # 横向分割线
         label = QLabel(tab_widget)
@@ -3582,7 +3603,7 @@ class Setting(QWidget) :
         self.customSetGeometry(label, 20, 20, 500, 20)
         # 渲染缩放比例滑块
         self.detect_scale_slider = QSlider(function_tab)
-        self.customSetGeometry(self.detect_scale_slider, 120, 20, 290, 25)
+        self.customSetGeometry(self.detect_scale_slider, 120, 20, 280, 25)
         self.detect_scale_slider.setRange(1, 4)
         self.detect_scale_slider.setSingleStep(1)
         self.detect_scale_slider.setOrientation(Qt.Horizontal)
@@ -3590,28 +3611,6 @@ class Setting(QWidget) :
         self.detect_scale_slider.valueChanged.connect(self.changeDetectScale)
         self.detect_scale_slider.installEventFilter(self)
         self.detect_scale_slider.setCursor(ui.static.icon.SELECT_CURSOR)
-        # 设置字体
-        self.detect_scale_slider.setStyleSheet("QSlider { background: transparent; }"
-                                               "QSlider:groove:horizontal { height: %spx;"
-                                                                           "border-radius: %spx;"
-                                                                           "margin-left: %spx;"
-                                                                           "margin-right: %spx;"
-                                                                           "background: rgba(89, 89, 89, 0.3); }"
-                                              "QSlider:handle:horizontal { width: %spx;"
-                                                                          "height: %spx;"
-                                                                          "margin-top: %spx;"
-                                                                          "margin-left: %spx;"
-                                                                          "margin-bottom: %spx;"
-                                                                          "margin-right: %spx;"
-                                                                          "border-image: url(./config/icon/slider.png); }"
-                                              "QSlider::sub-page:horizontal { height: %spx;"
-                                                                             "border-radius: %spx;"
-                                                                             "margin-left: %spx;"
-                                                                             "background: %s; }"
-                                              %(8.66*self.rate, 4*self.rate, 13.33*self.rate, 13.33*self.rate,
-                                                33.33*self.rate, 33.33*self.rate, -13.33*self.rate, -13.33*self.rate,
-                                                -13.33*self.rate, -13.33*self.rate, 8.66*self.rate, 4*self.rate,
-                                                10*self.rate, self.color_2))
         # 渲染缩放比例滑块数值标签
         self.detect_scale_slider_label = QLabel(function_tab)
         self.customSetGeometry(self.detect_scale_slider_label, 410, 20, 30, 20)
@@ -3626,19 +3625,47 @@ class Setting(QWidget) :
                              "QPushButton:hover { background-color: #83AAF9; }"
                              "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
 
+        # 字块合并间隔标签
+        label = QLabel(function_tab)
+        label.setText("字块合并间隔: ")
+        self.customSetGeometry(label, 20, 70, 500, 20)
+        # 字块合并间隔比例滑块
+        self.merge_threshold_slider = QSlider(function_tab)
+        self.customSetGeometry(self.merge_threshold_slider, 120, 70, 280, 25)
+        self.merge_threshold_slider.setRange(1, 50)
+        self.merge_threshold_slider.setSingleStep(1)
+        self.merge_threshold_slider.setOrientation(Qt.Horizontal)
+        self.merge_threshold_slider.setValue(self.merge_threshold*10)
+        self.merge_threshold_slider.valueChanged.connect(self.changeMergeThreshold)
+        self.merge_threshold_slider.installEventFilter(self)
+        self.merge_threshold_slider.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 渲染缩放比例滑块数值标签
+        self.merge_threshold_slider_label = QLabel(function_tab)
+        self.customSetGeometry(self.merge_threshold_slider_label, 410, 70, 30, 20)
+        self.merge_threshold_slider_label.setText("{:.1f}".format(self.merge_threshold))
+        # 字块合并间隔?号图标
+        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", function_tab)
+        self.customSetIconSize(button, 20, 20)
+        self.customSetGeometry(button, 440, 70, 20, 20)
+        button.clicked.connect(lambda: self.showDesc("merge_threshold"))
+        button.setCursor(ui.static.icon.QUESTION_CURSOR)
+        button.setStyleSheet("QPushButton { background: transparent; }"
+                             "QPushButton:hover { background-color: #83AAF9; }"
+                             "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
+
         # 过滤拟声词开关
         self.filtrate_switch = ui.switch.SwitchOCR(function_tab, self.filtrate_use, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.filtrate_switch, 20, 70, 65, 20)
+        self.customSetGeometry(self.filtrate_switch, 20, 120, 65, 20)
         self.filtrate_switch.checkedChanged.connect(self.changeFiltrateUseSwitch)
         self.filtrate_switch.setCursor(ui.static.icon.SELECT_CURSOR)
         # 过滤拟声词标签
         label = QLabel(function_tab)
         label.setText("过滤拟声词汇")
-        self.customSetGeometry(label, 100, 70, 500, 20)
+        self.customSetGeometry(label, 100, 120, 500, 20)
         # 过滤拟声词?号图标
         button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", function_tab)
         self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 190, 70, 20, 20)
+        self.customSetGeometry(button, 190, 120, 20, 20)
         button.clicked.connect(lambda: self.showDesc("filtrate"))
         button.setCursor(ui.static.icon.QUESTION_CURSOR)
         button.setStyleSheet("QPushButton { background: transparent; }"
@@ -3647,17 +3674,17 @@ class Setting(QWidget) :
 
         # 快速渲染开关
         self.fast_render_switch = ui.switch.SwitchOCR(function_tab, self.fast_render_use, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.fast_render_switch, 290, 70, 65, 20)
+        self.customSetGeometry(self.fast_render_switch, 290, 120, 65, 20)
         self.fast_render_switch.checkedChanged.connect(self.changeFastRenderUseSwitch)
         self.fast_render_switch.setCursor(ui.static.icon.SELECT_CURSOR)
         # 快速渲染标签
         label = QLabel(function_tab)
         label.setText("快速渲染")
-        self.customSetGeometry(label, 370, 70, 500, 20)
+        self.customSetGeometry(label, 370, 120, 500, 20)
         # 快速渲染?号图标
         button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", function_tab)
         self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 440, 70, 20, 20)
+        self.customSetGeometry(button, 440, 120, 20, 20)
         button.clicked.connect(lambda: self.showDesc("fast_render"))
         button.setCursor(ui.static.icon.QUESTION_CURSOR)
         button.setStyleSheet("QPushButton { background: transparent;}"
@@ -3666,17 +3693,17 @@ class Setting(QWidget) :
 
         # 导出图片时重命名开关
         self.output_rename_switch = ui.switch.SwitchOCR(function_tab, self.output_rename_use, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.output_rename_switch, 20, 120, 65, 20)
+        self.customSetGeometry(self.output_rename_switch, 20, 170, 65, 20)
         self.output_rename_switch.checkedChanged.connect(self.changeOutputRenameUseSwitch)
         self.output_rename_switch.setCursor(ui.static.icon.SELECT_CURSOR)
         # 导出图片时重命名标签
         label = QLabel(function_tab)
         label.setText("导出时重命名")
-        self.customSetGeometry(label, 100, 120, 500, 20)
+        self.customSetGeometry(label, 100, 170, 500, 20)
         # 导出图片时重命名?号图标
         button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", function_tab)
         self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 190, 120, 20, 20)
+        self.customSetGeometry(button, 190, 170, 20, 20)
         button.clicked.connect(lambda: self.showDesc("input_rename"))
         button.setCursor(ui.static.icon.QUESTION_CURSOR)
         button.setStyleSheet("QPushButton { background: transparent;}"
@@ -3685,12 +3712,12 @@ class Setting(QWidget) :
 
         # 自动打开图片翻译
         self.auto_open_manga_switch = ui.switch.SwitchOCR(function_tab, sign=self.auto_open_manga_use, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.auto_open_manga_switch, 20, 170, 65, 20)
+        self.customSetGeometry(self.auto_open_manga_switch, 20, 220, 65, 20)
         self.auto_open_manga_switch.checkedChanged.connect(self.changeAutoOpenMangaSwitch)
         self.auto_open_manga_switch.setCursor(ui.static.icon.SELECT_CURSOR)
         # 自动打开图片翻译标签
         label = QLabel(function_tab)
-        self.customSetGeometry(label, 100, 170, 400, 20)
+        self.customSetGeometry(label, 100, 220, 400, 20)
         label.setText("登录后自动打开图片翻译界面")
 
         # 加载背景图
@@ -3742,6 +3769,14 @@ class Setting(QWidget) :
         self.detect_scale_slider_label.setText("x{}".format(self.detect_scale))
 
 
+    # 改变字块合并间隔
+    def changeMergeThreshold(self) :
+
+        self.merge_threshold = round(self.merge_threshold_slider.value()/10, 1)
+        self.object.config["mangaMergeThreshold"] = self.merge_threshold
+        self.merge_threshold_slider_label.setText("{:.1f}".format(self.merge_threshold))
+
+
     # 说明窗口
     def showDesc(self, message_type) :
 
@@ -3750,7 +3785,7 @@ class Setting(QWidget) :
         if message_type == "detect_scale" :
             self.desc_ui.setWindowTitle("文字缩放比例说明")
             self.desc_ui.desc_text.append("\n会对图片进行放大后再进行识别, 对于字体较小的图片可以调大此参数, 调大可能会增加文字识别耗时"
-                                          "\n\n日文默认值为1, \n英文默认值为3")
+                                          "\n\n日文建议值为1, \n英文建议值为3")
 
         elif message_type == "font_color" :
             self.desc_ui.setWindowTitle("全局字体色说明")
@@ -3791,6 +3826,11 @@ class Setting(QWidget) :
                                           "\n\n开关关闭, 则由系统自动判断渲染的文字大小"
                                           "\n\n范围为16-512, 单位pt"
                                           "\n\n默认值关闭")
+
+        elif message_type == "merge_threshold" :
+            self.desc_ui.setWindowTitle("字块合并间隔说明")
+            self.desc_ui.desc_text.append("\n该数值影响文本框的合并情况, 数值越小, 文本框越不容易被合并"
+                                          "\n\n建议值为5.0")
 
         else :
             return

@@ -297,6 +297,7 @@ def configConvert(object) :
     object.config["mangaLanguage"] = object.config.get("mangaLanguage", "JAP")
     # 图片翻译高级设置
     object.config["mangaDetectScale"] = object.config.get("mangaDetectScale", 1)
+    object.config["mangaMergeThreshold"] = object.config.get("mangaMergeThreshold", 5.0)
     object.config["mangaFontColor"] = object.config.get("mangaFontColor", "#83AAF9")
     object.config["mangaBgColor"] = object.config.get("mangaBgColor", "#83AAF9")
     object.config["mangaFontColorUse"] = object.config.get("mangaFontColorUse", False)
