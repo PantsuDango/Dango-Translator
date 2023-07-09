@@ -2139,6 +2139,10 @@ class RenderTextBlock(QWidget) :
             self.loadImage()
             self.matchButtonSize()
             self.object.manga_ui.setImageInitRate(init_image_rate)
+            # 刷新编辑框译图列表框
+            self.object.manga_ui.editImageWidgetRefreshImage(self.original_image_path)
+            self.object.manga_ui.transImageWidgetRefreshImage(self.original_image_path)
+
 
         except Exception as err :
             self.logger.error(traceback.format_exc())
@@ -2300,10 +2304,10 @@ class RenderTextBlock(QWidget) :
             with open(json_file_path, "r", encoding="utf-8") as file :
                 json_data = json.load(file)
             if "translated_text" in json_data :
-                if len(json_data["translated_text"]) == button.index + 1 :
+                if len(json_data["translated_text"]) > button.index :
                     del json_data["translated_text"][button.index]
             if "text_block" in json_data :
-                if len(json_data["text_block"]) == button.index + 1 :
+                if len(json_data["text_block"]) > button.index :
                     del json_data["text_block"][button.index]
             # 缓存ocr结果
             with open(json_file_path, "w", encoding="utf-8") as file :
@@ -2319,6 +2323,11 @@ class RenderTextBlock(QWidget) :
             self.loadImage()
             self.matchButtonSize()
             self.object.manga_ui.setImageInitRate(init_image_rate)
+
+            # 刷新编辑框译图列表框
+            self.object.manga_ui.editImageWidgetRefreshImage(self.original_image_path)
+            self.object.manga_ui.transImageWidgetRefreshImage(self.original_image_path)
+
         except Exception :
             self.logger.error(traceback.format_exc())
             utils.message.MessageBox("删除文本块失败", traceback.format_exc(), self.rate)
@@ -2431,6 +2440,9 @@ class RenderTextBlock(QWidget) :
             self.loadImage()
             self.matchButtonSize()
             self.object.manga_ui.setImageInitRate(init_image_rate)
+            # 刷新编辑框译图列表框
+            self.object.manga_ui.editImageWidgetRefreshImage(self.original_image_path)
+            self.object.manga_ui.transImageWidgetRefreshImage(self.original_image_path)
 
         except Exception :
             self.logger.error(traceback.format_exc())
@@ -2909,6 +2921,9 @@ class TransEdit(QWidget) :
             self.object.manga_ui.show_image_widget.loadImage()
             self.object.manga_ui.show_image_widget.matchButtonSize()
             self.object.manga_ui.setImageInitRate(init_image_rate)
+            # 刷新编辑框译图列表框
+            self.object.manga_ui.editImageWidgetRefreshImage(self.button.original_image_path)
+            self.object.manga_ui.transImageWidgetRefreshImage(self.button.original_image_path)
 
         except Exception :
             self.logger.error(traceback.format_exc())
