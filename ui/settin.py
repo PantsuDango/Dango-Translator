@@ -167,12 +167,6 @@ class Settin(QMainWindow) :
         self.setTabFive()
         self.setTabSix()
 
-        # 背景图pixiv标签
-        label = QLabel(self)
-        self.customSetGeometry(label, 630, 400, 200, 15)
-        label.setText("背景图 pixiv id: %s"%self.object.yaml["dict_info"]["bg_pixiv_id"])
-        label.setStyleSheet("font-size: 9pt; color: %s"%self.color_2)
-
 
     # OCR设定标签页
     def setTabOne(self) :

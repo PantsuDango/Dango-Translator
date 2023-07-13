@@ -43,7 +43,7 @@ class DangoTranslator :
         # 本地配置
         self.yaml = utils.config.openConfig(self.logger)
         # 版本号
-        self.yaml["version"] = "4.5.5"
+        self.yaml["version"] = "4.5.6"
         # 配置中心
         dict_info = utils.config.getDictInfo(self.yaml["dict_info_url"], self.logger)
         if dict_info :
