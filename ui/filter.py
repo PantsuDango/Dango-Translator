@@ -38,8 +38,9 @@ class Filter(QWidget) :
         # 背景, 长宽比1.424
         label = QLabel(self)
         self.customSetGeometry(label, 0, 0, 230, 300)
-
-        label.setPixmap(ui.static.icon.createPixmap(ui.static.background.LOGIN, 230, 300))
+        pixmap = ui.static.icon.MANGA_SETTING_PIXMAP.scaled(self.width(), self.height(),
+                                                            Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        label.setPixmap(pixmap)
 
         # 表格
         self.table_widget = QTableWidget(self)

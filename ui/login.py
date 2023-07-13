@@ -56,7 +56,8 @@ class Login(QWidget) :
         # 背景图片, 长宽比: 1.13
         label = QLabel(self)
         self.customSetGeometry(label, 0, 0, 500, 566)
-        pixmap = ui.static.icon.LOGIN_PIXMAP.scaled(self.width(), self.height(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        pixmap = ui.static.icon.LOGIN_PIXMAP.scaled(self.width(), self.height(),
+                                                    Qt.KeepAspectRatio, Qt.SmoothTransformation)
         label.setPixmap(pixmap)
 
         # 矩形框
