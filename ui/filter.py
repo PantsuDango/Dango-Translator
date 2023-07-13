@@ -38,6 +38,7 @@ class Filter(QWidget) :
         # 背景, 长宽比1.424
         label = QLabel(self)
         self.customSetGeometry(label, 0, 0, 230, 300)
+
         label.setPixmap(ui.static.icon.createPixmap(ui.static.background.LOGIN, 230, 300))
 
         # 表格

@@ -49,7 +49,7 @@ class Desc(QWidget) :
         self.desc_text.setCursor(ui.static.icon.PIXMAP_CURSOR)
 
         # 加载背景图
-        pixmap = ui.static.icon.MANGA_SETTING_BG_PIXMAP.scaledToWidth(self.window_width)
+        pixmap = ui.static.icon.LOGIN_PIXMAP.scaled(self.width(), self.height(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
         # 样式设定页面背景
         label = QLabel(self)
         label.setAlignment(Qt.AlignCenter)

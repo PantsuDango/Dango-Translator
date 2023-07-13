@@ -28,7 +28,7 @@ class Login(QWidget) :
     def ui(self):
 
         # 窗口尺寸
-        self.resize(int(400*self.rate), int(566*self.rate))
+        self.resize(int(500*self.rate), int(566*self.rate))
 
         # 窗口无标题栏、窗口置顶、窗口透明
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
@@ -53,35 +53,28 @@ class Login(QWidget) :
                            "QTextEdit:focus { border-bottom: 2px dashed %s; }"
                            %(self.color, self.color, self.color))
 
-        # 背景图片, 长宽比: 1.39
+        # 背景图片, 长宽比: 1.13
         label = QLabel(self)
-        self.customSetGeometry(label, 0, 0, 400, 566)
-        label.setPixmap(ui.static.icon.createPixmap(ui.static.background.LOGIN, 400, 566))
-
-        # 版本号
-        label = QLabel(self)
-        self.customSetGeometry(label, 15, 340, 200, 15)
-        label.setStyleSheet("color: %s;"
-                            "background: transparent;"
-                            "font: 10pt %s;" % (self.color, self.font_type))
-        label.setText("封面图 pixiv id: %s"%self.object.yaml["dict_info"]["cover_pixiv_id"])
+        self.customSetGeometry(label, 0, 0, 500, 566)
+        pixmap = ui.static.icon.LOGIN_PIXMAP.scaled(self.width(), self.height(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        label.setPixmap(pixmap)
 
         # 矩形框
         label = QLabel(self)
-        self.customSetGeometry(label, 0, 355, 400, 211)
+        self.customSetGeometry(label, 60, 355, 400, 211)
         label.setStyleSheet("background-color: rgba(255, 255, 255, 0.7);"
                             "border-width: 5px 5px 5px 5px;"
                             "border:2px solid %s;"
-                            "border-radius:15px;"%self.color)
+                            "border-radius: 15px;"%self.color)
 
         # Logo
         label = QLabel(self)
-        self.customSetGeometry(label, 80, 365, 35, 35)
+        self.customSetGeometry(label, 140, 365, 35, 35)
         label.setPixmap(ui.static.icon.createPixmap(ui.static.icon.APP_LOGO, 30, 30))
 
         # 标题
         label = QLabel(self)
-        self.customSetGeometry(label, 130, 370, 250, 30)
+        self.customSetGeometry(label, 190, 370, 250, 30)
         label.setText("团子翻译器")
         label.setStyleSheet("color: %s;"
                             "background: transparent;"
@@ -91,7 +84,7 @@ class Login(QWidget) :
         # 最小化按钮
         button = QPushButton(qtawesome.icon("fa.minus", color=self.color), "", self)
         self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 345, 360, 20, 20)
+        self.customSetGeometry(button, 405, 360, 20, 20)
         button.setStyleSheet("background: transparent;")
         button.setCursor(ui.static.icon.SELECT_CURSOR)
         button.clicked.connect(self.showMinimized)
@@ -99,21 +92,21 @@ class Login(QWidget) :
         # 退出按钮
         button = QPushButton(qtawesome.icon("fa.times", color=self.color), "", self)
         self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 370, 360, 20, 20)
+        self.customSetGeometry(button, 430, 360, 20, 20)
         button.setStyleSheet("background: transparent;")
         button.setCursor(ui.static.icon.SELECT_CURSOR)
         button.clicked.connect(self.quit)
 
         # 账号输入框
         self.user_text = QLineEdit(self)
-        self.customSetGeometry(self.user_text, 40, 410, 315, 30)
+        self.customSetGeometry(self.user_text, 100, 410, 315, 30)
         self.user_text.setPlaceholderText("请输入账号:")
         self.user_text.setText(self.user)
         self.user_text.setCursor(ui.static.icon.EDIT_CURSOR)
 
         # 密码输入框
         self.password_text = QLineEdit(self)
-        self.customSetGeometry(self.password_text, 40, 455, 315, 30)
+        self.customSetGeometry(self.password_text, 100, 455, 315, 30)
         self.password_text.setPlaceholderText("请输入密码:")
         self.password_text.setEchoMode(QLineEdit.Password)
         self.password_text.setText(self.password)
@@ -122,14 +115,14 @@ class Login(QWidget) :
         # 是否显示密码
         self.eye_button = QPushButton(qtawesome.icon("fa.eye-slash", color=self.color), "", self)
         self.customSetIconSize(self.eye_button, 25, 25)
-        self.customSetGeometry(self.eye_button, 330, 455, 30, 30)
+        self.customSetGeometry(self.eye_button, 390, 455, 30, 30)
         self.eye_button.setStyleSheet("background: transparent;")
         self.eye_button.setCursor(ui.static.icon.SELECT_CURSOR)
         self.eye_button.clicked.connect(self.clickEyeButton)
 
         # 登录按钮
         self.login_button = QPushButton(self)
-        self.customSetGeometry(self.login_button, 130, 495, 50, 35)
+        self.customSetGeometry(self.login_button, 190, 495, 50, 35)
         self.login_button.setCursor(ui.static.icon.SELECT_CURSOR)
         self.login_button.setText("登录")
         self.login_button.setStyleSheet("background: transparent;"
@@ -139,7 +132,7 @@ class Login(QWidget) :
 
         # 注册按钮
         self.register_button = QPushButton(self)
-        self.customSetGeometry(self.register_button, 220, 495, 50, 35)
+        self.customSetGeometry(self.register_button, 280, 495, 50, 35)
         self.register_button.setCursor(ui.static.icon.SELECT_CURSOR)
         self.register_button.setText("注册")
         self.register_button.setStyleSheet("background: transparent;"
@@ -149,7 +142,7 @@ class Login(QWidget) :
 
         # 忘记密码按钮
         self.forget_password_button = QPushButton(self)
-        self.customSetGeometry(self.forget_password_button, 305, 490, 60, 15)
+        self.customSetGeometry(self.forget_password_button, 365, 490, 60, 15)
         self.forget_password_button.setCursor(ui.static.icon.SELECT_CURSOR)
         self.forget_password_button.setText("忘记密码")
         self.forget_password_button.setStyleSheet("background: transparent;"
@@ -159,7 +152,7 @@ class Login(QWidget) :
 
         # 版本号
         label = QLabel(self)
-        self.customSetGeometry(label, 20, 540, 380, 15)
+        self.customSetGeometry(label, 80, 540, 380, 15)
         label.setText("版本号: %s  更新时间: 2023-07-05  By: 胖次团子"%self.object.yaml["version"])
         label.setStyleSheet("color: %s;"
                             "background: transparent;"
@@ -209,25 +202,34 @@ class Login(QWidget) :
     # 鼠标移动事件
     def mouseMoveEvent(self, e: QMouseEvent) :
 
-        self._endPos = e.pos() - self._startPos
-        self.move(self.pos() + self._endPos)
+        try :
+            self._endPos = e.pos() - self._startPos
+            self.move(self.pos() + self._endPos)
+        except :
+            pass
 
 
     # 鼠标按下事件
     def mousePressEvent(self, e: QMouseEvent) :
 
-        if e.button() == Qt.LeftButton:
-            self._isTracking = True
-            self._startPos = QPoint(e.x(), e.y())
+        try :
+            if e.button() == Qt.LeftButton :
+                self._isTracking = True
+                self._startPos = QPoint(e.x(), e.y())
+        except :
+            pass
 
 
     # 鼠标松开事件
     def mouseReleaseEvent(self, e: QMouseEvent) :
 
-        if e.button() == Qt.LeftButton:
-            self._isTracking = False
-            self._startPos = None
-            self._endPos = None
+        try :
+            if e.button() == Qt.LeftButton :
+                self._isTracking = False
+                self._startPos = None
+                self._endPos = None
+        except :
+            pass
 
 
     # 点击眼睛

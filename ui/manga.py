@@ -3736,7 +3736,7 @@ class Setting(QWidget) :
         label.setText("登录后自动打开图片翻译界面")
 
         # 加载背景图
-        pixmap = ui.static.icon.MANGA_SETTING_BG_PIXMAP.scaledToHeight(self.window_height)
+        pixmap = ui.static.icon.MANGA_SETTING_PIXMAP.scaledToHeight(self.window_height)
         # 样式设定页面背景
         label = TransparentImageLabel(font_tab)
         label.setAlignment(Qt.AlignCenter)
