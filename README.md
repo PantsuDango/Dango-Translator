@@ -94,8 +94,8 @@
 <img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.5.6/setting3.png" width="100%" height="100%">
 <img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.5.6/setting4.png" width="100%" height="100%">
 <img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.5.6/setting5.png" width="100%" height="100%">
-<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.3.6/%E5%A4%9A%E8%8C%83%E5%9B%B4%E5%88%87%E6%8D%A2.png" width="50%" height="50%">
-<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.5.6/filter.png" width="50%" height="50%">
+<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.3.6/%E5%A4%9A%E8%8C%83%E5%9B%B4%E5%88%87%E6%8D%A2.png" width="30%" height="30%">
+<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.5.6/filter.png" width="30%" height="30%">
 
 #### 支持作者
 <img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.5.6/setting6.png" width="100%" height="100%">
