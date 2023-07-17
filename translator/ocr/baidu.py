@@ -81,7 +81,7 @@ def baiduOCR(object, test=False) :
     if language == "RU" :
         language = "RUS"
     access_token = object.config.get("AccessToken", "")
-    show_translate_row = object.config.get("showTranslateRow", "False")
+    show_translate_row = object.config.get("showTranslateRow", False)
     ocr_config = object.config.get("OCR", {})
     high_precision = ocr_config.get("highPrecision", False)
     branch_line_use = object.config.get("BranchLineUse", False)
@@ -90,7 +90,7 @@ def baiduOCR(object, test=False) :
     if not access_token :
         return False, "百度OCR错误: 还未注册百度OCR密钥, 不可使用\n请于[设置]-[识别设定]-[百度OCR]页面内, 点击[注册]按钮完成注册并填入密钥后再使用"
     # 是否使用高精度模式
-    if show_translate_row == "True" or high_precision :
+    if show_translate_row == True or high_precision :
         request_url = "https://aip.baidubce.com/rest/2.0/ocr/v1/accurate_basic"
     else :
         request_url = "https://aip.baidubce.com/rest/2.0/ocr/v1/general_basic"
@@ -121,7 +121,7 @@ def baiduOCR(object, test=False) :
     if "words_result" in resp:
         words = resp.get("words_result", [])
         content = ""
-        if show_translate_row == "True":
+        if show_translate_row == True :
             # 竖向翻译模式
             if words:
                 for word in words[::-1]:
@@ -151,7 +151,7 @@ def baiduOCR(object, test=False) :
         if error_code == 6 :
             content += "开通的服务类型非通用文字识别, 请检查百度OCR的注册网页, 注册的类型是不是通用文字识别"
         elif error_code == 17 :
-            if show_translate_row == "True":
+            if show_translate_row == True :
                 content += "竖排翻译模式每日额度已用光, 请关闭竖排翻译模式, 或切换其他OCR使用竖排翻译"
             else:
                 content += "无使用额度或免费额度已用光, 可更换本地OCR或在线OCR"

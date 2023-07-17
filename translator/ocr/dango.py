@@ -206,9 +206,9 @@ def dangoOCR(object, test=False) :
     token = object.config.get("DangoToken", "")
     url = object.config.get("nodeURL", object.yaml["dict_info"]["ocr_server"])
     language = object.config.get("language", "JAP")
-    show_translate_row = object.config.get("showTranslateRow", "False")
+    show_translate_row = object.config.get("showTranslateRow", False)
     branch_line_use = object.config.get("BranchLineUse", False)
-    if language == "JAP" and show_translate_row == "True":
+    if language == "JAP" and show_translate_row == True :
         language = "Vertical_JAP"
     if test :
         image_path = TEST_IMAGE_PATH

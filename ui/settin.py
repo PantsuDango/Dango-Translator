@@ -1,4 +1,3 @@
-import requests
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -6,8 +5,10 @@ from traceback import format_exc
 import qtawesome
 import webbrowser
 import base64
+import requests
 import os
 import re
+import json
 
 import utils.thread
 import utils.config
@@ -1701,27 +1702,27 @@ class Settin(QMainWindow) :
         self.baidu_ocr_high_precision_use = self.object.config["OCR"]["highPrecision"]
 
         # 公共有道翻译开关
-        self.youdao_use = eval(self.object.config["youdaoUse"])
+        self.youdao_use = self.object.config["youdaoUse"]
         if self.youdao_use :
             self.translate_list.append("youdao")
         # 公共百度翻译开关
-        self.baidu_web_use = eval(self.object.config["baiduwebUse"])
+        self.baidu_web_use = self.object.config["baiduwebUse"]
         if self.baidu_web_use :
             self.translate_list.append("baidu")
         # 公共腾讯翻译开关
-        self.tencent_web_use = eval(self.object.config["tencentwebUse"])
+        self.tencent_web_use = self.object.config["tencentwebUse"]
         if self.tencent_web_use :
             self.translate_list.append("tencent")
         # 公共DeepL翻译开关
-        self.deepl_use = eval(self.object.config["deeplUse"])
+        self.deepl_use = self.object.config["deeplUse"]
         if self.deepl_use :
             self.translate_list.append("deepl")
         # 公共Bing翻译开关
-        self.bing_use = eval(self.object.config["bingUse"])
+        self.bing_use = self.object.config["bingUse"]
         if self.bing_use :
             self.translate_list.append("bing")
         # 公共彩云翻译开关
-        self.caiyun_web_use = eval(self.object.config["caiyunUse"])
+        self.caiyun_web_use = self.object.config["caiyunUse"]
         if self.caiyun_web_use :
             self.translate_list.append("caiyun")
         # 私人团子翻译开关
@@ -1729,19 +1730,19 @@ class Settin(QMainWindow) :
         if self.dango_use :
             self.translate_list.append("dango_private")
         # 私人腾讯翻译开关
-        self.tencent_use = eval(self.object.config["tencentUse"])
+        self.tencent_use = self.object.config["tencentUse"]
         if self.tencent_use :
             self.translate_list.append("tencent_private")
         # 私人百度翻译开关
-        self.baidu_use = eval(self.object.config["baiduUse"])
+        self.baidu_use = self.object.config["baiduUse"]
         if self.baidu_use :
             self.translate_list.append("baidu_private")
         # 私人彩云翻译开关
-        self.caiyun_use = eval(self.object.config["caiyunPrivateUse"])
+        self.caiyun_use = self.object.config["caiyunPrivateUse"]
         if self.caiyun_use :
             self.translate_list.append("caiyun_private")
         # 私人ChatGPT翻译开关
-        self.chatgpt_use = eval(self.object.config["chatgptPrivateUse"])
+        self.chatgpt_use = self.object.config["chatgptPrivateUse"]
         if self.chatgpt_use :
             self.translate_list.append("chatgpt_private")
         # 私人阿里云翻译开关
@@ -1783,21 +1784,21 @@ class Settin(QMainWindow) :
         # 翻译字体类型
         self.font_type = self.object.config["fontType"]
         # 字体样式开关
-        self.font_color_type = eval(self.object.config["showColorType"])
+        self.font_color_type = self.object.config["showColorType"]
         # 自动翻译间隔设定
         self.translate_speed = self.object.config["translateSpeed"]
         # 显示原文开关
-        self.show_original_use = eval(self.object.config["showOriginal"])
+        self.show_original_use = self.object.config["showOriginal"]
         # 原文自动复制到剪贴板开关
-        self.auto_clipboard_use = eval(self.object.config["showClipboard"])
+        self.auto_clipboard_use = self.object.config["showClipboard"]
         # 文字方向开关
-        self.text_direction_use = eval(self.object.config["showTranslateRow"])
+        self.text_direction_use = self.object.config["showTranslateRow"]
         # 文字换行开关
         self.branch_line_use = self.object.config["BranchLineUse"]
         # 翻译快捷键开关
-        self.translate_hotkey_use = eval(self.object.config["showHotKey1"])
+        self.translate_hotkey_use = self.object.config["showHotKey1"]
         # 范围快捷键开关
-        self.range_hotkey_use = eval(self.object.config["showHotKey2"])
+        self.range_hotkey_use = self.object.config["showHotKey2"]
         # 自动登录开关
         self.auto_login_use = self.object.yaml["auto_login"]
         # 自动翻译图片刷新相似度
@@ -1841,7 +1842,7 @@ class Settin(QMainWindow) :
         # 重置
         self.node_info_comboBox.clear()
         # 展开全部节点信息
-        self.node_info = eval(self.object.yaml["dict_info"]["ocr_node"])
+        self.node_info = json.loads(self.object.yaml["dict_info"]["ocr_node"])
         self.node_info_comboBox.setMaxVisibleItems(len(self.node_info)+1)
 
         # 自动模式
@@ -2247,11 +2248,11 @@ class Settin(QMainWindow) :
 
         if checked :
             self.translate_hotkey_use = True
-            self.object.config["showHotKey1"] = "True"
+            self.object.config["showHotKey1"] = True
             self.object.translation_ui.registerTranslateHotkey()
         else:
             self.translate_hotkey_use = False
-            self.object.config["showHotKey1"] = "False"
+            self.object.config["showHotKey1"] = False
             self.object.translation_ui.unRegisterTranslateHotkey()
 
 
@@ -2260,11 +2261,11 @@ class Settin(QMainWindow) :
 
         if checked :
             self.range_hotkey_use = True
-            self.object.config["showHotKey2"] = "True"
+            self.object.config["showHotKey2"] = True
             self.object.translation_ui.registerRangeHotkey()
         else:
             self.range_hotkey_use = False
-            self.object.config["showHotKey2"] = "False"
+            self.object.config["showHotKey2"] = False
             self.object.translation_ui.unRegisterRangeHotkey()
 
 
@@ -2951,8 +2952,8 @@ class Settin(QMainWindow) :
 
         # 刷新翻译
         translater_list = ["youdaoUse", "baiduwebUse", "tencentwebUse", "deeplUse", "bingUse", "caiyunUse"]
-        for val in translater_list:
-            if self.object.config[val] == "False":
+        for val in translater_list :
+            if self.object.config[val] == False :
                 continue
             web_type = val.replace("Use", "").replace("web", "")
             # 刷新翻译引擎1
@@ -3042,27 +3043,27 @@ class Settin(QMainWindow) :
             self.object.config["language"] = "JAP"
 
         # 公共有道翻译开关
-        self.object.config["youdaoUse"] = str(self.youdao_use)
+        self.object.config["youdaoUse"] = self.youdao_use
         # 公共百度翻译开关
-        self.object.config["baiduwebUse"] = str(self.baidu_web_use)
+        self.object.config["baiduwebUse"] = self.baidu_web_use
         # 公共腾讯翻译开关
-        self.object.config["tencentwebUse"] = str(self.tencent_web_use)
+        self.object.config["tencentwebUse"] = self.tencent_web_use
         # 公共DeepL翻译开关
-        self.object.config["deeplUse"] = str(self.deepl_use)
+        self.object.config["deeplUse"] = self.deepl_use
         # 公共Bing翻译开关
-        self.object.config["bingUse"] = str(self.bing_use)
+        self.object.config["bingUse"] = self.bing_use
         # 公共彩云翻译开关
-        self.object.config["caiyunUse"] = str(self.caiyun_web_use)
+        self.object.config["caiyunUse"] = self.caiyun_web_use
         # 私人团子翻译开关
         self.object.config["dangoUse"] = self.dango_use
         # 私人腾讯翻译开关
-        self.object.config["tencentUse"] = str(self.tencent_use)
+        self.object.config["tencentUse"] = self.tencent_use
         # 私人百度翻译开关
-        self.object.config["baiduUse"] = str(self.baidu_use)
+        self.object.config["baiduUse"] = self.baidu_use
         # 私人彩云翻译开关
-        self.object.config["caiyunPrivateUse"] = str(self.caiyun_use)
+        self.object.config["caiyunPrivateUse"] = self.caiyun_use
         # 私人ChatGPT翻译开关
-        self.object.config["chatgptPrivateUse"] = str(self.chatgpt_use)
+        self.object.config["chatgptPrivateUse"] = self.chatgpt_use
         # 私人ChatGPT翻译开关
         self.object.config["aliyunPrivateUse"] = self.aliyun_use
 
@@ -3108,21 +3109,21 @@ class Settin(QMainWindow) :
         self.object.translation_ui.translate_text.setFont(font)
 
         # 字体样式开关
-        self.object.config["showColorType"] = str(self.font_color_type)
+        self.object.config["showColorType"] = self.font_color_type
         # 自动翻译间隔
         self.object.config["translateSpeed"] = self.auto_speed_spinBox.value()
         # 显示原文开关
-        self.object.config["showOriginal"] = str(self.show_original_use)
+        self.object.config["showOriginal"] = self.show_original_use
         # 原文自动复制到剪贴板开关
-        self.object.config["showClipboard"] = str(self.auto_clipboard_use)
+        self.object.config["showClipboard"] = self.auto_clipboard_use
         # 文字方向
-        self.object.config["showTranslateRow"] = str(self.text_direction_use)
+        self.object.config["showTranslateRow"] = self.text_direction_use
         # 文字换行
         self.object.config["BranchLineUse"] = self.branch_line_use
         # 翻译快捷键开关
-        self.object.config["showHotKey1"] = str(self.translate_hotkey_use)
+        self.object.config["showHotKey1"] = self.translate_hotkey_use
         # 范围快捷键开关
-        self.object.config["showHotKey2"] = str(self.range_hotkey_use)
+        self.object.config["showHotKey2"] = self.range_hotkey_use
         # 自动翻译图片刷新相似度
         self.object.config["imageSimilarity"] = self.image_refresh_spinBox.value()
         # 自动翻译文字刷新相似度

@@ -4,6 +4,7 @@ from traceback import format_exc
 import re
 import zipfile
 import os
+import json
 import utils.http
 
 CHROMEDRIVER_PATH = "./config/tools/chromedriver.exe"
@@ -45,7 +46,7 @@ def getChromeVersionInfo(chrome_version, logger) :
     if not res :
         return
     try :
-        res = eval(res)
+        res = json.loads(res)
     except Exception :
         logger.error(format_exc())
         return

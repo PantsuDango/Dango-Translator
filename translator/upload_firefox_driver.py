@@ -3,6 +3,7 @@ from traceback import format_exc, print_exc
 import re
 import zipfile
 import os
+import json
 import utils.http
 
 FIREFOX_DRIVER_PATH = "./config/tools/geckodriver.exe"
@@ -37,7 +38,7 @@ def getFirefoxVersionInfo(logger) :
     if not res :
         return
     try:
-        res = eval(res)
+        res = json.loads(res)
         text = res["md/Firefox.html"]["body"]
     except Exception:
         logger.error(format_exc())

@@ -107,6 +107,11 @@ def getDangoSettin(object) :
 # 配置转换
 def configConvert(object) :
 
+    # 修复开关采用字符串存值的问题
+    use_map = {
+        "True": True,
+        "False": False
+    }
     ################### OCR设定 ###################
     # 本地OCR开关
     object.config["offlineOCR"] = object.config.get("offlineOCR", False)
@@ -118,7 +123,7 @@ def configConvert(object) :
     object.config["onlineOCRProbation"] = object.config.get("onlineOCRProbation", False)
     # 在线OCR节点
     object.config["nodeURL"] = object.config.get("nodeURL", object.yaml["dict_info"]["ocr_server"])
-    node_info = eval(object.yaml["dict_info"]["ocr_node"])
+    node_info = json.loads(object.yaml["dict_info"]["ocr_node"])
     if object.config["nodeURL"] not in node_info.values() :
         object.config["nodeURL"] = object.yaml["dict_info"]["ocr_server"]
     # 百度OCR开关
@@ -164,40 +169,65 @@ def configConvert(object) :
     object.config["fontColor"]["original"] = object.config["fontColor"].get("original", "#5B8FF9")
 
     # 公共有道翻译开关
-    object.config["youdaoUse"] = object.config.get("youdaoUse", "False")
+    object.config["youdaoUse"] = object.config.get("youdaoUse", False)
+    if object.config["youdaoUse"] in use_map :
+        object.config["youdaoUse"] = use_map[object.config["youdaoUse"]]
     # 公共百度翻译开关
-    object.config["baiduwebUse"] = object.config.get("baiduwebUse", "False")
+    object.config["baiduwebUse"] = object.config.get("baiduwebUse", False)
+    if object.config["baiduwebUse"] in use_map :
+        object.config["baiduwebUse"] = use_map[object.config["baiduwebUse"]]
     # 公共腾讯翻译开关
-    object.config["tencentwebUse"] = object.config.get("tencentwebUse", "False")
+    object.config["tencentwebUse"] = object.config.get("tencentwebUse", False)
+    if object.config["tencentwebUse"] in use_map :
+        object.config["tencentwebUse"] = use_map[object.config["tencentwebUse"]]
     # 公共DeepL翻译开关
-    object.config["deeplUse"] = object.config.get("deeplUse", "False")
+    object.config["deeplUse"] = object.config.get("deeplUse", False)
+    if object.config["deeplUse"] in use_map :
+        object.config["deeplUse"] = use_map[object.config["deeplUse"]]
     # 公共bing翻译开关
-    object.config["bingUse"] = object.config.get("bingUse", "False")
+    object.config["bingUse"] = object.config.get("bingUse", False)
+    if object.config["bingUse"] in use_map :
+        object.config["bingUse"] = use_map[object.config["bingUse"]]
     # 公共彩云翻译开关
-    object.config["caiyunUse"] = object.config.get("caiyunUse", "False")
+    object.config["caiyunUse"] = object.config.get("caiyunUse", False)
+    if object.config["caiyunUse"] in use_map :
+        object.config["caiyunUse"] = use_map[object.config["caiyunUse"]]
     # 私人团子翻译开关
     object.config["dangoUse"] = object.config.get("dangoUse", False)
+    if object.config["dangoUse"] in use_map :
+        object.config["dangoUse"] = use_map[object.config["dangoUse"]]
     # 私人腾讯翻译开关
-    object.config["tencentUse"] = object.config.get("tencentUse", "False")
+    object.config["tencentUse"] = object.config.get("tencentUse", False)
+    if object.config["tencentUse"] in use_map :
+        object.config["tencentUse"] = use_map[object.config["tencentUse"]]
     # 私人百度翻译开关
-    object.config["baiduUse"] = object.config.get("baiduUse", "False")
+    object.config["baiduUse"] = object.config.get("baiduUse", False)
+    if object.config["baiduUse"] in use_map :
+        object.config["baiduUse"] = use_map[object.config["baiduUse"]]
     # 私人彩云翻译开关
-    object.config["caiyunPrivateUse"] = object.config.get("caiyunPrivateUse", "False")
+    object.config["caiyunPrivateUse"] = object.config.get("caiyunPrivateUse", False)
+    if object.config["caiyunPrivateUse"] in use_map :
+        object.config["caiyunPrivateUse"] = use_map[object.config["caiyunPrivateUse"]]
     # 私人ChatGPT翻译开关
-    object.config["chatgptPrivateUse"] = object.config.get("chatgptPrivateUse", "False")
+    object.config["chatgptPrivateUse"] = object.config.get("chatgptPrivateUse", False)
+    if object.config["chatgptPrivateUse"] in use_map :
+        object.config["chatgptPrivateUse"] = use_map[object.config["chatgptPrivateUse"]]
     # 私人阿里云翻译开关
     object.config["aliyunPrivateUse"] = object.config.get("aliyunPrivateUse", False)
+    if object.config["aliyunPrivateUse"] in use_map :
+        object.config["aliyunPrivateUse"] = use_map[object.config["aliyunPrivateUse"]]
 
-    # 确保版本转换后至多只有2个翻译源能被同时开始
+    # 确保版本转换后至多只有3个翻译源能被同时开始
     tmp = []
     for val in ["youdaoUse", "baiduwebUse", "tencentwebUse", "deeplUse", "bingUse",
-                "caiyunUse", "tencentUse", "baiduUse", "caiyunPrivateUse"] :
-        if object.config[val] == "True" :
+                "caiyunUse", "tencentUse", "baiduUse", "caiyunPrivateUse",
+                "chatgptPrivateUse", "dangoUse", "aliyunPrivateUse"] :
+        if object.config[val] == True :
             tmp.append(val)
     if len(tmp) > 3 :
         count = 0
         for val in tmp :
-            object.config[val] = "False"
+            object.config[val] = False
             count += 1
             if len(tmp) - count <= 3 :
                 break
@@ -234,27 +264,39 @@ def configConvert(object) :
     # 字体
     object.config["fontType"] = object.config.get("fontType", "华康方圆体W7")
     # 字体样式开关
-    object.config["showColorType"] = object.config.get("showColorType", "False")
+    object.config["showColorType"] = object.config.get("showColorType", False)
+    if object.config["showColorType"] in use_map :
+        object.config["showColorType"] = use_map[object.config["showColorType"]]
     # 自动翻译时间间隔
     object.config["translateSpeed"] = object.config.get("translateSpeed", 0.5)
     # 显示原文开关
-    object.config["showOriginal"] = object.config.get("showOriginal", "False")
+    object.config["showOriginal"] = object.config.get("showOriginal", False)
+    if object.config["showOriginal"] in use_map :
+        object.config["showOriginal"] = use_map[object.config["showOriginal"]]
     # 原文自动复制到剪贴板开关
-    object.config["showClipboard"] = object.config.get("showClipboard", "False")
+    object.config["showClipboard"] = object.config.get("showClipboard", False)
+    if object.config["showClipboard"] in use_map :
+        object.config["showClipboard"] = use_map[object.config["showClipboard"]]
     # 文字方向
-    object.config["showTranslateRow"] = object.config.get("showTranslateRow", "False")
+    object.config["showTranslateRow"] = object.config.get("showTranslateRow", False)
+    if object.config["showTranslateRow"] in use_map :
+        object.config["showTranslateRow"] = use_map[object.config["showTranslateRow"]]
     # 文字换行
     object.config["BranchLineUse"] = object.config.get("BranchLineUse", False)
     # 翻译快捷键
     object.config["translateHotkeyValue1"] = object.config.get("translateHotkeyValue1", "ctrl")
     object.config["translateHotkeyValue2"] = object.config.get("translateHotkeyValue2", "d")
     # 翻译快捷键开关
-    object.config["showHotKey1"] = object.config.get("showHotKey1", "False")
+    object.config["showHotKey1"] = object.config.get("showHotKey1", False)
+    if object.config["showHotKey1"] in use_map :
+        object.config["showHotKey1"] = use_map[object.config["showHotKey1"]]
     # 范围快捷键
     object.config["rangeHotkeyValue1"] = object.config.get("rangeHotkeyValue1", "ctrl")
     object.config["rangeHotkeyValue2"] = object.config.get("rangeHotkeyValue2", "f")
     # 范围快捷键开关
-    object.config["showHotKey2"] = object.config.get("showHotKey2", "False")
+    object.config["showHotKey2"] = object.config.get("showHotKey2", False)
+    if object.config["showHotKey2"] in use_map :
+        object.config["showHotKey2"] = use_map[object.config["showHotKey2"]]
     # 屏蔽词
     object.config["Filter"] = object.config.get("Filter", [])
     # 图像相似度
@@ -271,10 +313,8 @@ def configConvert(object) :
 
     # 隐藏范围快捷键开关
     object.config["showHotKey3"] = object.config.get("showHotKey3", False)
-    if object.config["showHotKey3"] == "True":
-        object.config["showHotKey3"] = True
-    elif object.config["showHotKey3"] == "False":
-        object.config["showHotKey3"] = False
+    if object.config["showHotKey3"] in use_map :
+        object.config["showHotKey3"] = use_map[object.config["showHotKey3"]]
 
     # 是否全屏下置顶开关
     object.config["setTop"] =  object.config.get("setTop", False)
@@ -309,6 +349,30 @@ def configConvert(object) :
     object.config["mangaFiltrateUse"] = object.config.get("mangaFiltrateUse", True)
     object.config["mangaFontSizeUse"] = object.config.get("mangaFontSizeUse", False)
     object.config["mangaFontSize"] = object.config.get("mangaFontSize", 36)
+
+    # 允许写入的key
+    allow_keys = [
+        "dictInfo", "offlineOCR", "onlineOCR", "DangoToken", "onlineOCRProbation", "nodeURL", "baiduOCR", "OCR", "AccessToken",
+        "language", "fontColor", "youdaoUse", "baiduwebUse", "tencentwebUse", "deeplUse", "bingUse", "caiyunUse",
+        "tencentUse", "baiduUse", "caiyunPrivateUse", "chatgptPrivateUse", "dangoUse", "aliyunPrivateUse", "tencentAPI",
+        "baiduAPI", "caiyunAPI", "chatgptAPI", "aliyunAPI","chatgptProxy", "chatgptApiAddr", "chatgptModel",
+        "horizontal", "fontSize", "fontType", "showColorType", "translateSpeed", "showOriginal", "showClipboard",
+        "showTranslateRow", "BranchLineUse", "translateHotkeyValue1", "translateHotkeyValue2", "showHotKey1",
+        "rangeHotkeyValue1", "rangeHotkeyValue2", "showHotKey2", "Filter", "imageSimilarity", "textSimilarity",
+        "showStatusbarUse", "drawImageUse", "hideRangeHotkeyValue1", "hideRangeHotkeyValue2", "showHotKey3", "setTop",
+        "agreeCollectUse", "switch1Use", "switch2Use", "switch3Use", "switch4Use", "choiceRangeHotkeyValue",
+        "choiceRangeHotKeyUse", "autoPlaysoundUse", "mangaTrans", "mangaLanguage", "mangaDetectScale",
+        "mangaMergeThreshold", "mangaFontColor", "mangaBgColor", "mangaFontColorUse", "mangaBgColorUse",
+        "mangaFontType", "mangaOutputRenameUse", "mangaFastRenderUse", "mangaShadowSize", "mangaFiltrateUse",
+        "mangaFontSizeUse", "mangaFontSize"
+    ]
+    # 删除多余的key
+    delete_keys = []
+    for key in object.config.keys() :
+        if key not in allow_keys :
+            delete_keys.append(key)
+    for key in delete_keys :
+        del object.config[key]
 
 # 保存配置至服务器
 def postSaveSettin(object) :

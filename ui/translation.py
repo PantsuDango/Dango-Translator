@@ -353,14 +353,14 @@ class Translation(QMainWindow) :
             self.statusbar.hide()
 
         # 注册翻译快捷键
-        if self.object.config["showHotKey1"] == "True" :
+        if self.object.config["showHotKey1"] == True :
             self.registerTranslateHotkey()
         # 注册范围快捷键
-        if self.object.config["showHotKey2"] == "True" :
+        if self.object.config["showHotKey2"] == True :
             self.registerRangeHotkey()
         self.range_hotkey_sign.connect(self.clickRange)
         # 注册隐藏范围框快捷键
-        if self.object.config["showHotKey3"] == "True" or self.object.config["showHotKey3"] == True :
+        if self.object.config["showHotKey3"] == True :
             self.registerHideRangeHotkey()
 
         # 设置一个定时器, 用于检测鼠标位置
@@ -919,7 +919,7 @@ class Translation(QMainWindow) :
             return
 
         # 显示在文本框上
-        if self.object.config["showColorType"] == "False" :
+        if self.object.config["showColorType"] == False :
             self.format.setTextOutline(QPen(QColor(color), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
             self.translate_text.mergeCurrentCharFormat(self.format)
             self.translate_text.append(result)
@@ -1028,7 +1028,7 @@ class Translation(QMainWindow) :
         # 筛选翻译源类型
         translater_list = ["youdaoUse", "baiduwebUse", "tencentwebUse", "deeplUse", "bingUse", "caiyunUse"]
         for val in translater_list :
-            if self.object.config[val] == "False" :
+            if self.object.config[val] == False :
                 continue
             if not self.webdriver_type1 :
                 # 翻译模块一的翻译源类型
