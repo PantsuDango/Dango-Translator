@@ -363,7 +363,7 @@ def getChatgptModels(api_key, proxy, logger) :
         data = result.get("data", [])
         for val in data :
             model = val.get("id", "")
-            if model :
+            if model and "gpt-" in model :
                 models.append(model)
     except Exception :
         logger.error(format_exc())

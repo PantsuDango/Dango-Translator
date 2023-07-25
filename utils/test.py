@@ -51,7 +51,7 @@ def testOfflineOCR(object) :
 
 
 # 测试私人腾讯
-def testTencent(object) :
+def testTencent(object, secret_id, secret_key) :
 
     # 测试信息显示窗
     object.settin_ui.desc_ui = ui.desc.Desc(object)
@@ -59,8 +59,6 @@ def testTencent(object) :
     object.settin_ui.desc_ui.desc_text.append("\n开始测试...")
     object.settin_ui.desc_ui.show()
 
-    secret_id = object.config["tencentAPI"]["Key"]
-    secret_key = object.config["tencentAPI"]["Secret"]
     original = "もし、今の状況が自分らしくないことの連続で、好きになれないなら、どうすれば、変えられるかを真剣に考えてみよう。そしないと問題はちっとも解決しない。"
     object.settin_ui.desc_ui.desc_text.append("\n原文: \n{}".format(original))
     QApplication.processEvents()
@@ -70,7 +68,7 @@ def testTencent(object) :
 
 
 # 测试私人百度翻译
-def testBaidu(object) :
+def testBaidu(object, secret_id, secret_key) :
 
     # 测试信息显示窗
     object.settin_ui.desc_ui = ui.desc.Desc(object)
@@ -81,15 +79,13 @@ def testBaidu(object) :
     original = "もし、今の状況が自分らしくないことの連続で、好きになれないなら、どうすれば、変えられるかを真剣に考えてみよう。そしないと問題はちっとも解決しない。"
     object.settin_ui.desc_ui.desc_text.append("\n原文: \n{}".format(original))
     QApplication.processEvents()
-    secret_id = object.config["baiduAPI"]["Key"]
-    secret_key = object.config["baiduAPI"]["Secret"]
     result = translator.api.baidu(original, secret_id, secret_key, object.logger)
     object.settin_ui.desc_ui.desc_text.append("\n译文: \n{}".format(result))
     object.settin_ui.desc_ui.desc_text.append("\n测试结束!")
 
 
 # 测试私人彩云翻译
-def testCaiyun(object) :
+def testCaiyun(object, secret_key) :
 
     # 测试信息显示窗
     object.settin_ui.desc_ui = ui.desc.Desc(object)
@@ -100,7 +96,6 @@ def testCaiyun(object) :
     original = "もし、今の状況が自分らしくないことの連続で、好きになれないなら、どうすれば、変えられるかを真剣に考えてみよう。そしないと問題はちっとも解決しない。"
     object.settin_ui.desc_ui.desc_text.append("\n原文: \n{}".format(original))
     QApplication.processEvents()
-    secret_key = object.config["caiyunAPI"]
     result = translator.api.caiyun(original, secret_key, object.logger)
     object.settin_ui.desc_ui.desc_text.append("\n译文: \n{}".format(result))
     object.settin_ui.desc_ui.desc_text.append("\n测试结束!")
@@ -141,7 +136,7 @@ def testBaiduOCR(object) :
 
 
 # 测试私人ChatGPT翻译
-def testChatGPT(object) :
+def testChatGPT(object, api_key, proxy, url, model) :
 
     try :
         # 测试信息显示窗
@@ -159,11 +154,11 @@ def testChatGPT(object) :
             try :
                 start = time.time()
                 result = translator.api.chatgpt(
-                    api_key=object.config["chatgptAPI"],
+                    api_key=api_key,
                     language="JAP",
-                    proxy=object.config["chatgptProxy"],
-                    url=object.config["chatgptApiAddr"],
-                    model=object.config["chatgptModel"],
+                    proxy=proxy,
+                    url=url,
+                    model=model,
                     content=original,
                     logger=object.logger,
                 )
@@ -199,7 +194,7 @@ def testDango(object) :
 
 
 # 测试私人阿里云翻译
-def testAliyun(object) :
+def testAliyun(object, access_key_id, access_key_secret) :
 
     # 测试信息显示窗
     object.settin_ui.desc_ui = ui.desc.Desc(object)
@@ -210,8 +205,6 @@ def testAliyun(object) :
     original = "もし、今の状況が自分らしくないことの連続で、好きになれないなら、どうすれば、変えられるかを真剣に考えてみよう。そしないと問題はちっとも解決しない。"
     object.settin_ui.desc_ui.desc_text.append("\n原文: \n{}".format(original))
     QApplication.processEvents()
-    access_key_id = object.config["aliyunAPI"]["Key"]
-    access_key_secret = object.config["aliyunAPI"]["Secret"]
     sign, result = translator.api.aliyun(access_key_id, access_key_secret, "JAP", original, object.logger)
     object.settin_ui.desc_ui.desc_text.append("\n译文: \n{}".format(result))
     object.settin_ui.desc_ui.desc_text.append("\n测试结束!")

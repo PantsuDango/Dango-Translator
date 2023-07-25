@@ -26,6 +26,11 @@ import ui.switch
 import ui.desc
 import ui.key
 import ui.progress_bar
+import ui.tencent
+import ui.baidu
+import ui.caiyun
+import ui.chatgpt
+import ui.aliyun
 import translator.ocr.baidu
 import translator.all
 
@@ -89,9 +94,13 @@ class Settin(QMainWindow) :
 
         # 初始化界面
         self.key_ui = ui.key.Key(self.object)
-        self.chatgpt_key_ui = ui.key.ChatGPTKey(self.object)
         self.desc_ui = ui.desc.Desc(self.object)
         self.hotkey_ui = ui.hotkey.HotKey(self.object)
+        self.tencent_setting_ui = ui.tencent.TencentSetting(self.object)
+        self.baidu_setting_ui = ui.baidu.BaiduSetting(self.object)
+        self.caiyun_setting_ui = ui.caiyun.CaiyunSetting(self.object)
+        self.chatgpt_setting_ui = ui.chatgpt.ChatGPTSetting(self.object)
+        self.aliyun_setting_ui = ui.aliyun.AliyunSetting(self.object)
 
 
     def ui(self):
@@ -643,265 +652,138 @@ class Settin(QMainWindow) :
         label = QLabel(private_translater_tab)
         self.customSetGeometry(label, 20, 60, 35, 20)
         label.setText("团子:")
-
         # 私人团子翻译开关
         self.dango_private_switch = ui.switch.SwitchOCR(private_translater_tab, sign=self.dango_use, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.dango_private_switch, 90, 60, 65, 20)
+        self.customSetGeometry(self.dango_private_switch, 70, 60, 65, 20)
         self.dango_private_switch.checkedChanged.connect(self.changeDangoSwitch)
         self.dango_private_switch.setCursor(ui.static.icon.SELECT_CURSOR)
         # 私人团子翻译颜色选择
         self.dango_private_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.dango_color),"", private_translater_tab)
         self.customSetIconSize(self.dango_private_color_button, 20, 20)
-        self.customSetGeometry(self.dango_private_color_button, 165, 60, 20, 20)
+        self.customSetGeometry(self.dango_private_color_button, 150, 60, 20, 20)
         self.dango_private_color_button.setStyleSheet("background: transparent;")
         self.dango_private_color_button.clicked.connect(lambda: self.changeTranslateColor("dango_private", self.dango_use))
         self.dango_private_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
-
         # 私人团子翻译测试按钮
         button = QPushButton(private_translater_tab)
-        self.customSetGeometry(button, 205, 60, 60, 20)
+        self.customSetGeometry(button, 185, 60, 60, 20)
         button.setText("测试")
         button.clicked.connect(lambda: utils.test.testDango(self.object))
         button.setCursor(ui.static.icon.SELECT_CURSOR)
 
-        # 私人团子翻译标签
-        label = QLabel(private_translater_tab)
-        self.customSetGeometry(label, 280, 60, 500, 20)
-        label.setText("免费内测中, 不保证稳定性")
-
         # 私人腾讯翻译标签
         label = QLabel(private_translater_tab)
-        self.customSetGeometry(label, 20, 105, 35, 20)
+        self.customSetGeometry(label, 320, 60, 35, 20)
         label.setText("腾讯:")
-
         # 私人腾讯翻译开关
         self.tencent_private_switch = ui.switch.SwitchOCR(private_translater_tab, sign=self.tencent_use, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.tencent_private_switch, 90, 105, 65, 20)
+        self.customSetGeometry(self.tencent_private_switch, 370, 60, 65, 20)
         self.tencent_private_switch.checkedChanged.connect(self.changeTencentSwitch)
         self.tencent_private_switch.setCursor(ui.static.icon.SELECT_CURSOR)
         # 私人腾讯翻译颜色选择
         self.tencent_private_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.tencent_color), "", private_translater_tab)
         self.customSetIconSize(self.tencent_private_color_button, 20, 20)
-        self.customSetGeometry(self.tencent_private_color_button, 165, 105, 20, 20)
+        self.customSetGeometry(self.tencent_private_color_button, 450, 60, 20, 20)
         self.tencent_private_color_button.setStyleSheet("background: transparent;")
         self.tencent_private_color_button.clicked.connect(lambda: self.changeTranslateColor("tencent_private", self.tencent_use))
         self.tencent_private_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
-
-        # 私人腾讯翻译密钥按钮
+        # 私人腾讯翻译设置按钮
         button = QPushButton(private_translater_tab)
-        self.customSetGeometry(button, 205, 105, 60, 20)
-        button.setText("密钥")
-        button.clicked.connect(lambda: self.showKey("tencentTranslate"))
-        button.setCursor(ui.static.icon.SELECT_CURSOR)
-
-        # 私人腾讯翻译测试按钮
-        button = QPushButton(private_translater_tab)
-        self.customSetGeometry(button, 285, 105, 60, 20)
-        button.setText("测试")
-        button.clicked.connect(lambda: utils.test.testTencent(self.object))
-        button.setCursor(ui.static.icon.SELECT_CURSOR)
-
-        # 私人腾讯翻译教程按钮
-        button = QPushButton(private_translater_tab)
-        self.customSetGeometry(button, 365, 105, 60, 20)
-        button.setText("注册")
-        button.clicked.connect(self.openTencentTutorial)
-        button.setCursor(ui.static.icon.SELECT_CURSOR)
-
-        # 私人腾讯查额度按钮
-        button = QPushButton(private_translater_tab)
-        self.customSetGeometry(button, 445, 105, 60, 20)
-        button.setText("查额度")
-        button.clicked.connect(self.openTencentQueryQuota)
+        self.customSetGeometry(button, 485, 60, 60, 20)
+        button.setText("设置")
+        button.clicked.connect(self.openTencentSetting)
         button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 私人百度翻译标签
         label = QLabel(private_translater_tab)
-        self.customSetGeometry(label, 20, 150, 35, 20)
+        self.customSetGeometry(label, 20, 110, 35, 20)
         label.setText("百度:")
-
         # 私人百度翻译开关
         self.baidu_private_switch = ui.switch.SwitchOCR(private_translater_tab, sign=self.baidu_use, startX=(65-20) * self.rate)
-        self.customSetGeometry(self.baidu_private_switch, 90, 150, 65, 20)
+        self.customSetGeometry(self.baidu_private_switch, 70, 110, 65, 20)
         self.baidu_private_switch.checkedChanged.connect(self.changeBaiduTranslaterSwitch)
         self.baidu_private_switch.setCursor(ui.static.icon.SELECT_CURSOR)
-
         # 私人百度翻译颜色选择
         self.baidu_private_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.baidu_color), "", private_translater_tab)
         self.customSetIconSize(self.baidu_private_color_button, 20, 20)
-        self.customSetGeometry(self.baidu_private_color_button, 165, 150, 20, 20)
+        self.customSetGeometry(self.baidu_private_color_button, 150, 110, 20, 20)
         self.baidu_private_color_button.setStyleSheet("background: transparent;")
         self.baidu_private_color_button.clicked.connect(lambda: self.changeTranslateColor("baidu_private", self.baidu_color))
         self.baidu_private_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
-
-        # 私人百度翻译密钥按钮
+        # 私人百度翻译设置按钮
         button = QPushButton(private_translater_tab)
-        self.customSetGeometry(button, 205, 150, 60, 20)
-        button.setText("密钥")
-        button.clicked.connect(lambda: self.showKey("baiduTranslate"))
-        button.setCursor(ui.static.icon.SELECT_CURSOR)
-
-        # 私人百度翻译测试按钮
-        button = QPushButton(private_translater_tab)
-        self.customSetGeometry(button, 285, 150, 60, 20)
-        button.setText("测试")
-        button.clicked.connect(lambda: utils.test.testBaidu(self.object))
-        button.setCursor(ui.static.icon.SELECT_CURSOR)
-
-        # 私人百度翻译教程按钮
-        button = QPushButton(private_translater_tab)
-        self.customSetGeometry(button, 365, 150, 60, 20)
-        button.setText("注册")
-        button.clicked.connect(self.openBaiduTutorial)
-        button.setCursor(ui.static.icon.SELECT_CURSOR)
-
-        # 私人百度查额度按钮
-        button = QPushButton(private_translater_tab)
-        self.customSetGeometry(button, 445, 150, 60, 20)
-        button.setText("查额度")
-        button.clicked.connect(self.openBaiduQueryQuota)
+        self.customSetGeometry(button, 185, 110, 60, 20)
+        button.setText("设置")
+        button.clicked.connect(self.openBaiduSetting)
         button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 私人彩云翻译标签
         label = QLabel(private_translater_tab)
-        self.customSetGeometry(label, 20, 195, 35, 20)
+        self.customSetGeometry(label, 320, 110, 35, 20)
         label.setText("彩云:")
-
         # 私人彩云翻译开关
         self.caiyun_private_switch = ui.switch.SwitchOCR(private_translater_tab, sign=self.caiyun_use, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.caiyun_private_switch, 90, 195, 65, 20)
+        self.customSetGeometry(self.caiyun_private_switch, 370, 110, 65, 20)
         self.caiyun_private_switch.checkedChanged.connect(self.changeCaiyunSwitch)
         self.caiyun_private_switch.setCursor(ui.static.icon.SELECT_CURSOR)
-
         # 私人彩云翻译颜色选择
         self.caiyun_private_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.caiyun_color), "", private_translater_tab)
         self.customSetIconSize(self.caiyun_private_color_button, 20, 20)
-        self.customSetGeometry(self.caiyun_private_color_button, 165, 195, 20, 20)
+        self.customSetGeometry(self.caiyun_private_color_button, 450, 110, 20, 20)
         self.caiyun_private_color_button.setStyleSheet("background: transparent;")
-        self.caiyun_private_color_button.clicked.connect(
-            lambda: self.changeTranslateColor("caiyun_private", self.caiyun_color))
+        self.caiyun_private_color_button.clicked.connect(lambda: self.changeTranslateColor("caiyun_private", self.caiyun_color))
         self.caiyun_private_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
-
-        # 私人彩云翻译密钥按钮
+        # 私人彩云翻译设置按钮
         button = QPushButton(private_translater_tab)
-        self.customSetGeometry(button, 205, 195, 60, 20)
-        button.setText("密钥")
-        button.clicked.connect(lambda: self.showKey("caiyunTranslate"))
-        button.setCursor(ui.static.icon.SELECT_CURSOR)
-
-        # 私人彩云翻译测试按钮
-        button = QPushButton(private_translater_tab)
-        self.customSetGeometry(button, 285, 195, 60, 20)
-        button.setText("测试")
-        button.clicked.connect(lambda: utils.test.testCaiyun(self.object))
-        button.setCursor(ui.static.icon.SELECT_CURSOR)
-
-        # 私人彩云翻译教程按钮
-        button = QPushButton(private_translater_tab)
-        self.customSetGeometry(button, 365, 195, 60, 20)
-        button.setText("注册")
-        button.clicked.connect(self.openCaiyunTutorial)
-        button.setCursor(ui.static.icon.SELECT_CURSOR)
-
-        # 私人彩云查额度按钮
-        button = QPushButton(private_translater_tab)
-        self.customSetGeometry(button, 445, 195, 60, 20)
-        button.setText("查额度")
-        button.clicked.connect(self.openCaiyunQueryQuota)
+        self.customSetGeometry(button, 485, 110, 60, 20)
+        button.setText("设置")
+        button.clicked.connect(self.openCaiyunSetting)
         button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 私人ChatGPT翻译标签
         label = QLabel(private_translater_tab)
-        self.customSetGeometry(label, 20, 240, 60, 20)
-        label.setText("ChatGPT:")
-
+        self.customSetGeometry(label, 20, 160, 60, 20)
+        label.setText("GPT:")
         # 私人ChatGPT翻译开关
         self.chatgpt_private_switch = ui.switch.SwitchOCR(private_translater_tab, sign=self.chatgpt_use, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.chatgpt_private_switch, 90, 240, 65, 20)
+        self.customSetGeometry(self.chatgpt_private_switch, 70, 160, 65, 20)
         self.chatgpt_private_switch.checkedChanged.connect(self.changeChatGPTSwitch)
         self.chatgpt_private_switch.setCursor(ui.static.icon.SELECT_CURSOR)
-
         # 私人ChatGPT翻译颜色选择
         self.chatgpt_private_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.chatgpt_color), "", private_translater_tab)
         self.customSetIconSize(self.chatgpt_private_color_button, 20, 20)
-        self.customSetGeometry(self.chatgpt_private_color_button, 165, 240, 20, 20)
+        self.customSetGeometry(self.chatgpt_private_color_button, 150, 160, 20, 20)
         self.chatgpt_private_color_button.setStyleSheet("background: transparent;")
         self.chatgpt_private_color_button.clicked.connect(lambda: self.changeTranslateColor("chatgpt_private", self.chatgpt_color))
         self.chatgpt_private_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
-
-        # 私人ChatGPT翻译密钥按钮
+        # 私人ChatGPT翻译设置按钮
         button = QPushButton(private_translater_tab)
-        self.customSetGeometry(button, 205, 240, 60, 20)
-        button.setText("密钥")
-        button.clicked.connect(lambda: self.showKey("chatgptTranslate"))
-        button.setCursor(ui.static.icon.SELECT_CURSOR)
-
-        # 私人ChatGPT翻译测试按钮
-        button = QPushButton(private_translater_tab)
-        self.customSetGeometry(button, 285, 240, 60, 20)
-        button.setText("测试")
-        button.clicked.connect(lambda: utils.test.testChatGPT(self.object))
-        button.setCursor(ui.static.icon.SELECT_CURSOR)
-
-        # 私人ChatGPT翻译注册按钮
-        button = QPushButton(private_translater_tab)
-        self.customSetGeometry(button, 365, 240, 60, 20)
-        button.setText("注册")
-        button.clicked.connect(self.openChatGPTTutorial)
-        button.setCursor(ui.static.icon.SELECT_CURSOR)
-
-        # 私人ChatGPT查额度按钮
-        button = QPushButton(private_translater_tab)
-        self.customSetGeometry(button, 445, 240, 60, 20)
-        button.setText("代理")
-        button.clicked.connect(lambda: self.showKey("chatgptProxy"))
+        self.customSetGeometry(button, 185, 160, 60, 20)
+        button.setText("设置")
+        button.clicked.connect(self.openChatgptSetting)
         button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 私人阿里云翻译标签
         label = QLabel(private_translater_tab)
-        self.customSetGeometry(label, 20, 285, 100, 20)
-        label.setText("阿里云:")
-
+        self.customSetGeometry(label, 320, 160, 100, 20)
+        label.setText("阿里:")
         # 私人阿里云翻译开关
         self.aliyun_private_switch = ui.switch.SwitchOCR(private_translater_tab, sign=self.aliyun_use, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.aliyun_private_switch, 90, 285, 65, 20)
+        self.customSetGeometry(self.aliyun_private_switch, 370, 160, 65, 20)
         self.aliyun_private_switch.checkedChanged.connect(self.changeAliyunSwitch)
         self.aliyun_private_switch.setCursor(ui.static.icon.SELECT_CURSOR)
-
         # 私人阿里云翻译颜色选择
         self.aliyun_private_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.aliyun_color), "", private_translater_tab)
         self.customSetIconSize(self.aliyun_private_color_button, 20, 20)
-        self.customSetGeometry(self.aliyun_private_color_button, 165, 285, 20, 20)
+        self.customSetGeometry(self.aliyun_private_color_button, 450, 160, 20, 20)
         self.aliyun_private_color_button.setStyleSheet("background: transparent;")
         self.aliyun_private_color_button.clicked.connect(lambda: self.changeTranslateColor("aliyun_private", self.aliyun_color))
         self.aliyun_private_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
-
-        # 私人阿里云翻译密钥按钮
+        # 私人阿里云翻译设置按钮
         button = QPushButton(private_translater_tab)
-        self.customSetGeometry(button, 205, 285, 60, 20)
-        button.setText("密钥")
-        button.clicked.connect(lambda: self.showKey("aliyunTranslate"))
-        button.setCursor(ui.static.icon.SELECT_CURSOR)
-
-        # 私人阿里云翻译测试按钮
-        button = QPushButton(private_translater_tab)
-        self.customSetGeometry(button, 285, 285, 60, 20)
-        button.setText("测试")
-        button.clicked.connect(lambda: utils.test.testAliyun(self.object))
-        button.setCursor(ui.static.icon.SELECT_CURSOR)
-
-        # 私人阿里云翻译教程按钮
-        button = QPushButton(private_translater_tab)
-        self.customSetGeometry(button, 365, 285, 60, 20)
-        button.setText("注册")
-        button.clicked.connect(self.openAliyunTutorial)
-        button.setCursor(ui.static.icon.SELECT_CURSOR)
-
-        # 私人彩云查额度按钮
-        button = QPushButton(private_translater_tab)
-        self.customSetGeometry(button, 445, 285, 60, 20)
-        button.setText("查额度")
-        button.clicked.connect(self.openAliyunQueryQuota)
+        self.customSetGeometry(button, 485, 160, 60, 20)
+        button.setText("设置")
+        button.clicked.connect(self.openAliyunSetting)
         button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 公共翻译备注
@@ -2352,18 +2234,6 @@ class Settin(QMainWindow) :
             utils.test.testOfflineOCR(self.object)
 
 
-    # 打开私人腾讯翻译教程
-    def openTencentTutorial(self):
-
-        try :
-            url = self.object.yaml["dict_info"]["tencent_tutorial"]
-            webbrowser.open(url, new=0, autoraise=True)
-        except Exception :
-            self.logger.error(format_exc())
-            utils.message.MessageBox("打开失败",
-                                     "请尝试手动打开此地址:\n%s     "%url)
-
-
     # 打开公共翻译教程
     def openPublicTransTutorial(self):
 
@@ -2374,54 +2244,6 @@ class Settin(QMainWindow) :
             self.logger.error(format_exc())
             utils.message.MessageBox("打开失败",
                                      "请尝试手动打开此地址:\n%s     "%url)
-
-
-    # 打开私人百度翻译教程
-    def openBaiduTutorial(self):
-
-        try:
-            url = self.object.yaml["dict_info"]["baidu_tutorial"]
-            webbrowser.open(url, new=0, autoraise=True)
-        except Exception:
-            self.logger.error(format_exc())
-            utils.message.MessageBox("打开失败",
-                                     "请尝试手动打开此地址:\n%s     "%url)
-
-
-    # 打开私人彩云翻译教程
-    def openCaiyunTutorial(self):
-
-        try:
-            url = self.object.yaml["dict_info"]["caiyun_tutorial"]
-            webbrowser.open(url, new=0, autoraise=True)
-        except Exception:
-            self.logger.error(format_exc())
-            utils.message.MessageBox("打开失败",
-                                     "请尝试手动打开此地址:\n%s     "%url)
-
-
-    # 打开私人ChatGPT翻译教程
-    def openChatGPTTutorial(self):
-
-        try:
-            url = self.object.yaml["dict_info"]["chatgpt_tutorial"]
-            webbrowser.open(url, new=0, autoraise=True)
-        except Exception:
-            self.logger.error(format_exc())
-            utils.message.MessageBox("打开失败",
-                                     "请尝试手动打开此地址:\n%s     "%url)
-
-
-    # 打开私人阿里云翻译教程
-    def openAliyunTutorial(self):
-
-        try:
-            url = self.object.yaml["dict_info"]["aliyun_tutorial"]
-            webbrowser.open(url, new=0, autoraise=True)
-        except Exception :
-            self.logger.error(format_exc())
-            utils.message.MessageBox("打开失败",
-                                     "请尝试手动打开此地址:\n%s    "%url)
 
 
     # 打开本地OCR教程
@@ -2584,68 +2406,8 @@ class Settin(QMainWindow) :
                                      "打开地址失败, 请尝试手动打开此网页下载\n%s     "%url)
 
 
-    # 打开查询私人腾讯额度地址
-    def openTencentQueryQuota(self):
-
-        url = "https://console.cloud.tencent.com/tmt"
-        try:
-            webbrowser.open(url, new=0, autoraise=True)
-        except Exception:
-            self.logger.error(format_exc())
-            utils.message.MessageBox("私人腾讯额度查询",
-                                     "打开地址失败, 请尝试手动打开此网页下载\n%s     "%url)
-
-
-    # 打开查询私人彩云额度地址
-    def openCaiyunQueryQuota(self):
-
-        url = "https://dashboard.caiyunapp.com/v1/token/5e818320d4b84b00d29a9316/?type=2"
-        try:
-            webbrowser.open(url, new=0, autoraise=True)
-        except Exception:
-            self.logger.error(format_exc())
-            utils.message.MessageBox("私人彩云额度查询",
-                                     "打开地址失败, 请尝试手动打开此网页下载\n%s     "%url)
-
-
-    # 打开查询私人阿里云额度地址
-    def openAliyunQueryQuota(self):
-
-        url = "https://usercenter2.aliyun.com/finance/expense-report/expense-detail"
-        try:
-            webbrowser.open(url, new=0, autoraise=True)
-        except Exception:
-            self.logger.error(format_exc())
-            utils.message.MessageBox("私人腾讯额度查询",
-                                     "打开地址失败, 请尝试手动打开此网页下载\n%s     " % url)
-
-
-    # 打开查询私人ChatGPT额度地址
-    def openChatGPTQueryQuota(self):
-
-        url = "https://platform.openai.com/account/usage"
-        try:
-            webbrowser.open(url, new=0, autoraise=True)
-        except Exception:
-            self.logger.error(format_exc())
-            utils.message.MessageBox("私人ChatGPT额度查询",
-                                     "打开地址失败, 请尝试手动打开此网页下载\n%s     " % url)
-
-
-    # 打开查询私人百度额度地址
-    def openBaiduQueryQuota(self):
-
-        url = "https://fanyi-api.baidu.com/api/trans/product/desktop"
-        try:
-            webbrowser.open(url, new=0, autoraise=True)
-        except Exception:
-            self.logger.error(format_exc())
-            utils.message.MessageBox("私人腾讯额度查询",
-                                     "打开地址失败, 请尝试手动打开此网页下载\n%s     "%url)
-
-
     # 打开团子在线OCR购买
-    def openDangoBuyPage(self):
+    def openDangoBuyPage(self) :
 
         try :
             ocr_login_html = self.object.yaml["dict_info"]["ocr_login_html"]
@@ -2755,40 +2517,7 @@ class Settin(QMainWindow) :
             self.key_ui.baidu_ocr_key_textEdit.show()
             self.key_ui.baidu_ocr_secret_textEdit.show()
 
-        # 私人腾讯翻译
-        elif key_type == "tencentTranslate" :
-            self.key_ui.setWindowTitle("私人腾讯翻译 - 密钥编辑 - 退出会自动保存")
-            self.key_ui.tencent_private_key_textEdit.show()
-            self.key_ui.tencent_private_secret_textEdit.show()
-
-        # 私人百度翻译
-        elif key_type == "baiduTranslate" :
-            self.key_ui.setWindowTitle("私人百度翻译 - 密钥编辑 - 退出会自动保存")
-            self.key_ui.baidu_private_key_textEdit.show()
-            self.key_ui.baidu_private_secret_textEdit.show()
-
-        # 私人彩云翻译
-        elif key_type == "caiyunTranslate" :
-            self.key_ui.setWindowTitle("私人彩云翻译 - 密钥编辑 - 退出会自动保存")
-            self.key_ui.caiyun_private_key_textEdit.show()
-
-        # 私人ChatGPT翻译-密钥设置
-        elif key_type == "chatgptTranslate":
-            self.key_ui.setWindowTitle("私人ChatGPT翻译 - 密钥编辑 - 退出会自动保存")
-            self.key_ui.chatgpt_private_key_textEdit.show()
-
-        # 私人ChatGPT代理-代理设置
-        elif key_type == "chatgptProxy" :
-            self.chatgpt_key_ui.show()
-
-        # 私人阿里云翻译
-        elif key_type == "aliyunTranslate":
-            self.key_ui.setWindowTitle("私人阿里云翻译 - 密钥编辑 - 退出会自动保存")
-            self.key_ui.aliyun_private_key_textEdit.show()
-            self.key_ui.aliyun_private_secret_textEdit.show()
-
-        if key_type != "chatgptProxy" :
-            self.key_ui.show()
+        self.key_ui.show()
 
 
     # 翻译框透明度
@@ -3179,3 +2908,33 @@ class Settin(QMainWindow) :
         self.object.translation_ui.show()
         if self.object.range_ui.show_sign == True :
             self.object.range_ui.show()
+
+
+    # 打开私人腾讯翻译设置页面
+    def openTencentSetting(self) :
+
+        self.tencent_setting_ui.show()
+
+
+    # 打开私人百度翻译设置页面
+    def openBaiduSetting(self) :
+
+        self.baidu_setting_ui.show()
+
+
+    # 打开私人彩云翻译设置页面
+    def openCaiyunSetting(self) :
+
+        self.caiyun_setting_ui.show()
+
+
+    # 打开私人chatgpt翻译设置页面
+    def openChatgptSetting(self) :
+
+        self.chatgpt_setting_ui.show()
+
+
+    # 打开私人阿里云翻译设置页面
+    def openAliyunSetting(self) :
+
+        self.aliyun_setting_ui.show()
