@@ -161,6 +161,7 @@ class Manga(QWidget) :
         self.createTransAction("私人百度")
         self.createTransAction("私人ChatGPT")
         self.createTransAction("私人阿里云")
+        self.createTransAction("私人有道")
         # 将下拉菜单设置为按钮的菜单
         self.select_trans_button.setMenu(self.trans_menu)
         self.trans_action_group.triggered.connect(self.changeSelectTrans)
@@ -1277,6 +1278,16 @@ class Manga(QWidget) :
                     access_key_secret=self.object.config["aliyunAPI"]["Secret"],
                     source_language=self.object.config["mangaLanguage"],
                     text_to_translate=original,
+                    logger=self.object.logger
+                )
+                if not sign :
+                    return False, result
+
+            elif manga_trans == "私人有道" :
+                sign, result = translator.api.youdao(
+                    text=original,
+                    app_key=self.object.config["youdaoAPI"]["Key"],
+                    app_secret=self.object.config["youdaoAPI"]["Secret"],
                     logger=self.object.logger
                 )
                 if not sign :
@@ -2666,12 +2677,24 @@ class TransEdit(QWidget) :
         self.customSetGeometry(button, 350, 0, 70, 30)
         button.setCursor(ui.static.icon.EDIT_CURSOR)
         button.setText(" 阿里云")
-        button.setIcon(ui.static.icon.ALIYUN_ICON)
+        button.setIcon(ui.static.icon.TRANSLATE_ICON)
         button.setStyleSheet("QPushButton {background: transparent; font: 9pt '华康方圆体W7'; border-radius: 6px}"
                              "QPushButton:hover {background-color: #83AAF9;}"
                              "QPushButton:pressed {background-color: #4480F9;}")
         button.clicked.connect(lambda: self.refreshTrans("阿里云"))
         button.setToolTip("<b>使用私人阿里云重新翻译</b>")
+
+        # 私人有道
+        button = QPushButton(self)
+        self.customSetGeometry(button, 420, 0, 70, 30)
+        button.setCursor(ui.static.icon.EDIT_CURSOR)
+        button.setText(" 有道")
+        button.setIcon(ui.static.icon.TRANSLATE_ICON)
+        button.setStyleSheet("QPushButton {background: transparent; font: 9pt '华康方圆体W7'; border-radius: 6px}"
+                             "QPushButton:hover {background-color: #83AAF9;}"
+                             "QPushButton:pressed {background-color: #4480F9;}")
+        button.clicked.connect(lambda: self.refreshTrans("有道"))
+        button.setToolTip("<b>使用私人有道重新翻译</b>")
 
         # 修改字体颜色
         self.font_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.font_color), "", self)
@@ -2936,6 +2959,7 @@ class TransEdit(QWidget) :
         original = self.original_text.toPlainText()
         if not original.strip() :
             return
+
         if trans_type == "团子" :
             sign, result = translator.ocr.dango.dangoTrans(
                 object=self.object,
@@ -2943,8 +2967,9 @@ class TransEdit(QWidget) :
                 language=self.object.config["mangaLanguage"]
             )
             if not sign :
-                utils.message.MessageBox("团子翻译失败", result, self.rate)
+                utils.message.MessageBox("私人团子翻译失败", result, self.rate)
                 return
+
         elif trans_type == "彩云" :
             result = translator.api.caiyun(
                 sentence=original,
@@ -2952,8 +2977,9 @@ class TransEdit(QWidget) :
                 logger=self.logger
             )
             if result[:6] == "私人彩云: ":
-                utils.message.MessageBox("彩云翻译失败", result, self.rate)
+                utils.message.MessageBox("私人彩云翻译失败", result, self.rate)
                 return
+
         elif trans_type == "腾讯":
             result = translator.api.tencent(
                 sentence=original,
@@ -2962,8 +2988,9 @@ class TransEdit(QWidget) :
                 logger=self.logger
             )
             if result[:6] == "私人腾讯: ":
-                utils.message.MessageBox("腾讯翻译失败", result, self.rate)
+                utils.message.MessageBox("私人腾讯翻译失败", result, self.rate)
                 return
+
         elif trans_type == "百度":
             result = translator.api.baidu(
                 sentence=original,
@@ -2972,8 +2999,9 @@ class TransEdit(QWidget) :
                 logger=self.logger
             )
             if result[:6] == "私人百度: ":
-                utils.message.MessageBox("百度翻译失败", result, self.rate)
+                utils.message.MessageBox("私人百度翻译失败", result, self.rate)
                 return
+
         elif trans_type == "ChatGPT":
             result = translator.api.chatgpt(
                 api_key=self.object.config["chatgptAPI"],
@@ -2985,8 +3013,9 @@ class TransEdit(QWidget) :
                 logger=self.logger
             )
             if result[:11] == "私人ChatGPT: ":
-                utils.message.MessageBox("ChatGPT翻译失败", result, self.rate)
+                utils.message.MessageBox("私人ChatGPT翻译失败", result, self.rate)
                 return
+
         elif trans_type == "阿里云":
             sign, result = translator.api.aliyun(
                 access_key_id=self.object.config["aliyunAPI"]["Key"],
@@ -2996,8 +3025,20 @@ class TransEdit(QWidget) :
                 logger=self.object.logger
             )
             if not sign :
-                utils.message.MessageBox("阿里云翻译失败", result, self.rate)
+                utils.message.MessageBox("私人阿里云翻译失败", result, self.rate)
                 return
+
+        elif trans_type == "有道":
+            sign, result = translator.api.youdao(
+                text=original,
+                app_key=self.object.config["youdaoAPI"]["Key"],
+                app_secret=self.object.config["youdaoAPI"]["Secret"],
+                logger=self.object.logger
+            )
+            if not sign :
+                utils.message.MessageBox("私人有道翻译失败", result, self.rate)
+                return
+
         else :
             return
 

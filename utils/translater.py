@@ -225,6 +225,15 @@ class TranslaterProcess(QThread) :
                 logger=self.logger,
             )
 
+        # 私人有道
+        elif self.trans_type == "youdao_private" :
+            sign, result = translator.api.youdao(
+                text=self.object.translation_ui.original,
+                app_key=self.object.config["youdaoAPI"]["Key"],
+                app_secret=self.object.config["youdaoAPI"]["Secret"],
+                logger=self.logger,
+            )
+
         elif self.trans_type == "original" :
             result = self.object.translation_ui.original
 
@@ -496,6 +505,11 @@ class Translater(QThread) :
             utils.thread.createThread(self.creatTranslaterThread, "aliyun_private")
             nothing_sign = True
 
+        # 私人有道
+        if self.object.config["youdaoPrivateUse"] == True :
+            utils.thread.createThread(self.creatTranslaterThread, "youdao_private")
+            nothing_sign = True
+
         # 显示原文
         if self.object.config["showOriginal"] == True or not nothing_sign :
             if not nothing_sign :
@@ -563,6 +577,11 @@ class Translater(QThread) :
         # 私人阿里云
         if self.object.config["aliyunPrivateUse"] == True :
             utils.thread.createThread(self.creatTranslaterThread, "aliyun_private")
+            nothing_sign = True
+
+        # 私人有道
+        if self.object.config["youdaoPrivateUse"] == True :
+            utils.thread.createThread(self.creatTranslaterThread, "youdao_private")
             nothing_sign = True
 
         # 显示原文

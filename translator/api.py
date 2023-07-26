@@ -16,11 +16,50 @@ from random import randint
 from traceback import format_exc
 import json
 import re
-
 import urllib.parse
 import hashlib
 import base64
 import hmac
+import random
+
+
+# 私人有道翻译错误码对照
+YOUDAO_ERROR_CODE_MAP = {
+    '101': '缺少必填的参数',
+    '102': '不支持的语言类型',
+    '103': '翻译文本过长',
+    '104': '不支持的API类型',
+    '105': '不支持的签名类型',
+    '106': '不支持的响应类型',
+    '107': '不支持的传输加密类型',
+    '108': 'appKey无效',
+    '109': 'batchLog格式不正确',
+    '110': '无相关服务的有效实例',
+    '111': '开发者账号无效',
+    '201': '解密失败，可能为DES,BASE64,URLDecode的错误',
+    '202': '签名检验失败',
+    '203': '访问IP地址不在可访问IP列表',
+    '205': '请求的接口与应用的平台类型不一致',
+    '206': '因为时间戳无效导致签名错误',
+    '207': '重放请求',
+    '301': '辞典查询失败',
+    '302': '翻译查询失败',
+    '303': '服务端的其他异常',
+    '401': '账户已经欠费停',
+    '411': '访问频率受限,请稍后访问',
+    '412': '长请求过于频繁，请稍后访问',
+    '413': '账户已经欠费停',
+    '414': '账户已经欠费停',
+    '415': '账户已经欠费停',
+    '416': '账户已经欠费停',
+    '420': '账户已经欠费停',
+    '430': '账户已经欠费停',
+    '436': '账户已经欠费停',
+    '501': '词典查询失败',
+    '502': '词典查询失败',
+    '503': '词典查询失败',
+    '504': '词典查询失败',
+}
 
 
 # 私人百度翻译
@@ -222,8 +261,9 @@ def caiyun(sentence, token, logger) :
 def chatgpt(api_key, language, proxy, url, model, content, logger) :
 
     try :
-        if not api_key:
+        if not api_key :
             return "私人ChatGPT: 还未填入私人ChatGPT密钥, 不可使用"
+
         language_map = {
             "JAP": "日语",
             "ENG": "英文",
@@ -439,3 +479,47 @@ def aliyun(access_key_id, access_key_secret, source_language, text_to_translate,
         return False, "私人阿里: 翻译出错-{}, 请排查完错误后重试".format(err)
 
     return True, response_content
+
+
+# 私人有道翻译
+def youdao(text, app_key, app_secret, logger) :
+
+    if (not app_key) or (not app_secret):
+        return False, "私人有道: 还未填入私人密钥, 不可使用. 请在设置-翻译设定-私人翻译中注册私人有道并填入密钥后重试"
+
+    url = "https://openapi.youdao.com/api"
+    salt = random.randint(1, 65536)
+    sign = app_key + text + str(salt) + app_secret
+    sign = hashlib.md5(sign.encode()).hexdigest()
+    params = {
+        "q": text,
+        "from": "auto",
+        "to": "zh-CHS",
+        "appKey": app_key,
+        "salt": salt,
+        "sign": sign
+    }
+
+    sign = False
+    result = "私人有道: 翻译出错, "
+    try :
+        resp = requests.get(url, params=params)
+        resp = json.loads(resp.text)
+        error_code = resp.get("errorCode", "-1")
+
+        if error_code == "0" :
+            sign = True
+            result = "\n".join(resp["translation"])
+        elif error_code in YOUDAO_ERROR_CODE_MAP :
+            result += "errorCode-{}, {}".format(error_code, YOUDAO_ERROR_CODE_MAP[error_code])
+        else :
+            result += "errorCode-{}".format(error_code)
+
+    except Exception as err :
+        logger.error(format_exc())
+        result += str(err)
+
+    if not sign :
+        logger.error(result)
+
+    return sign, result

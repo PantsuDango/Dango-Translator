@@ -167,13 +167,13 @@ def testChatGPT(object, api_key, proxy, url, model) :
                 object.settin_ui.desc_ui.desc_text.append("测试结束!")
             except Exception :
                 object.settin_ui.desc_ui.desc_text.append("\n测试出错: \n{}".format(traceback.format_exc()))
-                object.logger.info(traceback.format_exc())
+                object.logger.error(traceback.format_exc())
 
         utils.thread.createThread(func)
 
     except Exception :
         object.settin_ui.desc_ui.desc_text.append("\n测试出错: \n{}".format(traceback.format_exc()))
-        object.logger.info(traceback.format_exc())
+        object.logger.error(traceback.format_exc())
 
 
 # 测试私人团子
@@ -208,3 +208,36 @@ def testAliyun(object, access_key_id, access_key_secret) :
     sign, result = translator.api.aliyun(access_key_id, access_key_secret, "JAP", original, object.logger)
     object.settin_ui.desc_ui.desc_text.append("\n译文: \n{}".format(result))
     object.settin_ui.desc_ui.desc_text.append("\n测试结束!")
+
+
+# 测试私人有道翻译
+def testYoudao(object, app_key, app_secret) :
+
+    try :
+        # 测试信息显示窗
+        object.settin_ui.desc_ui = ui.desc.Desc(object)
+        object.settin_ui.desc_ui.setWindowTitle("私人有道翻译测试")
+        object.settin_ui.desc_ui.desc_text.append("\n开始测试...")
+        object.settin_ui.desc_ui.show()
+
+        original = "もし、今の状況が自分らしくないことの連続で、好きになれないなら、どうすれば、変えられるかを真剣に考えてみよう。そしないと問題はちっとも解決しない。"
+        object.settin_ui.desc_ui.desc_text.append("\n原文: \n{}".format(original))
+        QApplication.processEvents()
+
+        # 异步调用gpt
+        def func() :
+            try :
+                start = time.time()
+                sign, result = translator.api.youdao(original, app_key, app_secret, object.logger)
+                object.settin_ui.desc_ui.desc_text.append("\n译文: \n{}".format(result))
+                object.settin_ui.desc_ui.desc_text.append("\n耗时: {:.2f}s".format(time.time()-start))
+                object.settin_ui.desc_ui.desc_text.append("测试结束!")
+            except Exception :
+                object.settin_ui.desc_ui.desc_text.append("\n测试出错: \n{}".format(traceback.format_exc()))
+                object.logger.error(traceback.format_exc())
+
+        utils.thread.createThread(func)
+
+    except Exception :
+        object.settin_ui.desc_ui.desc_text.append("\n测试出错: \n{}".format(traceback.format_exc()))
+        object.logger.error(traceback.format_exc())

@@ -912,6 +912,9 @@ class Translation(QMainWindow) :
         # 私人阿里云
         elif trans_type == "aliyun_private" :
             color = self.object.config["fontColor"]["aliyunPrivate"]
+        # 私人有道
+        elif trans_type == "youdao_private" :
+            color = self.object.config["fontColor"]["youdaoPrivate"]
         # 原文
         elif trans_type == "original" :
             color = self.object.config.get("fontColor", {}).get("original", self.font_color_1)

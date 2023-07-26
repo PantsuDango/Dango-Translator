@@ -165,6 +165,8 @@ def configConvert(object) :
     object.config["fontColor"]["chatgptPrivate"] = object.config["fontColor"].get("chatgptPrivate", "#5B8FF9")
     # 字体颜色 私人阿里云
     object.config["fontColor"]["aliyunPrivate"] = object.config["fontColor"].get("aliyunPrivate", "#5B8FF9")
+    # 字体颜色 私人有道
+    object.config["fontColor"]["youdaoPrivate"] = object.config["fontColor"].get("youdaoPrivate", "#5B8FF9")
     # 原文颜色
     object.config["fontColor"]["original"] = object.config["fontColor"].get("original", "#5B8FF9")
 
@@ -216,12 +218,14 @@ def configConvert(object) :
     object.config["aliyunPrivateUse"] = object.config.get("aliyunPrivateUse", False)
     if object.config["aliyunPrivateUse"] in use_map :
         object.config["aliyunPrivateUse"] = use_map[object.config["aliyunPrivateUse"]]
+    # 私人有道翻译开关
+    object.config["youdaoPrivateUse"] = object.config.get("youdaoPrivateUse", False)
 
     # 确保版本转换后至多只有3个翻译源能被同时开始
     tmp = []
     for val in ["youdaoUse", "baiduwebUse", "tencentwebUse", "deeplUse", "bingUse",
                 "caiyunUse", "tencentUse", "baiduUse", "caiyunPrivateUse",
-                "chatgptPrivateUse", "dangoUse", "aliyunPrivateUse"] :
+                "chatgptPrivateUse", "dangoUse", "aliyunPrivateUse", "youdaoPrivateUse"] :
         if object.config[val] == True :
             tmp.append(val)
     if len(tmp) > 3 :
@@ -248,6 +252,10 @@ def configConvert(object) :
     object.config["aliyunAPI"] = object.config.get("aliyunAPI", {})
     object.config["aliyunAPI"]["Key"] = object.config["aliyunAPI"].get("Key", "")
     object.config["aliyunAPI"]["Secret"] = object.config["aliyunAPI"].get("Secret", "")
+    # 私人有道翻译密钥
+    object.config["youdaoAPI"] = object.config.get("youdaoAPI", {})
+    object.config["youdaoAPI"]["Key"] = object.config["youdaoAPI"].get("Key", "")
+    object.config["youdaoAPI"]["Secret"] = object.config["youdaoAPI"].get("Secret", "")
 
     # 私人ChatGPT翻译代理
     object.config["chatgptProxy"] = object.config.get("chatgptProxy", "")
@@ -364,7 +372,7 @@ def configConvert(object) :
         "choiceRangeHotKeyUse", "autoPlaysoundUse", "mangaTrans", "mangaLanguage", "mangaDetectScale",
         "mangaMergeThreshold", "mangaFontColor", "mangaBgColor", "mangaFontColorUse", "mangaBgColorUse",
         "mangaFontType", "mangaOutputRenameUse", "mangaFastRenderUse", "mangaShadowSize", "mangaFiltrateUse",
-        "mangaFontSizeUse", "mangaFontSize"
+        "mangaFontSizeUse", "mangaFontSize", "youdaoPrivateUse", "youdaoAPI"
     ]
     # 删除多余的key
     delete_keys = []
@@ -425,6 +433,8 @@ def saveTransHisTory(text, translate_type) :
         content = "[私人ChatGPT]\n%s\n"%text
     elif translate_type == "aliyun_private" :
         content = "[私人阿里云]\n%s\n"%text
+    elif translate_type == "youdao_private" :
+        content = "[私人有道]\n%s\n"%text
     else:
         return
 
