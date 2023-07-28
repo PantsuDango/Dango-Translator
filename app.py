@@ -17,6 +17,7 @@ import utils.message
 import utils.port
 import utils.update
 import utils.hwnd
+import utils.sqlite
 
 import ui.login
 import ui.register
