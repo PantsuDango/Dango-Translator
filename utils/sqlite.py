@@ -6,6 +6,36 @@ import traceback
 
 DB_PATH = "../db/"
 HISTORY_FILE_PATH = "../翻译历史.txt"
+TRANS_MAP = {
+    "公共有道": "youdao",
+    "公共彩云": "caiyun",
+    "公共DeepL": "deepl",
+    "公共百度": "baidu",
+    "公共腾讯": "tencent",
+    "公共Bing": "bing",
+    "私人团子": "dango_private",
+    "私人百度": "baidu_private",
+    "私人腾讯": "tencent_private",
+    "私人彩云": "caiyun_private",
+    "私人ChatGPT": "chatgpt_private",
+    "私人阿里云": "aliyun_private",
+    "私人有道": "youdao_private",
+}
+TRANS_MAP_INVERSION = {
+    "youdao": "公共有道",
+    "caiyun": "公共彩云",
+    "deepl": "公共DeepL",
+    "baidu": "公共百度",
+    "tencent": "公共腾讯",
+    "bing": "公共Bing",
+    "dango_private": "私人团子",
+    "baidu_private": "私人百度",
+    "tencent_private": "私人腾讯",
+    "caiyun_private": "私人彩云",
+    "chatgpt_private": "私人ChatGPT",
+    "aliyun_private": "私人阿里云",
+    "youdao_private": "私人有道"
+}
 
 
 # 连接翻译历史数据库
@@ -29,7 +59,7 @@ def connectTranslationDB(logger) :
             trans_type TEXT NOT NULL,
             tgt TEXT NOT NULL,
             create_time DATATIME DEFAULT CURRENT_TIMESTAMP,
-            UNIQUE (`src`, `trans_type`, `tgt`));
+            UNIQUE (`src`, `trans_type`));
         '''
         TRANSLATION_DB.execute(create_translations_sql)
     except Exception :
@@ -39,8 +69,15 @@ def connectTranslationDB(logger) :
 # 写入翻译历史数据库
 def insertTranslationDB(logger, src, trans_type, tgt, create_time=None) :
 
+    if trans_type in TRANS_MAP_INVERSION :
+        trans_type = TRANS_MAP_INVERSION[trans_type]
+    if re.match("^{}[:：]".format(trans_type), tgt) :
+        return
+    if trans_type in TRANS_MAP :
+        trans_type = TRANS_MAP[trans_type]
     if not create_time :
         create_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
     try :
         insert_translation_sql = '''
             INSERT INTO translations (src, trans_type, tgt, create_time)
@@ -60,10 +97,7 @@ def SyncTranslationHistory(logger) :
     time_pattern = r'''\[原文\]\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\]'''
     original_pattern = r'''\[原文\]\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\]'''
     text = ""
-    trans_type_list = [
-        "公共有道", "公共彩云", "公共DeepL", "公共百度", "公共腾讯", "公共Bing", "私人团子",
-        "私人百度", "私人腾讯", "私人彩云", "私人ChatGPT", "私人阿里云", "私人有道"
-    ]
+
     # 读取翻译历史文件
     with open(HISTORY_FILE_PATH, "r", encoding="utf-8") as file :
         for line in file :
@@ -77,14 +111,11 @@ def SyncTranslationHistory(logger) :
                 if re_result :
                     src = re_result[0]
                     # 提取译文
-                    for trans_type in trans_type_list :
+                    for trans_type in TRANS_MAP.keys() :
                         trans_pattern = r'''\[{}\]'''.format(trans_type)
                         re_result = re.findall(trans_pattern+r"\n(.+?)\n", text, re.S)
                         if re_result :
-                            trans = re_result[0]
-                            if re.match("^{}[:：]".format(trans_type), trans) :
-                                continue
-                            trans_map[trans_type] = trans
+                            trans_map[trans_type] = re_result[0]
                 # 写入翻译历史数据库
                 if src and len(trans_map) >= 1 :
                     values = []

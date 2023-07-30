@@ -4,7 +4,6 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import fileinput
-import collections
 import re
 import os
 
@@ -37,10 +36,6 @@ class TransHistory(QWidget) :
         # 界面尺寸
         self.window_width = int(800 * self.rate)
         self.window_height = int(500 * self.rate)
-        # 存500条翻译历史
-        self.data = collections.deque(maxlen=1000)
-        # 是否读取翻译历史完毕
-        self.read_file_finish = False
 
 
     def ui(self) :
@@ -63,8 +58,6 @@ class TransHistory(QWidget) :
         # 说明框
         self.text = QTextBrowser(self)
         self.text.setGeometry(QRect(0, 0, self.window_width, self.window_height))
-        # self.text.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        # self.text.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.text.setStyleSheet("QTextBrowser { border-width: 0;"
                                      "border-style: outset;"
                                      "border-top:0px solid #e8f3f9;"
@@ -81,26 +74,16 @@ class TransHistory(QWidget) :
                                  int(h * self.rate)))
 
 
-    # 读取翻译历史
-    def readTransHistory(self) :
-
-        if os.path.exists(TRANS_FILE) :
-            with open(TRANS_FILE, "r", encoding="utf-8") as file:
-                for line in file:
-                    self.data.append(line)
-        self.read_file_finish = True
-
-
     # 窗口显示信号
     def showEvent(self, e) :
 
         self.text.clear()
-        for val in self.data :
-            self.text.append(val)
+        # for val in self.data :
+        #     self.text.append(val)
 
 
     # 窗口关闭处理
-    def closeEvent(self, event):
+    def closeEvent(self, event) :
 
         self.close()
         self.object.translation_ui.show()

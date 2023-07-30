@@ -2,8 +2,8 @@ import yaml
 import json
 import time
 from traceback import format_exc
-
 import utils.http
+import utils.sqlite
 
 
 YAML_PATH = "./config/config.yaml"
@@ -385,6 +385,7 @@ def configConvert(object) :
     for key in delete_keys :
         del object.config[key]
 
+
 # 保存配置至服务器
 def postSaveSettin(object) :
 
@@ -397,53 +398,6 @@ def postSaveSettin(object) :
     if not res:
         url = "https://trans.dango.cloud/DangoTranslate/SaveSettin"
         utils.http.post(url, body, object.logger)
-
-
-# 保存识别到的原文
-def saveOriginalHisTory(original) :
-
-    date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
-    with open(HISTORY_FILE_PATH, "a+", encoding="utf-8") as file :
-        content = "\n\n[原文][%s]\n%s\n"%(date, original)
-        file.write(content)
-    return content
-
-
-# 保存翻译历史
-def saveTransHisTory(text, translate_type) :
-
-    if translate_type == "youdao" :
-        content = "[公共有道]\n%s\n"%text
-    elif translate_type == "caiyun" :
-        content = "[公共彩云]\n%s\n"%text
-    elif translate_type == "deepl" :
-        content = "[公共DeepL]\n%s\n"%text
-    elif translate_type == "baidu" :
-        content = "[公共百度]\n%s\n"%text
-    elif translate_type == "tencent" :
-        content = "[公共腾讯]\n%s\n"%text
-    elif translate_type == "bing" :
-        content = "[公共Bing]\n%s\n"%text
-    elif translate_type == "dango_private" :
-        content = "[私人团子]\n%s\n"%text
-    elif translate_type == "baidu_private" :
-        content = "[私人百度]\n%s\n"%text
-    elif translate_type == "tencent_private" :
-        content = "[私人腾讯]\n%s\n"%text
-    elif translate_type == "caiyun_private" :
-        content = "[私人彩云]\n%s\n"%text
-    elif translate_type == "chatgpt_private" :
-        content = "[私人ChatGPT]\n%s\n"%text
-    elif translate_type == "aliyun_private" :
-        content = "[私人阿里云]\n%s\n"%text
-    elif translate_type == "youdao_private" :
-        content = "[私人有道]\n%s\n"%text
-    else:
-        return
-
-    with open(HISTORY_FILE_PATH, "a+", encoding="utf-8") as file :
-        file.write(content)
-    return content
 
 
 # 获取版本广播信息
@@ -460,13 +414,12 @@ def getVersionMessage(object) :
     return res.get("Result", "")
 
 
-
 # 从本地获取配置信息
 def readCloudConfigFormLocal(logger) :
 
     config = None
     try :
-        with open(CLOUD_CONFIG_PATH, "r", encoding="utf-8") as file:
+        with open(CLOUD_CONFIG_PATH, "r", encoding="utf-8") as file :
             config = json.loads(file.read())
     except Exception :
         logger.error(format_exc())
@@ -478,7 +431,7 @@ def readCloudConfigFormLocal(logger) :
 def saveCloudConfigToLocal(object) :
 
     try :
-        with open(CLOUD_CONFIG_PATH, "w", encoding="utf-8") as file:
+        with open(CLOUD_CONFIG_PATH, "w", encoding="utf-8") as file :
             json.dump(object.config, file, indent=4, ensure_ascii=False)
     except Exception :
         object.logger.error(format_exc())

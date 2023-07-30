@@ -16,6 +16,7 @@ import utils.http
 import utils.range
 import utils.message
 import utils.hwnd
+import utils.sqlite
 
 import translator.sound
 import translator.all
@@ -932,9 +933,8 @@ class Translation(QMainWindow) :
         QApplication.processEvents()
 
         # 保存译文
-        content = utils.config.saveTransHisTory(result, trans_type)
-        if self.object.trans_history_ui.read_file_finish :
-            self.object.trans_history_ui.data.append(content)
+        if trans_type != "original" :
+            utils.sqlite.insertTranslationDB(self.logger, self.original, trans_type, result)
 
         # 线程结束，减少线程数
         self.thread_state -= 1
