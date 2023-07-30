@@ -63,6 +63,10 @@ class DangoTranslator :
         self.range = (0, 0, 0, 0)
         # 在线ocr可用性
         self.online_ocr_sign = False
+        # 连接db
+        utils.sqlite.connectTranslationDB(self.logger)
+        # 同步旧翻译历史文件
+        utils.thread.createThread(utils.sqlite.initTranslationDB, self)
 
 
     # 登录
@@ -150,6 +154,7 @@ class DangoTranslator :
 
     # 自动登录后检查
     def autoLoginCheck(self, message) :
+
         self.checkBindEmailSign = True
         utils.message.MessageBox("自动登录失败", message, self.yaml["screen_scale_rate"])
 

@@ -28,16 +28,16 @@ def openConfig(logger) :
             "port": 6666,
         }
     # 2022.02.19 添加新参数
-    if "auto_login" not in config.keys():
+    if "auto_login" not in config.keys() :
         config["auto_login"] = False
     # 2022.09.26 添加新参数
-    if "agree_collect_time" not in config.keys():
+    if "agree_collect_time" not in config.keys() :
         config["agree_collect_time"] = "2022-09-25"
     # 2022.10.30 添加新参数
-    if "selenium_debug" not in config.keys():
+    if "selenium_debug" not in config.keys() :
         config["selenium_debug"] = False
     # 2022.11.13 添加新参数
-    if "range" in config.keys():
+    if "range" in config.keys() :
         del config["range"]
     if "range1" not in config.keys():
         config["range1"] = {"x": 0, "y": 0, "w": 0, "h": 0}
@@ -48,11 +48,14 @@ def openConfig(logger) :
     if "range4" not in config.keys():
         config["range4"] = {"x": 0, "y": 0, "w": 0, "h": 0}
     # 2022.03.08 修改参数
-    if "dict_info_url" in config.keys():
+    if "dict_info_url" in config.keys() :
         config["dict_info_url"] = "https://trans.dango.cloud/DangoTranslate/ShowDict"
-    # 2023.07.03 添加新参数
-    if "auto_open_manga_use" not in config.keys():
+    # 2023.07.03 自动打开图片翻译界面
+    if "auto_open_manga_use" not in config.keys() :
         config["auto_open_manga_use"] = False
+    # 2023.07.30 翻译历史数据同步
+    if "sync_db" not in config.keys() :
+        config["sync_db"] = False
 
     return config
 
