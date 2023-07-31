@@ -18,7 +18,7 @@ TRANS_MAP = {
     "私人腾讯": "tencent_private",
     "私人彩云": "caiyun_private",
     "私人ChatGPT": "chatgpt_private",
-    "私人阿里云": "aliyun_private",
+    "私人阿里": "aliyun_private",
     "私人有道": "youdao_private",
 }
 TRANS_MAP_INVERSION = {
@@ -33,7 +33,7 @@ TRANS_MAP_INVERSION = {
     "tencent_private": "私人腾讯",
     "caiyun_private": "私人彩云",
     "chatgpt_private": "私人ChatGPT",
-    "aliyun_private": "私人阿里云",
+    "aliyun_private": "私人阿里",
     "youdao_private": "私人有道"
 }
 
@@ -52,7 +52,7 @@ def connectTranslationDB(logger) :
         db_path = os.path.join(DB_PATH, "translation.db")
         TRANSLATION_DB = sqlite3.connect(db_path, check_same_thread=False)
         # 初始化翻译记录表
-        create_translations_sql = '''
+        sql = '''
             CREATE TABLE IF NOT EXISTS translations (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             src TEXT NOT NULL,
@@ -61,7 +61,7 @@ def connectTranslationDB(logger) :
             create_time DATATIME DEFAULT CURRENT_TIMESTAMP,
             UNIQUE (`src`, `trans_type`));
         '''
-        TRANSLATION_DB.execute(create_translations_sql)
+        TRANSLATION_DB.execute(sql)
     except Exception :
         logger.error(traceback.format_exc())
 
@@ -79,16 +79,27 @@ def insertTranslationDB(logger, src, trans_type, tgt, create_time=None) :
         create_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     try :
-        insert_translation_sql = '''
+        sql = '''
             INSERT INTO translations (src, trans_type, tgt, create_time)
             VALUES (?, ?, ?, ?);
         '''
-        TRANSLATION_DB.execute(insert_translation_sql, (src, trans_type, tgt, create_time))
+        TRANSLATION_DB.execute(sql, (src, trans_type, tgt, create_time))
         TRANSLATION_DB.commit()
     except sqlite3.IntegrityError :
         pass
     except Exception :
         logger.error(traceback.format_exc())
+
+
+# 查询翻译历史数据库
+def selectTranslationDBList(count) :
+
+    sql = '''SELECT * FROM translations ORDER BY id DESC LIMIT ?;'''
+    cursor = TRANSLATION_DB.execute(sql, (count,))
+    rows = cursor.fetchall()
+    cursor.close()
+
+    return rows
 
 
 # 同步旧翻译历史文件

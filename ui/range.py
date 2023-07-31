@@ -155,7 +155,7 @@ class Range(QMainWindow) :
         self.font_type = "华康方圆体W7"
         self.color = "#1E90FF"
         self.font_size = 12
-        self.show_sign = False
+        self.show_sign = True
         self.ui()
 
 
