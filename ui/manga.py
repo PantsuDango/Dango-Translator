@@ -1110,16 +1110,27 @@ class Manga(QWidget) :
         # 过滤错误的文本块
         new_text_block = []
         for index, val in enumerate(result.get("text_block", [])) :
-            texts = val.get("texts", [])
+
             # 过滤<skip>
+            new_texts = []
+            new_coordinate = []
             skip_sign = False
-            for i, text in enumerate(texts):
+
+            texts = val.get("texts", [])
+            coordinate = val.get("coordinate", [])
+            for text, coord in zip(texts, coordinate) :
                 if not text or text == "<skip>":
                     skip_sign = True
-                    del val["coordinate"][i]
-                    del val["texts"][i]
-            if not texts :
+                    continue
+                new_texts.append(text)
+                new_coordinate.append(coord)
+
+            if not new_texts :
                 continue
+
+            val["texts"] = new_texts
+            val["coordinate"] = new_coordinate
+
             # 如果过滤过<skip>的情况就重新计算文本块的坐标
             if skip_sign :
                 x_list, y_list = [], []
