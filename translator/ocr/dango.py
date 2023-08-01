@@ -367,7 +367,7 @@ def mangaOCR(object, filepath, image_base64=None, filtrate=True, check_permissio
         # 测试版本保留
         with open("ocr.json", "w", encoding="utf-8") as file:
             json.dump(body, file, indent=4)
-        resp = utils.http.post(url=url, body=body, logger=object.logger, timeout=20)
+        resp = utils.http.post(url=url, body=body, logger=object.logger, timeout=60)
         if resp.get("Code", -1) == 0 :
             result = resp.get("Data", {})
             sign = True
@@ -415,7 +415,7 @@ def mangaIPT(object, filepath, mask, image_base64=None, check_permission=False) 
         # 测试版本保留
         with open("ipt.json", "w", encoding="utf-8") as file :
             json.dump(body, file, indent=4)
-        resp = utils.http.post(url=url, body=body, logger=object.logger, timeout=20)
+        resp = utils.http.post(url=url, body=body, logger=object.logger, timeout=60)
         if resp.get("Code", -1) == 0 :
             result = resp.get("Data", {})
             sign = True
@@ -458,7 +458,7 @@ def mangaRDR(object, trans_list, inpainted_image, text_block, font, check_permis
         # 测试版本保留
         with open("rdr.json", "w", encoding="utf-8") as file:
             json.dump(body, file, indent=4)
-        resp = utils.http.post(url=url, body=body, logger=object.logger, timeout=20)
+        resp = utils.http.post(url=url, body=body, logger=object.logger, timeout=60)
         if resp.get("Code", -1) == 0 :
             result = resp.get("Data", {})
             sign = True
@@ -519,7 +519,7 @@ def dangoTrans(object, sentence, language="auto") :
     sign = False
     result = "私人团子: "
     try :
-        resp = utils.http.post(url=url, body=body, logger=object.logger, timeout=5)
+        resp = utils.http.post(url=url, body=body, logger=object.logger, timeout=10)
         if resp.get("Code", -1) == 0 :
             result = resp.get("Data", {}).get("texts", [])
             result = "\n".join(result)

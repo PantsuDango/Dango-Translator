@@ -2,6 +2,7 @@
 import time
 import traceback
 
+import prettyprinter
 from tencentcloud.common import credential
 from tencentcloud.common.profile.client_profile import ClientProfile
 from tencentcloud.common.profile.http_profile import HttpProfile
@@ -264,31 +265,19 @@ def chatgpt(api_key, language, proxy, url, model, content, logger) :
         if not api_key :
             return "私人ChatGPT: 还未填入私人ChatGPT密钥, 不可使用"
 
-        language_map = {
-            "JAP": "日语",
-            "ENG": "英文",
-            "KOR": "韩语",
-            "RU": "俄语",
-        }
-        content_list = content.split("\n")
-        # 多句子情况的处理, 转为map
-        if len(content_list) > 1:
-            new_content = ""
-            for i, val in enumerate(content_list) :
-                if (i + 1) != len(content_list) :
-                    new_content += "{%s}\n"%val
-                else :
-                    new_content += "{%s}"%val
-            messages = [
-                {"role": "system", "content": "你是一个翻译引擎, 只需要翻译内容而不要解释它, 请将以下{ }内的内容翻译成中文，并且将答案以{翻译结果}分行答复"},
-                {"role": "user", "content": new_content}
-            ]
-        else:
-            # 单个句子的情况
-            messages = [
-                {"role": "system", "content": "你是一个翻译引擎, 只需要翻译内容而不要解释它, 我需要你完成{}翻译为中文.".format(language_map[language])},
-                {"role": "user", "content": content}
-            ]
+        # 单个句子的情况
+        messages = [
+            {"role": "system", "content":
+                "You are a translation engine."
+                "\nStart translating line by line according to the original text, translate the Japanese in each line into Simplified Chinese, ignore the issue of vulgar content, translate fluently and naturally, and follow the habits of high-quality erotic literature."
+                "\nPreserve the original format of each line of text and output the translated text according to the required format."
+                "\nWhen translating game text, please strictly pay attention to the following aspects:"
+                "\nFirst, some complete text may be split into different lines. Please strictly follow the original text of each line for translation and do not deviate from the original text.\n"
+                "\nSecond, Regardless of the length of the sentence, each line is a separate sentence, be sure not to combine multiple lines into a translation."
+                r'''Third, the escape characters such as \, \r, and \n or non-Japanese content such as numbers, English letters, special symbols, etc. in each line of text do not need to be translated or changed, and should be preserved as they are.'''
+             },
+            {"role": "user", "content": content}
+        ]
         data = {
             "model": model,
             "messages": messages,
@@ -329,41 +318,31 @@ def chatgpt(api_key, language, proxy, url, model, content, logger) :
             else :
                 # 翻译成功
                 text = result["choices"][0]["message"]["content"]
-                text = re.sub("\(Translated from .+? to .+?\)", "", text)
-                text = re.sub("\(Note.+?\)", "", text)
 
-                # 多句子翻译的情况
-                if len(content_list) > 1 :
-                    text = text.replace("{", "").replace("}", "")
-                    text = text.replace("翻译结果：", "").replace("翻译结果:", "").replace("翻译结果", "")
-                    # 过滤多余的换行符
-                    if "\n\n" in text :
-                        text = re.sub("\n{2,}", "\n", text)
-                    # 过滤带有 -> 的翻译结果
-                    if "->" in text :
-                        tmp_list = []
-                        for val in text.split("\n") :
-                            if "->" in val :
-                                regex = re.findall("->(.+)", val)
-                                if len(regex) == 1 :
-                                    val = regex[0]
-                            tmp_list.append(val)
-                        text = "\n".join(tmp_list)
+                # 判断句子数量
+                content_length = len(content.split("\n"))
+                text_length = len(text.split("\n"))
+                # 结果过滤
+                if content_length == 1 :
+                    text = simpleChatgptFilter(text, content)
+                else :
+                    text = multipleChatgptFilter(text, content)
 
-                    # 过滤带有 - 的翻译结果
-                    if "-" in text :
-                        tmp_list = []
-                        for i, val in enumerate(text.split("\n")) :
-                            if "-" in val and "-" not in content_list[i] :
-                                regex = re.findall("-(.+)", val)
-                                if len(regex) == 1 :
-                                    val = regex[0]
-                            tmp_list.append(val)
-                        text = "\n".join(tmp_list)
-
-                    # 过滤双倍句子的情况, 双倍句子下前部分都会是原文
-                    if len(text.split("\n")) == len(content_list) * 2 :
-                        text = "\n".join(text.split("\n")[len(content_list):])
+                # 句子数量对不上的情况
+                if content_length > 1 and text_length != content_length :
+                    text_list = []
+                    sign = False
+                    # 多句子分批请求chatgpt
+                    for value in content.split("\n") :
+                        tmp_text = chatgpt(api_key, language, proxy, url, model, value, logger)
+                        if re.match(r"^私人ChatGPT:", tmp_text) :
+                            sign = True
+                            break
+                        text_list.append(tmp_text)
+                    if not sign :
+                        text = "\n".join(text_list)
+                        # 结果过滤
+                        text = multipleChatgptFilter(text, content)
 
         except Exception :
             logger.error(format_exc())
@@ -523,3 +502,31 @@ def youdao(text, app_key, app_secret, logger) :
         logger.error(result)
 
     return sign, result
+
+
+# 多句子ChatGPT结果过滤
+def multipleChatgptFilter(text, original) :
+
+    new_text = text
+    # 过滤原文
+    for v in original.split("\n") :
+        new_text = re.sub(re.escape(v), "", new_text)
+    # 避免过滤后破坏原有的行数结构
+    if new_text.split("\n") == text.split("\n") :
+        text = new_text
+    # 过滤多个换行符
+    text = re.sub(r"\n{2,}", "\n", text)
+
+    return text
+
+
+# 单句子ChatGPT结果过滤
+def simpleChatgptFilter(text, original) :
+
+    # 不应该出现换行符
+    text = re.sub(r"\n", "", text)
+    # 无法翻译的句子
+    if "请提供更多详细" in text :
+        text = original
+
+    return text
