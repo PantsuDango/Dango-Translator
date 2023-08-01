@@ -293,6 +293,7 @@ class Translater(QThread) :
         super(Translater, self).__init__()
         self.object = object
         self.logger = object.logger
+        self.trans_map = {}
 
     # 截图
     def imageCut(self):
@@ -539,6 +540,12 @@ class Translater(QThread) :
 
     # 刷新翻译
     def flushTranslate(self, original) :
+
+        # 从数据库中获取翻译结果
+        rows = utils.sqlite.selectTranslationDBBySrcAndTransType(original, self.logger)
+        self.trans_map = {}
+        for row in rows:
+            self.trans_map[row[2]] = row[3]
 
         # 更新原文
         self.object.translation_ui.original = original
