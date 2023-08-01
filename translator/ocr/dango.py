@@ -76,7 +76,7 @@ def resultSortTD(ocr_result, language) :
         x2 = tmp_words_list[0]["Coordinate"]["LowerRight"][0]
         y2 = tmp_words_list[0]["Coordinate"]["LowerRight"][1]
         text = ""
-        for val in tmp_words_list :
+        for index, val in enumerate(tmp_words_list) :
             if val["Coordinate"]["UpperLeft"][0] < x1 :
                 x1 = val["Coordinate"]["UpperLeft"][0]
             if val["Coordinate"]["UpperLeft"][1] < y1 :
@@ -86,11 +86,13 @@ def resultSortTD(ocr_result, language) :
             if val["Coordinate"]["LowerRight"][1] > y2 :
                 y2 = val["Coordinate"]["LowerRight"][1]
             text += val["Words"]
+            if language == "ENG" and index+1 != len(tmp_words_list) :
+                text += " "
             filter_words_list.append(val)
 
         # 获取字宽
         word_width = val["Coordinate"]["LowerRight"][1] - val["Coordinate"]["UpperRight"][1]
-        if language == "ENG":
+        if language == "ENG" :
             word_width = val["Coordinate"]["LowerRight"][1] - val["Coordinate"]["UpperRight"][1] + 3
 
         new_words_list.append({
@@ -106,8 +108,8 @@ def resultSortTD(ocr_result, language) :
 
     # 结果组包
     text = ""
-    for val in new_words_list :
-        if val == new_words_list[-1] :
+    for index, val in enumerate(new_words_list) :
+        if index+1 == len(new_words_list) :
             text += val["Words"]
         else :
             text += val["Words"] + "\n"
@@ -140,12 +142,14 @@ def resultSortMD(ocr_result, language) :
         y1 = tmp_words_list[0]["Coordinate"]["UpperRight"][1]
         y2 = tmp_words_list[0]["Coordinate"]["LowerRight"][1]
         text = ""
-        for val in tmp_words_list:
+        for index, val in enumerate(tmp_words_list) :
             if val["Coordinate"]["UpperRight"][1] < y1:
                 y1 = val["Coordinate"]["UpperRight"][1]
             if val["Coordinate"]["LowerRight"][1] > y2:
                 y2 = val["Coordinate"]["LowerRight"][1]
             text += val["Words"]
+            if language == "ENG" and index+1 != len(tmp_words_list) :
+                text += " "
             filter_words_list.append(val)
 
         if language == "ENG":
@@ -243,34 +247,12 @@ def dangoOCR(object, test=False) :
     message = res.get("Message", "")
     ocr_result = res.get("Data", [])
     if code == 0 :
-        # 如果开启了贴字翻译就去掉白边
-        if object.config["drawImageUse"] :
-            try :
-                # 去掉白边
-                image = Image.open(image_path)
-                coordinate = (10, 10, image.width - 10, image.height - 10)
-                region = image.crop(coordinate)
-                region.save(image_path)
-                # 裁剪后复位坐标参数
-                for index, val in enumerate(ocr_result) :
-                    UpperLeft = val["Coordinate"]["UpperLeft"]
-                    UpperRight = val["Coordinate"]["UpperRight"]
-                    LowerRight = val["Coordinate"]["LowerRight"]
-                    LowerLeft = val["Coordinate"]["LowerLeft"]
-                    ocr_result[index]["Coordinate"]["UpperLeft"] = [UpperLeft[0]-10, UpperLeft[1]-10]
-                    ocr_result[index]["Coordinate"]["UpperRight"] = [UpperRight[0]-10, UpperRight[1]-10]
-                    ocr_result[index]["Coordinate"]["LowerRight"] = [LowerRight[0]-10, LowerRight[1]-10]
-                    ocr_result[index]["Coordinate"]["LowerLeft"] = [LowerLeft[0]-10, LowerLeft[1]-10]
-            except Exception :
-                object.logger.error(message)
-
         content = ""
         # 竖向翻译
         if language == "Vertical_JAP" :
             content, ocr_result = resultSortMD(ocr_result, language)
             if object.config["drawImageUse"] :
                 object.ocr_result = ocr_result
-
         # 横向翻译
         else :
             # 贴字翻译采用文本聚类
@@ -280,7 +262,7 @@ def dangoOCR(object, test=False) :
                     for index, val in enumerate(ocr_result) :
                         # 获取字宽
                         word_width = val["Coordinate"]["LowerRight"][1] - val["Coordinate"]["UpperRight"][1]
-                        if language == "ENG":
+                        if language == "ENG" :
                             word_width += 3
                         ocr_result[index]["WordWidth"] = int(word_width)
                         # 自动换行
@@ -291,15 +273,20 @@ def dangoOCR(object, test=False) :
                 else :
                     content, ocr_result = resultSortTD(ocr_result, language)
                 object.ocr_result = ocr_result
+
             # 普通翻译文字直接拼接
             else :
-                for val in ocr_result :
+                for index, val in enumerate(ocr_result) :
                     # 开启了自动换行
-                    if branch_line_use and val != ocr_result[-1] :
+                    if branch_line_use and index+1 != len(ocr_result) :
                         content += val["Words"] + "\n"
                     else :
                         content += val["Words"]
+                        if language == "ENG" and index+1 != len(ocr_result) :
+                            content += " "
+
         return True, content
+
     else :
         if code == -3 :
             return False, "在线OCR错误: 在线OCR需购买才可使用\n请于[设置]-[识别设定]-[在线OCR]页面内, 点击购买按钮完成支付后再使用\n若您已经购买但仍出现此提示, 请直接通过交流群联系客服"
@@ -328,26 +315,6 @@ def offlineOCR(object) :
     ocr_result = res.get("Data", [])
 
     if code == 0 :
-        if object.config["drawImageUse"] :
-            try :
-                # 去掉白边
-                image = Image.open(image_path)
-                coordinate = (10, 10, image.width - 10, image.height - 10)
-                region = image.crop(coordinate)
-                region.save(image_path)
-                # 裁剪后复位坐标参数
-                for index, val in enumerate(ocr_result) :
-                    UpperLeft = val["Coordinate"]["UpperLeft"]
-                    UpperRight = val["Coordinate"]["UpperRight"]
-                    LowerRight = val["Coordinate"]["LowerRight"]
-                    LowerLeft = val["Coordinate"]["LowerLeft"]
-                    ocr_result[index]["Coordinate"]["UpperLeft"] = [UpperLeft[0]-10, UpperLeft[1]-10]
-                    ocr_result[index]["Coordinate"]["UpperRight"] = [UpperRight[0]-10, UpperRight[1]-10]
-                    ocr_result[index]["Coordinate"]["LowerRight"] = [LowerRight[0]-10, LowerRight[1]-10]
-                    ocr_result[index]["Coordinate"]["LowerLeft"] = [LowerLeft[0]-10, LowerLeft[1]-10]
-            except Exception :
-                object.logger.error(message)
-
         if language == "Vertical_JAP" :
             content, ocr_result = resultSortMD(ocr_result, language)
         else :
