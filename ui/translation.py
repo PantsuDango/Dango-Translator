@@ -707,94 +707,6 @@ class Translation(QMainWindow) :
         if self.statusbar_sign :
             self.statusbar.show()
 
-        width = round((self.width() - 534 * self.rate) / 2)
-        height = self.height() - 30 * self.rate
-
-        # 重置所有控件的位置和大小
-        self.start_button.setGeometry(QRect(
-            width,
-            5 * self.rate,
-            20 * self.rate,
-            20 * self.rate
-        ))
-        self.edit_trans_button.setGeometry(QRect(
-            width + 40 * self.rate,
-            5 * self.rate,
-            20 * self.rate,
-            20 * self.rate
-        ))
-        self.settin_button.setGeometry(QRect(
-            width + 80 * self.rate,
-            5 * self.rate,
-            20 * self.rate,
-            20 * self.rate
-        ))
-        self.range_button.setGeometry(QRect(
-            width + 120 * self.rate,
-            5 * self.rate,
-            20 * self.rate,
-            20 * self.rate
-        ))
-        self.multi_range_button.setGeometry(QRect(
-            width + 160 * self.rate,
-            5 * self.rate,
-            20 * self.rate,
-            20 * self.rate
-        ))
-        self.filter_word_button.setGeometry(QRect(
-            width + 200 * self.rate,
-            5 * self.rate,
-            20 * self.rate,
-            20 * self.rate
-        ))
-        self.switch_button.setGeometry(QRect(
-            width + 240 * self.rate,
-            5 * self.rate,
-            50 * self.rate,
-            20 * self.rate
-        ))
-        self.play_voice_button.setGeometry(QRect(
-            width + 310 * self.rate,
-            5 * self.rate,
-            20 * self.rate,
-            20 * self.rate
-        ))
-        self.lock_button.setGeometry(QRect(
-            width + 350 * self.rate,
-            5 * self.rate,
-            24 * self.rate,
-            20 * self.rate
-        ))
-        self.trans_history_button.setGeometry(QRect(
-            width + 394 * self.rate,
-            5 * self.rate,
-            24 * self.rate,
-            20 * self.rate
-        ))
-        self.manga_button.setGeometry(QRect(
-            width + 434 * self.rate,
-            5 * self.rate,
-            20 * self.rate,
-            20 * self.rate
-        ))
-        self.minimize_button.setGeometry(QRect(
-            width + 474 * self.rate,
-            5 * self.rate,
-            20 * self.rate,
-            20 * self.rate
-        ))
-        self.quit_button.setGeometry(QRect(
-            width + 514 * self.rate,
-            5 * self.rate,
-            20 * self.rate,
-            20 * self.rate
-        ))
-        self.translate_text.setGeometry(
-            0,
-            30 * self.rate,
-            self.width(),
-            height * self.rate
-        )
         # 隐藏所有顶部工具栏控件
         self.switch_button.hide()
         self.start_button.hide()
@@ -1120,6 +1032,95 @@ class Translation(QMainWindow) :
         if h >= screen_h - 100 :
             h = screen_h - 100
         self.resize(w, h)
+
+        width = round((self.width() - 534 * self.rate) / 2)
+        height = self.height() - 30 * self.rate
+
+        # 重置所有控件的位置和大小
+        self.start_button.setGeometry(QRect(
+            width,
+            5 * self.rate,
+            20 * self.rate,
+            20 * self.rate
+        ))
+        self.edit_trans_button.setGeometry(QRect(
+            width + 40 * self.rate,
+            5 * self.rate,
+            20 * self.rate,
+            20 * self.rate
+        ))
+        self.settin_button.setGeometry(QRect(
+            width + 80 * self.rate,
+            5 * self.rate,
+            20 * self.rate,
+            20 * self.rate
+        ))
+        self.range_button.setGeometry(QRect(
+            width + 120 * self.rate,
+            5 * self.rate,
+            20 * self.rate,
+            20 * self.rate
+        ))
+        self.multi_range_button.setGeometry(QRect(
+            width + 160 * self.rate,
+            5 * self.rate,
+            20 * self.rate,
+            20 * self.rate
+        ))
+        self.filter_word_button.setGeometry(QRect(
+            width + 200 * self.rate,
+            5 * self.rate,
+            20 * self.rate,
+            20 * self.rate
+        ))
+        self.switch_button.setGeometry(QRect(
+            width + 240 * self.rate,
+            5 * self.rate,
+            50 * self.rate,
+            20 * self.rate
+        ))
+        self.play_voice_button.setGeometry(QRect(
+            width + 310 * self.rate,
+            5 * self.rate,
+            20 * self.rate,
+            20 * self.rate
+        ))
+        self.lock_button.setGeometry(QRect(
+            width + 350 * self.rate,
+            5 * self.rate,
+            24 * self.rate,
+            20 * self.rate
+        ))
+        self.trans_history_button.setGeometry(QRect(
+            width + 394 * self.rate,
+            5 * self.rate,
+            24 * self.rate,
+            20 * self.rate
+        ))
+        self.manga_button.setGeometry(QRect(
+            width + 434 * self.rate,
+            5 * self.rate,
+            20 * self.rate,
+            20 * self.rate
+        ))
+        self.minimize_button.setGeometry(QRect(
+            width + 474 * self.rate,
+            5 * self.rate,
+            20 * self.rate,
+            20 * self.rate
+        ))
+        self.quit_button.setGeometry(QRect(
+            width + 514 * self.rate,
+            5 * self.rate,
+            20 * self.rate,
+            20 * self.rate
+        ))
+        self.translate_text.setGeometry(
+            0,
+            30 * self.rate,
+            self.width(),
+            height * self.rate
+        )
 
 
     # 退出程序

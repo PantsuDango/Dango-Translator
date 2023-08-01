@@ -252,7 +252,6 @@ class Range(QMainWindow) :
     # 鼠标进入控件事件
     def enterEvent(self, QEvent) :
 
-        self.hide_button.setGeometry(QRect(int(self.width()-40*self.rate), 0, int(40*self.rate), int(30*self.rate)))
         self.hide_button.show()
         self.drag_label.setStyleSheet("background-color:rgba(62, 62, 62, 0.1)")
 
@@ -265,7 +264,6 @@ class Range(QMainWindow) :
     def leaveEvent(self, QEvent) :
 
         self.drag_label.setStyleSheet("background-color:none")
-        self.label.setGeometry(0, 0, self.width(), self.height())
         self.hide_button.hide()
 
         # 选择使用的范围
@@ -336,7 +334,10 @@ class Range(QMainWindow) :
             w = screen_w - 100
         if h >= screen_h - 100:
             h = screen_h - 100
+
         self.resize(w, h)
+        self.label.resize(w, h)
+        self.hide_button.setGeometry(QRect(int(w-40*self.rate), 0, int(40*self.rate), int(30*self.rate)))
 
 
     # 退出信号
