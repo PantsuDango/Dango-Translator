@@ -244,6 +244,7 @@ class Range(QMainWindow) :
                 self._isTracking = False
                 self._startPos = None
                 self._endPos = None
+                self.resizeEvent(QSize(self.width(), self.height()))
         except Exception :
             pass
 
@@ -309,12 +310,33 @@ class Range(QMainWindow) :
         if hotkey_sign :
             if self.object.translation_ui.isHidden() and self.object.multi_range_ui.isHidden() :
                 return
-            #self.object.translation_ui.sound.playButtonSound()
 
         if self.isHidden() :
             self.show()
         else :
             self.hide()
+
+
+    # 获取屏幕尺寸
+    def getScreenSize(self) :
+
+        screen_number = QApplication.desktop().screenNumber(self)
+        screen = QDesktopWidget().screenGeometry(screen_number)
+        return screen.width(), screen.height()
+
+
+    # 窗口大小改变事件
+    def resizeEvent(self, event) :
+
+        screen_w, screen_h = self.getScreenSize()
+        w = self.width()
+        h = self.height()
+
+        if w >= screen_w - 100:
+            w = screen_w - 100
+        if h >= screen_h - 100:
+            h = screen_h - 100
+        self.resize(w, h)
 
 
     # 退出信号

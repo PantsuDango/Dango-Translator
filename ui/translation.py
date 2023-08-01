@@ -62,11 +62,18 @@ class Translation(QMainWindow) :
 
         # 窗口尺寸
         if "translation_ui_coordinate" in self.object.yaml :
+
+            coordinate_x = self.object.yaml["translation_ui_coordinate"]["x"]
+            coordinate_y = self.object.yaml["translation_ui_coordinate"]["y"]
+            if coordinate_x < 0 :
+                coordinate_x = 0
+            if coordinate_y < 0 :
+                coordinate_y = 0
             self.resize(self.object.yaml["translation_ui_coordinate"]["w"], int(130*self.rate))
-            self.move(self.object.yaml["translation_ui_coordinate"]["x"],
-                      self.object.yaml["translation_ui_coordinate"]["y"])
-        else:
+            self.move(coordinate_x, coordinate_y)
+        else :
             self.resize(int(800*self.rate), int(130*self.rate))
+
         # 窗口无标题栏、窗口置顶、窗口透明
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
@@ -370,6 +377,14 @@ class Translation(QMainWindow) :
         self.timer.start(300)
 
 
+    # 获取屏幕尺寸
+    def getScreenSize(self) :
+
+        screen_number = QApplication.desktop().screenNumber(self)
+        screen = QDesktopWidget().screenGeometry(screen_number)
+        return screen.width(), screen.height()
+
+
     # 检测鼠标位置
     def checkMousePosition(self) :
 
@@ -642,7 +657,7 @@ class Translation(QMainWindow) :
             if e.button() == Qt.LeftButton :
                 self._isTracking = True
                 self._startPos = QPoint(e.x(), e.y())
-        except Exception:
+        except Exception :
             pass
 
 
@@ -654,7 +669,8 @@ class Translation(QMainWindow) :
                 self._isTracking = False
                 self._startPos = None
                 self._endPos = None
-        except Exception:
+                self.resizeEvent(QSize(self.width(), self.height()))
+        except Exception :
             pass
 
 
@@ -1090,6 +1106,20 @@ class Translation(QMainWindow) :
     def showAppQuitMessageBox(self) :
 
         utils.message.quitAppMessageBox("退出程序", "真的要关闭团子吗?QAQ      ", self.object)
+
+
+    # 窗口大小改变事件
+    def resizeEvent(self, event) :
+
+        screen_w, screen_h = self.getScreenSize()
+        w = self.width()
+        h = self.height()
+
+        if w >= screen_w - 100 :
+            w = screen_w - 100
+        if h >= screen_h - 100 :
+            h = screen_h - 100
+        self.resize(w, h)
 
 
     # 退出程序
