@@ -6,6 +6,7 @@ import traceback
 
 DB_PATH = "../db/"
 HISTORY_FILE_PATH = "../翻译历史.txt"
+TRANSLATION_DB = None
 TRANS_MAP = {
     "公共有道": "youdao",
     "公共彩云": "caiyun",
@@ -58,8 +59,12 @@ def connectTranslationDB(logger) :
             src TEXT NOT NULL,
             trans_type TEXT NOT NULL,
             tgt TEXT NOT NULL,
-            create_time DATATIME DEFAULT CURRENT_TIMESTAMP,
+            create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
             UNIQUE (`src`, `trans_type`));
+        '''
+        TRANSLATION_DB.execute(sql)
+        sql = '''
+            CREATE INDEX IF NOT EXISTS src ON translations (src);
         '''
         TRANSLATION_DB.execute(sql)
     except Exception :
@@ -68,6 +73,10 @@ def connectTranslationDB(logger) :
 
 # 写入翻译历史数据库
 def insertTranslationDB(logger, src, trans_type, tgt, create_time=None) :
+
+    global TRANSLATION_DB
+    if not TRANSLATION_DB :
+        return
 
     if trans_type in TRANS_MAP_INVERSION :
         trans_type = TRANS_MAP_INVERSION[trans_type]
@@ -92,18 +101,49 @@ def insertTranslationDB(logger, src, trans_type, tgt, create_time=None) :
 
 
 # 查询翻译历史数据库
-def selectTranslationDBList(count) :
+def selectTranslationDBList(count, logger) :
 
-    sql = '''SELECT * FROM translations ORDER BY id DESC LIMIT ?;'''
-    cursor = TRANSLATION_DB.execute(sql, (count,))
-    rows = cursor.fetchall()
-    cursor.close()
+    rows = []
+    global TRANSLATION_DB
+    if not TRANSLATION_DB :
+        return rows
+
+    try :
+        sql = '''SELECT * FROM translations ORDER BY id DESC LIMIT ?;'''
+        cursor = TRANSLATION_DB.execute(sql, (count,))
+        rows = cursor.fetchall()
+        cursor.close()
+    except Exception :
+        logger.error(traceback.format_exc())
+
+    return rows
+
+
+# 查询翻译历史数据库
+def selectTranslationDBBySrcAndTransType(src, logger) :
+
+    rows = []
+    global TRANSLATION_DB
+    if not TRANSLATION_DB:
+        return rows
+
+    try :
+        sql = '''SELECT * FROM translations WHERE src = ?;'''
+        cursor = TRANSLATION_DB.execute(sql, (src,))
+        rows = cursor.fetchall()
+        cursor.close()
+    except Exception :
+        logger.error(traceback.format_exc())
 
     return rows
 
 
 # 同步旧翻译历史文件
 def SyncTranslationHistory(logger) :
+
+    global TRANSLATION_DB
+    if not TRANSLATION_DB :
+        return
 
     time_pattern = r'''\[原文\]\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\]'''
     original_pattern = r'''\[原文\]\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\]'''
@@ -140,6 +180,10 @@ def SyncTranslationHistory(logger) :
 
 # 数据库初始化
 def initTranslationDB(object) :
+
+    global TRANSLATION_DB
+    if not TRANSLATION_DB :
+        return
 
     if not object.yaml["sync_db"] :
         SyncTranslationHistory(object.logger)

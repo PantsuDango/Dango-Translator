@@ -95,7 +95,7 @@ class TransHistory(QWidget) :
     def refreshTableData(self) :
 
         # 查询数据库
-        rows = utils.sqlite.selectTranslationDBList(self.max_rows)
+        rows = utils.sqlite.selectTranslationDBList(self.max_rows, self.object.logger)
         rows = list(reversed(rows))
         # 表格行数
         self.table_widget.setRowCount(len(rows))

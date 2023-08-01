@@ -10,6 +10,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageGrab
 
 import utils.thread
 import utils.config
+import utils.sqlite
 
 import translator.ocr.baidu
 import translator.ocr.dango
@@ -27,11 +28,12 @@ class TranslaterProcess(QThread) :
     display_signal = pyqtSignal(str, str)
     draw_image_signal = pyqtSignal(bool)
 
-    def __init__(self, object, trans_type) :
+    def __init__(self, object, trans_type, trans_map={}) :
 
         super(TranslaterProcess, self).__init__()
         self.object = object
         self.trans_type = trans_type
+        self.trans_map = trans_map
         self.logger = object.logger
 
 
@@ -161,81 +163,97 @@ class TranslaterProcess(QThread) :
 
         result = ""
 
-        # 公共翻译一
-        if self.trans_type == "webdriver_1" :
-            if self.object.translation_ui.webdriver1.open_sign :
-                result = self.object.translation_ui.webdriver1.translater(self.object.translation_ui.original)
-            else :
-                result = "%s翻译: 我抽风啦, 请尝试重新翻译! 如果频繁出现, 建议直接注册使用私人翻译"%self.object.translation_ui.webdriver1.translater_map[self.object.translation_ui.webdriver1.web_type]
+        # 从本地数据库获取已经翻译过的结果
+        if self.trans_type in self.trans_map :
+            result = self.trans_map[self.trans_type]
+        else :
+            # 公共翻译一
+            if self.trans_type == "webdriver_1" :
+                # 从本地数据库获取已经翻译过的结果
+                if self.object.translation_ui.webdriver1.web_type in self.trans_map :
+                    result = self.trans_map[self.object.translation_ui.webdriver1.web_type]
+                else :
+                    if self.object.translation_ui.webdriver1.open_sign :
+                        result = self.object.translation_ui.webdriver1.translater(self.object.translation_ui.original)
+                    else :
+                        result = "%s翻译: 我抽风啦, 请尝试重新翻译! 如果频繁出现, 建议直接注册使用私人翻译"%self.object.translation_ui.webdriver1.translater_map[self.object.translation_ui.webdriver1.web_type]
 
-        # 公共翻译二
-        elif self.trans_type == "webdriver_2" :
-            if self.object.translation_ui.webdriver2.open_sign :
-                result = self.object.translation_ui.webdriver2.translater(self.object.translation_ui.original)
-            else :
-                result = "%s翻译: 我抽风啦, 请尝试重新翻译! 如果频繁出现, 建议直接注册使用私人翻译"%self.object.translation_ui.webdriver2.translater_map[self.object.translation_ui.webdriver2.web_type]
+            # 公共翻译二
+            elif self.trans_type == "webdriver_2" :
+                # 从本地数据库获取已经翻译过的结果
+                if self.object.translation_ui.webdriver2.web_type in self.trans_map :
+                    result = self.trans_map[self.object.translation_ui.webdriver2.web_type]
+                else :
+                    if self.object.translation_ui.webdriver2.open_sign :
+                        result = self.object.translation_ui.webdriver2.translater(self.object.translation_ui.original)
+                    else :
+                        result = "%s翻译: 我抽风啦, 请尝试重新翻译! 如果频繁出现, 建议直接注册使用私人翻译"%self.object.translation_ui.webdriver2.translater_map[self.object.translation_ui.webdriver2.web_type]
 
-        # 公共翻译三
-        elif self.trans_type == "webdriver_3":
-            if self.object.translation_ui.webdriver3.open_sign :
-                result = self.object.translation_ui.webdriver3.translater(self.object.translation_ui.original)
-            else:
-                result = "%s翻译: 我抽风啦, 请尝试重新翻译! 如果频繁出现, 建议直接注册使用私人翻译" % self.object.translation_ui.webdriver3.translater_map[self.object.translation_ui.webdriver3.web_type]
+            # 公共翻译三
+            elif self.trans_type == "webdriver_3" :
+                # 从本地数据库获取已经翻译过的结果
+                if self.object.translation_ui.webdriver3.web_type in self.trans_map :
+                    result = self.trans_map[self.object.translation_ui.webdriver3.web_type]
+                else :
+                    if self.object.translation_ui.webdriver3.open_sign :
+                        result = self.object.translation_ui.webdriver3.translater(self.object.translation_ui.original)
+                    else:
+                        result = "%s翻译: 我抽风啦, 请尝试重新翻译! 如果频繁出现, 建议直接注册使用私人翻译" % self.object.translation_ui.webdriver3.translater_map[self.object.translation_ui.webdriver3.web_type]
 
-        # 私人团子
-        elif self.trans_type == "dango_private" :
-            sign, result = translator.ocr.dango.dangoTrans(self.object, self.object.translation_ui.original, self.object.config["language"])
+            # 私人团子
+            elif self.trans_type == "dango_private" :
+                sign, result = translator.ocr.dango.dangoTrans(self.object, self.object.translation_ui.original, self.object.config["language"])
 
-        # 私人百度
-        elif self.trans_type == "baidu_private" :
-            app_id = self.object.config["baiduAPI"]["Key"]
-            secret_key = self.object.config["baiduAPI"]["Secret"]
-            result = translator.api.baidu(self.object.translation_ui.original, app_id, secret_key, self.logger)
+            # 私人百度
+            elif self.trans_type == "baidu_private" :
+                app_id = self.object.config["baiduAPI"]["Key"]
+                secret_key = self.object.config["baiduAPI"]["Secret"]
+                result = translator.api.baidu(self.object.translation_ui.original, app_id, secret_key, self.logger)
 
-        # 私人腾讯
-        elif self.trans_type == "tencent_private" :
-            secret_id = self.object.config["tencentAPI"]["Key"]
-            secret_key = self.object.config["tencentAPI"]["Secret"]
-            result = translator.api.tencent(self.object.translation_ui.original, secret_id, secret_key, self.logger)
+            # 私人腾讯
+            elif self.trans_type == "tencent_private" :
+                secret_id = self.object.config["tencentAPI"]["Key"]
+                secret_key = self.object.config["tencentAPI"]["Secret"]
+                result = translator.api.tencent(self.object.translation_ui.original, secret_id, secret_key, self.logger)
 
-        # 私人彩云
-        elif self.trans_type == "caiyun_private" :
-            secret_key = self.object.config["caiyunAPI"]
-            result = translator.api.caiyun(self.object.translation_ui.original, secret_key, self.logger)
+            # 私人彩云
+            elif self.trans_type == "caiyun_private" :
+                secret_key = self.object.config["caiyunAPI"]
+                result = translator.api.caiyun(self.object.translation_ui.original, secret_key, self.logger)
 
-        # 私人ChatGPT
-        elif self.trans_type == "chatgpt_private" :
-            result = translator.api.chatgpt(
-                api_key=self.object.config["chatgptAPI"],
-                language=self.object.config["language"],
-                proxy=self.object.config["chatgptProxy"],
-                url=self.object.config["chatgptApiAddr"],
-                model=self.object.config["chatgptModel"],
-                content=self.object.translation_ui.original,
-                logger=self.logger,
-            )
+            # 私人ChatGPT
+            elif self.trans_type == "chatgpt_private" :
+                result = translator.api.chatgpt(
+                    api_key=self.object.config["chatgptAPI"],
+                    language=self.object.config["language"],
+                    proxy=self.object.config["chatgptProxy"],
+                    url=self.object.config["chatgptApiAddr"],
+                    model=self.object.config["chatgptModel"],
+                    content=self.object.translation_ui.original,
+                    logger=self.logger,
+                )
 
-        # 私人阿里云
-        elif self.trans_type == "aliyun_private" :
-            sign, result = translator.api.aliyun(
-                access_key_id=self.object.config["aliyunAPI"]["Key"],
-                access_key_secret=self.object.config["aliyunAPI"]["Secret"],
-                source_language=self.object.config["language"],
-                text_to_translate=self.object.translation_ui.original,
-                logger=self.logger,
-            )
+            # 私人阿里云
+            elif self.trans_type == "aliyun_private" :
+                sign, result = translator.api.aliyun(
+                    access_key_id=self.object.config["aliyunAPI"]["Key"],
+                    access_key_secret=self.object.config["aliyunAPI"]["Secret"],
+                    source_language=self.object.config["language"],
+                    text_to_translate=self.object.translation_ui.original,
+                    logger=self.logger,
+                )
 
-        # 私人有道
-        elif self.trans_type == "youdao_private" :
-            sign, result = translator.api.youdao(
-                text=self.object.translation_ui.original,
-                app_key=self.object.config["youdaoAPI"]["Key"],
-                app_secret=self.object.config["youdaoAPI"]["Secret"],
-                logger=self.logger,
-            )
+            # 私人有道
+            elif self.trans_type == "youdao_private" :
+                sign, result = translator.api.youdao(
+                    text=self.object.translation_ui.original,
+                    app_key=self.object.config["youdaoAPI"]["Key"],
+                    app_secret=self.object.config["youdaoAPI"]["Secret"],
+                    logger=self.logger,
+                )
 
-        elif self.trans_type == "original" :
-            result = self.object.translation_ui.original
+            elif self.trans_type == "original" :
+                result = self.object.translation_ui.original
 
         # 根据屏蔽词过滤
         for val in self.object.config["Filter"]:
@@ -337,7 +355,7 @@ class Translater(QThread) :
             QApplication.processEvents()
 
         self.object.translation_ui.thread_state += 1
-        thread = TranslaterProcess(self.object, trans_type)
+        thread = TranslaterProcess(self.object, trans_type, self.trans_map)
         thread.display_signal.connect(self.object.translation_ui.display_text)
         thread.draw_image_signal.connect(self.object.range_ui.drawImage)
         thread.start()
@@ -455,6 +473,12 @@ class Translater(QThread) :
 
         # 判断是否未开任何翻译源
         nothing_sign = False
+
+        # 从数据库中获取翻译结果
+        rows = utils.sqlite.selectTranslationDBBySrcAndTransType(original, self.logger)
+        self.trans_map = {}
+        for row in rows :
+            self.trans_map[row[2]] = row[3]
 
         # 公共翻译一
         if self.object.translation_ui.webdriver1.web_type :
