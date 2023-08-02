@@ -1261,7 +1261,6 @@ class Manga(QWidget) :
         manga_trans = utils.sqlite.TRANS_MAP[manga_trans]
 
         # 如果本地有翻译缓存则直接使用
-        print(trans_map)
         if manga_trans in trans_map :
             result = trans_map[manga_trans]
         else :
