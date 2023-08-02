@@ -1948,6 +1948,7 @@ class RenderTextBlock(QWidget) :
         self.image_label.setCursor(Qt.OpenHandCursor)
         self.image_label.paint_sign.connect(self.paintTextBlockButton)
         self.image_label.paint_reset_sign.connect(self.paintTextBlockButtonReset)
+        self.image_label.paint_recover_sign.connect(self.paintAreaRecoverReset)
         widget = QWidget()
         layout = QVBoxLayout()
         layout.addWidget(self.image_label, alignment=Qt.AlignCenter)
@@ -1964,6 +1965,17 @@ class RenderTextBlock(QWidget) :
         self.manual_ocr_button.clicked.connect(self.manualOCR)
         if not self.json_data :
             self.manual_ocr_button.hide()
+
+        # 区域还原按钮
+        self.area_recover_button = QPushButton(self)
+        self.area_recover_button.setText(" 区域还原")
+        self.area_recover_button.setIcon(ui.static.icon.RECOVER_ICON)
+        self.area_recover_button.setToolTip("<b>通过在编辑图上长按鼠标左键, 框出一个区域, 该区域会恢复原图的摸样</b>")
+        self.area_recover_button.setGeometry(100*self.rate[0], 590*self.rate[1], 100*self.rate[0], 30*self.rate[1])
+        self.area_recover_button.setStyleSheet("QPushButton:hover {background-color: #83AAF9;}")
+        self.area_recover_button.clicked.connect(self.areaRecover)
+        if not self.json_data :
+            self.area_recover_button.hide()
 
         # 显示图片缩放比例
         self.rate_label = TransparentButton(self)
@@ -2023,23 +2035,24 @@ class RenderTextBlock(QWidget) :
     # 绘制矩形框按钮信号槽
     def paintTextBlockButton(self, x, y, w, h) :
 
+        # 初始化框按钮
         if not self.paint_button :
             self.paint_button = CustomTextBlockButton(self.image_label)
             self.paint_button.setCursor(ui.static.icon.EDIT_CURSOR)
             self.paint_button.setStyleSheet("QPushButton {background: transparent; border: 2px solid red;}"
                                             "QPushButton:hover {background-color:rgba(62, 62, 62, 0.1)}")
-            # 打开文本框编辑信号
-            self.paint_button.click_signal.connect(self.clickTextBlock)
-            # 移动文本框信号
-            self.paint_button.move_signal.connect(self.refreshTextBlockPosition)
             self.paint_button.setGeometry(x, y, w, h)
-            self.paint_button.setStyleSheet("QPushButton {background: transparent; border: 2px solid red;}"
-                                            "QPushButton:hover {background-color:rgba(62, 62, 62, 0.1)}")
-            # 文本框右键菜单
-            self.paint_button.setContextMenuPolicy(Qt.CustomContextMenu)
-            self.paint_button.customContextMenuRequested.connect(lambda _, b=self.paint_button: self.showTextBlockButtonMenu(b))
-
             self.paint_button.show()
+
+            # 如果是绘制OCR框状态
+            if self.image_label.paint_type == "ocr" :
+                # 打开文本框编辑信号
+                self.paint_button.click_signal.connect(self.clickTextBlock)
+                # 移动文本框信号
+                self.paint_button.move_signal.connect(self.refreshTextBlockPosition)
+                # 文本框右键菜单
+                self.paint_button.setContextMenuPolicy(Qt.CustomContextMenu)
+                self.paint_button.customContextMenuRequested.connect(lambda _, b=self.paint_button: self.showTextBlockButtonMenu(b))
 
         self.paint_button.setGeometry(x, y, w, h)
 
@@ -2209,6 +2222,56 @@ class RenderTextBlock(QWidget) :
                 self.manualOCR()
 
 
+    # 绘制区域结束执行区域还原
+    def paintAreaRecoverReset(self, sign) :
+
+        try :
+            if not self.paint_button :
+                if self.paint_status :
+                    self.areaRecover()
+                return
+            # 如果框太小就直接删掉, 防止误操作绘制出错误的框
+            if self.paint_button.width() <= 10 and self.paint_button.height() <= 10 :
+                self.paint_button.deleteLater()
+                if self.paint_status :
+                    self.areaRecover()
+                return
+
+            # 计算坐标
+            x = int(self.paint_button.x() / self.image_rate[0])
+            y = int(self.paint_button.y() / self.image_rate[1])
+            w = int(self.paint_button.width() / self.image_rate[0])
+            h = int(self.paint_button.height() / self.image_rate[1])
+            # 打开原图, 按照坐标截图
+            original_image = Image.open(self.original_image_path)
+            original_cut_image = original_image.crop((x, y, x+w, y+h))
+            # 打开ipt图, 将原图贴于ipt图上
+            ipt_image = Image.open(self.ipt_image_path)
+            ipt_image.paste(original_cut_image, (x, y))
+            ipt_image.save(self.ipt_image_path)
+            # 打开rdr图, 将原图贴于rdr图上
+            rdr_image = Image.open(self.image_path)
+            rdr_image.paste(original_cut_image, (x, y))
+            rdr_image.save(self.image_path)
+
+            # 刷新大图
+            init_image_rate = copy.deepcopy(self.image_rate)
+            self.loadImage()
+            self.matchButtonSize()
+            self.object.manga_ui.setImageInitRate(init_image_rate)
+            # 刷新编辑框译图列表框
+            self.object.manga_ui.editImageWidgetRefreshImage(self.original_image_path)
+            self.object.manga_ui.transImageWidgetRefreshImage(self.original_image_path)
+
+        except Exception as err :
+            self.logger.error(traceback.format_exc())
+            utils.message.MessageBox("区域还原失败", traceback.format_exc(), self.rate)
+        finally :
+            if self.paint_status :
+                self.paint_button.deleteLater()
+                self.areaRecover()
+
+
     # 加载大图
     def loadImage(self) :
 
@@ -2329,6 +2392,7 @@ class RenderTextBlock(QWidget) :
         self.matchButtonSize()
         self.rate_label.setGeometry(930*w_rate, 590*h_rete, 60*w_rate, 30*h_rete)
         self.manual_ocr_button.setGeometry(0, 590*h_rete, 100*w_rate, 30*h_rete)
+        self.area_recover_button.setGeometry(100*w_rate, 590*h_rete, 100*w_rate, 30*h_rete)
 
 
     # 文字块按钮右键菜单
@@ -2509,9 +2573,11 @@ class RenderTextBlock(QWidget) :
 
         self.paint_status = not self.paint_status
         self.paint_button = None
+        self.image_label.paint_type = "ocr"
 
         if self.paint_status :
             # 按下手动OCR按钮
+            self.area_recover_button.setEnabled(False)
             self.scroll_area.paint_status = True
             self.image_label.paint_status = True
             self.scroll_area.setCursor(Qt.CrossCursor)
@@ -2522,11 +2588,43 @@ class RenderTextBlock(QWidget) :
                 self.object.manga_ui.next_page_button.hide()
         else :
             # 释放手动OCR按钮
+            self.area_recover_button.setEnabled(True)
             self.scroll_area.paint_status = False
             self.image_label.paint_status = False
             self.scroll_area.setCursor(Qt.OpenHandCursor)
             self.image_label.setCursor(Qt.OpenHandCursor)
             self.manual_ocr_button.setStyleSheet("QPushButton:hover {background-color: #83AAF9;}")
+            if not self.object.manga_ui.hide_image_widget_status :
+                self.object.manga_ui.last_page_button.show()
+                self.object.manga_ui.next_page_button.show()
+
+
+    # 点击区域还原按钮
+    def areaRecover(self) :
+
+        self.paint_status = not self.paint_status
+        self.paint_button = None
+        self.image_label.paint_type = "recover"
+
+        if self.paint_status :
+            # 按下区域还原按钮
+            self.manual_ocr_button.setEnabled(False)
+            self.scroll_area.paint_status = True
+            self.image_label.paint_status = True
+            self.scroll_area.setCursor(Qt.CrossCursor)
+            self.image_label.setCursor(Qt.CrossCursor)
+            self.area_recover_button.setStyleSheet("background-color: #83AAF9;")
+            if not self.object.manga_ui.hide_image_widget_status :
+                self.object.manga_ui.last_page_button.hide()
+                self.object.manga_ui.next_page_button.hide()
+        else:
+            # 释放区域还原按钮
+            self.manual_ocr_button.setEnabled(True)
+            self.scroll_area.paint_status = False
+            self.image_label.paint_status = False
+            self.scroll_area.setCursor(Qt.OpenHandCursor)
+            self.image_label.setCursor(Qt.OpenHandCursor)
+            self.area_recover_button.setStyleSheet("QPushButton:hover {background-color: #83AAF9;}")
             if not self.object.manga_ui.hide_image_widget_status :
                 self.object.manga_ui.last_page_button.show()
                 self.object.manga_ui.next_page_button.show()
@@ -4073,6 +4171,7 @@ class CustomPaintLabel(QLabel) :
 
     paint_sign = pyqtSignal(int, int, int, int)
     paint_reset_sign = pyqtSignal(bool)
+    paint_recover_sign = pyqtSignal(bool)
 
     def __init__(self, parent=None) :
 
@@ -4081,6 +4180,8 @@ class CustomPaintLabel(QLabel) :
         self.is_drawing = False
         self.start_point = QPoint()
         self.end_point = QPoint()
+        # ocr or recover
+        self.paint_type = ""
 
 
     # 鼠标移动事件
@@ -4094,7 +4195,7 @@ class CustomPaintLabel(QLabel) :
                 if self.end_point != self.start_point :
                     x, y, w, h = self.getRange()
                     self.paint_sign.emit(x, y, w, h)
-        except:
+        except :
             pass
 
 
@@ -4121,7 +4222,10 @@ class CustomPaintLabel(QLabel) :
             if e.button() == Qt.LeftButton :
                 self.end_point = e.pos()
                 if self.end_point != self.start_point :
-                    self.paint_reset_sign.emit(True)
+                    if self.paint_type == "ocr" :
+                        self.paint_reset_sign.emit(True)
+                    elif self.paint_type == "recover" :
+                        self.paint_recover_sign.emit(True)
                 self.is_drawing = False
                 self.start_point = QPoint()
                 self.end_point = QPoint()
