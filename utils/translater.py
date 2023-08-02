@@ -252,8 +252,13 @@ class TranslaterProcess(QThread) :
                     logger=self.logger,
                 )
 
+            # 原文
             elif self.trans_type == "original" :
                 result = self.object.translation_ui.original
+
+            # 保存译文
+            if trans_type != "original" :
+                utils.sqlite.insertTranslationDB(self.logger, self.object.translation_ui.original, self.trans_type, result)
 
         # 根据屏蔽词过滤
         for val in self.object.config["Filter"]:
@@ -476,10 +481,7 @@ class Translater(QThread) :
         nothing_sign = False
 
         # 从数据库中获取翻译结果
-        rows = utils.sqlite.selectTranslationDBBySrcAndTransType(original, self.logger)
-        self.trans_map = {}
-        for row in rows :
-            self.trans_map[row[2]] = row[3]
+        self.trans_map = utils.sqlite.selectTranslationDBBySrcAndTransType(original, self.logger)
 
         # 公共翻译一
         if self.object.translation_ui.webdriver1.web_type :
@@ -542,11 +544,7 @@ class Translater(QThread) :
     def flushTranslate(self, original) :
 
         # 从数据库中获取翻译结果
-        rows = utils.sqlite.selectTranslationDBBySrcAndTransType(original, self.logger)
-        self.trans_map = {}
-        for row in rows:
-            self.trans_map[row[2]] = row[3]
-
+        self.trans_map = utils.sqlite.selectTranslationDBBySrcAndTransType(original, self.logger)
         # 更新原文
         self.object.translation_ui.original = original
 

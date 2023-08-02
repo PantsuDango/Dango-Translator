@@ -1,34 +1,40 @@
 # -*- coding: utf-8 -*-
-import copy
-import time
 
 from PyQt5.QtCore import *
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+
+import re
 import os
 import io
+import copy
+import time
 import base64
 import shutil
 import json
 from math import sqrt
 import webbrowser
 import qtawesome
-from PIL import Image
+from PIL import Image, ImageDraw
 import traceback
 import pyperclip
 import pathlib
+
 import translator.ocr.dango
 import translator.api
+
 import ui.progress_bar
 import ui.range
 import ui.desc
 import ui.static.icon
+
 import utils.translater
 import utils.zip
 import utils.http
 import utils.thread
 import utils.message
+import utils.sqlite
 
 
 FONT_PATH_1 = "./config/other/NotoSansSC-Regular.otf"
@@ -98,7 +104,6 @@ class Manga(QWidget) :
                                             "QPushButton:hover {background-color: #83AAF9;}"
                                             "QPushButton:pressed {background-color: #4480F9;}")
         self.trans_all_button.setIcon(ui.static.icon.RUN_ICON)
-        #self.trans_all_button.clicked.connect(self.clickTransAllButton)
         # 一键翻译菜单
         self.trans_all_menu = QMenu(self.trans_all_button)
         self.trans_all_action_group = QActionGroup(self.trans_all_menu)
@@ -160,7 +165,7 @@ class Manga(QWidget) :
         self.createTransAction("私人腾讯")
         self.createTransAction("私人百度")
         self.createTransAction("私人ChatGPT")
-        self.createTransAction("私人阿里云")
+        self.createTransAction("私人阿里")
         self.createTransAction("私人有道")
         # 将下拉菜单设置为按钮的菜单
         self.select_trans_button.setMenu(self.trans_menu)
@@ -1105,7 +1110,7 @@ class Manga(QWidget) :
 
 
     # 漫画OCR配置过滤
-    def mangaOcrFilter(self, result) :
+    def mangaOcrFilter(self, result, image_path="") :
 
         # 过滤错误的文本块
         new_text_block = []
@@ -1126,6 +1131,17 @@ class Manga(QWidget) :
                 new_coordinate.append(coord)
 
             if not new_texts :
+                # if image_path :
+                #     # 如果过滤过<skip>的情况就将mask区域涂黑, 不消除该区域
+                #     image = Image.open(self.getMaskFilePath(image_path))
+                #     draw = ImageDraw.Draw(image)
+                #     draw.rectangle((
+                #         val["block_coordinate"]["upper_left"][0],
+                #         val["block_coordinate"]["upper_left"][1],
+                #         val["block_coordinate"]["lower_right"][0],
+                #         val["block_coordinate"]["lower_right"][1]
+                #     ), fill=0)
+                #     image.save(self.getMaskFilePath(image_path))
                 continue
 
             val["texts"] = new_texts
@@ -1191,7 +1207,7 @@ class Manga(QWidget) :
             del result["mask"]
 
             # 在线OCR配置过滤
-            result = self.mangaOcrFilter(result)
+            result = self.mangaOcrFilter(result, image_path)
 
             # 缓存ocr结果
             with open(self.getJsonFilePath(image_path), "w", encoding="utf-8") as file:
@@ -1219,10 +1235,6 @@ class Manga(QWidget) :
     # 漫画翻译配置过滤
     def mangaTransFilter(self, json_data) :
 
-        # 翻译源
-        manga_trans = self.object.config["mangaTrans"]
-        # 存译文列表
-        translated_text = []
         # 解析ocr结果获取原文
         original = []
         for val in json_data["text_block"] :
@@ -1231,47 +1243,66 @@ class Manga(QWidget) :
                 tmp += text
             original.append(tmp)
         original = "\n".join(original)
+        original = original.strip()
 
-        # 调用翻译
+        translated_text = []
         result = ""
-        if original.strip() :
-            if manga_trans == "私人团子" :
+        sign = True
+
+        # 空原文
+        if not original :
+            json_data["translated_text"] = translated_text
+            return sign, json_data
+
+        # 从本地数据库获取翻译
+        trans_map = utils.sqlite.selectTranslationDBBySrcAndTransType(original, self.logger)
+        # 翻译源
+        manga_trans = self.object.config["mangaTrans"]
+        manga_trans = utils.sqlite.TRANS_MAP[manga_trans]
+
+        # 如果本地有翻译缓存则直接使用
+        print(trans_map)
+        if manga_trans in trans_map :
+            result = trans_map[manga_trans]
+        else :
+            # 调用翻译
+            if manga_trans == "dango_private" :
                 sign, result = translator.ocr.dango.dangoTrans(
-                    self.object,
-                    original,
-                    self.object.config["mangaLanguage"]
+                    object=self.object,
+                    sentence=original,
+                    language=self.object.config["mangaLanguage"]
                 )
-                if not sign :
-                    return False, result
 
-            if manga_trans == "私人彩云" :
+            elif manga_trans == "caiyun_private" :
                 result = translator.api.caiyun(
-                    original,
-                    self.object.config["caiyunAPI"],
-                    self.logger
+                    sentence=original,
+                    token=self.object.config["caiyunAPI"],
+                    logger=self.logger
                 )
-                if result[:6] == "私人彩云: " :
-                    return False, result
+                if re.match("^私人彩云[:：]", result) :
+                    sign = False
 
-            elif manga_trans == "私人腾讯" :
+            elif manga_trans == "tencent_private" :
                 result = translator.api.tencent(
-                    original,
-                    self.object.config["tencentAPI"]["Key"],
-                    self.object.config["tencentAPI"]["Secret"], self.logger
+                    sentence=original,
+                    secret_id=self.object.config["tencentAPI"]["Key"],
+                    secret_key=self.object.config["tencentAPI"]["Secret"],
+                    logger=self.logger
                 )
-                if result[:6] == "私人腾讯: " :
-                    return False, result
+                if re.match("^私人腾讯[:：]", result) :
+                    sign = False
 
-            elif manga_trans == "私人百度" :
+            elif manga_trans == "baidu_private" :
                 result = translator.api.baidu(
-                    original,
-                    self.object.config["baiduAPI"]["Key"],
-                    self.object.config["baiduAPI"]["Secret"], self.logger
+                    sentence=original,
+                    app_id=self.object.config["baiduAPI"]["Key"],
+                    secret_key=self.object.config["baiduAPI"]["Secret"],
+                    logger=self.logger
                 )
-                if result[:6] == "私人百度: " :
-                    return False, result
+                if re.match("^私人百度[:：]", result) :
+                    sign = False
 
-            elif manga_trans == "私人ChatGPT" :
+            elif manga_trans == "chatgpt_private" :
                 result = translator.api.chatgpt(
                     api_key=self.object.config["chatgptAPI"],
                     language=self.object.config["mangaLanguage"],
@@ -1280,10 +1311,10 @@ class Manga(QWidget) :
                     model=self.object.config["chatgptModel"],
                     content=original,
                     logger=self.logger)
-                if result[:11] == "私人ChatGPT: " :
-                    return False, result
+                if re.match("^私人ChatGPT[:：]", result) :
+                    sign = False
 
-            elif manga_trans == "私人阿里云" :
+            elif manga_trans == "aliyun_private" :
                 sign, result = translator.api.aliyun(
                     access_key_id=self.object.config["aliyunAPI"]["Key"],
                     access_key_secret=self.object.config["aliyunAPI"]["Secret"],
@@ -1291,31 +1322,35 @@ class Manga(QWidget) :
                     text_to_translate=original,
                     logger=self.object.logger
                 )
-                if not sign :
-                    return False, result
 
-            elif manga_trans == "私人有道" :
+            elif manga_trans == "youdao_private" :
                 sign, result = translator.api.youdao(
                     text=original,
                     app_key=self.object.config["youdaoAPI"]["Key"],
                     app_secret=self.object.config["youdaoAPI"]["Secret"],
                     logger=self.object.logger
                 )
-                if not sign :
-                    return False, result
 
+        # 翻译成功
+        if sign :
+            # 翻译结果缓存到本地数据库
+            if manga_trans not in trans_map :
+                utils.sqlite.insertTranslationDB(self.logger, original, manga_trans, result)
             # 根据屏蔽词过滤
             for filter in self.object.config["Filter"]:
                 if not filter[0] :
                     continue
                 result = result.replace(filter[0], filter[1])
+            # 按照text_block长度分割翻译结果
+            for text in result.split("\n") :
+                translated_text.append(text)
+            translated_text = translated_text[:len(json_data["text_block"])]
+            json_data["translated_text"] = translated_text
+        else :
+            # 翻译失败, result为错误信息
+            json_data = result
 
-            for index, word in enumerate(result.split("\n")[:len(json_data["text_block"])]):
-                translated_text.append(word)
-
-        json_data["translated_text"] = translated_text
-
-        return True, json_data
+        return sign, json_data
 
 
     # 图片翻译
@@ -2595,6 +2630,15 @@ class TransEdit(QWidget) :
             "鸿蒙/HarmonyOS_Sans_Condensed_Italic/HarmonyOS_Sans_Condensed_Light_Italic",
             "鸿蒙/HarmonyOS_Sans_Condensed/HarmonyOS_Sans_Condensed_Bold"
         ]
+        self.trans_type_map = {
+            "团子": "dango_private",
+            "彩云": "caiyun_private",
+            "腾讯": "tencent_private",
+            "百度": "baidu_private",
+            "ChatGPT": "chatgpt_private",
+            "阿里": "aliyun_private",
+            "有道": "youdao_private",
+        }
         self.ui()
 
 
@@ -2687,13 +2731,13 @@ class TransEdit(QWidget) :
         button = QPushButton(self)
         self.customSetGeometry(button, 350, 0, 70, 30)
         button.setCursor(ui.static.icon.EDIT_CURSOR)
-        button.setText(" 阿里云")
+        button.setText(" 阿里")
         button.setIcon(ui.static.icon.TRANSLATE_ICON)
         button.setStyleSheet("QPushButton {background: transparent; font: 9pt '华康方圆体W7'; border-radius: 6px}"
                              "QPushButton:hover {background-color: #83AAF9;}"
                              "QPushButton:pressed {background-color: #4480F9;}")
-        button.clicked.connect(lambda: self.refreshTrans("阿里云"))
-        button.setToolTip("<b>使用私人阿里云重新翻译</b>")
+        button.clicked.connect(lambda: self.refreshTrans("阿里"))
+        button.setToolTip("<b>使用私人阿里重新翻译</b>")
 
         # 私人有道
         button = QPushButton(self)
@@ -2970,88 +3014,96 @@ class TransEdit(QWidget) :
         original = self.original_text.toPlainText()
         if not original.strip() :
             return
-
-        if trans_type == "团子" :
-            sign, result = translator.ocr.dango.dangoTrans(
-                object=self.object,
-                sentence=original,
-                language=self.object.config["mangaLanguage"]
-            )
-            if not sign :
-                utils.message.MessageBox("私人团子翻译失败", result, self.rate)
-                return
-
-        elif trans_type == "彩云" :
-            result = translator.api.caiyun(
-                sentence=original,
-                token=self.object.config["caiyunAPI"],
-                logger=self.logger
-            )
-            if result[:6] == "私人彩云: ":
-                utils.message.MessageBox("私人彩云翻译失败", result, self.rate)
-                return
-
-        elif trans_type == "腾讯":
-            result = translator.api.tencent(
-                sentence=original,
-                secret_id=self.object.config["tencentAPI"]["Key"],
-                secret_key=self.object.config["tencentAPI"]["Secret"],
-                logger=self.logger
-            )
-            if result[:6] == "私人腾讯: ":
-                utils.message.MessageBox("私人腾讯翻译失败", result, self.rate)
-                return
-
-        elif trans_type == "百度":
-            result = translator.api.baidu(
-                sentence=original,
-                app_id=self.object.config["baiduAPI"]["Key"],
-                secret_key=self.object.config["baiduAPI"]["Secret"],
-                logger=self.logger
-            )
-            if result[:6] == "私人百度: ":
-                utils.message.MessageBox("私人百度翻译失败", result, self.rate)
-                return
-
-        elif trans_type == "ChatGPT":
-            result = translator.api.chatgpt(
-                api_key=self.object.config["chatgptAPI"],
-                language=self.object.config["mangaLanguage"],
-                proxy=self.object.config["chatgptProxy"],
-                url=self.object.config["chatgptApiAddr"],
-                model=self.object.config["chatgptModel"],
-                content=original,
-                logger=self.logger
-            )
-            if result[:11] == "私人ChatGPT: ":
-                utils.message.MessageBox("私人ChatGPT翻译失败", result, self.rate)
-                return
-
-        elif trans_type == "阿里云":
-            sign, result = translator.api.aliyun(
-                access_key_id=self.object.config["aliyunAPI"]["Key"],
-                access_key_secret=self.object.config["aliyunAPI"]["Secret"],
-                source_language=self.object.config["mangaLanguage"],
-                text_to_translate=original,
-                logger=self.object.logger
-            )
-            if not sign :
-                utils.message.MessageBox("私人阿里云翻译失败", result, self.rate)
-                return
-
-        elif trans_type == "有道":
-            sign, result = translator.api.youdao(
-                text=original,
-                app_key=self.object.config["youdaoAPI"]["Key"],
-                app_secret=self.object.config["youdaoAPI"]["Secret"],
-                logger=self.object.logger
-            )
-            if not sign :
-                utils.message.MessageBox("私人有道翻译失败", result, self.rate)
-                return
-
+        # 翻译源
+        trans_type = self.trans_type_map[trans_type]
+        # 从本地数据库获取翻译
+        trans_map = utils.sqlite.selectTranslationDBBySrcAndTransType(original, self.logger)
+        if trans_type in trans_map :
+            result = trans_map[trans_type]
         else :
-            return
+            # 调用翻译
+            if trans_type == "dango_private" :
+                sign, result = translator.ocr.dango.dangoTrans(
+                    object=self.object,
+                    sentence=original,
+                    language=self.object.config["mangaLanguage"]
+                )
+                if not sign :
+                    utils.message.MessageBox("私人团子翻译失败", result, self.rate)
+                    return
+
+            elif trans_type == "caiyun_private" :
+                result = translator.api.caiyun(
+                    sentence=original,
+                    token=self.object.config["caiyunAPI"],
+                    logger=self.logger
+                )
+                if re.match("^私人彩云[:：]", result) :
+                    utils.message.MessageBox("私人彩云翻译失败", result, self.rate)
+                    return
+
+            elif trans_type == "tencent_private" :
+                result = translator.api.tencent(
+                    sentence=original,
+                    secret_id=self.object.config["tencentAPI"]["Key"],
+                    secret_key=self.object.config["tencentAPI"]["Secret"],
+                    logger=self.logger
+                )
+                if re.match("^私人腾讯[:：]", result) :
+                    utils.message.MessageBox("私人腾讯翻译失败", result, self.rate)
+                    return
+
+            elif trans_type == "baidu_private" :
+                result = translator.api.baidu(
+                    sentence=original,
+                    app_id=self.object.config["baiduAPI"]["Key"],
+                    secret_key=self.object.config["baiduAPI"]["Secret"],
+                    logger=self.logger
+                )
+                if re.match("^私人百度[:：]", result) :
+                    utils.message.MessageBox("私人百度翻译失败", result, self.rate)
+                    return
+
+            elif trans_type == "chatgpt_private" :
+                result = translator.api.chatgpt(
+                    api_key=self.object.config["chatgptAPI"],
+                    language=self.object.config["mangaLanguage"],
+                    proxy=self.object.config["chatgptProxy"],
+                    url=self.object.config["chatgptApiAddr"],
+                    model=self.object.config["chatgptModel"],
+                    content=original,
+                    logger=self.logger
+                )
+                if re.match("^私人ChatGPT[:：]", result) :
+                    utils.message.MessageBox("私人ChatGPT翻译失败", result, self.rate)
+                    return
+
+            elif trans_type == "aliyun_private" :
+                sign, result = translator.api.aliyun(
+                    access_key_id=self.object.config["aliyunAPI"]["Key"],
+                    access_key_secret=self.object.config["aliyunAPI"]["Secret"],
+                    source_language=self.object.config["mangaLanguage"],
+                    text_to_translate=original,
+                    logger=self.object.logger
+                )
+                if not sign :
+                    utils.message.MessageBox("私人阿里翻译失败", result, self.rate)
+                    return
+
+            elif trans_type == "youdao_private" :
+                sign, result = translator.api.youdao(
+                    text=original,
+                    app_key=self.object.config["youdaoAPI"]["Key"],
+                    app_secret=self.object.config["youdaoAPI"]["Secret"],
+                    logger=self.object.logger
+                )
+                if not sign :
+                    utils.message.MessageBox("私人有道翻译失败", result, self.rate)
+                    return
+            else :
+                return
+            # 翻译结果缓存到本地数据库
+            utils.sqlite.insertTranslationDB(self.object.logger, original, trans_type, result)
 
         # 根据屏蔽词过滤
         for filter in self.object.config["Filter"]:

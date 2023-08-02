@@ -1598,7 +1598,7 @@ class Settin(QMainWindow) :
             "baidu_private": "【私人百度】",
             "caiyun_private": "【私人彩云】",
             "chatgpt_private": "【私人ChatGPT】",
-            "aliyun_private": "【私人阿里云】",
+            "aliyun_private": "【私人阿里】",
             "youdao_private": "【私人有道】"
         }
 

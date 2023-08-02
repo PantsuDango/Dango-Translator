@@ -198,7 +198,7 @@ def testAliyun(object, access_key_id, access_key_secret) :
 
     # 测试信息显示窗
     object.settin_ui.desc_ui = ui.desc.Desc(object)
-    object.settin_ui.desc_ui.setWindowTitle("私人阿里云翻译测试")
+    object.settin_ui.desc_ui.setWindowTitle("私人阿里翻译测试")
     object.settin_ui.desc_ui.desc_text.append("\n开始测试...")
     object.settin_ui.desc_ui.show()
 

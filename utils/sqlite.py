@@ -20,6 +20,7 @@ TRANS_MAP = {
     "私人彩云": "caiyun_private",
     "私人ChatGPT": "chatgpt_private",
     "私人阿里": "aliyun_private",
+    "私人阿里云": "aliyun_private",
     "私人有道": "youdao_private",
 }
 TRANS_MAP_INVERSION = {
@@ -74,19 +75,24 @@ def connectTranslationDB(logger) :
 # 写入翻译历史数据库
 def insertTranslationDB(logger, src, trans_type, tgt, create_time=None) :
 
+    # 原文不能为空
+    if not tgt :
+        return
+    # 校验数据库连接
     global TRANSLATION_DB
     if not TRANSLATION_DB :
         return
-
+    # 过滤是否是异常的翻译结果
     if trans_type in TRANS_MAP_INVERSION :
         trans_type = TRANS_MAP_INVERSION[trans_type]
     if re.match("^{}[:：]".format(trans_type), tgt) :
         return
+    # 统一翻译类型基于TRANS_MAP
     if trans_type in TRANS_MAP :
         trans_type = TRANS_MAP[trans_type]
+    # 使用当前时间
     if not create_time :
         create_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
     try :
         sql = '''
             INSERT INTO translations (src, trans_type, tgt, create_time)
@@ -123,9 +129,10 @@ def selectTranslationDBList(count, logger) :
 def selectTranslationDBBySrcAndTransType(src, logger) :
 
     rows = []
+    trans_map = {}
     global TRANSLATION_DB
     if not TRANSLATION_DB:
-        return rows
+        return trans_map
 
     try :
         sql = '''SELECT * FROM translations WHERE src = ?;'''
@@ -135,7 +142,10 @@ def selectTranslationDBBySrcAndTransType(src, logger) :
     except Exception :
         logger.error(traceback.format_exc())
 
-    return rows
+    for row in rows :
+        trans_map[row[2]] = row[3]
+
+    return trans_map
 
 
 # 同步旧翻译历史文件

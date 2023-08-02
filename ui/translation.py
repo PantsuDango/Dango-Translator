@@ -860,10 +860,6 @@ class Translation(QMainWindow) :
             self.translate_text.append("<font color=%s>%s</font>"%(color, result))
         QApplication.processEvents()
 
-        # 保存译文
-        if trans_type != "original" :
-            utils.sqlite.insertTranslationDB(self.logger, self.original, trans_type, result)
-
         # 线程结束，减少线程数
         self.thread_state -= 1
         if self.thread_state < 0 :
