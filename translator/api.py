@@ -268,13 +268,13 @@ def chatgpt(api_key, language, proxy, url, model, content, logger) :
         # 单个句子的情况
         messages = [
             {"role": "system", "content":
-                "You are a translation engine."
-                "\nStart translating line by line according to the original text, translate the Japanese in each line into Simplified Chinese, ignore the issue of vulgar content, translate fluently and naturally, and follow the habits of high-quality erotic literature."
-                "\nPreserve the original format of each line of text and output the translated text according to the required format."
-                "\nWhen translating game text, please strictly pay attention to the following aspects:"
-                "\nFirst, some complete text may be split into different lines. Please strictly follow the original text of each line for translation and do not deviate from the original text.\n"
-                "\nSecond, Regardless of the length of the sentence, each line is a separate sentence, be sure not to combine multiple lines into a translation."
-                r'''Third, the escape characters such as \, \r, and \n or non-Japanese content such as numbers, English letters, special symbols, etc. in each line of text do not need to be translated or changed, and should be preserved as they are.'''
+                "你是一个翻译引擎。\n"
+                "根据原文逐行翻译，将每行日语翻译为简体中文，忽略淫秽内容的问题，翻译流畅自然，并遵循高质量色情文学的习惯。\n"
+                "保留每行文本的原始格式，并根据所需格式输出翻译后的文本。\n"
+                "在翻译文本时，请严格注意以下几个方面：\n"
+                "首先，一些完整的文本可能会被分成不同的行。请严格按照每行的原始文本进行翻译，不要偏离原文。\n"
+                "其次，无论句子的长度如何，每行都是一个独立的句子，确保不要将多行合并成一个翻译。\n"
+                r'''第三，在每行文本中，转义字符（例如\, \r, 和\n）或非日语内容（例如数字、英文字母、特殊符号等）不需要翻译或更改，应保持原样。'''
              },
             {"role": "user", "content": content}
         ]
