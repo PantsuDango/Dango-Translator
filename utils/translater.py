@@ -257,7 +257,7 @@ class TranslaterProcess(QThread) :
                 result = self.object.translation_ui.original
 
             # 保存译文
-            if trans_type != "original" :
+            if self.trans_type != "original" :
                 utils.sqlite.insertTranslationDB(self.logger, self.object.translation_ui.original, self.trans_type, result)
 
         # 根据屏蔽词过滤
