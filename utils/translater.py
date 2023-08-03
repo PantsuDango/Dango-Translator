@@ -229,6 +229,7 @@ class TranslaterProcess(QThread) :
                     proxy=self.object.config["chatgptProxy"],
                     url=self.object.config["chatgptApiAddr"],
                     model=self.object.config["chatgptModel"],
+                    prompt=self.object.config["chatgptPrompt"],
                     content=self.object.translation_ui.original,
                     logger=self.logger,
                 )

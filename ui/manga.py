@@ -1308,6 +1308,7 @@ class Manga(QWidget) :
                     proxy=self.object.config["chatgptProxy"],
                     url=self.object.config["chatgptApiAddr"],
                     model=self.object.config["chatgptModel"],
+                    prompt=self.object.config["chatgptPrompt"],
                     content=original,
                     logger=self.logger)
                 if re.match("^私人ChatGPT[:：]", result) :
@@ -3168,6 +3169,7 @@ class TransEdit(QWidget) :
                     proxy=self.object.config["chatgptProxy"],
                     url=self.object.config["chatgptApiAddr"],
                     model=self.object.config["chatgptModel"],
+                    prompt=self.object.config["chatgptPrompt"],
                     content=original,
                     logger=self.logger
                 )

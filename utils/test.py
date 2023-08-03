@@ -136,7 +136,7 @@ def testBaiduOCR(object) :
 
 
 # 测试私人ChatGPT翻译
-def testChatGPT(object, api_key, proxy, url, model) :
+def testChatGPT(object, api_key, proxy, url, model, prompt) :
 
     try :
         # 测试信息显示窗
@@ -159,6 +159,7 @@ def testChatGPT(object, api_key, proxy, url, model) :
                     proxy=proxy,
                     url=url,
                     model=model,
+                    prompt=prompt,
                     content=original,
                     logger=object.logger,
                 )

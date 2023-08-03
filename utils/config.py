@@ -4,6 +4,7 @@ import time
 from traceback import format_exc
 import utils.http
 import utils.sqlite
+import translator.api
 
 
 YAML_PATH = "./config/config.yaml"
@@ -361,6 +362,9 @@ def configConvert(object) :
     object.config["mangaFontSizeUse"] = object.config.get("mangaFontSizeUse", False)
     object.config["mangaFontSize"] = object.config.get("mangaFontSize", 36)
 
+    # chatgpt prompt
+    object.config["chatgptPrompt"] = object.config.get("chatgptPrompt", translator.api.CHATGPT_PROMPT)
+
     # 允许写入的key
     allow_keys = [
         "dictInfo", "offlineOCR", "onlineOCR", "DangoToken", "onlineOCRProbation", "nodeURL", "baiduOCR", "OCR", "AccessToken",
@@ -375,7 +379,7 @@ def configConvert(object) :
         "choiceRangeHotKeyUse", "autoPlaysoundUse", "mangaTrans", "mangaLanguage", "mangaDetectScale",
         "mangaMergeThreshold", "mangaFontColor", "mangaBgColor", "mangaFontColorUse", "mangaBgColorUse",
         "mangaFontType", "mangaOutputRenameUse", "mangaFastRenderUse", "mangaShadowSize", "mangaFiltrateUse",
-        "mangaFontSizeUse", "mangaFontSize", "youdaoPrivateUse", "youdaoAPI"
+        "mangaFontSizeUse", "mangaFontSize", "youdaoPrivateUse", "youdaoAPI", "chatgptPrompt"
     ]
     # 删除多余的key
     delete_keys = []
