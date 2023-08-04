@@ -79,3 +79,9 @@ class Desc(QWidget) :
         object.setGeometry(QRect(int(x * self.rate),
                                  int(y * self.rate), int(w * self.rate),
                                  int(h * self.rate)))
+
+
+    # 添加消息文本
+    def appendDescText(self, text) :
+
+        self.desc_text.append(text)

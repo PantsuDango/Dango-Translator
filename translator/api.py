@@ -247,21 +247,23 @@ def caiyun(sentence, token, logger) :
     }
     proxies = {"http": None, "https": None}
 
-    text = ""
+    text = "私人彩云: "
     try:
-        response = requests.request("POST", url, data=json.dumps(payload), headers=headers, proxies=proxies, timeout=5)
-        result = json.loads(response.text)["target"]
-        for word in result :
-            text += word
-            if word != result[-1] :
-                text += "\n"
+        resp = requests.request("POST", url, data=json.dumps(payload), headers=headers, proxies=proxies, timeout=5)
+        resp = json.loads(resp.text)
+        if "target" in resp :
+            # 翻译成功
+            text = "\n".join(resp["target"])
+        else :
+            # 翻译失败
+            message = resp.get("message", "我抽风啦, 请尝试重新翻译!")
+            if message == "Invalid token" :
+                message =  "无效的令牌"
+            text += message
+            logger.error(text)
     except Exception :
-        try :
-            logger.error(format_exc())
-            text = "私人彩云: %s"%str(json.loads(response.text))
-        except Exception :
-            logger.error(format_exc())
-            text = "私人彩云: 我抽风啦, 请尝试重新翻译!"
+        logger.error(format_exc())
+        text = "私人彩云: 我抽风啦, 请尝试重新翻译!"
 
     return text
 
@@ -269,86 +271,98 @@ def caiyun(sentence, token, logger) :
 # ChatGPT翻译
 def chatgpt(api_key, language, proxy, url, model, prompt, content, logger) :
 
-    try :
-        if not api_key :
-            return "私人ChatGPT: 还未填入私人ChatGPT密钥, 不可使用"
+    if not api_key :
+        return "私人ChatGPT: 还未填入私人ChatGPT密钥, 不可使用"
 
-        # 单个句子的情况
-        messages = [
-            {"role": "system", "content": prompt},
-            {"role": "user", "content": content}
-        ]
-        data = {
-            "model": model,
-            "messages": messages,
-            "temperature": 0,
-            "max_tokens": 1000,
-            "top_p": 1,
-            "n": 1,
-            "frequency_penalty": 1,
-            "presence_penalty": 1,
-            "stream": False,
-        }
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer {}".format(api_key)
-        }
+    messages = [
+        {"role": "system", "content": prompt},
+        {"role": "user", "content": content}
+    ]
+    data = {
+        "model": model,
+        "messages": messages,
+        "temperature": 0,
+        "max_tokens": 1000,
+        "top_p": 1,
+        "n": 1,
+        "frequency_penalty": 1,
+        "presence_penalty": 1,
+        "stream": False,
+    }
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {}".format(api_key)
+    }
+    proxies = {
+        "http": None,
+        "https": None
+    }
+    if proxy :
         proxies = {
-            "http": None,
-            "https": None
+            "http": "http://{}".format(proxy),
+            "https": "https://{}".format(proxy)
         }
-        if proxy:
-            proxies = {
-                "http": "http://{}".format(proxy),
-                "https": "https://{}".format(proxy)
-            }
 
+    text = "私人ChatGPT: "
+
+    try :
         response = requests.post(url, headers=headers, data=json.dumps(data), proxies=proxies, timeout=30)
         response.encoding = "utf-8"
         result = json.loads(response.text)
         response.close()
-        try :
-            if result.get("error", {}).get("message", "") :
-                # 翻译出错
-                error = result.get("error", {}).get("message", "")
-                if "Rate limit reached" in error :
-                    text = "私人ChatGPT: 请求次数超限制, 请稍后重试, 或使用不带QPS限制的密钥"
-                else :
-                    text = "私人ChatGPT: 翻译出错: {}, 请排查完错误后重试".format(error)
-            else :
-                # 翻译成功
-                text = result["choices"][0]["message"]["content"]
 
-                # 判断句子数量
-                content_length = len(content.split("\n"))
-                text_length = len(text.split("\n"))
-                # 结果过滤
-                if content_length == 1 :
-                    text = simpleChatgptFilter(text, content)
-                else :
+        if result.get("error", {}).get("message", "") :
+            # 翻译出错
+            error = result.get("error", {}).get("message", "")
+            if "Rate limit reached" in error :
+                text += "请求次数超限制, 请稍后重试, 或使用不带次数限制的密钥"
+            elif "You can find your API key" in error :
+                text += "无效的密钥, 请检查密钥是否正确"
+            elif "You exceeded your current quota" in error :
+                text += "账户额度已耗尽, 请检查账户确保有额度后重试"
+            elif "Invalid URL" in error :
+                text += "请求失败, 无效的API接口地址, 请检查API接口地址是否正确"
+            elif re.match("The model .+? does not exist", error) :
+                text += "错误的模型, {} 不存在".format(model)
+            else :
+                text += "翻译出错: {}, 请排查完错误后重试".format(error)
+        else :
+            # 翻译成功
+            text = result["choices"][0]["message"]["content"]
+
+            # 判断句子数量
+            content_length = len(content.split("\n"))
+            text_length = len(text.split("\n"))
+            # 结果过滤
+            if content_length == 1 :
+                text = simpleChatgptFilter(text, content)
+            else :
+                text = multipleChatgptFilter(text, content)
+
+            # 句子数量对不上的情况
+            if content_length > 1 and text_length != content_length :
+                text_list = []
+                sign = False
+                # 多句子分批请求chatgpt
+                for value in content.split("\n") :
+                    tmp_text = chatgpt(api_key, language, proxy, url, model, prompt, value, logger)
+                    if re.match(r"^私人ChatGPT:", tmp_text) :
+                        sign = True
+                        break
+                    text_list.append(tmp_text)
+                if not sign :
+                    text = "\n".join(text_list)
+                    # 结果过滤
                     text = multipleChatgptFilter(text, content)
 
-                # 句子数量对不上的情况
-                if content_length > 1 and text_length != content_length :
-                    text_list = []
-                    sign = False
-                    # 多句子分批请求chatgpt
-                    for value in content.split("\n") :
-                        tmp_text = chatgpt(api_key, language, proxy, url, model, prompt, value, logger)
-                        if re.match(r"^私人ChatGPT:", tmp_text) :
-                            sign = True
-                            break
-                        text_list.append(tmp_text)
-                    if not sign :
-                        text = "\n".join(text_list)
-                        # 结果过滤
-                        text = multipleChatgptFilter(text, content)
-
-        except Exception :
-            logger.error(format_exc())
-            return "私人ChatGPT: 翻译出错: {}".format(str(result))
     except requests.exceptions.ReadTimeout :
-        text = "私人ChatGPT: 翻译超时, ChatGPT需要挂载代理才可使用, 请点击[代理]按钮, 正确配置好代理后重试"
+        text += "翻译超时, 如有挂载代理, 请检查代理稳定性后重试"
+    except requests.exceptions.ProxyError :
+        text += "代理访问错误, 请检查是否有开启代理, 且代理地址正确"
+    except requests.exceptions.ConnectionError :
+        text += "网络连接错误, 无法访问到ChatGPT API"
+        if not proxy :
+            text += ", 请尝试使用代理访问"
     except Exception as err :
         logger.error(format_exc())
         text = "私人ChatGPT: 翻译出错: {}, 请排查完错误后重试".format(err)

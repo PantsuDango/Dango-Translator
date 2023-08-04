@@ -84,6 +84,8 @@ class TabWidget(QTabWidget) :
 
 class Settin(QMainWindow) :
 
+    desc_signal = pyqtSignal(str)
+
     def __init__(self, object):
 
         super(Settin, self).__init__()
@@ -103,6 +105,8 @@ class Settin(QMainWindow) :
         self.chatgpt_setting_ui = ui.chatgpt.ChatGPTSetting(self.object)
         self.aliyun_setting_ui = ui.aliyun.AliyunSetting(self.object)
         self.youdao_setting_ui = ui.youdao.YoudaoSetting(self.object)
+        # 信号槽
+        self.desc_signal.connect(self.desc_ui.appendDescText)
 
 
     def ui(self):

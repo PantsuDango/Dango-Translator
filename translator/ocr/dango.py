@@ -296,16 +296,18 @@ def dangoOCR(object, test=False) :
 
 
 # 本地OCR
-def offlineOCR(object) :
+def offlineOCR(object, test=False) :
 
     image_path = os.path.join(os.getcwd(), "config", "image.jpg")
-    url = "http://127.0.0.1:6666/ocr/api"
     language = object.config["language"]
+    if test :
+        image_path = TEST_IMAGE_PATH
+        language = "JAP"
     body = {
         "ImagePath": image_path,
         "Language": language
     }
-
+    url = "http://127.0.0.1:6666/ocr/api"
     res = utils.http.post(url, body, object.logger)
     if not res :
         return False, "本地OCR错误: 本地OCR所使用的端口可能被占用, 请重启电脑以释放端口后重试\n如果频繁出现, 建议切换其他OCR使用"

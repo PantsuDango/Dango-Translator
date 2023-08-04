@@ -1,6 +1,8 @@
 from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
 import time
 import os
+import re
 
 import translator.ocr.dango
 import translator.ocr.baidu
@@ -12,233 +14,262 @@ import traceback
 
 
 TEST_IMAGE_PATH = os.path.join(os.getcwd(), "config", "other", "image.jpg")
-NEW_TEST_IMAGE_PATH = os.path.join(os.getcwd(), "config", "other", "new_image.jpg")
+TEST_ORIGINAL = "もし、今の状況が自分らしくないことの連続で、好きになれないなら、どうすれば、変えられるかを真剣に考えてみよう。そしないと問題はちっとも解決しない。"
 
 
 # 测试本地OCR
 def testOfflineOCR(object) :
 
-    # 测试信息显示窗
-    object.settin_ui.desc_ui = ui.desc.Desc(object)
-    object.settin_ui.desc_ui.setWindowTitle("本地OCR测试")
-    object.settin_ui.desc_ui.desc_text.append("\n开始测试, 共测试5次...")
-    object.settin_ui.desc_ui.show()
+    desc_ui = object.settin_ui.desc_ui
+    signal = object.settin_ui.desc_signal
+    desc_ui.desc_text.clear()
+    desc_ui.show()
+
+    desc_ui.setWindowTitle("本地OCR测试")
+    desc_ui.desc_text.append("\n开始测试...")
+    desc_ui.desc_text.insertHtml('<img src={} width="{}" >'.format(TEST_IMAGE_PATH, 245 * object.settin_ui.rate))
     QApplication.processEvents()
-    total_time = 0
 
-    url = "http://127.0.0.1:6666/ocr/api"
-    body = {
-        "ImagePath": TEST_IMAGE_PATH,
-        "Language": "JAP"
-    }
-
-    for num in range(1, 6) :
+    def func():
         start = time.time()
-        # try :
-        #     translator.ocr.dango.imageBorder(TEST_IMAGE_PATH, NEW_TEST_IMAGE_PATH, "a", 20, color=(255, 255, 255))
-        # except Exception :
-        #     body["ImagePath"] = TEST_IMAGE_PATH
-        res = utils.http.post(url, body, object.logger)
-        end = time.time()
-        total_time += end-start
-        if res.get("Code", -1) == 0 :
-            object.settin_ui.desc_ui.desc_text.append("\n第{}次, 成功, 耗时{:.2f}s".format(num, (end - start)))
-        else:
-            object.settin_ui.desc_ui.desc_text.append("\n第{}次, 失败".format(num))
-        QApplication.processEvents()
+        sign, result = translator.ocr.dango.offlineOCR(object, True)
+        if sign :
+            signal.emit("\n识别结果:\n{}\n\n耗时: {:.2f}s\n测试成功!".format(result, time.time() - start))
+        else :
+            signal.emit("\n测试出错:\n{}\n\n测试失败, 请排查完错误后重试!".format(result))
 
-    object.settin_ui.desc_ui.desc_text.append("\n测试完成, 平均耗时{:.2f}s".format(total_time/5))
+    utils.thread.createThread(func)
 
 
 # 测试私人腾讯
 def testTencent(object, secret_id, secret_key) :
 
-    # 测试信息显示窗
-    object.settin_ui.desc_ui = ui.desc.Desc(object)
-    object.settin_ui.desc_ui.setWindowTitle("私人腾讯翻译测试")
-    object.settin_ui.desc_ui.desc_text.append("\n开始测试...")
-    object.settin_ui.desc_ui.show()
+    desc_ui = object.settin_ui.desc_ui
+    signal = object.settin_ui.desc_signal
+    desc_ui.desc_text.clear()
+    desc_ui.show()
 
-    original = "もし、今の状況が自分らしくないことの連続で、好きになれないなら、どうすれば、変えられるかを真剣に考えてみよう。そしないと問題はちっとも解決しない。"
-    object.settin_ui.desc_ui.desc_text.append("\n原文: \n{}".format(original))
+    desc_ui.setWindowTitle("私人腾讯翻译测试")
+    signal.emit("\n开始测试...\n\n原文: \n{}".format(TEST_ORIGINAL))
     QApplication.processEvents()
-    result = translator.api.tencent(original, secret_id, secret_key, object.logger)
-    object.settin_ui.desc_ui.desc_text.append("\n译文: \n{}".format(result))
-    object.settin_ui.desc_ui.desc_text.append("\n测试结束!")
+
+    def func() :
+        start = time.time()
+        result = translator.api.tencent(TEST_ORIGINAL, secret_id, secret_key, object.logger)
+        if not re.match("^私人腾讯[:：]", result) :
+            signal.emit("\n译文:\n{}\n\n耗时: {:.2f}s\n测试成功!".format(result, time.time() - start))
+        else:
+            signal.emit("\n测试出错:\n{}\n\n测试失败, 请排查完错误后重试!".format(result))
+
+    utils.thread.createThread(func)
 
 
 # 测试私人百度翻译
 def testBaidu(object, secret_id, secret_key) :
 
-    # 测试信息显示窗
-    object.settin_ui.desc_ui = ui.desc.Desc(object)
-    object.settin_ui.desc_ui.setWindowTitle("私人百度翻译测试")
-    object.settin_ui.desc_ui.desc_text.append("\n开始测试...")
-    object.settin_ui.desc_ui.show()
+    desc_ui = object.settin_ui.desc_ui
+    signal = object.settin_ui.desc_signal
+    desc_ui.desc_text.clear()
+    desc_ui.show()
 
-    original = "もし、今の状況が自分らしくないことの連続で、好きになれないなら、どうすれば、変えられるかを真剣に考えてみよう。そしないと問題はちっとも解決しない。"
-    object.settin_ui.desc_ui.desc_text.append("\n原文: \n{}".format(original))
+    desc_ui.setWindowTitle("私人百度翻译测试")
+    signal.emit("\n开始测试...\n\n原文: \n{}".format(TEST_ORIGINAL))
     QApplication.processEvents()
-    result = translator.api.baidu(original, secret_id, secret_key, object.logger)
-    object.settin_ui.desc_ui.desc_text.append("\n译文: \n{}".format(result))
-    object.settin_ui.desc_ui.desc_text.append("\n测试结束!")
+
+    def func() :
+        start = time.time()
+        result = translator.api.baidu(TEST_ORIGINAL, secret_id, secret_key, object.logger)
+        if not re.match("^私人百度[:：]", result):
+            signal.emit("\n译文:\n{}\n\n耗时: {:.2f}s\n测试成功!".format(result, time.time() - start))
+        else:
+            signal.emit("\n测试出错:\n{}\n\n测试失败, 请排查完错误后重试!".format(result))
+
+    utils.thread.createThread(func)
 
 
 # 测试私人彩云翻译
 def testCaiyun(object, secret_key) :
 
-    # 测试信息显示窗
-    object.settin_ui.desc_ui = ui.desc.Desc(object)
-    object.settin_ui.desc_ui.setWindowTitle("私人彩云翻译测试")
-    object.settin_ui.desc_ui.desc_text.append("\n开始测试...")
-    object.settin_ui.desc_ui.show()
+    desc_ui = object.settin_ui.desc_ui
+    signal = object.settin_ui.desc_signal
+    desc_ui.desc_text.clear()
+    desc_ui.show()
 
-    original = "もし、今の状況が自分らしくないことの連続で、好きになれないなら、どうすれば、変えられるかを真剣に考えてみよう。そしないと問題はちっとも解決しない。"
-    object.settin_ui.desc_ui.desc_text.append("\n原文: \n{}".format(original))
+    desc_ui.setWindowTitle("私人彩云翻译测试")
+    signal.emit("\n开始测试...\n\n原文: \n{}".format(TEST_ORIGINAL))
     QApplication.processEvents()
-    result = translator.api.caiyun(original, secret_key, object.logger)
-    object.settin_ui.desc_ui.desc_text.append("\n译文: \n{}".format(result))
-    object.settin_ui.desc_ui.desc_text.append("\n测试结束!")
+
+    def func() :
+        start = time.time()
+        result = translator.api.caiyun(TEST_ORIGINAL, secret_key, object.logger)
+        if not re.match("^私人彩云[:：]", result) :
+            signal.emit("\n译文:\n{}\n\n耗时: {:.2f}s\n测试成功!".format(result, time.time() - start))
+        else:
+            signal.emit("\n测试出错:\n{}\n\n测试失败, 请排查完错误后重试!".format(result))
+
+    utils.thread.createThread(func)
 
 
 # 测试在线OCR
 def testOnlineOCR(object) :
 
-    # 测试信息显示窗
-    object.settin_ui.desc_ui = ui.desc.Desc(object)
-    object.settin_ui.desc_ui.setWindowTitle("团子在线OCR测试")
-    object.settin_ui.desc_ui.desc_text.append("\n开始测试...")
-    object.settin_ui.desc_ui.desc_text.insertHtml('<img src={} width="{}" >'.format(TEST_IMAGE_PATH, 245 * object.settin_ui.rate))
-    object.settin_ui.desc_ui.show()
+    desc_ui = object.settin_ui.desc_ui
+    signal = object.settin_ui.desc_signal
+    desc_ui.desc_text.clear()
+    desc_ui.show()
+
+    desc_ui.setWindowTitle("团子在线OCR测试")
+    desc_ui.desc_text.append("\n开始测试...")
+    desc_ui.desc_text.insertHtml('<img src={} width="{}" >'.format(TEST_IMAGE_PATH, 245 * object.settin_ui.rate))
     QApplication.processEvents()
 
-    ocr_sign, original = translator.ocr.dango.dangoOCR(object, test=True)
-    object.settin_ui.desc_ui.desc_text.append("\n识别结果: \n{}".format(original))
-    object.settin_ui.desc_ui.desc_text.append("\n测试结束!")
-    utils.thread.createThread(utils.http.ocrProbationReadCount, object)
+    def func() :
+        start = time.time()
+        sign, result = translator.ocr.dango.dangoOCR(object, test=True)
+        if sign :
+            signal.emit("\n识别结果:\n{}\n\n耗时: {:.2f}s\n测试成功!".format(result, time.time()-start))
+        else :
+            signal.emit("\n测试出错:\n{}\n\n测试失败, 请排查完错误后重试!".format(result))
+
+    utils.thread.createThread(func)
 
 
 # 测试百度OCR
 def testBaiduOCR(object) :
 
-    # 测试信息显示窗
-    object.settin_ui.desc_ui = ui.desc.Desc(object)
-    object.settin_ui.desc_ui.setWindowTitle("百度OCR测试")
-    object.settin_ui.desc_ui.desc_text.append("\n开始测试...")
-    object.settin_ui.desc_ui.desc_text.insertHtml('<img src={} width="{}" >'.format(TEST_IMAGE_PATH, 245 * object.settin_ui.rate))
-    object.settin_ui.desc_ui.show()
+    desc_ui = object.settin_ui.desc_ui
+    signal = object.settin_ui.desc_signal
+    desc_ui.desc_text.clear()
+    desc_ui.show()
+
+    desc_ui.setWindowTitle("百度OCR测试")
+    desc_ui.desc_text.append("\n开始测试...")
+    desc_ui.desc_text.insertHtml('<img src={} width="{}" >'.format(TEST_IMAGE_PATH, 245 * object.settin_ui.rate))
     QApplication.processEvents()
 
-    translator.ocr.baidu.getAccessToken(object)
-    ocr_sign, original = translator.ocr.baidu.baiduOCR(object, test=True)
-    object.settin_ui.desc_ui.desc_text.append("\n识别结果: \n{}".format(original))
-    object.settin_ui.desc_ui.desc_text.append("\n测试结束!")
+    def func() :
+        start = time.time()
+        translator.ocr.baidu.getAccessToken(object)
+        sign, result = translator.ocr.baidu.baiduOCR(object, test=True)
+        if sign :
+            signal.emit("\n识别结果:\n{}\n\n耗时: {:.2f}s\n测试成功!".format(result, time.time()-start))
+        else :
+            signal.emit("\n测试出错:\n{}\n\n测试失败, 请排查完错误后重试!".format(result))
+
+    utils.thread.createThread(func)
 
 
 # 测试私人ChatGPT翻译
 def testChatGPT(object, api_key, proxy, url, model, prompt) :
 
-    try :
-        # 测试信息显示窗
-        object.settin_ui.desc_ui = ui.desc.Desc(object)
-        object.settin_ui.desc_ui.setWindowTitle("私人ChatGPT翻译测试")
-        object.settin_ui.desc_ui.desc_text.append("\n开始测试...")
-        object.settin_ui.desc_ui.show()
+    desc_ui = object.settin_ui.desc_ui
+    signal = object.settin_ui.desc_signal
+    desc_ui.desc_text.clear()
+    desc_ui.show()
 
-        original = "もし、今の状況が自分らしくないことの連続で、好きになれないなら、どうすれば、変えられるかを真剣に考えてみよう。そしないと問題はちっとも解決しない。"
-        object.settin_ui.desc_ui.desc_text.append("\n原文: \n{}".format(original))
-        QApplication.processEvents()
+    desc_ui.setWindowTitle("私人ChatGPT翻译测试")
+    signal.emit("\n开始测试...\n\n原文: \n{}".format(TEST_ORIGINAL))
+    QApplication.processEvents()
 
-        # 异步调用gpt
-        def func() :
-            try :
-                start = time.time()
-                result = translator.api.chatgpt(
-                    api_key=api_key,
-                    language="JAP",
-                    proxy=proxy,
-                    url=url,
-                    model=model,
-                    prompt=prompt,
-                    content=original,
-                    logger=object.logger,
-                )
-                object.settin_ui.desc_ui.desc_text.append("\n译文: \n{}".format(result))
-                object.settin_ui.desc_ui.desc_text.append("\n耗时: {:.2f}s".format(time.time()-start))
-                object.settin_ui.desc_ui.desc_text.append("测试结束!")
-            except Exception :
-                object.settin_ui.desc_ui.desc_text.append("\n测试出错: \n{}".format(traceback.format_exc()))
-                object.logger.error(traceback.format_exc())
+    def func():
+        start = time.time()
+        result = translator.api.chatgpt(
+            api_key=api_key,
+            language="JAP",
+            proxy=proxy,
+            url=url,
+            model=model,
+            prompt=prompt,
+            content=TEST_ORIGINAL,
+            logger=object.logger,
+        )
+        if not re.match("^私人ChatGPT[:：]", result) :
+            signal.emit("\n译文:\n{}\n\n耗时: {:.2f}s\n测试成功!".format(result, time.time() - start))
+        else:
+            signal.emit("\n测试出错:\n{}\n\n测试失败, 请排查完错误后重试!".format(result))
 
-        utils.thread.createThread(func)
-
-    except Exception :
-        object.settin_ui.desc_ui.desc_text.append("\n测试出错: \n{}".format(traceback.format_exc()))
-        object.logger.error(traceback.format_exc())
+    utils.thread.createThread(func)
 
 
 # 测试私人团子
 def testDango(object) :
 
-    # 测试信息显示窗
-    object.settin_ui.desc_ui = ui.desc.Desc(object)
-    object.settin_ui.desc_ui.setWindowTitle("私人团子翻译测试")
-    object.settin_ui.desc_ui.desc_text.append("\n开始测试...")
-    object.settin_ui.desc_ui.show()
+    desc_ui = object.settin_ui.desc_ui
+    signal = object.settin_ui.desc_signal
+    desc_ui.desc_text.clear()
+    desc_ui.show()
 
-    original = "もし、今の状況が自分らしくないことの連続で、好きになれないなら、どうすれば、変えられるかを真剣に考えてみよう。そしないと問題はちっとも解決しない。"
-    object.settin_ui.desc_ui.desc_text.append("\n原文: \n{}".format(original))
+    desc_ui.setWindowTitle("私人团子翻译测试")
+    signal.emit("\n开始测试...\n\n原文: \n{}".format(TEST_ORIGINAL))
     QApplication.processEvents()
-    sign, result = translator.ocr.dango.dangoTrans(object, original, "JAP")
-    object.settin_ui.desc_ui.desc_text.append("\n译文: \n{}".format(result))
-    object.settin_ui.desc_ui.desc_text.append("\n测试结束!")
+
+    def func() :
+        start = time.time()
+        sign, result = translator.ocr.dango.dangoTrans(
+            object=object,
+            sentence=TEST_ORIGINAL,
+            language="JAP"
+        )
+        if sign :
+            signal.emit("\n译文:\n{}\n\n耗时: {:.2f}s\n测试成功!".format(result, time.time()-start))
+        else :
+            signal.emit("\n测试出错:\n{}\n\n测试失败, 请排查完错误后重试!".format(result))
+
+    utils.thread.createThread(func)
 
 
 # 测试私人阿里云翻译
 def testAliyun(object, access_key_id, access_key_secret) :
 
-    # 测试信息显示窗
-    object.settin_ui.desc_ui = ui.desc.Desc(object)
-    object.settin_ui.desc_ui.setWindowTitle("私人阿里翻译测试")
-    object.settin_ui.desc_ui.desc_text.append("\n开始测试...")
-    object.settin_ui.desc_ui.show()
+    desc_ui = object.settin_ui.desc_ui
+    signal = object.settin_ui.desc_signal
+    desc_ui.desc_text.clear()
+    desc_ui.show()
 
-    original = "もし、今の状況が自分らしくないことの連続で、好きになれないなら、どうすれば、変えられるかを真剣に考えてみよう。そしないと問題はちっとも解決しない。"
-    object.settin_ui.desc_ui.desc_text.append("\n原文: \n{}".format(original))
+    desc_ui.setWindowTitle("私人有道翻译测试")
+    signal.emit("\n开始测试...\n\n原文: \n{}".format(TEST_ORIGINAL))
     QApplication.processEvents()
-    sign, result = translator.api.aliyun(access_key_id, access_key_secret, "JAP", original, object.logger)
-    object.settin_ui.desc_ui.desc_text.append("\n译文: \n{}".format(result))
-    object.settin_ui.desc_ui.desc_text.append("\n测试结束!")
+
+    def func() :
+        start = time.time()
+        sign, result = translator.api.aliyun(
+            access_key_id=access_key_id,
+            access_key_secret=access_key_secret,
+            source_language="JAP",
+            text_to_translate=TEST_ORIGINAL,
+            logger=object.logger
+        )
+        if sign :
+            signal.emit("\n译文:\n{}\n\n耗时: {:.2f}s\n测试成功!".format(result, time.time()-start))
+        else :
+            signal.emit("\n测试出错:\n{}\n\n测试失败, 请排查完错误后重试!".format(result))
+
+    utils.thread.createThread(func)
 
 
 # 测试私人有道翻译
 def testYoudao(object, app_key, app_secret) :
 
-    try :
-        # 测试信息显示窗
-        object.settin_ui.desc_ui = ui.desc.Desc(object)
-        object.settin_ui.desc_ui.setWindowTitle("私人有道翻译测试")
-        object.settin_ui.desc_ui.desc_text.append("\n开始测试...")
-        object.settin_ui.desc_ui.show()
+    desc_ui = object.settin_ui.desc_ui
+    signal = object.settin_ui.desc_signal
+    desc_ui.desc_text.clear()
+    desc_ui.show()
 
-        original = "もし、今の状況が自分らしくないことの連続で、好きになれないなら、どうすれば、変えられるかを真剣に考えてみよう。そしないと問題はちっとも解決しない。"
-        object.settin_ui.desc_ui.desc_text.append("\n原文: \n{}".format(original))
-        QApplication.processEvents()
+    desc_ui.setWindowTitle("私人有道翻译测试")
+    signal.emit("\n开始测试...\n\n原文: \n{}".format(TEST_ORIGINAL))
+    QApplication.processEvents()
 
-        # 异步调用gpt
-        def func() :
-            try :
-                start = time.time()
-                sign, result = translator.api.youdao(original, app_key, app_secret, object.logger)
-                object.settin_ui.desc_ui.desc_text.append("\n译文: \n{}".format(result))
-                object.settin_ui.desc_ui.desc_text.append("\n耗时: {:.2f}s".format(time.time()-start))
-                object.settin_ui.desc_ui.desc_text.append("测试结束!")
-            except Exception :
-                object.settin_ui.desc_ui.desc_text.append("\n测试出错: \n{}".format(traceback.format_exc()))
-                object.logger.error(traceback.format_exc())
+    def func():
+        start = time.time()
+        sign, result = translator.api.youdao(
+            text=TEST_ORIGINAL,
+            app_key=app_key,
+            app_secret=app_secret,
+            logger=object.logger
+        )
+        if sign :
+            signal.emit("\n译文:\n{}\n\n耗时: {:.2f}s\n测试成功!".format(result, time.time()-start))
+        else :
+            signal.emit("\n测试出错:\n{}\n\n测试失败, 请排查完错误后重试!".format(result))
 
-        utils.thread.createThread(func)
-
-    except Exception :
-        object.settin_ui.desc_ui.desc_text.append("\n测试出错: \n{}".format(traceback.format_exc()))
-        object.logger.error(traceback.format_exc())
+    utils.thread.createThread(func)
