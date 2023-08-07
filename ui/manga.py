@@ -42,7 +42,7 @@ FONT_PATH_2 = "./config/other/华康方圆体W7.TTC"
 
 
 # 图片翻译界面
-class Manga(QWidget) :
+class Manga(QMainWindow) :
 
     show_error_signal = pyqtSignal(list)
     flushed_render_image_and_text_block_signal = pyqtSignal(str)
@@ -74,20 +74,27 @@ class Manga(QWidget) :
         # 鼠标样式
         self.setCursor(ui.static.icon.PIXMAP_CURSOR)
         # 设置字体
-        self.setStyleSheet("font: %spt '%s';"%(self.font_size, self.font_type))
+        self.setStyleSheet("font: %spt '%s'; background-color: #FFFFFF;}"
+                           #"QMenu {background-color: white; border-radius: 3px; padding: 5px; margin: 6px;}"
+                           #"QMenu::item:text {padding-left: 10px; padding-right: 10px;}"
+                           #"QMenu::item:selected {color: #1aa3ff; background-color: #e5f5ff; border-radius: 3px;}"
+                           #"QMenu::separator {height: 1px; background: #bbbbbb; margin: 5px; margin-left: 10px; margin-right: 10px;}"
+                           %(self.font_size, self.font_type))
 
         # 底部状态栏
         self.status_label = QLabel(self)
+        self.status_label.setStyleSheet("color: #5B8FF9; background-color: #FFFFFF;")
 
         # 导入原图按钮
         self.input_image_button = QPushButton(self)
         self.input_image_button.setText(" 导入原图")
-        self.input_image_button.setStyleSheet("QPushButton {background: transparent;}"
-                                              "QPushButton:hover {background-color: #83AAF9;}"
-                                              "QPushButton:pressed {background-color: #4480F9;}")
+        self.input_image_button.setStyleSheet("QPushButton {background: transparent; color: #5B8FF9;}"
+                                              "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}"
+                                              "QPushButton:pressed {background-color: #4480F9; color: #FFFFFF;}")
         self.input_image_button.setIcon(ui.static.icon.OPEN_ICON)
         # 导入原图菜单
         self.input_menu = QMenu(self.input_image_button)
+        #self.input_menu.setStyleSheet("QMenu {background-color: white; border-radius: 3px; padding: 5px; margin: 6px;}")
         self.input_action_group = QActionGroup(self.input_menu)
         self.input_action_group.setExclusive(True)
         self.createInputAction("从文件导入")
@@ -100,9 +107,9 @@ class Manga(QWidget) :
         # 一键翻译按钮
         self.trans_all_button = QPushButton(self)
         self.trans_all_button.setText(" 一键翻译")
-        self.trans_all_button.setStyleSheet("QPushButton {background: transparent;}"
-                                            "QPushButton:hover {background-color: #83AAF9;}"
-                                            "QPushButton:pressed {background-color: #4480F9;}")
+        self.trans_all_button.setStyleSheet("QPushButton {background: transparent; color: #5B8FF9;}"
+                                            "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}"
+                                            "QPushButton:pressed {background-color: #4480F9; color: #FFFFFF;}")
         self.trans_all_button.setIcon(ui.static.icon.RUN_ICON)
         # 一键翻译菜单
         self.trans_all_menu = QMenu(self.trans_all_button)
@@ -117,9 +124,9 @@ class Manga(QWidget) :
         # 译图导出按钮
         self.output_image_button = QPushButton(self)
         self.output_image_button.setText(" 译图导出")
-        self.output_image_button.setStyleSheet("QPushButton {background: transparent;}"
-                                               "QPushButton:hover {background-color: #83AAF9;}"
-                                               "QPushButton:pressed {background-color: #4480F9;}")
+        self.output_image_button.setStyleSheet("QPushButton {background: transparent; color: #5B8FF9;}"
+                                               "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}"
+                                               "QPushButton:pressed {background-color: #4480F9; color: #FFFFFF;}")
         self.output_image_button.setIcon(ui.static.icon.OUTPUT_ICON)
         # 译图导出菜单
         self.output_menu = QMenu(self.output_image_button)
@@ -135,9 +142,9 @@ class Manga(QWidget) :
         # 选择语种按钮
         self.select_language_button = QPushButton(self)
         self.select_language_button.setText(" 选择语种")
-        self.select_language_button.setStyleSheet("QPushButton {background: transparent;}"
-                                                  "QPushButton:hover {background-color: #83AAF9;}"
-                                                  "QPushButton:pressed {background-color: #4480F9;}")
+        self.select_language_button.setStyleSheet("QPushButton {background: transparent; color: #5B8FF9;}"
+                                                  "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}"
+                                                  "QPushButton:pressed {background-color: #4480F9; color: #FFFFFF;}")
         self.select_language_button.setIcon(ui.static.icon.LANGUAGE_ICON)
         # 选择语种菜单
         self.language_menu = QMenu(self.select_language_button)
@@ -152,9 +159,9 @@ class Manga(QWidget) :
         # 选择翻译源按钮
         self.select_trans_button = QPushButton(self)
         self.select_trans_button.setText(" 选择翻译源")
-        self.select_trans_button.setStyleSheet("QPushButton {background: transparent;}"
-                                               "QPushButton:hover {background-color: #83AAF9;}"
-                                               "QPushButton:pressed {background-color: #4480F9;}")
+        self.select_trans_button.setStyleSheet("QPushButton {background: transparent; color: #5B8FF9;}"
+                                               "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}"
+                                               "QPushButton:pressed {background-color: #4480F9; color: #FFFFFF;}")
         self.select_trans_button.setIcon(ui.static.icon.TRANSLATE_ICON)
         # 翻译源菜单
         self.trans_menu = QMenu(self.select_trans_button)
@@ -174,27 +181,27 @@ class Manga(QWidget) :
         # 高级设置按钮
         self.setting_button = QPushButton(self)
         self.setting_button.setText(" 高级设置")
-        self.setting_button.setStyleSheet("QPushButton {background: transparent;}"
-                                          "QPushButton:hover {background-color: #83AAF9;}"
-                                          "QPushButton:pressed {background-color: #4480F9;}")
+        self.setting_button.setStyleSheet("QPushButton {background: transparent; color: #5B8FF9;}"
+                                          "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}"
+                                          "QPushButton:pressed {background-color: #4480F9; color: #FFFFFF;}")
         self.setting_button.setIcon(ui.static.icon.SETTING_ICON)
         self.setting_button.clicked.connect(self.clickSettingButton)
 
         # 购买按钮
         self.buy_button = QPushButton(self)
         self.buy_button.setText(" 去购买使用")
-        self.buy_button.setStyleSheet("QPushButton {background: transparent;}"
-                                      "QPushButton:hover {background-color: #83AAF9;}"
-                                      "QPushButton:pressed {background-color: #4480F9;}")
+        self.buy_button.setStyleSheet("QPushButton {background: transparent; color: #5B8FF9;}"
+                                      "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}"
+                                      "QPushButton:pressed {background-color: #4480F9; color: #FFFFFF;}")
         self.buy_button.setIcon(ui.static.icon.GO_BUY_ICON)
         self.buy_button.clicked.connect(self.object.settin_ui.openDangoBuyPage)
 
         # 教程按钮
         self.tutorial_button = QPushButton(self)
         self.tutorial_button.setText(" 使用教程")
-        self.tutorial_button.setStyleSheet("QPushButton {background: transparent;}"
-                                           "QPushButton:hover {background-color: #83AAF9;}"
-                                           "QPushButton:pressed {background-color: #4480F9;}")
+        self.tutorial_button.setStyleSheet("QPushButton {background: transparent; color: #5B8FF9;}"
+                                           "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}"
+                                           "QPushButton:pressed {background-color: #4480F9; color: #FFFFFF;}")
         self.tutorial_button.setIcon(ui.static.icon.RUN_ICON)
         self.tutorial_button.clicked.connect(self.openUseTutorial)
 
@@ -205,7 +212,8 @@ class Manga(QWidget) :
         # 原图按钮
         self.original_image_button = QPushButton(self)
         self.original_image_button.setText("原图")
-        self.original_image_button.setStyleSheet("background-color: #83AAF9; border-right: 1px solid black;")
+        self.original_image_button.setStyleSheet("QPushButton {background: transparent; color: #5B8FF9;}"
+                                                 "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}")
         self.original_image_button.clicked.connect(lambda: self.clickImageButton("original"))
 
         # 原图按钮 和 译图按钮 竖向分割线
@@ -215,8 +223,8 @@ class Manga(QWidget) :
         # 编辑按钮
         self.edit_image_button = QPushButton(self)
         self.edit_image_button.setText("编辑")
-        self.edit_image_button.setStyleSheet("QPushButton {background: transparent;}"
-                                             "QPushButton:hover {background-color: #83AAF9;}")
+        self.edit_image_button.setStyleSheet("QPushButton {background: transparent; color: #5B8FF9;}"
+                                             "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}")
         self.edit_image_button.clicked.connect(lambda: self.clickImageButton("edit"))
 
         # 原图按钮 和 译图按钮 竖向分割线
@@ -226,8 +234,8 @@ class Manga(QWidget) :
         # 译图按钮
         self.trans_image_button = QPushButton(self)
         self.trans_image_button.setText("译图")
-        self.trans_image_button.setStyleSheet("QPushButton {background: transparent;}"
-                                              "QPushButton:hover {background-color: #83AAF9;}")
+        self.trans_image_button.setStyleSheet("QPushButton {background: transparent; color: #5B8FF9;}"
+                                              "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}")
         self.trans_image_button.clicked.connect(lambda: self.clickImageButton("trans"))
 
         # 译图右侧竖向分割线
@@ -267,6 +275,7 @@ class Manga(QWidget) :
         self.show_image_scroll_area.setWidgetResizable(True)
         self.show_image_scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.show_image_scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.show_image_scroll_area.setStyleSheet("background-color: #FFFFFF;")
 
         # 错误展示提示窗
         self.show_error_label = QPushButton(self)
@@ -305,6 +314,17 @@ class Manga(QWidget) :
         # 刷新底部状态栏
         self.refreshStatusLabel()
 
+        # 背景图片
+        self.background_label = TransparentImageLabel(self)
+        self.background_label.setAlignment(Qt.AlignCenter)
+        self.background_label.setPixmap(ui.static.icon.MANGA_PIXMAP)
+        self.show_image_scroll_area.setWidget(self.background_label)
+        #self.background_label.lower()
+        self.background_label.setOpacity(0.7)
+
+        # 初始化点击原图按钮
+        self.original_image_button.click()
+
 
     # 初始化配置
     def getInitConfig(self) :
@@ -313,8 +333,8 @@ class Manga(QWidget) :
         self.rate = self.object.yaml["screen_scale_rate"]
         # 界面字体
         self.font_type = "华康方圆体W7"
-        # 字体颜色
-        self.color = "#595959"
+        # 字体颜色(蓝色)
+        self.color = "#5B8FF9"
         # 界面字体大小
         self.font_size = 7
         # 界面尺寸
@@ -662,29 +682,29 @@ class Manga(QWidget) :
         self.original_image_widget.hide()
         self.edit_image_widget.hide()
         self.trans_image_widget.hide()
-        self.original_image_button.setStyleSheet("QPushButton {background: transparent;}"
-                                                 "QPushButton:hover {background-color: #83AAF9;}")
-        self.edit_image_button.setStyleSheet("QPushButton {background: transparent;}"
-                                             "QPushButton:hover {background-color: #83AAF9;}")
-        self.trans_image_button.setStyleSheet("QPushButton {background: transparent;}"
-                                              "QPushButton:hover {background-color: #83AAF9;}")
+        self.original_image_button.setStyleSheet("QPushButton {background: transparent; color: #5B8FF9;}"
+                                                 "QPushButton:hover {background-color: #83AAF9; color: #00000;}")
+        self.edit_image_button.setStyleSheet("QPushButton {background: transparent; color: #5B8FF9;}"
+                                             "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}")
+        self.trans_image_button.setStyleSheet("QPushButton {background: transparent; color: #5B8FF9;}"
+                                              "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}")
         if button_type == "original" :
             self.original_image_widget.show()
-            self.original_image_button.setStyleSheet("background-color: #83AAF9;")
+            self.original_image_button.setStyleSheet("background-color: #83AAF9; color: #FFFFFF;")
             self.original_image_widget.verticalScrollBar().setValue(self.image_widget_scroll_bar_value)
             self.original_image_widget.setCurrentRow(self.image_widget_index)
             self.loadOriginalImage()
 
         elif button_type == "edit" :
             self.edit_image_widget.show()
-            self.edit_image_button.setStyleSheet("background-color: #83AAF9;")
+            self.edit_image_button.setStyleSheet("background-color: #83AAF9; color: #FFFFFF;")
             self.edit_image_widget.verticalScrollBar().setValue(self.image_widget_scroll_bar_value)
             self.edit_image_widget.setCurrentRow(self.image_widget_index)
             self.loadEditImage()
 
         elif button_type == "trans" :
             self.trans_image_widget.show()
-            self.trans_image_button.setStyleSheet("background-color: #83AAF9;")
+            self.trans_image_button.setStyleSheet("background-color: #83AAF9; color: #FFFFFF;")
             self.trans_image_widget.verticalScrollBar().setValue(self.image_widget_scroll_bar_value)
             self.trans_image_widget.setCurrentRow(self.image_widget_index)
             self.loadTransImage()
@@ -766,7 +786,7 @@ class Manga(QWidget) :
 
         if self.check_permission :
             self.status_label.setText(
-                "原文语种: {}     翻译源: {}     试用开关: {}     剩余试用次数: {}"
+                "  原文语种: {}     翻译源: {}     试用开关: {}     剩余试用次数: {}"
                 .format(
                     self.language_map[self.object.config["mangaLanguage"]],
                     self.object.config["mangaTrans"],
@@ -775,13 +795,14 @@ class Manga(QWidget) :
                 ))
         else :
             self.status_label.setText(
-                "原文语种: {}     翻译源: {}     试用开关: {}"
+                '<font color="#5B8FF9">&nbsp;&nbsp;原文语种:&nbsp;</font> <font color="#999999">{}</font>'
+                '<font color="#5B8FF9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;翻译源:&nbsp;</font> <font color="#999999">{}</font>'
+                '<font color="#5B8FF9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;试用开关:&nbsp;</font> <font color="#999999">{}</font>'
                 .format(
                     self.language_map[self.object.config["mangaLanguage"]],
                     self.object.config["mangaTrans"],
                     "关闭",
                 ))
-
 
 
     # 设置原图列表框右键菜单
@@ -1565,7 +1586,7 @@ class Manga(QWidget) :
         self.customSetGeometry(self.input_image_button, 0, 0, 120, 35, w_rate, h_rate)
         # 底部状态栏
         self.status_label.setGeometry(
-            10 * w_rate, h - 30 * h_rate,
+            0, h - 30 * h_rate,
             w, 30 * h_rate
         )
         # 一键翻译按钮
@@ -1701,6 +1722,18 @@ class Manga(QWidget) :
         # 图片大图展示
         if self.show_image_widget :
             self.show_image_widget.resize(self.show_image_scroll_area.width(), self.show_image_scroll_area.height())
+        # 图片大图展示背景
+        try :
+            self.background_label.setPixmap(
+                ui.static.icon.MANGA_PIXMAP.scaled(
+                    self.show_image_scroll_area.width()*0.7,
+                    self.show_image_scroll_area.height()*0.7,
+                    Qt.KeepAspectRatio,
+                    Qt.SmoothTransformation)
+            )
+            self.show_image_scroll_area.setWidget(self.background_label)
+        except Exception :
+            pass
 
 
     # 展示错误消息
