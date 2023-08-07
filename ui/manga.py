@@ -74,27 +74,28 @@ class Manga(QMainWindow) :
         # 鼠标样式
         self.setCursor(ui.static.icon.PIXMAP_CURSOR)
         # 设置字体
-        self.setStyleSheet("font: %spt '%s'; background-color: #FFFFFF;}"
-                           #"QMenu {background-color: white; border-radius: 3px; padding: 5px; margin: 6px;}"
-                           #"QMenu::item:text {padding-left: 10px; padding-right: 10px;}"
-                           #"QMenu::item:selected {color: #1aa3ff; background-color: #e5f5ff; border-radius: 3px;}"
-                           #"QMenu::separator {height: 1px; background: #bbbbbb; margin: 5px; margin-left: 10px; margin-right: 10px;}"
-                           %(self.font_size, self.font_type))
+        self.setStyleSheet("font: %spt '%s'; background-color: rgba(255, 255, 255, 1);"%(self.font_size, self.font_type))
 
         # 底部状态栏
         self.status_label = QLabel(self)
         self.status_label.setStyleSheet("color: #5B8FF9; background-color: #FFFFFF;")
+
+        # 顶部工具栏底色Label
+        self.top_background_label = QLabel(self)
+        self.top_background_label.setStyleSheet("background-color: #FFFFFF;")
 
         # 导入原图按钮
         self.input_image_button = QPushButton(self)
         self.input_image_button.setText(" 导入原图")
         self.input_image_button.setStyleSheet("QPushButton {background: transparent; color: #5B8FF9;}"
                                               "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}"
-                                              "QPushButton:pressed {background-color: #4480F9; color: #FFFFFF;}")
+                                              "QPushButton:pressed {background-color: #83AAF9; color: #FFFFFF;}")
         self.input_image_button.setIcon(ui.static.icon.OPEN_ICON)
         # 导入原图菜单
         self.input_menu = QMenu(self.input_image_button)
-        #self.input_menu.setStyleSheet("QMenu {background-color: white; border-radius: 3px; padding: 5px; margin: 6px;}")
+        self.input_menu.setStyleSheet("QMenu {color: #5B8FF9; background-color: #FFFFFF;}"
+                                      "QMenu::item:selected:enabled {background: #E5F5FF;}"
+                                      "QMenu::item:checked {background: #E5F5FF;}")
         self.input_action_group = QActionGroup(self.input_menu)
         self.input_action_group.setExclusive(True)
         self.createInputAction("从文件导入")
@@ -109,10 +110,13 @@ class Manga(QMainWindow) :
         self.trans_all_button.setText(" 一键翻译")
         self.trans_all_button.setStyleSheet("QPushButton {background: transparent; color: #5B8FF9;}"
                                             "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}"
-                                            "QPushButton:pressed {background-color: #4480F9; color: #FFFFFF;}")
+                                            "QPushButton:pressed {background-color: #83AAF9; color: #FFFFFF;}")
         self.trans_all_button.setIcon(ui.static.icon.RUN_ICON)
         # 一键翻译菜单
         self.trans_all_menu = QMenu(self.trans_all_button)
+        self.trans_all_menu.setStyleSheet("QMenu {color: #5B8FF9; background-color: #FFFFFF;}"
+                                          "QMenu::item:selected:enabled {background: #E5F5FF;}"
+                                          "QMenu::item:checked {background: #E5F5FF;}")
         self.trans_all_action_group = QActionGroup(self.trans_all_menu)
         self.trans_all_action_group.setExclusive(True)
         self.createTransAllAction("跳过已翻译的")
@@ -126,10 +130,13 @@ class Manga(QMainWindow) :
         self.output_image_button.setText(" 译图导出")
         self.output_image_button.setStyleSheet("QPushButton {background: transparent; color: #5B8FF9;}"
                                                "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}"
-                                               "QPushButton:pressed {background-color: #4480F9; color: #FFFFFF;}")
+                                               "QPushButton:pressed {background-color: #83AAF9; color: #FFFFFF;}")
         self.output_image_button.setIcon(ui.static.icon.OUTPUT_ICON)
         # 译图导出菜单
         self.output_menu = QMenu(self.output_image_button)
+        self.output_menu.setStyleSheet("QMenu {color: #5B8FF9; background-color: #FFFFFF;}"
+                                       "QMenu::item:selected:enabled {background: #E5F5FF;}"
+                                       "QMenu::item:checked {background: #E5F5FF;}")
         self.output_action_group = QActionGroup(self.output_menu)
         self.output_action_group.setExclusive(True)
         self.createOutputAction("导出到指定目录")
@@ -144,10 +151,13 @@ class Manga(QMainWindow) :
         self.select_language_button.setText(" 选择语种")
         self.select_language_button.setStyleSheet("QPushButton {background: transparent; color: #5B8FF9;}"
                                                   "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}"
-                                                  "QPushButton:pressed {background-color: #4480F9; color: #FFFFFF;}")
+                                                  "QPushButton:pressed {background-color: #83AAF9; color: #FFFFFF;}")
         self.select_language_button.setIcon(ui.static.icon.LANGUAGE_ICON)
         # 选择语种菜单
         self.language_menu = QMenu(self.select_language_button)
+        self.language_menu.setStyleSheet("QMenu {color: #5B8FF9; background-color: #FFFFFF;}"
+                                         "QMenu::item:selected:enabled {background: #E5F5FF;}"
+                                         "QMenu::item:checked {background: #E5F5FF;}")
         self.language_action_group = QActionGroup(self.language_menu)
         self.language_action_group.setExclusive(True)
         self.createLanguageAction("日语(Japanese)")
@@ -161,10 +171,13 @@ class Manga(QMainWindow) :
         self.select_trans_button.setText(" 选择翻译源")
         self.select_trans_button.setStyleSheet("QPushButton {background: transparent; color: #5B8FF9;}"
                                                "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}"
-                                               "QPushButton:pressed {background-color: #4480F9; color: #FFFFFF;}")
+                                               "QPushButton:pressed {background-color: #83AAF9; color: #FFFFFF;}")
         self.select_trans_button.setIcon(ui.static.icon.TRANSLATE_ICON)
         # 翻译源菜单
         self.trans_menu = QMenu(self.select_trans_button)
+        self.trans_menu.setStyleSheet("QMenu {color: #5B8FF9; background-color: #FFFFFF;}"
+                                      "QMenu::item:selected:enabled {background: #E5F5FF;}"
+                                      "QMenu::item:checked {background: #E5F5FF;}")
         self.trans_action_group = QActionGroup(self.trans_menu)
         self.trans_action_group.setExclusive(True)
         self.createTransAction("私人团子")
@@ -183,7 +196,7 @@ class Manga(QMainWindow) :
         self.setting_button.setText(" 高级设置")
         self.setting_button.setStyleSheet("QPushButton {background: transparent; color: #5B8FF9;}"
                                           "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}"
-                                          "QPushButton:pressed {background-color: #4480F9; color: #FFFFFF;}")
+                                          "QPushButton:pressed {background-color: #83AAF9; color: #FFFFFF;}")
         self.setting_button.setIcon(ui.static.icon.SETTING_ICON)
         self.setting_button.clicked.connect(self.clickSettingButton)
 
@@ -192,7 +205,7 @@ class Manga(QMainWindow) :
         self.buy_button.setText(" 去购买使用")
         self.buy_button.setStyleSheet("QPushButton {background: transparent; color: #5B8FF9;}"
                                       "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}"
-                                      "QPushButton:pressed {background-color: #4480F9; color: #FFFFFF;}")
+                                      "QPushButton:pressed {background-color: #83AAF9; color: #FFFFFF;}")
         self.buy_button.setIcon(ui.static.icon.GO_BUY_ICON)
         self.buy_button.clicked.connect(self.object.settin_ui.openDangoBuyPage)
 
@@ -201,9 +214,13 @@ class Manga(QMainWindow) :
         self.tutorial_button.setText(" 使用教程")
         self.tutorial_button.setStyleSheet("QPushButton {background: transparent; color: #5B8FF9;}"
                                            "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}"
-                                           "QPushButton:pressed {background-color: #4480F9; color: #FFFFFF;}")
+                                           "QPushButton:pressed {background-color: #83AAF9; color: #FFFFFF;}")
         self.tutorial_button.setIcon(ui.static.icon.RUN_ICON)
         self.tutorial_button.clicked.connect(self.openUseTutorial)
+
+        # 列表框按钮底色Label
+        self.widget_button_background_label = QLabel(self)
+        self.widget_button_background_label.setStyleSheet("background-color: #FFFFFF;")
 
         # 工具栏横向分割线
         self.cut_line_label1 = QLabel(self)
@@ -714,7 +731,7 @@ class Manga(QMainWindow) :
     def createInputAction(self, label) :
 
         action = QAction(label, self.input_menu)
-        action.setCheckable(True)
+        action.setCheckable(False)
         action.setData(label)
         self.input_action_group.addAction(action)
         self.input_menu.addAction(action)
@@ -724,7 +741,7 @@ class Manga(QMainWindow) :
     def createTransAllAction(self, label) :
 
         action = QAction(label, self.trans_all_menu)
-        action.setCheckable(True)
+        action.setCheckable(False)
         action.setData(label)
         self.trans_all_action_group.addAction(action)
         self.trans_all_menu.addAction(action)
@@ -734,7 +751,7 @@ class Manga(QMainWindow) :
     def createOutputAction(self, label) :
 
         action = QAction(label, self.output_menu)
-        action.setCheckable(True)
+        action.setCheckable(False)
         action.setData(label)
         self.output_action_group.addAction(action)
         self.output_menu.addAction(action)
@@ -1589,6 +1606,8 @@ class Manga(QMainWindow) :
             0, h - 30 * h_rate,
             w, 30 * h_rate
         )
+        # 顶部工具栏底色Label
+        self.top_background_label.setGeometry(0, 0, w, self.input_image_button.height())
         # 一键翻译按钮
         self.trans_all_button.setGeometry(
             self.input_image_button.width(), 0,
@@ -1628,6 +1647,11 @@ class Manga(QMainWindow) :
         self.cut_line_label1.setGeometry(
             0, self.input_image_button.height(),
             w, 1
+        )
+        # 列表框按钮底色Label
+        self.widget_button_background_label.setGeometry(
+            0, self.input_image_button.height(),
+            200 * w_rate, 25 * h_rate
         )
         # 图片列表框原图按钮
         self.original_image_button.setGeometry(
