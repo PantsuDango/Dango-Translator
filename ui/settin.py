@@ -32,6 +32,7 @@ import ui.caiyun
 import ui.chatgpt
 import ui.aliyun
 import ui.youdao
+import ui.xiaoniu
 import translator.ocr.baidu
 import translator.all
 
@@ -105,6 +106,7 @@ class Settin(QMainWindow) :
         self.chatgpt_setting_ui = ui.chatgpt.ChatGPTSetting(self.object)
         self.aliyun_setting_ui = ui.aliyun.AliyunSetting(self.object)
         self.youdao_setting_ui = ui.youdao.YoudaoSetting(self.object)
+        self.xiaoniu_setting_ui = ui.xiaoniu.XiaoniuSetting(self.object)
         # 信号槽
         self.desc_signal.connect(self.desc_ui.appendDescText)
 
@@ -813,6 +815,29 @@ class Settin(QMainWindow) :
         self.customSetGeometry(button, 185, 210, 60, 20)
         button.setText("设置")
         button.clicked.connect(self.openYoudaoSetting)
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
+
+        # 私人小牛翻译标签
+        label = QLabel(private_translater_tab)
+        self.customSetGeometry(label, 320, 210, 35, 20)
+        label.setText("小牛:")
+        # 私人小牛翻译开关
+        self.xiaoniu_private_switch = ui.switch.SwitchOCR(private_translater_tab, sign=self.xiaoniu_private_use, startX=(65-20) * self.rate)
+        self.customSetGeometry(self.xiaoniu_private_switch, 370, 210, 65, 20)
+        self.xiaoniu_private_switch.checkedChanged.connect(self.changeXiaoniuPrivateTranslaterSwitch)
+        self.xiaoniu_private_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 私人小牛翻译颜色选择
+        self.xiaoniu_private_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.xiaoniu_private_color), "", private_translater_tab)
+        self.customSetIconSize(self.xiaoniu_private_color_button, 20, 20)
+        self.customSetGeometry(self.xiaoniu_private_color_button, 450, 210, 20, 20)
+        self.xiaoniu_private_color_button.setStyleSheet("background: transparent;")
+        self.xiaoniu_private_color_button.clicked.connect(lambda: self.changeTranslateColor("xiaoniu_private", self.xiaoniu_private_color))
+        self.xiaoniu_private_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 私人小牛翻译设置按钮
+        button = QPushButton(private_translater_tab)
+        self.customSetGeometry(button, 485, 210, 60, 20)
+        button.setText("设置")
+        button.clicked.connect(self.openXiaoniuSetting)
         button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 公共翻译备注
@@ -1603,7 +1628,8 @@ class Settin(QMainWindow) :
             "caiyun_private": "【私人彩云】",
             "chatgpt_private": "【私人ChatGPT】",
             "aliyun_private": "【私人阿里】",
-            "youdao_private": "【私人有道】"
+            "youdao_private": "【私人有道】",
+            "xiaoniu_private": "【私人小牛】"
         }
 
         # OCR各开关
@@ -1665,6 +1691,10 @@ class Settin(QMainWindow) :
         self.youdao_private_use = self.object.config["youdaoPrivateUse"]
         if self.youdao_private_use :
             self.translate_list.append("youdao_private")
+        # 私人小牛翻译开关
+        self.xiaoniu_private_use = self.object.config["xiaoniuPrivateUse"]
+        if self.xiaoniu_private_use :
+            self.translate_list.append("xiaoniu_private")
 
         # 字体颜色 公共有道
         self.youdao_color = self.object.config["fontColor"]["youdao"]
@@ -1692,6 +1722,8 @@ class Settin(QMainWindow) :
         self.aliyun_color = self.object.config["fontColor"]["aliyunPrivate"]
         # 字体颜色 私人有道
         self.youdao_private_color = self.object.config["fontColor"]["youdaoPrivate"]
+        # 字体颜色 私人小牛
+        self.xiaoniu_private_color = self.object.config["fontColor"]["xiaoniuPrivate"]
         # 原文颜色
         self.original_color = self.object.config["fontColor"]["original"]
 
@@ -2090,9 +2122,22 @@ class Settin(QMainWindow) :
             self.youdao_private_use = True
             self.translate_list.append("youdao_private")
             self.checkTranslaterUse()
-        else :
+        else:
             self.youdao_private_use = False
             self.translate_list.remove("youdao_private")
+        self.setTransLabelMessage()
+
+
+    # 改变私人小牛翻译开关状态
+    def changeXiaoniuPrivateTranslaterSwitch(self, checked):
+
+        if checked :
+            self.xiaoniu_private_use = True
+            self.translate_list.append("xiaoniu_private")
+            self.checkTranslaterUse()
+        else:
+            self.xiaoniu_private_use = False
+            self.translate_list.remove("xiaoniu_private")
         self.setTransLabelMessage()
 
 
@@ -2517,6 +2562,9 @@ class Settin(QMainWindow) :
         elif translate_type == "youdao_private" :
             self.youdao_private_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=color.name()))
             self.youdao_private_color = color.name()
+        elif translate_type == "xiaoniu_private" :
+            self.xiaoniu_private_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=color.name()))
+            self.xiaoniu_private_color = color.name()
         elif translate_type == "original" :
             self.original_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=color.name()))
             self.original_color = color.name()
@@ -2718,6 +2766,10 @@ class Settin(QMainWindow) :
                 self.youdao_private_switch.mousePressEvent(1)
                 self.youdao_private_switch.updateValue()
 
+            elif val == "xiaoniu_private" :
+                self.xiaoniu_private_switch.mousePressEvent(1)
+                self.xiaoniu_private_switch.updateValue()
+
             if len(self.translate_list) <= 3 :
                 break
 
@@ -2853,6 +2905,8 @@ class Settin(QMainWindow) :
         self.object.config["aliyunPrivateUse"] = self.aliyun_use
         # 私人有道翻译开关
         self.object.config["youdaoPrivateUse"] = self.youdao_private_use
+        # 私人小牛翻译开关
+        self.object.config["xiaoniuPrivateUse"] = self.xiaoniu_private_use
 
         # 字体颜色 公共有道
         self.object.config["fontColor"]["youdao"] = self.youdao_color
@@ -2880,6 +2934,8 @@ class Settin(QMainWindow) :
         self.object.config["fontColor"]["aliyunPrivate"] = self.aliyun_color
         # 字体颜色 私人有道
         self.object.config["fontColor"]["youdaoPrivate"] = self.youdao_private_color
+        # 字体颜色 私人小牛
+        self.object.config["fontColor"]["xiaoniuPrivate"] = self.xiaoniu_private_color
         # 原文颜色
         self.object.config["fontColor"]["original"] = self.original_color
 
@@ -2938,7 +2994,7 @@ class Settin(QMainWindow) :
 
 
     # 窗口显示信号
-    def showEvent(self, e):
+    def showEvent(self, e) :
 
         # 如果处于自动模式下则暂停
         if self.object.translation_ui.translate_mode :
@@ -3004,3 +3060,9 @@ class Settin(QMainWindow) :
     def openYoudaoSetting(self) :
 
         self.youdao_setting_ui.show()
+
+
+    # 打开私人小牛翻译设置页面
+    def openXiaoniuSetting(self) :
+
+        self.xiaoniu_setting_ui.show()

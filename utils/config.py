@@ -171,6 +171,8 @@ def configConvert(object) :
     object.config["fontColor"]["aliyunPrivate"] = object.config["fontColor"].get("aliyunPrivate", "#5B8FF9")
     # 字体颜色 私人有道
     object.config["fontColor"]["youdaoPrivate"] = object.config["fontColor"].get("youdaoPrivate", "#5B8FF9")
+    # 字体颜色 私人小牛
+    object.config["fontColor"]["xiaoniuPrivate"] = object.config["fontColor"].get("xiaoniuPrivate", "#5B8FF9")
     # 原文颜色
     object.config["fontColor"]["original"] = object.config["fontColor"].get("original", "#5B8FF9")
 
@@ -224,12 +226,14 @@ def configConvert(object) :
         object.config["aliyunPrivateUse"] = use_map[object.config["aliyunPrivateUse"]]
     # 私人有道翻译开关
     object.config["youdaoPrivateUse"] = object.config.get("youdaoPrivateUse", False)
+    # 私人小牛翻译开关
+    object.config["xiaoniuPrivateUse"] = object.config.get("xiaoniuPrivateUse", False)
 
     # 确保版本转换后至多只有3个翻译源能被同时开始
     tmp = []
-    for val in ["youdaoUse", "baiduwebUse", "tencentwebUse", "deeplUse", "bingUse",
-                "caiyunUse", "tencentUse", "baiduUse", "caiyunPrivateUse",
-                "chatgptPrivateUse", "dangoUse", "aliyunPrivateUse", "youdaoPrivateUse"] :
+    for val in ["youdaoUse", "baiduwebUse", "tencentwebUse", "deeplUse", "bingUse", "caiyunUse", "tencentUse",
+                "baiduUse", "caiyunPrivateUse", "chatgptPrivateUse", "dangoUse", "aliyunPrivateUse", "youdaoPrivateUse",
+                "xiaoniuPrivateUse"] :
         if object.config[val] == True :
             tmp.append(val)
     if len(tmp) > 3 :
@@ -364,6 +368,8 @@ def configConvert(object) :
 
     # chatgpt prompt
     object.config["chatgptPrompt"] = object.config.get("chatgptPrompt", translator.api.CHATGPT_PROMPT)
+    # 私人小牛翻译密钥
+    object.config["xiaoniuAPI"] = object.config.get("xiaoniuAPI", "")
 
     # 允许写入的key
     allow_keys = [
@@ -379,7 +385,8 @@ def configConvert(object) :
         "choiceRangeHotKeyUse", "autoPlaysoundUse", "mangaTrans", "mangaLanguage", "mangaDetectScale",
         "mangaMergeThreshold", "mangaFontColor", "mangaBgColor", "mangaFontColorUse", "mangaBgColorUse",
         "mangaFontType", "mangaOutputRenameUse", "mangaFastRenderUse", "mangaShadowSize", "mangaFiltrateUse",
-        "mangaFontSizeUse", "mangaFontSize", "youdaoPrivateUse", "youdaoAPI", "chatgptPrompt"
+        "mangaFontSizeUse", "mangaFontSize", "youdaoPrivateUse", "youdaoAPI", "chatgptPrompt", "xiaoniuPrivateUse",
+        "xiaoniuAPI"
     ]
     # 删除多余的key
     delete_keys = []

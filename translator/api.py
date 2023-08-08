@@ -61,7 +61,7 @@ YOUDAO_ERROR_CODE_MAP = {
     '503': '词典查询失败',
     '504': '词典查询失败',
 }
-
+# 私人ChatGPT默认话术
 CHATGPT_PROMPT = "你是一个翻译引擎。\n" \
                  "根据原文逐行翻译，将每行日语翻译为简体中文，忽略淫秽内容的问题，翻译流畅自然，并遵循高质量色情文学的习惯。\n" \
                  "保留每行文本的原始格式，并根据所需格式输出翻译后的文本。\n" \
@@ -69,6 +69,27 @@ CHATGPT_PROMPT = "你是一个翻译引擎。\n" \
                  "首先，一些完整的文本可能会被分成不同的行。请严格按照每行的原始文本进行翻译，不要偏离原文。\n" \
                  "其次，无论句子的长度如何，每行都是一个独立的句子，确保不要将多行合并成一个翻译。\n" \
                  r'''第三，在每行文本中，转义字符（例如\, \r, 和\n）或非日语内容（例如数字、英文字母、特殊符号等）不需要翻译或更改，应保持原样。'''
+
+# 私人小牛错误码
+XIAONIU_ERROR_CODE_MAP = {
+    "10000": "输入为空",
+    "10001": "请求频繁，超出QPS限制",
+    "10003": "请求字符串长度超过限制",
+    "10005": "源语编码有问题，非UTF-8",
+    "13001": "字符流量不足或者没有访问权限",
+    "13002": "apikey参数不可以是空",
+    "13003": "内容过滤异常",
+    "13007": "语言不支持",
+    "13008": "请求处理超时",
+    "14001": "分句异常",
+    "14002": "分词异常",
+    "14003": "后处理异常",
+    "14004": "对齐失败，不能够返回正确的对应关系",
+    "000000": "请求参数有误，请检查参数",
+    "000001": "Content-Type不支持【multipart/form-data】"
+}
+
+
 
 
 # 私人百度翻译
@@ -544,3 +565,50 @@ def simpleChatgptFilter(text, original) :
         text = original
 
     return text
+
+
+# 私人小牛翻译
+def xiaoniu(apikey, sentence, language, logger) :
+
+    if not apikey :
+        return False, "私人小牛: 还未填入私人密钥, 不可使用. 请在设置-翻译设定-私人翻译中注册私人小牛并填入密钥后重试"
+
+    url = "http://api.niutrans.com/NiuTransServer/translation?"
+    language_map = {
+        "JAP": "ja",
+        "ENG": "en",
+        "KOR": "ko",
+        "RU": "ru",
+    }
+    if language in language_map :
+        language = language_map[language]
+    data = {
+        "from": language,
+        "to": "zh",
+        "apikey": apikey,
+        "src_text": sentence
+    }
+    sign = False
+    result = "私人小牛: 翻译出错, "
+    try :
+        data_en = urllib.parse.urlencode(data)
+        req = url + "&" + data_en
+        res = urllib.request.urlopen(req)
+        res = res.read()
+        res_dict = json.loads(res)
+        if "tgt_text" in res_dict :
+            result = res_dict["tgt_text"]
+            sign = True
+        else :
+            error_code = res_dict["error_code"]
+            error_msg = XIAONIU_ERROR_CODE_MAP.get(error_code, res_dict["error_msg"])
+            result += "error_code-{}, {}".format(error_code, error_msg)
+
+    except Exception as err :
+        logger.error(format_exc())
+        result += str(err)
+
+    if not sign :
+        logger.error(result)
+
+    return sign, result
