@@ -328,17 +328,15 @@ class Manga(QMainWindow) :
         # 图片翻译进度条
         self.trans_process_bar = ui.progress_bar.MangaProgressBar(self.object.yaml["screen_scale_rate"])
 
-        # 刷新底部状态栏
-        self.refreshStatusLabel()
-
         # 背景图片
         self.background_label = TransparentImageLabel(self)
         self.background_label.setAlignment(Qt.AlignCenter)
         self.background_label.setPixmap(ui.static.icon.MANGA_PIXMAP)
         self.show_image_scroll_area.setWidget(self.background_label)
-        #self.background_label.lower()
         self.background_label.setOpacity(0.7)
 
+        # 刷新底部状态栏
+        self.refreshStatusLabel()
         # 初始化点击原图按钮
         self.original_image_button.click()
 
@@ -803,7 +801,10 @@ class Manga(QMainWindow) :
 
         if self.check_permission :
             self.status_label.setText(
-                "  原文语种: {}     翻译源: {}     试用开关: {}     剩余试用次数: {}"
+                '<font color="#5B8FF9">&nbsp;&nbsp;原文语种:&nbsp;</font> <font color="#708090">{}</font>'
+                '<font color="#5B8FF9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;翻译源:&nbsp;</font> <font color="#708090">{}</font>'
+                '<font color="#5B8FF9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;试用开关:&nbsp;</font> <font color="#708090">{}</font>'
+                '<font color="#5B8FF9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;剩余试用次数:&nbsp;</font> <font color="#708090">{}</font>'
                 .format(
                     self.language_map[self.object.config["mangaLanguage"]],
                     self.object.config["mangaTrans"],
@@ -812,9 +813,9 @@ class Manga(QMainWindow) :
                 ))
         else :
             self.status_label.setText(
-                '<font color="#5B8FF9">&nbsp;&nbsp;原文语种:&nbsp;</font> <font color="#999999">{}</font>'
-                '<font color="#5B8FF9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;翻译源:&nbsp;</font> <font color="#999999">{}</font>'
-                '<font color="#5B8FF9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;试用开关:&nbsp;</font> <font color="#999999">{}</font>'
+                '<font color="#5B8FF9">&nbsp;&nbsp;原文语种:&nbsp;</font> <font color="#708090">{}</font>'
+                '<font color="#5B8FF9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;翻译源:&nbsp;</font> <font color="#708090">{}</font>'
+                '<font color="#5B8FF9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;试用开关:&nbsp;</font> <font color="#708090">{}</font>'
                 .format(
                     self.language_map[self.object.config["mangaLanguage"]],
                     self.object.config["mangaTrans"],
@@ -2019,7 +2020,8 @@ class RenderTextBlock(QWidget) :
         self.manual_ocr_button.setIcon(ui.static.icon.TEXT_BLOCK_ICON)
         self.manual_ocr_button.setToolTip("<b>手动绘制文字识别框, 点击后可通过长按鼠标左键在编辑图上拉取新的识别框, 再次点击按钮释放</b>")
         self.manual_ocr_button.setGeometry(0, 590*self.rate[1], 100*self.rate[0], 30*self.rate[1])
-        self.manual_ocr_button.setStyleSheet("QPushButton:hover {background-color: #83AAF9;}")
+        self.manual_ocr_button.setStyleSheet("QPushButton {color: #5B8FF9;}"
+                                             "QPushButton:hover {background-color: #83AAF9; color: #FFFFF;}")
         self.manual_ocr_button.clicked.connect(self.manualOCR)
         if not self.json_data :
             self.manual_ocr_button.hide()
@@ -2030,7 +2032,8 @@ class RenderTextBlock(QWidget) :
         self.area_recover_button.setIcon(ui.static.icon.RECOVER_ICON)
         self.area_recover_button.setToolTip("<b>通过在编辑图上长按鼠标左键, 框出一个区域, 该区域会恢复原图的摸样</b>")
         self.area_recover_button.setGeometry(100*self.rate[0], 590*self.rate[1], 100*self.rate[0], 30*self.rate[1])
-        self.area_recover_button.setStyleSheet("QPushButton:hover {background-color: #83AAF9;}")
+        self.area_recover_button.setStyleSheet("QPushButton {color: #5B8FF9;}"
+                                               "QPushButton:hover {background-color: #83AAF9; color: #FFFFF;}")
         self.area_recover_button.clicked.connect(self.areaRecover)
         if not self.json_data :
             self.area_recover_button.hide()
