@@ -187,6 +187,7 @@ class Manga(QMainWindow) :
         self.createTransAction("私人ChatGPT")
         self.createTransAction("私人阿里")
         self.createTransAction("私人有道")
+        self.createTransAction("私人小牛")
         # 将下拉菜单设置为按钮的菜单
         self.select_trans_button.setMenu(self.trans_menu)
         self.trans_action_group.triggered.connect(self.changeSelectTrans)
@@ -698,7 +699,7 @@ class Manga(QMainWindow) :
         self.edit_image_widget.hide()
         self.trans_image_widget.hide()
         self.original_image_button.setStyleSheet("QPushButton {background: transparent; color: #5B8FF9;}"
-                                                 "QPushButton:hover {background-color: #83AAF9; color: #00000;}")
+                                                 "QPushButton:hover {background-color: #83AAF9; color: #000000;}")
         self.edit_image_button.setStyleSheet("QPushButton {background: transparent; color: #5B8FF9;}"
                                              "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}")
         self.trans_image_button.setStyleSheet("QPushButton {background: transparent; color: #5B8FF9;}"
@@ -1370,13 +1371,21 @@ class Manga(QMainWindow) :
                     logger=self.object.logger
                 )
 
+            elif manga_trans == "xiaoniu_private" :
+                sign, result = translator.api.xiaoniu(
+                    apikey=self.object.config["xiaoniuAPI"],
+                    sentence=original,
+                    language=self.object.config["mangaLanguage"],
+                    logger=self.logger
+                )
+
         # 翻译成功
         if sign :
             # 翻译结果缓存到本地数据库
             if manga_trans not in trans_map :
                 utils.sqlite.insertTranslationDB(self.logger, original, manga_trans, result)
             # 根据屏蔽词过滤
-            for filter in self.object.config["Filter"]:
+            for filter in self.object.config["Filter"] :
                 if not filter[0] :
                     continue
                 result = result.replace(filter[0], filter[1])
@@ -2021,7 +2030,7 @@ class RenderTextBlock(QWidget) :
         self.manual_ocr_button.setToolTip("<b>手动绘制文字识别框, 点击后可通过长按鼠标左键在编辑图上拉取新的识别框, 再次点击按钮释放</b>")
         self.manual_ocr_button.setGeometry(0, 590*self.rate[1], 100*self.rate[0], 30*self.rate[1])
         self.manual_ocr_button.setStyleSheet("QPushButton {color: #5B8FF9;}"
-                                             "QPushButton:hover {background-color: #83AAF9; color: #FFFFF;}")
+                                             "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}")
         self.manual_ocr_button.clicked.connect(self.manualOCR)
         if not self.json_data :
             self.manual_ocr_button.hide()
@@ -2033,7 +2042,7 @@ class RenderTextBlock(QWidget) :
         self.area_recover_button.setToolTip("<b>通过在编辑图上长按鼠标左键, 框出一个区域, 该区域会恢复原图的摸样</b>")
         self.area_recover_button.setGeometry(100*self.rate[0], 590*self.rate[1], 100*self.rate[0], 30*self.rate[1])
         self.area_recover_button.setStyleSheet("QPushButton {color: #5B8FF9;}"
-                                               "QPushButton:hover {background-color: #83AAF9; color: #FFFFF;}")
+                                               "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}")
         self.area_recover_button.clicked.connect(self.areaRecover)
         if not self.json_data :
             self.area_recover_button.hide()
@@ -2796,6 +2805,7 @@ class TransEdit(QWidget) :
             "ChatGPT": "chatgpt_private",
             "阿里": "aliyun_private",
             "有道": "youdao_private",
+            "小牛": "xiaoniu_private",
         }
         self.ui()
 
@@ -2825,139 +2835,116 @@ class TransEdit(QWidget) :
         except Exception :
             pass
 
-        # 私人团子
-        button = QPushButton(self)
-        self.customSetGeometry(button, 0, 0, 70, 30)
-        button.setCursor(ui.static.icon.EDIT_CURSOR)
-        button.setText(" 团子")
-        button.setIcon(ui.static.icon.TRANSLATE_ICON)
-        button.setStyleSheet("QPushButton {background: transparent; font: 9pt '华康方圆体W7';}"
-                             "QPushButton:hover {background-color: #83AAF9;}"
-                             "QPushButton:pressed {background-color: #4480F9;}")
-        button.clicked.connect(lambda: self.refreshTrans("团子"))
-        button.setToolTip("<b>使用私人团子重新翻译</b>")
+        # 控件样式
+        self.setStyleSheet(
+            "QLabel {background: transparent; font: 9pt '华康方圆体W7'; color: #5B8FF9;}"
+            "QPushButton {background: transparent; font: 9pt '华康方圆体W7'; color: #5B8FF9;}"
+            "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}"
+            "QPushButton:pressed {background-color: #83AAF9; color: #FFFFFF;}"
+            "QMenu {color: #5B8FF9; background-color: #FFFFFF; font: 9pt '华康方圆体W7';}"
+            "QMenu::item:selected:enabled {background: #E5F5FF;}"
+            "QMenu::item:checked {background: #E5F5FF;}"
+            "QComboBox QAbstractItemView::item { min-height:40px; }"
+            "QDoubleSpinBox {background: transparent; font: 9pt '华康方圆体W7'; color: #5B8FF9;}"
+            "QSpinBox {background: transparent; font: 9pt '华康方圆体W7'; color: #5B8FF9;}"
+            "QTextBrowser {font: 12pt '%s';}"%font_type
+        )
 
         # 私人彩云
         button = QPushButton(self)
-        self.customSetGeometry(button, 70, 0, 70, 30)
+        self.customSetGeometry(button, 0, 0, 80, 30)
         button.setCursor(ui.static.icon.EDIT_CURSOR)
         button.setText(" 彩云")
         button.setIcon(ui.static.icon.TRANSLATE_ICON)
-        button.setStyleSheet("QPushButton {background: transparent; font: 9pt '华康方圆体W7';}"
-                             "QPushButton:hover {background-color: #83AAF9;}"
-                             "QPushButton:pressed {background-color: #4480F9;}")
         button.clicked.connect(lambda: self.refreshTrans("彩云"))
         button.setToolTip("<b>使用私人彩云重新翻译</b>")
 
         # 私人腾讯
         button = QPushButton(self)
-        self.customSetGeometry(button, 140, 0, 70, 30)
+        self.customSetGeometry(button, 80, 0, 80, 30)
         button.setCursor(ui.static.icon.EDIT_CURSOR)
         button.setText(" 腾讯")
         button.setIcon(ui.static.icon.TRANSLATE_ICON)
-        button.setStyleSheet("QPushButton {background: transparent; font: 9pt '华康方圆体W7';}"
-                             "QPushButton:hover {background-color: #83AAF9;}"
-                             "QPushButton:pressed {background-color: #4480F9;}")
         button.clicked.connect(lambda: self.refreshTrans("腾讯"))
         button.setToolTip("<b>使用私人腾讯重新翻译</b>")
 
         # 私人百度
         button = QPushButton(self)
-        self.customSetGeometry(button, 210, 0, 70, 30)
+        self.customSetGeometry(button, 160, 0, 80, 30)
         button.setCursor(ui.static.icon.EDIT_CURSOR)
         button.setText(" 百度")
         button.setIcon(ui.static.icon.TRANSLATE_ICON)
-        button.setStyleSheet("QPushButton {background: transparent; font: 9pt '华康方圆体W7';}"
-                             "QPushButton:hover {background-color: #83AAF9;}"
-                             "QPushButton:pressed {background-color: #4480F9;}")
         button.clicked.connect(lambda: self.refreshTrans("百度"))
         button.setToolTip("<b>使用私人百度重新翻译</b>")
 
         # 私人ChatGPT
         button = QPushButton(self)
-        self.customSetGeometry(button, 280, 0, 70, 30)
+        self.customSetGeometry(button, 240, 0, 80, 30)
         button.setCursor(ui.static.icon.EDIT_CURSOR)
         button.setText(" ChatGPT")
         button.setIcon(ui.static.icon.TRANSLATE_ICON)
-        button.setStyleSheet("QPushButton {background: transparent; font: 9pt '华康方圆体W7'; border-radius: 6px}"
-                             "QPushButton:hover {background-color: #83AAF9;}"
-                             "QPushButton:pressed {background-color: #4480F9;}")
         button.clicked.connect(lambda: self.refreshTrans("ChatGPT"))
         button.setToolTip("<b>使用私人ChatGPT重新翻译</b>")
 
-        # 私人阿里云
-        button = QPushButton(self)
-        self.customSetGeometry(button, 350, 0, 70, 30)
-        button.setCursor(ui.static.icon.EDIT_CURSOR)
-        button.setText(" 阿里")
-        button.setIcon(ui.static.icon.TRANSLATE_ICON)
-        button.setStyleSheet("QPushButton {background: transparent; font: 9pt '华康方圆体W7'; border-radius: 6px}"
-                             "QPushButton:hover {background-color: #83AAF9;}"
-                             "QPushButton:pressed {background-color: #4480F9;}")
-        button.clicked.connect(lambda: self.refreshTrans("阿里"))
-        button.setToolTip("<b>使用私人阿里重新翻译</b>")
-
-        # 私人有道
-        button = QPushButton(self)
-        self.customSetGeometry(button, 420, 0, 70, 30)
-        button.setCursor(ui.static.icon.EDIT_CURSOR)
-        button.setText(" 有道")
-        button.setIcon(ui.static.icon.TRANSLATE_ICON)
-        button.setStyleSheet("QPushButton {background: transparent; font: 9pt '华康方圆体W7'; border-radius: 6px}"
-                             "QPushButton:hover {background-color: #83AAF9;}"
-                             "QPushButton:pressed {background-color: #4480F9;}")
-        button.clicked.connect(lambda: self.refreshTrans("有道"))
-        button.setToolTip("<b>使用私人有道重新翻译</b>")
+        # 其他翻译按钮
+        self.select_trans_button = QPushButton(self)
+        self.customSetGeometry(self.select_trans_button, 320, 0, 80, 30)
+        self.select_trans_button.setCursor(ui.static.icon.EDIT_CURSOR)
+        self.select_trans_button.setText(" 其他")
+        self.select_trans_button.setIcon(ui.static.icon.TRANSLATE_ICON)
+        button.setToolTip("<b>选择使用的翻译源重新翻译</b>")
+        # 翻译源菜单
+        self.trans_menu = QMenu(self.select_trans_button)
+        self.trans_menu.setCursor(ui.static.icon.PIXMAP_CURSOR)
+        self.trans_action_group = QActionGroup(self.trans_menu)
+        self.trans_action_group.setExclusive(True)
+        self.createTransAction("团子")
+        self.createTransAction("阿里")
+        self.createTransAction("有道")
+        self.createTransAction("小牛")
+        # 将下拉菜单设置为按钮的菜单
+        self.select_trans_button.setMenu(self.trans_menu)
+        self.trans_action_group.triggered.connect(self.selectTrans)
 
         # 修改字体颜色
         self.font_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.font_color), "", self)
-        self.customSetGeometry(self.font_color_button, 0, 30, 70, 30)
+        self.customSetGeometry(self.font_color_button, 0, 30, 80, 30)
         self.font_color_button.setCursor(ui.static.icon.EDIT_CURSOR)
         self.font_color_button.setText(" 字体色")
         self.font_color_button.clicked.connect(self.changeTranslateColor)
-        self.font_color_button.setStyleSheet("QPushButton {background: transparent; font: 9pt '华康方圆体W7';}"
-                                             "QPushButton:hover {background-color: #83AAF9;}"
-                                             "QPushButton:pressed {background-color: #4480F9;}")
         self.font_color_button.setToolTip("<b>修改显示的字体颜色</b>")
 
         # 修改轮廓颜色
         self.bg_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.bg_color), "", self)
-        self.customSetGeometry(self.bg_color_button, 70, 30, 70, 30)
+        self.customSetGeometry(self.bg_color_button, 80, 30, 80, 30)
         self.bg_color_button.setCursor(ui.static.icon.EDIT_CURSOR)
         self.bg_color_button.setText(" 轮廓色")
         self.bg_color_button.clicked.connect(self.changeBackgroundColor)
-        self.bg_color_button.setStyleSheet("QPushButton {background: transparent; font: 9pt '华康方圆体W7';}"
-                                           "QPushButton:hover {background-color: #83AAF9;}"
-                                           "QPushButton:pressed {background-color: #4480F9;}")
         self.bg_color_button.setToolTip("<b>修改显示的轮廓颜色</b>")
 
         # 轮廓宽度设定
         self.shadow_size_spinbox = QDoubleSpinBox(self)
-        self.customSetGeometry(self.shadow_size_spinbox, 150, 35, 40, 20)
+        self.customSetGeometry(self.shadow_size_spinbox, 170, 35, 40, 20)
         self.shadow_size_spinbox.setDecimals(1)
         self.shadow_size_spinbox.setSingleStep(0.1)
         self.shadow_size_spinbox.setMinimum(0)
         self.shadow_size_spinbox.setMaximum(16)
         self.shadow_size_spinbox.setValue(4)
         self.shadow_size_spinbox.setCursor(ui.static.icon.SELECT_CURSOR)
-        self.shadow_size_spinbox.setStyleSheet("font: 9pt '华康方圆体W7';")
         label = QLabel(self)
-        self.customSetGeometry(label, 200, 37, 100, 20)
+        self.customSetGeometry(label, 220, 37, 100, 20)
         label.setText("轮廓宽度")
-        label.setStyleSheet("font: 9pt '华康方圆体W7';")
 
         # 字体大小设定
         self.text_size_spinbox = QSpinBox(self)
-        self.customSetGeometry(self.text_size_spinbox, 270, 35, 40, 20)
+        self.customSetGeometry(self.text_size_spinbox, 290, 35, 40, 20)
         self.text_size_spinbox.setMinimum(16)
         self.text_size_spinbox.setMaximum(512)
         self.text_size_spinbox.setValue(40)
         self.text_size_spinbox.setCursor(ui.static.icon.SELECT_CURSOR)
-        self.text_size_spinbox.setStyleSheet("font: 9pt '华康方圆体W7';")
         label = QLabel(self)
-        self.customSetGeometry(label, 320, 37, 100, 20)
+        self.customSetGeometry(label, 340, 37, 100, 20)
         label.setText("字体大小")
-        label.setStyleSheet("font: 9pt '华康方圆体W7';")
 
         # 字体样式
         label = QLabel(self)
@@ -2966,9 +2953,9 @@ class TransEdit(QWidget) :
         self.font_box = QComboBox(self)
         self.customSetGeometry(self.font_box, 30, 62, 390, 25)
         self.font_box.setCursor(ui.static.icon.EDIT_CURSOR)
+        self.font_box.view().setCursor(ui.static.icon.PIXMAP_CURSOR)
         self.font_box.setToolTip("<b>设置字体样式</b>")
-        self.font_box.setStyleSheet("font: 9pt '华康方圆体W7';"
-                                    "QComboBox QAbstractItemView::item { min-height:40px; }")
+
         # 支持编辑和搜索
         self.font_box.setEditable(True)
         line_edit = QLineEdit()
@@ -2981,7 +2968,6 @@ class TransEdit(QWidget) :
         self.original_text = QTextBrowser(self)
         self.customSetGeometry(self.original_text, 0, 90, 500, 100)
         self.original_text.setReadOnly(False)
-        self.original_text.setStyleSheet("font: 12pt '%s';"%font_type)
         self.original_text.setCursor(ui.static.icon.EDIT_CURSOR)
 
         # 原文复制按钮
@@ -3000,7 +2986,6 @@ class TransEdit(QWidget) :
         self.customSetGeometry(self.trans_text, 0, 190, 500, 100)
         self.trans_text.setCursor(ui.static.icon.EDIT_CURSOR)
         self.trans_text.setReadOnly(False)
-        self.trans_text.setStyleSheet("font: 12pt '%s';"%font_type)
         self.trans_text.setCursor(ui.static.icon.EDIT_CURSOR)
 
         # 译文复制按钮
@@ -3016,18 +3001,10 @@ class TransEdit(QWidget) :
 
         # 重新贴字按钮
         button = QPushButton(self)
-        self.customSetGeometry(button, 125, 300, 100, 50)
+        self.customSetGeometry(button, 200, 300, 100, 50)
         button.setText("重新贴字")
         button.setStyleSheet("font: 12pt '华康方圆体W7';")
         button.clicked.connect(self.renderTextBlock)
-        button.setCursor(ui.static.icon.SELECT_CURSOR)
-
-        # 取消按钮
-        button = QPushButton(self)
-        self.customSetGeometry(button, 275, 300, 100, 50)
-        button.setText("取消")
-        button.setStyleSheet("font: 12pt '华康方圆体W7';")
-        button.clicked.connect(self.close)
         button.setCursor(ui.static.icon.SELECT_CURSOR)
 
 
@@ -3259,6 +3236,18 @@ class TransEdit(QWidget) :
                 if not sign :
                     utils.message.MessageBox("私人有道翻译失败", result, self.rate)
                     return
+
+            elif trans_type == "xiaoniu_private" :
+                sign, result = translator.api.xiaoniu(
+                    apikey=self.object.config["xiaoniuAPI"],
+                    sentence=original,
+                    language=self.object.config["mangaLanguage"],
+                    logger=self.object.logger
+                )
+                if not sign :
+                    utils.message.MessageBox("私人小牛翻译失败", result, self.rate)
+                    return
+
             else :
                 return
             # 翻译结果缓存到本地数据库
@@ -3321,6 +3310,24 @@ class TransEdit(QWidget) :
         for index, font in enumerate(font_list) :
             self.font_box.addItem("")
             self.font_box.setItemText(index, font)
+
+
+    # 创建翻译源按钮的下拉菜单
+    def createTransAction(self, label) :
+
+        action = QAction(label, self.trans_menu)
+        action.setCheckable(True)
+        action.setData(label)
+        self.trans_action_group.addAction(action)
+        self.trans_menu.addAction(action)
+        if self.object.config["mangaTrans"] == label:
+            action.setChecked(True)
+
+
+    # 使用其他翻译源
+    def selectTrans(self, action) :
+
+        self.refreshTrans(action.data())
 
 
 # 根据文本块大小计算 font_size

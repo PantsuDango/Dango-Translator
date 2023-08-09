@@ -22,6 +22,7 @@ TRANS_MAP = {
     "私人阿里": "aliyun_private",
     "私人阿里云": "aliyun_private",
     "私人有道": "youdao_private",
+    "私人小牛": "xiaoniu_private"
 }
 TRANS_MAP_INVERSION = {
     "youdao": "公共有道",
@@ -36,7 +37,8 @@ TRANS_MAP_INVERSION = {
     "caiyun_private": "私人彩云",
     "chatgpt_private": "私人ChatGPT",
     "aliyun_private": "私人阿里",
-    "youdao_private": "私人有道"
+    "youdao_private": "私人有道",
+    "xiaoniu_private": "私人小牛"
 }
 
 

@@ -253,6 +253,15 @@ class TranslaterProcess(QThread) :
                     logger=self.logger,
                 )
 
+            # 私人小牛
+            elif self.trans_type == "xiaoniu_private" :
+                sign, result = translator.api.xiaoniu(
+                    apikey=self.object.config["xiaoniuAPI"],
+                    sentence=self.object.translation_ui.original,
+                    language=self.object.config["language"],
+                    logger=self.logger
+                )
+
             # 原文
             elif self.trans_type == "original" :
                 result = self.object.translation_ui.original
@@ -534,6 +543,11 @@ class Translater(QThread) :
             utils.thread.createThread(self.creatTranslaterThread, "youdao_private")
             nothing_sign = True
 
+        # 私人小牛
+        if self.object.config["xiaoniuPrivateUse"] == True :
+            utils.thread.createThread(self.creatTranslaterThread, "xiaoniu_private")
+            nothing_sign = True
+
         # 显示原文
         if self.object.config["showOriginal"] == True or not nothing_sign :
             if not nothing_sign :
@@ -604,6 +618,11 @@ class Translater(QThread) :
         # 私人有道
         if self.object.config["youdaoPrivateUse"] == True :
             utils.thread.createThread(self.creatTranslaterThread, "youdao_private")
+            nothing_sign = True
+
+        # 私人小牛
+        if self.object.config["xiaoniuPrivateUse"] == True:
+            utils.thread.createThread(self.creatTranslaterThread, "xiaoniu_private")
             nothing_sign = True
 
         # 显示原文
