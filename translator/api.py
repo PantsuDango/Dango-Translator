@@ -8,6 +8,7 @@ from tencentcloud.common.profile.client_profile import ClientProfile
 from tencentcloud.common.profile.http_profile import HttpProfile
 from tencentcloud.common.exception.tencent_cloud_sdk_exception import TencentCloudSDKException
 from tencentcloud.tmt.v20180321 import tmt_client, models
+import translator.huoshan
 
 import requests
 from http.client import HTTPConnection
@@ -22,7 +23,7 @@ import hashlib
 import base64
 import hmac
 import random
-
+import datetime
 
 # 私人有道翻译错误码对照
 YOUDAO_ERROR_CODE_MAP = {
@@ -88,9 +89,6 @@ XIAONIU_ERROR_CODE_MAP = {
     "000000": "请求参数有误，请检查参数",
     "000001": "Content-Type不支持【multipart/form-data】"
 }
-
-
-
 
 # 私人百度翻译
 def baidu(sentence, app_id, secret_key, logger):
@@ -603,6 +601,59 @@ def xiaoniu(apikey, sentence, language, logger) :
             error_code = res_dict["error_code"]
             error_msg = XIAONIU_ERROR_CODE_MAP.get(error_code, res_dict["error_msg"])
             result += "error_code-{}, {}".format(error_code, error_msg)
+
+    except Exception as err :
+        logger.error(format_exc())
+        result += str(err)
+
+    if not sign :
+        logger.error(result)
+
+    return sign, result
+
+
+# 私人火山
+def huoshan(ak, sk, text, logger) :
+
+    params = {
+        "Action": "TranslateText",
+        "Version": "2020-06-01"
+    }
+    body = {
+        "TargetLanguage":"zh",
+        "TextList": text.split("\n")
+    }
+    url = "https://translate.volcengineapi.com/"
+
+    sign = False
+    result = "私人火山: 翻译出错, "
+    try :
+        resp = requests.post(
+            url=url,
+            headers=translator.huoshan.header(ak, sk, text),
+            params=params,
+            data=json.dumps(body)
+        ).json()
+
+        # 请求成功
+        if "TranslationList" in resp :
+            text_list = []
+            for val in resp["TranslationList"] :
+                if not val.get("Translation", "") :
+                    continue
+                text_list.append(val["Translation"])
+            result = "\n".join(text_list)
+            sign = True
+        else :
+            # 请求失败
+            error_map = resp.get("ResponseMetadata", {}).get("Error", {})
+            code_n = error_map.get("CodeN", 0)
+            code = error_map.get("Code", "")
+            message = error_map.get("Message", "")
+            if code_n and code and message :
+                result += "CodeN-{}, Code-{}, {}".format(code_n, code, message)
+            else :
+                result += str(resp)
 
     except Exception as err :
         logger.error(format_exc())
