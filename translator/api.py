@@ -615,6 +615,9 @@ def xiaoniu(apikey, sentence, language, logger) :
 # 私人火山
 def huoshan(ak, sk, text, logger) :
 
+    if not ak or not sk :
+        return False, "私人火山: 还未填入私人密钥, 不可使用. 请在设置-翻译设定-私人翻译中注册私人火山并填入密钥后重试"
+
     params = {
         "Action": "TranslateText",
         "Version": "2020-06-01"
