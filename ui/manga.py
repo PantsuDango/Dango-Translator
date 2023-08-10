@@ -799,29 +799,40 @@ class Manga(QMainWindow) :
 
 
     # 刷新底部状态栏信息
-    def refreshStatusLabel(self) :
+    def refreshStatusLabel(self, image_path="") :
+
+        # 计算当前页码
+        index = 0
+        if image_path in self.image_path_list :
+            index = self.image_path_list.index(image_path) + 1
 
         if self.check_permission :
             self.status_label.setText(
                 '<font color="#5B8FF9">&nbsp;&nbsp;原文语种:&nbsp;</font> <font color="#708090">{}</font>'
-                '<font color="#5B8FF9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;翻译源:&nbsp;</font> <font color="#708090">{}</font>'
-                '<font color="#5B8FF9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;试用开关:&nbsp;</font> <font color="#708090">{}</font>'
-                '<font color="#5B8FF9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;剩余试用次数:&nbsp;</font> <font color="#708090">{}</font>'
+                '<font color="#5B8FF9">&nbsp;&nbsp;&nbsp;翻译源:&nbsp;</font> <font color="#708090">{}</font>'
+                '<font color="#5B8FF9">&nbsp;&nbsp;&nbsp;试用开关:&nbsp;</font> <font color="#708090">{}</font>'
+                '<font color="#5B8FF9">&nbsp;&nbsp;&nbsp;剩余试用次数:&nbsp;</font> <font color="#708090">{}</font>'
+                '<font color="#5B8FF9">&nbsp;&nbsp;&nbsp;当前页数:&nbsp;</font> <font color="#708090">{}/{}</font>'
                 .format(
                     self.language_map[self.object.config["mangaLanguage"]],
                     self.object.config["mangaTrans"],
                     "打开",
-                    self.manga_read_count
+                    self.manga_read_count,
+                    index,
+                    len(self.image_path_list)
                 ))
         else :
             self.status_label.setText(
                 '<font color="#5B8FF9">&nbsp;&nbsp;原文语种:&nbsp;</font> <font color="#708090">{}</font>'
-                '<font color="#5B8FF9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;翻译源:&nbsp;</font> <font color="#708090">{}</font>'
-                '<font color="#5B8FF9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;试用开关:&nbsp;</font> <font color="#708090">{}</font>'
+                '<font color="#5B8FF9">&nbsp;&nbsp;&nbsp;翻译源:&nbsp;</font> <font color="#708090">{}</font>'
+                '<font color="#5B8FF9">&nbsp;&nbsp;&nbsp;试用开关:&nbsp;</font> <font color="#708090">{}</font>'
+                '<font color="#5B8FF9">&nbsp;&nbsp;&nbsp;当前页数:&nbsp;</font> <font color="#708090">{}/{}</font>'
                 .format(
                     self.language_map[self.object.config["mangaLanguage"]],
                     self.object.config["mangaTrans"],
                     "关闭",
+                    index,
+                    len(self.image_path_list)
                 ))
 
 
@@ -1558,6 +1569,8 @@ class Manga(QMainWindow) :
         # 切换图片的时候保持比例
         if init_image_rate :
             self.setImageInitRate(init_image_rate)
+        # 刷新状态栏
+        self.refreshStatusLabel(image_path)
 
 
     # 设置图片初始缩放比例
