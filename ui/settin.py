@@ -33,6 +33,7 @@ import ui.chatgpt
 import ui.aliyun
 import ui.youdao
 import ui.xiaoniu
+import ui.huoshan
 import translator.ocr.baidu
 import translator.all
 
@@ -107,6 +108,9 @@ class Settin(QMainWindow) :
         self.aliyun_setting_ui = ui.aliyun.AliyunSetting(self.object)
         self.youdao_setting_ui = ui.youdao.YoudaoSetting(self.object)
         self.xiaoniu_setting_ui = ui.xiaoniu.XiaoniuSetting(self.object)
+        self.xiaoniu_setting_ui = ui.xiaoniu.XiaoniuSetting(self.object)
+        self.huoshan_setting_ui = ui.huoshan.HuoshanSetting(self.object)
+
         # 信号槽
         self.desc_signal.connect(self.desc_ui.appendDescText)
 
@@ -838,6 +842,29 @@ class Settin(QMainWindow) :
         self.customSetGeometry(button, 485, 210, 60, 20)
         button.setText("设置")
         button.clicked.connect(self.openXiaoniuSetting)
+        button.setCursor(ui.static.icon.SELECT_CURSOR)
+
+        # 私人火山翻译标签
+        label = QLabel(private_translater_tab)
+        self.customSetGeometry(label, 20, 260, 35, 20)
+        label.setText("火山:")
+        # 私人火山翻译开关
+        self.huoshan_private_switch = ui.switch.SwitchOCR(private_translater_tab, sign=self.huoshan_private_use, startX=(65-20) * self.rate)
+        self.customSetGeometry(self.huoshan_private_switch, 70, 260, 65, 20)
+        self.huoshan_private_switch.checkedChanged.connect(self.changeHuoshanPrivateTranslaterSwitch)
+        self.huoshan_private_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 私人火山翻译颜色选择
+        self.huoshan_private_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.huoshan_private_color), "", private_translater_tab)
+        self.customSetIconSize(self.huoshan_private_color_button, 20, 20)
+        self.customSetGeometry(self.huoshan_private_color_button, 150, 260, 20, 20)
+        self.huoshan_private_color_button.setStyleSheet("background: transparent;")
+        self.huoshan_private_color_button.clicked.connect(lambda: self.changeTranslateColor("huoshan_private", self.huoshan_private_color))
+        self.huoshan_private_color_button.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 私人火山翻译设置按钮
+        button = QPushButton(private_translater_tab)
+        self.customSetGeometry(button, 185, 260, 60, 20)
+        button.setText("设置")
+        button.clicked.connect(self.openHuoshanSetting)
         button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 公共翻译备注
@@ -1629,7 +1656,8 @@ class Settin(QMainWindow) :
             "chatgpt_private": "【私人ChatGPT】",
             "aliyun_private": "【私人阿里】",
             "youdao_private": "【私人有道】",
-            "xiaoniu_private": "【私人小牛】"
+            "xiaoniu_private": "【私人小牛】",
+            "huoshan_private": "【私人火山】"
         }
 
         # OCR各开关
@@ -1695,6 +1723,10 @@ class Settin(QMainWindow) :
         self.xiaoniu_private_use = self.object.config["xiaoniuPrivateUse"]
         if self.xiaoniu_private_use :
             self.translate_list.append("xiaoniu_private")
+        # 私人火山翻译开关
+        self.huoshan_private_use = self.object.config["huoshanPrivateUse"]
+        if self.huoshan_private_use :
+            self.translate_list.append("huoshan_private")
 
         # 字体颜色 公共有道
         self.youdao_color = self.object.config["fontColor"]["youdao"]
@@ -1724,6 +1756,8 @@ class Settin(QMainWindow) :
         self.youdao_private_color = self.object.config["fontColor"]["youdaoPrivate"]
         # 字体颜色 私人小牛
         self.xiaoniu_private_color = self.object.config["fontColor"]["xiaoniuPrivate"]
+        # 字体颜色 私人火山
+        self.huoshan_private_color = self.object.config["fontColor"]["huoshanPrivate"]
         # 原文颜色
         self.original_color = self.object.config["fontColor"]["original"]
 
@@ -2138,6 +2172,19 @@ class Settin(QMainWindow) :
         else:
             self.xiaoniu_private_use = False
             self.translate_list.remove("xiaoniu_private")
+        self.setTransLabelMessage()
+
+
+    # 改变私人火山翻译开关状态
+    def changeHuoshanPrivateTranslaterSwitch(self, checked):
+
+        if checked :
+            self.huoshan_private_use = True
+            self.translate_list.append("huoshan_private")
+            self.checkTranslaterUse()
+        else:
+            self.huoshan_private_use = False
+            self.translate_list.remove("huoshan_private")
         self.setTransLabelMessage()
 
 
@@ -2565,6 +2612,9 @@ class Settin(QMainWindow) :
         elif translate_type == "xiaoniu_private" :
             self.xiaoniu_private_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=color.name()))
             self.xiaoniu_private_color = color.name()
+        elif translate_type == "huoshan_private" :
+            self.huoshan_private_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=color.name()))
+            self.huoshan_private_color = color.name()
         elif translate_type == "original" :
             self.original_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=color.name()))
             self.original_color = color.name()
@@ -2770,6 +2820,10 @@ class Settin(QMainWindow) :
                 self.xiaoniu_private_switch.mousePressEvent(1)
                 self.xiaoniu_private_switch.updateValue()
 
+            elif val == "huoshan_private" :
+                self.huoshan_private_switch.mousePressEvent(1)
+                self.huoshan_private_switch.updateValue()
+
             if len(self.translate_list) <= 3 :
                 break
 
@@ -2907,6 +2961,8 @@ class Settin(QMainWindow) :
         self.object.config["youdaoPrivateUse"] = self.youdao_private_use
         # 私人小牛翻译开关
         self.object.config["xiaoniuPrivateUse"] = self.xiaoniu_private_use
+        # 私人火山翻译开关
+        self.object.config["huoshanPrivateUse"] = self.huoshan_private_use
 
         # 字体颜色 公共有道
         self.object.config["fontColor"]["youdao"] = self.youdao_color
@@ -2936,6 +2992,8 @@ class Settin(QMainWindow) :
         self.object.config["fontColor"]["youdaoPrivate"] = self.youdao_private_color
         # 字体颜色 私人小牛
         self.object.config["fontColor"]["xiaoniuPrivate"] = self.xiaoniu_private_color
+        # 字体颜色 私人火山
+        self.object.config["fontColor"]["huoshanPrivate"] = self.huoshan_private_color
         # 原文颜色
         self.object.config["fontColor"]["original"] = self.original_color
 
@@ -3066,3 +3124,9 @@ class Settin(QMainWindow) :
     def openXiaoniuSetting(self) :
 
         self.xiaoniu_setting_ui.show()
+
+
+    # 打开私人火山翻译设置页面
+    def openHuoshanSetting(self) :
+
+        self.huoshan_setting_ui.show()

@@ -188,6 +188,7 @@ class Manga(QMainWindow) :
         self.createTransAction("私人阿里")
         self.createTransAction("私人有道")
         self.createTransAction("私人小牛")
+        self.createTransAction("私人火山")
         # 将下拉菜单设置为按钮的菜单
         self.select_trans_button.setMenu(self.trans_menu)
         self.trans_action_group.triggered.connect(self.changeSelectTrans)
@@ -1376,6 +1377,14 @@ class Manga(QMainWindow) :
                     apikey=self.object.config["xiaoniuAPI"],
                     sentence=original,
                     language=self.object.config["mangaLanguage"],
+                    logger=self.logger
+                )
+
+            elif manga_trans == "huoshan_private" :
+                sign, result = translator.api.huoshan(
+                    ak=self.object.config["huoshanAPI"]["Key"],
+                    sk=self.object.config["huoshanAPI"]["Secret"],
+                    text=original,
                     logger=self.logger
                 )
 
@@ -2806,6 +2815,7 @@ class TransEdit(QWidget) :
             "阿里": "aliyun_private",
             "有道": "youdao_private",
             "小牛": "xiaoniu_private",
+            "火山": "huoshan_private",
         }
         self.ui()
 
@@ -2902,6 +2912,7 @@ class TransEdit(QWidget) :
         self.createTransAction("阿里")
         self.createTransAction("有道")
         self.createTransAction("小牛")
+        self.createTransAction("火山")
         # 将下拉菜单设置为按钮的菜单
         self.select_trans_button.setMenu(self.trans_menu)
         self.trans_action_group.triggered.connect(self.selectTrans)
@@ -3246,6 +3257,17 @@ class TransEdit(QWidget) :
                 )
                 if not sign :
                     utils.message.MessageBox("私人小牛翻译失败", result, self.rate)
+                    return
+
+            elif trans_type == "huoshan_private" :
+                sign, result = translator.api.huoshan(
+                    ak=self.object.config["huoshanAPI"]["Key"],
+                    sk=self.object.config["huoshanAPI"]["Secret"],
+                    text=original,
+                    logger=self.object.logger
+                )
+                if not sign :
+                    utils.message.MessageBox("私人火山翻译失败", result, self.rate)
                     return
 
             else :

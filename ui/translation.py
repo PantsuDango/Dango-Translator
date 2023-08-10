@@ -847,6 +847,9 @@ class Translation(QMainWindow) :
         # 私人小牛
         elif trans_type == "xiaoniu_private":
             color = self.object.config["fontColor"]["xiaoniuPrivate"]
+        # 私人火山
+        elif trans_type == "huoshan_private" :
+            color = self.object.config["fontColor"]["huoshanPrivate"]
         # 原文
         elif trans_type == "original" :
             color = self.object.config.get("fontColor", {}).get("original", self.font_color_1)

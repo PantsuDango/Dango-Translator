@@ -296,3 +296,26 @@ def testXiaoniu(object, secret_key) :
             signal.emit("\n测试出错:\n{}\n\n测试失败, 请排查完错误后重试!".format(result))
 
     utils.thread.createThread(func)
+
+
+# 测试私人火山
+def testHuoshan(object, secret_id, secret_key) :
+
+    desc_ui = object.settin_ui.desc_ui
+    signal = object.settin_ui.desc_signal
+    desc_ui.desc_text.clear()
+    desc_ui.show()
+
+    desc_ui.setWindowTitle("私人火山翻译测试")
+    signal.emit("\n开始测试...\n\n原文: \n{}".format(TEST_ORIGINAL))
+    QApplication.processEvents()
+
+    def func() :
+        start = time.time()
+        sign, result = translator.api.huoshan(secret_id, secret_key, TEST_ORIGINAL, object.logger)
+        if sign :
+            signal.emit("\n译文:\n{}\n\n耗时: {:.2f}s\n测试成功!".format(result, time.time() - start))
+        else:
+            signal.emit("\n测试出错:\n{}\n\n测试失败, 请排查完错误后重试!".format(result))
+
+    utils.thread.createThread(func)

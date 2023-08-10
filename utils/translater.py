@@ -262,6 +262,15 @@ class TranslaterProcess(QThread) :
                     logger=self.logger
                 )
 
+            # 私人火山
+            elif self.trans_type == "huoshan_private":
+                sign, result = translator.api.huoshan(
+                    ak=self.object.config["huoshanAPI"]["Key"],
+                    sk=self.object.config["huoshanAPI"]["Secret"],
+                    text=self.object.translation_ui.original,
+                    logger=self.logger
+                )
+
             # 原文
             elif self.trans_type == "original" :
                 result = self.object.translation_ui.original
@@ -548,6 +557,11 @@ class Translater(QThread) :
             utils.thread.createThread(self.creatTranslaterThread, "xiaoniu_private")
             nothing_sign = True
 
+        # 私人火山
+        if self.object.config["huoshanPrivateUse"] == True :
+            utils.thread.createThread(self.creatTranslaterThread, "huoshan_private")
+            nothing_sign = True
+
         # 显示原文
         if self.object.config["showOriginal"] == True or not nothing_sign :
             if not nothing_sign :
@@ -621,8 +635,13 @@ class Translater(QThread) :
             nothing_sign = True
 
         # 私人小牛
-        if self.object.config["xiaoniuPrivateUse"] == True:
+        if self.object.config["xiaoniuPrivateUse"] == True :
             utils.thread.createThread(self.creatTranslaterThread, "xiaoniu_private")
+            nothing_sign = True
+
+        # 私人火山
+        if self.object.config["huoshanPrivateUse"] == True :
+            utils.thread.createThread(self.creatTranslaterThread, "huoshan_private")
             nothing_sign = True
 
         # 显示原文
