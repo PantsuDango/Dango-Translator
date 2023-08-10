@@ -182,6 +182,7 @@ def testChatGPT(object, api_key, proxy, url, model, prompt) :
             prompt=prompt,
             content=TEST_ORIGINAL,
             logger=object.logger,
+            delay_time=0
         )
         if not re.match("^私人ChatGPT[:：]", result) :
             signal.emit("\n译文:\n{}\n\n耗时: {:.2f}s\n测试成功!".format(result, time.time() - start))

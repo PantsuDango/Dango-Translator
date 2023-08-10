@@ -369,6 +369,8 @@ def configConvert(object) :
     object.config["mangaFiltrateUse"] = object.config.get("mangaFiltrateUse", True)
     object.config["mangaFontSizeUse"] = object.config.get("mangaFontSizeUse", False)
     object.config["mangaFontSize"] = object.config.get("mangaFontSize", 36)
+    object.config["mangaChatgptDelayUse"] = object.config.get("mangaChatgptDelayUse", False)
+    object.config["mangaChatgptDelayTime"] = object.config.get("mangaChatgptDelayTime", 1)
 
     # chatgpt prompt
     object.config["chatgptPrompt"] = object.config.get("chatgptPrompt", translator.api.CHATGPT_PROMPT)
@@ -394,7 +396,7 @@ def configConvert(object) :
         "mangaMergeThreshold", "mangaFontColor", "mangaBgColor", "mangaFontColorUse", "mangaBgColorUse",
         "mangaFontType", "mangaOutputRenameUse", "mangaFastRenderUse", "mangaShadowSize", "mangaFiltrateUse",
         "mangaFontSizeUse", "mangaFontSize", "youdaoPrivateUse", "youdaoAPI", "chatgptPrompt", "xiaoniuPrivateUse",
-        "xiaoniuAPI", "huoshanPrivateUse", "huoshanAPI"
+        "xiaoniuAPI", "huoshanPrivateUse", "huoshanAPI", "mangaChatgptDelayUse", "mangaChatgptDelayTime"
     ]
     # 删除多余的key
     delete_keys = []

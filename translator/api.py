@@ -70,7 +70,6 @@ CHATGPT_PROMPT = "你是一个翻译引擎。\n" \
                  "首先，一些完整的文本可能会被分成不同的行。请严格按照每行的原始文本进行翻译，不要偏离原文。\n" \
                  "其次，无论句子的长度如何，每行都是一个独立的句子，确保不要将多行合并成一个翻译。\n" \
                  r'''第三，在每行文本中，转义字符（例如\, \r, 和\n）或非日语内容（例如数字、英文字母、特殊符号等）不需要翻译或更改，应保持原样。'''
-
 # 私人小牛错误码
 XIAONIU_ERROR_CODE_MAP = {
     "10000": "输入为空",
@@ -89,6 +88,8 @@ XIAONIU_ERROR_CODE_MAP = {
     "000000": "请求参数有误，请检查参数",
     "000001": "Content-Type不支持【multipart/form-data】"
 }
+# chatgpt的当前使用时间
+CHATGPT_USE_TIME = 0
 
 # 私人百度翻译
 def baidu(sentence, app_id, secret_key, logger):
@@ -288,8 +289,9 @@ def caiyun(sentence, token, logger) :
 
 
 # ChatGPT翻译
-def chatgpt(api_key, language, proxy, url, model, prompt, content, logger) :
+def chatgpt(api_key, language, proxy, url, model, prompt, content, logger, delay_time=0) :
 
+    global CHATGPT_USE_TIME
     if not api_key :
         return "私人ChatGPT: 还未填入私人ChatGPT密钥, 不可使用"
 
@@ -325,6 +327,11 @@ def chatgpt(api_key, language, proxy, url, model, prompt, content, logger) :
     text = "私人ChatGPT: "
 
     try :
+        # 如果需要延时
+        sub_time = time.time() - CHATGPT_USE_TIME
+        if delay_time > 0 and sub_time < delay_time :
+            time.sleep(delay_time - sub_time)
+
         response = requests.post(url, headers=headers, data=json.dumps(data), proxies=proxies, timeout=30)
         response.encoding = "utf-8"
         result = json.loads(response.text)
@@ -347,6 +354,7 @@ def chatgpt(api_key, language, proxy, url, model, prompt, content, logger) :
                 text += "翻译出错: {}, 请排查完错误后重试".format(error)
         else :
             # 翻译成功
+            CHATGPT_USE_TIME = time.time()
             text = result["choices"][0]["message"]["content"]
 
             # 判断句子数量
@@ -364,7 +372,7 @@ def chatgpt(api_key, language, proxy, url, model, prompt, content, logger) :
                 sign = False
                 # 多句子分批请求chatgpt
                 for value in content.split("\n") :
-                    tmp_text = chatgpt(api_key, language, proxy, url, model, prompt, value, logger)
+                    tmp_text = chatgpt(api_key, language, proxy, url, model, prompt, value, logger, delay_time)
                     if re.match(r"^私人ChatGPT:", tmp_text) :
                         sign = True
                         break

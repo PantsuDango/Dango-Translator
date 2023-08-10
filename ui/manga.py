@@ -1274,7 +1274,7 @@ class Manga(QMainWindow) :
 
 
     # 漫画翻译配置过滤
-    def mangaTransFilter(self, json_data) :
+    def mangaTransFilter(self, json_data, delay_time) :
 
         # 解析ocr结果获取原文
         original = []
@@ -1351,7 +1351,9 @@ class Manga(QMainWindow) :
                     model=self.object.config["chatgptModel"],
                     prompt=self.object.config["chatgptPrompt"],
                     content=original,
-                    logger=self.logger)
+                    logger=self.logger,
+                    delay_time=delay_time
+                )
                 if re.match("^私人ChatGPT[:：]", result) :
                     sign = False
 
@@ -1417,8 +1419,12 @@ class Manga(QMainWindow) :
         with open(self.getJsonFilePath(image_path), "r", encoding="utf-8") as file:
             json_data = json.load(file)
 
+        # chatgpt延时
+        delay_time = 0
+        if self.object.config["mangaChatgptDelayUse"] == True :
+            delay_time = self.object.config["mangaChatgptDelayTime"]
         # 漫画翻译配置过滤
-        sign, result = self.mangaTransFilter(json_data)
+        sign, result = self.mangaTransFilter(json_data, delay_time)
         if not sign :
             return sign, result
 
@@ -2039,7 +2045,8 @@ class RenderTextBlock(QWidget) :
         self.manual_ocr_button.setToolTip("<b>手动绘制文字识别框, 点击后可通过长按鼠标左键在编辑图上拉取新的识别框, 再次点击按钮释放</b>")
         self.manual_ocr_button.setGeometry(0, 590*self.rate[1], 100*self.rate[0], 30*self.rate[1])
         self.manual_ocr_button.setStyleSheet("QPushButton {color: #5B8FF9;}"
-                                             "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}")
+                                             "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}"
+                                             "QPushButton:pressed {background-color: #83AAF9; color: #FFFFFF;}")
         self.manual_ocr_button.clicked.connect(self.manualOCR)
         if not self.json_data :
             self.manual_ocr_button.hide()
@@ -2051,7 +2058,8 @@ class RenderTextBlock(QWidget) :
         self.area_recover_button.setToolTip("<b>通过在编辑图上长按鼠标左键, 框出一个区域, 该区域会恢复原图的摸样</b>")
         self.area_recover_button.setGeometry(100*self.rate[0], 590*self.rate[1], 100*self.rate[0], 30*self.rate[1])
         self.area_recover_button.setStyleSheet("QPushButton {color: #5B8FF9;}"
-                                               "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}")
+                                               "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}"
+                                               "QPushButton:pressed {background-color: #83AAF9; color: #FFFFFF;}")
         self.area_recover_button.clicked.connect(self.areaRecover)
         if not self.json_data :
             self.area_recover_button.hide()
@@ -2203,7 +2211,7 @@ class RenderTextBlock(QWidget) :
                 return
 
             # 请求翻译
-            sign, trans_result = self.object.manga_ui.mangaTransFilter(ocr_result)
+            sign, trans_result = self.object.manga_ui.mangaTransFilter(ocr_result, 0)
             if not sign :
                 utils.message.MessageBox("翻译失败", trans_result, self.rate)
                 self.paint_button.deleteLater()
@@ -3219,7 +3227,8 @@ class TransEdit(QWidget) :
                     model=self.object.config["chatgptModel"],
                     prompt=self.object.config["chatgptPrompt"],
                     content=original,
-                    logger=self.logger
+                    logger=self.logger,
+                    delay_time=0,
                 )
                 if re.match("^私人ChatGPT[:：]", result) :
                     utils.message.MessageBox("私人ChatGPT翻译失败", result, self.rate)
@@ -3619,6 +3628,8 @@ class Setting(QWidget) :
         self.font_size_use = self.object.config.get("mangaFontSizeUse", False)
         self.font_size = self.object.config.get("mangaFontSize", 36)
         self.auto_open_manga_use = self.object.yaml["auto_open_manga_use"]
+        self.chatgpt_delay_use =  self.object.config.get("mangaChatgptDelayUse", False)
+        self.chatgpt_delay_time = self.object.config.get("mangaChatgptDelayTime", 1)
         self.font_list = [
             "鸿蒙/HarmonyOS_Sans/HarmonyOS_Sans_Regular",
             "阿里/东方大楷/Alimama_DongFangDaKai_Regular",
@@ -3998,19 +4009,53 @@ class Setting(QWidget) :
                              "QPushButton:hover { background-color: #83AAF9; }"
                              "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
 
+        # chatgpt延时开关
+        self.chatgpt_delay_switch = ui.switch.SwitchOCR(function_tab, self.chatgpt_delay_use, startX=(65-20) * self.rate)
+        self.customSetGeometry(self.chatgpt_delay_switch, 20, 170, 65, 20)
+        self.chatgpt_delay_switch.checkedChanged.connect(self.changeChatgptDelayUseSwitch)
+        self.chatgpt_delay_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # chatgpt延时时间设定
+        self.chatgpt_delay_spinbox = QSpinBox(function_tab)
+        self.customSetGeometry(self.chatgpt_delay_spinbox, 100, 170, 60, 20)
+        self.chatgpt_delay_spinbox.setMinimum(1)
+        self.chatgpt_delay_spinbox.setMaximum(180)
+        self.chatgpt_delay_spinbox.setValue(self.chatgpt_delay_time)
+        self.chatgpt_delay_spinbox.setCursor(ui.static.icon.SELECT_CURSOR)
+        self.chatgpt_delay_spinbox.valueChanged.connect(self.changeChatgptDelayTime)
+        self.chatgpt_delay_spinbox.setStyleSheet("background: rgba(255, 255, 255, 0.3);")
+        # chatgpt延时标签
+        label = QLabel(function_tab)
+        self.customSetGeometry(label, 175, 170, 200, 20)
+        label.setText("ChatGPT翻译延时")
+        # chatgpt延时?号图标
+        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", function_tab)
+        self.customSetIconSize(button, 20, 20)
+        self.customSetGeometry(button, 280, 170, 20, 20)
+        button.clicked.connect(lambda: self.showDesc("chatgpt_delay"))
+        button.setCursor(ui.static.icon.QUESTION_CURSOR)
+        button.setStyleSheet("QPushButton { background: transparent;}"
+                             "QPushButton:hover { background-color: #83AAF9; }"
+                             "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
+
+        # 其他设定页签
+        other_tab = QWidget()
+        tab_widget.addTab(other_tab, "")
+        tab_widget.setTabText(tab_widget.indexOf(other_tab), "其他设定")
+        tab_widget.setTabIcon(tab_widget.indexOf(other_tab), ui.static.icon.OTHER_ICON)
+
         # 导出图片时重命名开关
-        self.output_rename_switch = ui.switch.SwitchOCR(function_tab, self.output_rename_use, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.output_rename_switch, 20, 170, 65, 20)
+        self.output_rename_switch = ui.switch.SwitchOCR(other_tab, self.output_rename_use, startX=(65-20) * self.rate)
+        self.customSetGeometry(self.output_rename_switch, 20, 20, 65, 20)
         self.output_rename_switch.checkedChanged.connect(self.changeOutputRenameUseSwitch)
         self.output_rename_switch.setCursor(ui.static.icon.SELECT_CURSOR)
         # 导出图片时重命名标签
-        label = QLabel(function_tab)
+        label = QLabel(other_tab)
         label.setText("导出时重命名")
-        self.customSetGeometry(label, 100, 170, 500, 20)
+        self.customSetGeometry(label, 100, 20, 500, 20)
         # 导出图片时重命名?号图标
-        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", function_tab)
+        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", other_tab)
         self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 190, 170, 20, 20)
+        self.customSetGeometry(button, 190, 20, 20, 20)
         button.clicked.connect(lambda: self.showDesc("input_rename"))
         button.setCursor(ui.static.icon.QUESTION_CURSOR)
         button.setStyleSheet("QPushButton { background: transparent;}"
@@ -4018,13 +4063,13 @@ class Setting(QWidget) :
                              "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
 
         # 自动打开图片翻译
-        self.auto_open_manga_switch = ui.switch.SwitchOCR(function_tab, sign=self.auto_open_manga_use, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.auto_open_manga_switch, 20, 220, 65, 20)
+        self.auto_open_manga_switch = ui.switch.SwitchOCR(other_tab, sign=self.auto_open_manga_use, startX=(65-20) * self.rate)
+        self.customSetGeometry(self.auto_open_manga_switch, 20, 70, 65, 20)
         self.auto_open_manga_switch.checkedChanged.connect(self.changeAutoOpenMangaSwitch)
         self.auto_open_manga_switch.setCursor(ui.static.icon.SELECT_CURSOR)
         # 自动打开图片翻译标签
-        label = QLabel(function_tab)
-        self.customSetGeometry(label, 100, 220, 400, 20)
+        label = QLabel(other_tab)
+        self.customSetGeometry(label, 100, 70, 400, 20)
         label.setText("登录后自动打开图片翻译界面")
 
         # 加载背景图
@@ -4038,6 +4083,13 @@ class Setting(QWidget) :
         label.setOpacity(0.5)
         # 功能设定页面背景
         label = TransparentImageLabel(function_tab)
+        label.setAlignment(Qt.AlignCenter)
+        label.setGeometry(QRect(0, 0, self.window_width, self.window_height))
+        label.setPixmap(pixmap)
+        label.lower()
+        label.setOpacity(0.5)
+        # 功能设定页面背景
+        label = TransparentImageLabel(other_tab)
         label.setAlignment(Qt.AlignCenter)
         label.setGeometry(QRect(0, 0, self.window_width, self.window_height))
         label.setPixmap(pixmap)
@@ -4139,6 +4191,11 @@ class Setting(QWidget) :
             self.desc_ui.desc_text.append("\n该数值影响文本框的合并情况, 数值越小, 文本框越不容易被合并"
                                           "\n\n建议值为5.0")
 
+        elif message_type == "chatgpt_delay" :
+            self.desc_ui.setWindowTitle("ChatGPT翻译延时说明")
+            self.desc_ui.desc_text.append("\n考虑到部分用户ChatGPT账号有使用限制, 短时间内高频使用会出错, 此参数用于设置使用ChatGPT翻译时的延时"
+                                          "\n\n开关开启时, 若当前使用的是ChatGPT翻译, 则两次翻译之间会经过所设置的数值大小(单位-秒)的等待时间")
+
         else :
             return
 
@@ -4238,6 +4295,18 @@ class Setting(QWidget) :
     def changeFontSize(self, value) :
 
         self.object.config["mangaFontSize"] = value
+
+
+    # 改变chatgpt延时开关状态
+    def changeChatgptDelayUseSwitch(self, checked) :
+
+        self.object.config["mangaChatgptDelayUse"] = checked
+
+
+    # 改变chatgpt延时时间
+    def changeChatgptDelayTime(self, value) :
+
+        self.object.config["mangaChatgptDelayTime"] = value
 
 
     # 窗口关闭处理

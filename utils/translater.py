@@ -232,6 +232,7 @@ class TranslaterProcess(QThread) :
                     prompt=self.object.config["chatgptPrompt"],
                     content=self.object.translation_ui.original,
                     logger=self.logger,
+                    delay_time=0
                 )
 
             # 私人阿里云
