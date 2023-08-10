@@ -350,6 +350,8 @@ def chatgpt(api_key, language, proxy, url, model, prompt, content, logger, delay
                 text += "请求失败, 无效的API接口地址, 请检查API接口地址是否正确"
             elif re.match("The model .+? does not exist", error) :
                 text += "错误的模型, {} 不存在".format(model)
+            elif "deactivated account" in error :
+                text += "账户已被停用, 请检查账户是否被封禁"
             else :
                 text += "翻译出错: {}, 请排查完错误后重试".format(error)
         else :
