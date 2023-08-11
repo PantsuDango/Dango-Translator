@@ -354,6 +354,7 @@ def mangaOCR(object, filepath, image_base64=None, filtrate=True, check_permissio
         "mask": True,
         "refine": True,
         "filtrate": filtrate,
+        "disable_skip_area": filtrate,
         "detect_scale": object.config.get("mangaDetectScale", 1),
         "merge_threshold": object.config.get("mangaMergeThreshold", 5.0),
         "image": image_base64
