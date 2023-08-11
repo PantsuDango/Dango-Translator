@@ -383,6 +383,8 @@ def configConvert(object) :
     object.config["mangaFontSize"] = object.config.get("mangaFontSize", 36)
     object.config["mangaChatgptDelayUse"] = object.config.get("mangaChatgptDelayUse", False)
     object.config["mangaChatgptDelayTime"] = object.config.get("mangaChatgptDelayTime", 1)
+    object.config["mangaFilterCharUse"] = object.config.get("mangaFilterCharUse", True)
+    object.config["mangaFilterCharCount"] = object.config.get("mangaFilterCharCount", 1)
 
     # 允许写入的key
     allow_keys = [
@@ -400,7 +402,7 @@ def configConvert(object) :
         "mangaFontType", "mangaOutputRenameUse", "mangaFastRenderUse", "mangaShadowSize", "mangaFiltrateUse",
         "mangaFontSizeUse", "mangaFontSize", "youdaoPrivateUse", "youdaoAPI", "chatgptPrompt", "xiaoniuPrivateUse",
         "xiaoniuAPI", "huoshanPrivateUse", "huoshanAPI", "mangaChatgptDelayUse", "mangaChatgptDelayTime",
-        "chatgptContextUse", "chatgptContextCount"
+        "chatgptContextUse", "chatgptContextCount", "mangaFilterCharUse", "mangaFilterCharCount"
     ]
     # 删除多余的key
     delete_keys = []

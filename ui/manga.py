@@ -3635,6 +3635,8 @@ class Setting(QWidget) :
         self.auto_open_manga_use = self.object.yaml["auto_open_manga_use"]
         self.chatgpt_delay_use =  self.object.config.get("mangaChatgptDelayUse", False)
         self.chatgpt_delay_time = self.object.config.get("mangaChatgptDelayTime", 1)
+        self.filter_char_use = self.object.config.get("mangaFilterCharUse", False)
+        self.filter_char_count = self.object.config.get("mangaFilterCharCount", False)
         self.font_list = [
             "鸿蒙/HarmonyOS_Sans/HarmonyOS_Sans_Regular",
             "阿里/东方大楷/Alimama_DongFangDaKai_Regular",
@@ -4042,6 +4044,34 @@ class Setting(QWidget) :
                              "QPushButton:hover { background-color: #83AAF9; }"
                              "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
 
+        # 过滤短字符结果开关
+        self.filter_char_switch = ui.switch.SwitchOCR(function_tab, self.filter_char_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.filter_char_switch, 20, 220, 65, 20)
+        self.filter_char_switch.checkedChanged.connect(self.changeFilterCharUseSwitch)
+        self.filter_char_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 过滤短字符结果长度设定
+        self.filter_char_spinbox = QSpinBox(function_tab)
+        self.customSetGeometry(self.filter_char_spinbox, 100, 220, 60, 20)
+        self.filter_char_spinbox.setMinimum(1)
+        self.filter_char_spinbox.setMaximum(5)
+        self.filter_char_spinbox.setValue(self.filter_char_count)
+        self.filter_char_spinbox.setCursor(ui.static.icon.SELECT_CURSOR)
+        self.filter_char_spinbox.valueChanged.connect(self.changeFilterCharCount)
+        self.filter_char_spinbox.setStyleSheet("background: rgba(255, 255, 255, 0.3);")
+        # 过滤短字符结果标签
+        label = QLabel(function_tab)
+        self.customSetGeometry(label, 175, 220, 200, 20)
+        label.setText("过滤短字符结果")
+        # chatgpt延时?号图标
+        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", function_tab)
+        self.customSetIconSize(button, 20, 20)
+        self.customSetGeometry(button, 280, 220, 20, 20)
+        button.clicked.connect(lambda: self.showDesc("filter_char"))
+        button.setCursor(ui.static.icon.QUESTION_CURSOR)
+        button.setStyleSheet("QPushButton { background: transparent;}"
+                             "QPushButton:hover { background-color: #83AAF9; }"
+                             "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
+
         # 其他设定页签
         other_tab = QWidget()
         tab_widget.addTab(other_tab, "")
@@ -4199,7 +4229,14 @@ class Setting(QWidget) :
         elif message_type == "chatgpt_delay" :
             self.desc_ui.setWindowTitle("ChatGPT翻译延时说明")
             self.desc_ui.desc_text.append("\n考虑到部分用户ChatGPT账号有使用限制, 短时间内高频使用会出错, 此参数用于设置使用ChatGPT翻译时的延时"
-                                          "\n\n开关开启时, 若当前使用的是ChatGPT翻译, 则两次翻译之间会经过所设置的数值大小(单位-秒)的等待时间")
+                                          "\n\n开关开启时, 若当前使用的是ChatGPT翻译, 则两次翻译之间会经过所设置的数值大小的等待时间"
+                                          "\n\n范围为1-180, 单位秒")
+
+        elif message_type == "filter_char" :
+            self.desc_ui.setWindowTitle("过滤短字符结果说明")
+            self.desc_ui.desc_text.append("\n考虑到部分文字长度很短的句子很可能是误识别的情况, 此参数用于设置过滤短文字结果"
+                                          "\n\n开关开启时, 若某个文本块的文字数小于所设置的数值, 则不会被翻译"
+                                          "\n\n范围为1-5, 单位个")
 
         else :
             return
@@ -4312,6 +4349,18 @@ class Setting(QWidget) :
     def changeChatgptDelayTime(self, value) :
 
         self.object.config["mangaChatgptDelayTime"] = value
+
+
+    # 改变过滤短字符开关状态
+    def changeFilterCharUseSwitch(self, checked) :
+
+        self.object.config["mangaFilterCharUse"] = checked
+
+
+    # 改变过滤短字符长度
+    def changeFilterCharCount(self, value) :
+
+        self.object.config["mangaFilterCharCount"] = value
 
 
     # 窗口关闭处理
