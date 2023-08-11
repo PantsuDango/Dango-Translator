@@ -1196,18 +1196,24 @@ class Manga(QMainWindow) :
                 new_texts.append(text)
                 new_coordinate.append(coord)
 
+            # 过滤空句子
             if not new_texts :
-                # if image_path :
-                #     # 如果过滤过<skip>的情况就将mask区域涂黑, 不消除该区域
-                #     image = Image.open(self.getMaskFilePath(image_path))
-                #     draw = ImageDraw.Draw(image)
-                #     draw.rectangle((
-                #         val["block_coordinate"]["upper_left"][0],
-                #         val["block_coordinate"]["upper_left"][1],
-                #         val["block_coordinate"]["lower_right"][0],
-                #         val["block_coordinate"]["lower_right"][1]
-                #     ), fill=0)
-                #     image.save(self.getMaskFilePath(image_path))
+                continue
+
+            # 过滤短句子
+            if self.object.config["mangaFilterCharUse"] \
+                    and len("".join(new_texts)) <= self.object.config["mangaFilterCharCount"] \
+                    and image_path :
+                # 如果过滤就将mask区域涂黑, 不消除该区域
+                image = Image.open(self.getMaskFilePath(image_path))
+                draw = ImageDraw.Draw(image)
+                draw.rectangle((
+                    val["block_coordinate"]["upper_left"][0],
+                    val["block_coordinate"]["upper_left"][1],
+                    val["block_coordinate"]["lower_right"][0],
+                    val["block_coordinate"]["lower_right"][1]
+                ), fill=0)
+                image.save(self.getMaskFilePath(image_path))
                 continue
 
             val["texts"] = new_texts
