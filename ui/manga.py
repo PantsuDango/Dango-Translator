@@ -497,8 +497,16 @@ class Manga(QMainWindow) :
                                                            "选择要翻译的生肉漫画目录",
                                                            dir_path,
                                                            options=options)
+            # 检查目录
             if not os.path.exists(folder_path) :
                 return
+            if os.path.basename(folder_path) == "dango_manga" :
+                utils.message.MessageBox("导入图片失败", "不能选择dango_manga目录     ")
+                return
+            if "dango_manga" in folder_path and os.path.basename(folder_path) == "tmp"  :
+                utils.message.MessageBox("导入图片失败", "不能选择tmp目录     ")
+                return
+            # 获取目录下所有图片加入列表
             for file in os.listdir(folder_path) :
                 file_ext = os.path.splitext(file)[1].lower()
                 if file_ext != ".png" and file_ext != ".jpg" and file_ext != ".jpeg" and file_ext != ".webp" :
@@ -522,6 +530,12 @@ class Manga(QMainWindow) :
                 for folder_path in folder_paths[1:] :
                     if not os.path.exists(folder_path) :
                         continue
+                    if os.path.basename(folder_path) == "dango_manga":
+                        utils.message.MessageBox("导入图片失败", "不能选择dango_manga目录     ")
+                        return
+                    if "dango_manga" in folder_path and os.path.basename(folder_path) == "tmp":
+                        utils.message.MessageBox("导入图片失败", "不能选择tmp目录     ")
+                        return
                     for file in os.listdir(folder_path) :
                         file_ext = os.path.splitext(file)[1].lower()
                         if file_ext != ".png" and file_ext != ".jpg" and file_ext != ".jpeg" and file_ext != ".webp" :
