@@ -3330,16 +3330,6 @@ class TransEdit(QWidget) :
         if color.isValid() :
             self.font_color = color.name()
             self.font_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=self.font_color))
-            # 原文
-            text = self.original_text.toPlainText()
-            self.original_text.clear()
-            self.original_text.setTextColor(color)
-            self.original_text.insertPlainText(text)
-            # 译文
-            text = self.trans_text.toPlainText()
-            self.trans_text.clear()
-            self.trans_text.setTextColor(color)
-            self.trans_text.insertPlainText(text)
         self.show()
 
 
