@@ -162,6 +162,12 @@ def testBaiduOCR(object) :
 # 测试私人ChatGPT翻译
 def testChatGPT(object, api_key, proxy, url, model, prompt) :
 
+    object.config["chatgptAPI"] = api_key
+    object.config["chatgptProxy"] = proxy
+    object.config["chatgptApiAddr"] = url
+    object.config["chatgptModel"] = model
+    object.config["chatgptPrompt"] = prompt
+
     desc_ui = object.settin_ui.desc_ui
     signal = object.settin_ui.desc_signal
     desc_ui.desc_text.clear()
@@ -174,14 +180,8 @@ def testChatGPT(object, api_key, proxy, url, model, prompt) :
     def func():
         start = time.time()
         result = translator.api.chatgpt(
-            api_key=api_key,
-            language="JAP",
-            proxy=proxy,
-            url=url,
-            model=model,
-            prompt=prompt,
+            object=object,
             content=TEST_ORIGINAL,
-            logger=object.logger,
             delay_time=0
         )
         if not re.match("^私人ChatGPT[:：]", result) :

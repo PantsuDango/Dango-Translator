@@ -224,14 +224,8 @@ class TranslaterProcess(QThread) :
             # 私人ChatGPT
             elif self.trans_type == "chatgpt_private" :
                 result = translator.api.chatgpt(
-                    api_key=self.object.config["chatgptAPI"],
-                    language=self.object.config["language"],
-                    proxy=self.object.config["chatgptProxy"],
-                    url=self.object.config["chatgptApiAddr"],
-                    model=self.object.config["chatgptModel"],
-                    prompt=self.object.config["chatgptPrompt"],
+                    object=self.object,
                     content=self.object.translation_ui.original,
-                    logger=self.logger,
                     delay_time=0
                 )
 

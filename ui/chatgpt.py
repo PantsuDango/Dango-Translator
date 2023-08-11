@@ -12,6 +12,8 @@ import webbrowser
 import re
 import urllib.parse
 import utils.message
+import ui.switch
+import qtawesome
 
 # 私人ChatGPT设置界面
 class ChatGPTSetting(QWidget) :
@@ -107,18 +109,49 @@ class ChatGPTSetting(QWidget) :
         label.setTextFormat(Qt.RichText)
         label.setTextInteractionFlags(Qt.TextSelectableByMouse)
 
-        # 催眠话术
+        # 联系上下文
         label = QLabel(self)
         self.customSetGeometry(label, 20, 350, 330, 20)
+        label.setText("联系上下文: ")
+        # 联系上下文开关
+        self.context_switch = ui.switch.SwitchOCR(self, sign=self.object.config["chatgptContextUse"], startX=(65-20)*self.rate)
+        self.customSetGeometry(self.context_switch, 20, 375, 65, 20)
+        self.context_switch.checkedChanged.connect(self.changeContextUseSwitch)
+        self.context_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 联系上下文句子数
+        self.context_spinbox = QSpinBox(self)
+        self.customSetGeometry(self.context_spinbox, 100, 375, 60, 20)
+        self.context_spinbox.setMinimum(1)
+        self.context_spinbox.setMaximum(10)
+        self.context_spinbox.setValue(self.object.config["chatgptContextCount"])
+        self.context_spinbox.setCursor(ui.static.icon.SELECT_CURSOR)
+        self.context_spinbox.valueChanged.connect(self.changeContextCount)
+        # 联系上下文标签
+        label = QLabel(self)
+        self.customSetGeometry(label, 175, 375, 200, 20)
+        label.setText("最大句子数")
+        # 联系上下文?号图标
+        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color), "", self)
+        self.customSetIconSize(button, 20, 20)
+        self.customSetGeometry(button, 240, 375, 20, 20)
+        button.clicked.connect(self.ContextDesc)
+        button.setCursor(ui.static.icon.QUESTION_CURSOR)
+        button.setStyleSheet("QPushButton { background: transparent;}"
+                             "QPushButton:hover { background-color: #83AAF9; }"
+                             "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
+
+        # 催眠话术
+        label = QLabel(self)
+        self.customSetGeometry(label, 20, 420, 330, 20)
         label.setText("prompt(催眠话术): ")
         self.message_text = QTextEdit(self)
-        self.customSetGeometry(self.message_text, 20, 370, 330, 120)
+        self.customSetGeometry(self.message_text, 20, 440, 330, 120)
         self.message_text.setCursor(ui.static.icon.SELECT_CURSOR)
         self.message_text.setText(self.object.config["chatgptPrompt"])
 
         # 测试按钮
         button = QPushButton(self)
-        self.customSetGeometry(button, 35, 520, 60, 20)
+        self.customSetGeometry(button, 35, 590, 60, 20)
         button.setText("测试")
         button.clicked.connect(lambda: utils.test.testChatGPT(
             self.object,
@@ -132,21 +165,21 @@ class ChatGPTSetting(QWidget) :
 
         # 注册按钮
         button = QPushButton(self)
-        self.customSetGeometry(button, 115, 520, 60, 20)
+        self.customSetGeometry(button, 115, 590, 60, 20)
         button.setText("注册")
         button.clicked.connect(self.openTutorial)
         button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 查额度按钮
         button = QPushButton(self)
-        self.customSetGeometry(button, 195, 520, 60, 20)
+        self.customSetGeometry(button, 195, 590, 60, 20)
         button.setText("查额度")
         button.clicked.connect(self.openQueryQuota)
         button.setCursor(ui.static.icon.SELECT_CURSOR)
 
         # 查额度按钮
         button = QPushButton(self)
-        self.customSetGeometry(button, 275, 520, 60, 20)
+        self.customSetGeometry(button, 275, 590, 60, 20)
         button.setText("重置")
         button.clicked.connect(self.clickResetButton)
         button.setCursor(ui.static.icon.SELECT_CURSOR)
@@ -179,7 +212,7 @@ class ChatGPTSetting(QWidget) :
         self.rate = self.object.yaml["screen_scale_rate"]
         # 界面尺寸
         self.window_width = int(370 * self.rate)
-        self.window_height = int(580 * self.rate)
+        self.window_height = int(650 * self.rate)
         # 颜色
         self.color = "#5B8FF9"
         self.font = "华康方圆体W7"
@@ -202,6 +235,13 @@ class ChatGPTSetting(QWidget) :
 
         object.setGeometry(QRect(int(x * self.rate),
                                  int(y * self.rate), int(w * self.rate),
+                                 int(h * self.rate)))
+
+
+    # 根据分辨率定义图标位置尺寸
+    def customSetIconSize(self, object, w, h) :
+
+        object.setIconSize(QSize(int(w * self.rate),
                                  int(h * self.rate)))
 
 
@@ -265,11 +305,54 @@ class ChatGPTSetting(QWidget) :
     # 重置chatgpt配置
     def resetConfig(self) :
 
+        # 重置API密钥
         self.secret_key_text.setText("")
+        self.object.config["chatgptAPI"] = ""
+        # 重置代理地址
         self.proxy_text.setText("")
+        self.object.config["chatgptProxy"] = ""
+        # 重置API地址
         self.api_text.setText("https://api.openai.com/v1/chat/completions")
+        self.object.config["chatgptAPI"] = "https://api.openai.com/v1/chat/completions"
+        # 重置模型
         self.model_box.setCurrentText("gpt-3.5-turbo-0613")
+        self.object.config["chatgptModel"] = "gpt-3.5-turbo-0613"
+        # 重置催眠话术
         self.message_text.setText(translator.api.CHATGPT_PROMPT)
+        self.object.config["chatgptPrompt"] = translator.api.CHATGPT_PROMPT
+        # 重置联系上下文开关
+        if not self.object.config["chatgptContextUse"] :
+            self.context_switch.mousePressEvent(1)
+            self.context_switch.updateValue()
+            self.object.config["chatgptContextUse"] = True
+        # 重置联系上下文句子数
+        self.context_spinbox.setValue(5)
+        self.object.config["chatgptContextCount"] = 5
+
+
+    # 改变联系上下文开关状态
+    def changeContextUseSwitch(self, checked) :
+
+        self.object.config["chatgptContextUse"] = checked
+
+
+    # 改变联系上下文句子数
+    def changeContextCount(self, value) :
+
+        self.object.config["chatgptContextCount"] = value
+
+
+    # 联系上下文说明
+    def ContextDesc(self) :
+
+        desc_ui = self.object.settin_ui.desc_ui
+        signal = self.object.settin_ui.desc_signal
+        desc_ui.desc_text.clear()
+        desc_ui.show()
+
+        desc_ui.setWindowTitle("chatgpt联系上下文说明")
+        signal.emit("\n开关开启后, chatgpt会联系之前翻译过的句子场景进行翻译, 可能会提高翻译准确率, 但是会消耗更多的翻译额度\n\n最大可联系句子为10, 默认值为5")
+        QApplication.processEvents()
 
 
     # 窗口关闭处理

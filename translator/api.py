@@ -2,7 +2,6 @@
 import time
 import traceback
 
-import prettyprinter
 from tencentcloud.common import credential
 from tencentcloud.common.profile.client_profile import ClientProfile
 from tencentcloud.common.profile.http_profile import HttpProfile
@@ -90,6 +89,8 @@ XIAONIU_ERROR_CODE_MAP = {
 }
 # chatgpt的当前使用时间
 CHATGPT_USE_TIME = 0
+# chatgpt联系上下文句子数组
+CHATGPT_CONTEXT_LIST = []
 
 # 私人百度翻译
 def baidu(sentence, app_id, secret_key, logger):
@@ -289,16 +290,34 @@ def caiyun(sentence, token, logger) :
 
 
 # ChatGPT翻译
-def chatgpt(api_key, language, proxy, url, model, prompt, content, logger, delay_time=0) :
+def chatgpt(object, content, delay_time=0) :
 
-    global CHATGPT_USE_TIME
+    # 获取配置
+    api_key = object.config["chatgptAPI"]
+    proxy = object.config["chatgptProxy"]
+    url = object.config["chatgptApiAddr"]
+    model = object.config["chatgptModel"]
+    prompt = object.config["chatgptPrompt"]
+    context_use = object.config["chatgptContextUse"]
+    context_count = object.config["chatgptContextCount"]
+    logger = object.logger
+
+    global CHATGPT_USE_TIME, CHATGPT_CONTEXT_LIST
     if not api_key :
         return "私人ChatGPT: 还未填入私人ChatGPT密钥, 不可使用"
 
-    messages = [
-        {"role": "system", "content": prompt},
-        {"role": "user", "content": content}
-    ]
+    messages = [{"role": "system", "content": prompt}]
+    try :
+        # 计算上下文最大长度
+        if len(CHATGPT_CONTEXT_LIST) > context_count * 2:
+            CHATGPT_CONTEXT_LIST = CHATGPT_CONTEXT_LIST[-context_count * 2:]
+        # 添加上下文
+        if context_use :
+            messages += CHATGPT_CONTEXT_LIST
+    except Exception :
+        logger.error(format_exc())
+    messages.append({"role": "user", "content": content})
+
     data = {
         "model": model,
         "messages": messages,
@@ -356,8 +375,12 @@ def chatgpt(api_key, language, proxy, url, model, prompt, content, logger, delay
                 text += "翻译出错: {}, 请排查完错误后重试".format(error)
         else :
             # 翻译成功
-            CHATGPT_USE_TIME = time.time()
             text = result["choices"][0]["message"]["content"]
+            # 记录翻译时间
+            CHATGPT_USE_TIME = time.time()
+            # 记录上下文
+            CHATGPT_CONTEXT_LIST.append({"role": "user", "content": content})
+            CHATGPT_CONTEXT_LIST.append({"role": "assistant", "content": text})
 
             # 判断句子数量
             content_length = len(content.split("\n"))
@@ -374,7 +397,7 @@ def chatgpt(api_key, language, proxy, url, model, prompt, content, logger, delay
                 sign = False
                 # 多句子分批请求chatgpt
                 for value in content.split("\n") :
-                    tmp_text = chatgpt(api_key, language, proxy, url, model, prompt, value, logger, delay_time)
+                    tmp_text = chatgpt(object, value, delay_time)
                     if re.match(r"^私人ChatGPT:", tmp_text) :
                         sign = True
                         break

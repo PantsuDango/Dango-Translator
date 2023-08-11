@@ -1369,14 +1369,8 @@ class Manga(QMainWindow) :
 
             elif manga_trans == "chatgpt_private" :
                 result = translator.api.chatgpt(
-                    api_key=self.object.config["chatgptAPI"],
-                    language=self.object.config["mangaLanguage"],
-                    proxy=self.object.config["chatgptProxy"],
-                    url=self.object.config["chatgptApiAddr"],
-                    model=self.object.config["chatgptModel"],
-                    prompt=self.object.config["chatgptPrompt"],
+                    object=self.object,
                     content=original,
-                    logger=self.logger,
                     delay_time=delay_time
                 )
                 if re.match("^私人ChatGPT[:：]", result) :
@@ -3247,14 +3241,8 @@ class TransEdit(QWidget) :
 
             elif trans_type == "chatgpt_private" :
                 result = translator.api.chatgpt(
-                    api_key=self.object.config["chatgptAPI"],
-                    language=self.object.config["mangaLanguage"],
-                    proxy=self.object.config["chatgptProxy"],
-                    url=self.object.config["chatgptApiAddr"],
-                    model=self.object.config["chatgptModel"],
-                    prompt=self.object.config["chatgptPrompt"],
+                    object=self.object,
                     content=original,
-                    logger=self.logger,
                     delay_time=0,
                 )
                 if re.match("^私人ChatGPT[:：]", result) :

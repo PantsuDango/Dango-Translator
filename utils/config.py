@@ -268,6 +268,12 @@ def configConvert(object) :
     object.config["youdaoAPI"] = object.config.get("youdaoAPI", {})
     object.config["youdaoAPI"]["Key"] = object.config["youdaoAPI"].get("Key", "")
     object.config["youdaoAPI"]["Secret"] = object.config["youdaoAPI"].get("Secret", "")
+    # 私人小牛翻译密钥
+    object.config["xiaoniuAPI"] = object.config.get("xiaoniuAPI", "")
+    # 私人火山翻译密钥
+    object.config["huoshanAPI"] = object.config.get("huoshanAPI", {})
+    object.config["huoshanAPI"]["Key"] = object.config["huoshanAPI"].get("Key", "")
+    object.config["huoshanAPI"]["Secret"] = object.config["huoshanAPI"].get("Secret", "")
 
     # 私人ChatGPT翻译代理
     object.config["chatgptProxy"] = object.config.get("chatgptProxy", "")
@@ -275,6 +281,12 @@ def configConvert(object) :
     object.config["chatgptApiAddr"] = object.config.get("chatgptApiAddr", "https://api.openai.com/v1/chat/completions")
     # 私人ChatGPT模型
     object.config["chatgptModel"] = object.config.get("chatgptModel", "gpt-3.5-turbo-0613")
+    # chatgpt prompt
+    object.config["chatgptPrompt"] = object.config.get("chatgptPrompt", translator.api.CHATGPT_PROMPT)
+    # chatgpt联系上下文开关
+    object.config["chatgptContextUse"] = object.config.get("chatgptContextUse", True)
+    # chatgpt联系上下文句子数
+    object.config["chatgptContextCount"] = object.config.get("chatgptContextCount", 5)
 
     ################### 其他设定 ###################
     # 翻译界面透明度
@@ -372,15 +384,6 @@ def configConvert(object) :
     object.config["mangaChatgptDelayUse"] = object.config.get("mangaChatgptDelayUse", False)
     object.config["mangaChatgptDelayTime"] = object.config.get("mangaChatgptDelayTime", 1)
 
-    # chatgpt prompt
-    object.config["chatgptPrompt"] = object.config.get("chatgptPrompt", translator.api.CHATGPT_PROMPT)
-    # 私人小牛翻译密钥
-    object.config["xiaoniuAPI"] = object.config.get("xiaoniuAPI", "")
-    # 私人火山翻译密钥
-    object.config["huoshanAPI"] = object.config.get("huoshanAPI", {})
-    object.config["huoshanAPI"]["Key"] = object.config["huoshanAPI"].get("Key", "")
-    object.config["huoshanAPI"]["Secret"] = object.config["huoshanAPI"].get("Secret", "")
-
     # 允许写入的key
     allow_keys = [
         "dictInfo", "offlineOCR", "onlineOCR", "DangoToken", "onlineOCRProbation", "nodeURL", "baiduOCR", "OCR", "AccessToken",
@@ -396,7 +399,8 @@ def configConvert(object) :
         "mangaMergeThreshold", "mangaFontColor", "mangaBgColor", "mangaFontColorUse", "mangaBgColorUse",
         "mangaFontType", "mangaOutputRenameUse", "mangaFastRenderUse", "mangaShadowSize", "mangaFiltrateUse",
         "mangaFontSizeUse", "mangaFontSize", "youdaoPrivateUse", "youdaoAPI", "chatgptPrompt", "xiaoniuPrivateUse",
-        "xiaoniuAPI", "huoshanPrivateUse", "huoshanAPI", "mangaChatgptDelayUse", "mangaChatgptDelayTime"
+        "xiaoniuAPI", "huoshanPrivateUse", "huoshanAPI", "mangaChatgptDelayUse", "mangaChatgptDelayTime",
+        "chatgptContextUse", "chatgptContextCount"
     ]
     # 删除多余的key
     delete_keys = []
