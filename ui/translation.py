@@ -62,15 +62,13 @@ class Translation(QMainWindow) :
 
         # 窗口尺寸
         if "translation_ui_coordinate" in self.object.yaml :
-
+            self.resize(self.object.yaml["translation_ui_coordinate"]["w"], int(130 * self.rate))
+            # 窗口位置
             coordinate_x = self.object.yaml["translation_ui_coordinate"]["x"]
             coordinate_y = self.object.yaml["translation_ui_coordinate"]["y"]
-            if coordinate_x < 0 :
-                coordinate_x = 0
-            if coordinate_y < 0 :
-                coordinate_y = 0
-            self.resize(self.object.yaml["translation_ui_coordinate"]["w"], int(130*self.rate))
-            self.move(coordinate_x, coordinate_y)
+            screen_w, screen_h = self.getScreenSize()
+            if (0 < coordinate_x < screen_w) and (0 < coordinate_y < screen_h) :
+                self.move(coordinate_x, coordinate_y)
         else :
             self.resize(int(800*self.rate), int(130*self.rate))
 

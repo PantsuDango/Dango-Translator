@@ -200,7 +200,7 @@ class Manga(QMainWindow) :
                                           "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}"
                                           "QPushButton:pressed {background-color: #83AAF9; color: #FFFFFF;}")
         self.setting_button.setIcon(ui.static.icon.SETTING_ICON)
-        self.setting_button.clicked.connect(self.clickSettingButton)
+        self.setting_button.clicked.connect(self.setting_ui.show)
 
         # 购买按钮
         self.buy_button = QPushButton(self)
@@ -1997,13 +1997,6 @@ class Manga(QMainWindow) :
         image_data.seek(0)
         adjusted_image = Image.open(image_data)
         adjusted_image.save(image_path, format)
-
-
-    # 点击高级设置按钮
-    def clickSettingButton(self) :
-
-        self.hide()
-        self.setting_ui.show()
 
 
     # 窗口关闭处理
@@ -4367,13 +4360,6 @@ class Setting(QWidget) :
     def changeFilterCharCount(self, value) :
 
         self.object.config["mangaFilterCharCount"] = value
-
-
-    # 窗口关闭处理
-    def closeEvent(self, event) :
-
-        self.hide()
-        self.object.manga_ui.show()
 
 
 # 背景完全透明且不可被点击的按钮
