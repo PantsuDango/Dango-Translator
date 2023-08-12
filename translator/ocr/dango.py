@@ -546,3 +546,38 @@ def imageWebpToPng(filepath) :
         im.save(img_bytes, format="png")
         img_bytes.seek(0)
         return img_bytes.read()
+
+
+# 漫画图片比例缩放
+def imageDetect(image_base64, detect_scale) :
+
+    try :
+        # 计算最长边尺寸
+        if detect_scale > 1 :
+            detect_scale = min(detect_scale * 0.6, 4)
+        longest_side = 1536 * detect_scale
+
+        # 打开图片文件获取尺寸
+        image_bytes = base64.b64decode(image_base64)
+        image_stream = io.BytesIO(image_bytes)
+        image = Image.open(image_stream)
+        width, height = image.size
+        # 判断最长边是否大于缩放值
+        if max(width, height) > longest_side :
+            if width > height :
+                height = int(height * longest_side / width)
+                width = int(longest_side)
+            else :
+                width = int(width * longest_side / height)
+                height = int(longest_side)
+            # 图片缩放
+            image = image.resize((width, height), Image.ANTIALIAS)
+            # 保存输出为base64
+            image_stream = io.BytesIO()
+            image.save(image_stream, format="PNG")
+            image_bytes = image_stream.getvalue()
+            image_base64 = base64.b64encode(image_bytes).decode()
+    except Exception :
+        pass
+
+    return image_base64
