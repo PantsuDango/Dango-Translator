@@ -2343,24 +2343,22 @@ class Settin(QMainWindow) :
     # 运行本地OCR
     def runOfflineOCR(self) :
 
-        # 杀死本地可能在运行ocr进程
-        utils.offline_ocr.killOfflineOCR(self.object.yaml["port"])
-
-        # 检查端口是否被占用
-        if utils.port.detectPort(self.object.yaml["port"]) :
-            utils.message.MessageBox("本地OCR运行失败",
-                                     "本地OCR已启动, 请不要重复运行!     ")
-        else :
-            try :
+        try :
+            # 杀死本地可能在运行ocr进程
+            err = utils.offline_ocr.killOfflineOCR(self.object.yaml["port"])
+            if err :
+                self.logger.error(err)
+            # 检查端口是否被占用
+            if utils.port.detectPort(self.object.yaml["port"]) :
+                utils.message.MessageBox("本地OCR运行失败", "本地OCR已启动, 请不要重复运行!     ")
+            else :
                 # 启动本地OCR
                 os.startfile(self.object.yaml["ocr_cmd_path"])
-            except FileNotFoundError :
-                utils.message.MessageBox("本地OCR运行失败",
-                                         "本地OCR还未安装, 请先安装!     ")
-            except Exception :
-                self.logger.error(format_exc())
-                utils.message.MessageBox("本地OCR运行失败",
-                                         "原因: %s"%format_exc())
+        except FileNotFoundError :
+            utils.message.MessageBox("本地OCR运行失败", "本地OCR还未安装, 请先安装!     ")
+        except Exception :
+            self.logger.error(format_exc())
+            utils.message.MessageBox("本地OCR运行失败", "原因: %s"%format_exc())
 
 
     # 测试本地OCR

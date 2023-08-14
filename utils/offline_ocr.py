@@ -46,10 +46,13 @@ def install_offline_ocr(object) :
 # 杀死本地ocr进程
 def killOfflineOCR(port) :
 
-    popen_content = os.popen("netstat -ano |findstr %s"%port).read()
-    if popen_content :
-        pid = popen_content.split(" ")[-1]
-        os.popen("taskkill /f /t /im %s"%pid)
+    try :
+        popen_content = os.popen("netstat -ano |findstr %s"%port).read()
+        if popen_content :
+            pid = popen_content.split(" ")[-1]
+            os.popen("taskkill /f /t /im %s"%pid)
+    except Exception :
+        return format_exc()
 
 
 # 是否卸载本地ocr
