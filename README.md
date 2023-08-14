@@ -1,8 +1,8 @@
 # 团子翻译器 - 基于OCR的生肉翻译软件
 
 
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.5.6-ff69b4)](https://github.com/PantsuDango/Dango-Translator)
-[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2023--07--13-ff69b4)]()
+[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.5.7-ff69b4)](https://github.com/PantsuDango/Dango-Translator)
+[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2023--08--14-ff69b4)]()
 [![操作系统](https://img.shields.io/badge/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-win7--11-ff69b4)]()
 [![GitHubStars](https://img.shields.io/github/stars/PantsuDango/Dango-Translator)]()
 [![GitHubForks](https://img.shields.io/github/forks/PantsuDango/Dango-Translator)]()
@@ -17,7 +17,7 @@
 + 搭载了离线OCR, 项目地址: [DangoOCR](https://github.com/PantsuDango/DangoOCR) 
 + 搭载了在线OCR和漫画OCR, 官网地址: [星河云OCR](https://cloud.stariver.org.cn/auth/login.html)
 + 实现自动模式，实时识别区域内的文本并翻译
-+ 配置了12种翻译源
++ 配置了15种翻译源
 + 账号系统, 能够自动云端保存配置
 + 另有图片翻译功能, 实现对生肉漫画图片自动识别、翻译、消字、嵌字
 
@@ -29,26 +29,28 @@
 ## 安装版下载
 - 群文件下载: [![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-19%E7%BE%A4691201730-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/19%E7%BE%A4.png)  
 - 官网下载: [下载地址](https://translator.dango.cloud)
-- Github Releases: [Ver4.5.6](https://github.com/PantsuDango/Dango-Translator/releases/tag/Ver4.5.6)
+- Github Releases: [Ver4.5.7](https://github.com/PantsuDango/Dango-Translator/releases/tag/Ver4.5.7)
 
   
 ## 更新日志
 ### 翻译器相关
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.5.6-ff69b4)]()
-[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2023--07--13-ff69b4)]()
+[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.5.7-ff69b4)]()
+[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2023--08--14-ff69b4)]()
 
-#### 版本号：4.5.6
-#### 更新时间 2023/07/13
+#### 版本号：4.5.7
+#### 更新时间 2023/08/14
 #### 新增
-+ 图片翻译, 高级设置新增文本气泡框合并间隔参数, 可解决不同的文本气泡框错误合并在一起的问题;      
-+ 翻译框在锁定状态时, 会应用鼠标穿透效果, 解决游玩游戏时出现误触翻译框问题;      
++ 翻译源新增私人有道、私人小牛、私人火山;
++ 优化翻译历史的界面, 新增sqllite管理翻译数据, 翻译加入本地查询, 重复的译文不会反复调用翻译源, 而是直接用本地保存的已翻译的结果;
++ chatgpt新增自定义催眠话术、联系上下文、翻译间隔延时功能;
++ 图片翻译编辑图新增, 区域还原功能, 可手动还原消除错误的区域;
++ 图片翻译高级设置新增过滤短字数句子功能;     
 #### 优化
-+ 修复初始化启动时, 设置的字体大小和样式不会生效的问题;      
-+ 图片翻译, 修复删除文本框可能出现报错的问题;      
-+ 图片翻译, 修复编辑文本框处, 重新翻译时屏蔽词不会生效的问题;      
-+  图片翻译, 修复重新翻译后, 编辑/译图列表框的略缩图不会刷新的问题;      
-+ 优化了图片翻译-高级设置的UI布局, 优化了设置登录、设置页面的背景图;
-+ 
++ 优化设置-翻译设定-私人翻译界面;
++ 优化图片翻译界面;
++ 修复特定情况下出现的翻译框过大, 位置超屏幕等各种问题;
++ 修复一些已知的bug;
+
 更多更新日志: [查看](https://github.com/PantsuDango/Dango-Translator/releases)  
 
 ## 原理说明
@@ -75,6 +77,7 @@
 ![](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.3.6/%E4%BD%BF%E7%94%A8%E6%95%88%E6%9E%9C.png)
 
 #### 漫画翻译
+![初始界面](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.5.7/manga.png)
 ![原图](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.5.6/manga1.png)
 ![编辑](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.5.6/manga2.png)
 ![译图](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.5.6/manga3.png)
@@ -90,7 +93,7 @@
 
 #### 设置界面
 <img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.5.6/setting1.png" width="100%" height="100%">
-<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.5.6/setting2.png" width="100%" height="100%">
+<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.5.7/settin.png" width="100%" height="100%">
 <img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.5.6/setting3.png" width="100%" height="100%">
 <img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.5.6/setting4.png" width="100%" height="100%">
 <img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.5.6/setting5.png" width="100%" height="100%">
