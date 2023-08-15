@@ -227,7 +227,7 @@ def testAliyun(object, access_key_id, access_key_secret) :
     desc_ui.desc_text.clear()
     desc_ui.show()
 
-    desc_ui.setWindowTitle("私人有道翻译测试")
+    desc_ui.setWindowTitle("私人阿里云翻译测试")
     signal.emit("\n开始测试...\n\n原文: \n{}".format(TEST_ORIGINAL))
     QApplication.processEvents()
 
