@@ -105,7 +105,11 @@ def insertTranslationDB(logger, src, trans_type, tgt, create_time=None) :
         TRANSLATION_DB.execute(sql, (src, trans_type, tgt, create_time))
         TRANSLATION_DB.commit()
     except sqlite3.IntegrityError :
-        pass
+        sql = '''
+            UPDATE translations SET tgt = ? WHERE src =? AND trans_type = ?;
+        '''
+        TRANSLATION_DB.execute(sql, (tgt, src, trans_type))
+        TRANSLATION_DB.commit()
     except Exception :
         logger.error(traceback.format_exc())
 
