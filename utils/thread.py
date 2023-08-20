@@ -113,13 +113,14 @@ class createMangaTransQThread(QThread) :
     bar_signal = pyqtSignal(int, str)
     add_message_signal = pyqtSignal(str, str)
 
-    def __init__(self, window, image_paths, reload_sign=False):
+    def __init__(self, window, image_paths, reload_sign=False, use_sqlite=True):
 
         super(createMangaTransQThread, self).__init__()
         self.window = window
         self.logger = self.window.logger
         self.image_paths = image_paths
         self.reload_sign = reload_sign
+        self.use_sqlite = use_sqlite
         self.window.trans_process_bar.stop_sign = False
         self.window.trans_process_bar.finish_sign = False
         self.success_count = 0
@@ -133,7 +134,7 @@ class createMangaTransQThread(QThread) :
         try :
             for index, image_path in enumerate(self.image_paths) :
                 # 翻译进程
-                result = self.window.transProcess(image_path, self.reload_sign)
+                result = self.window.transProcess(image_path, self.reload_sign, self.use_sqlite)
                 # 如果失败记录日志
                 image_name = os.path.basename(image_path)
                 if result :

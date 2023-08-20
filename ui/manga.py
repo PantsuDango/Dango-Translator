@@ -1046,7 +1046,7 @@ class Manga(QMainWindow) :
 
 
     # 翻译进程
-    def transProcess(self, image_path, reload_sign=False) :
+    def transProcess(self, image_path, reload_sign=False, use_sqlite=True) :
 
         # 漫画OCR
         start = time.time()
@@ -1091,7 +1091,7 @@ class Manga(QMainWindow) :
                 trans_sign = True
         # 需要翻译
         if trans_sign :
-            sign, trans_result = self.mangaTrans(image_path)
+            sign, trans_result = self.mangaTrans(image_path, use_sqlite)
             self.trans_process_bar.paintStatus("trans", round(time.time()-start, 1), sign)
             # 翻译失败
             if not sign :
@@ -1168,7 +1168,8 @@ class Manga(QMainWindow) :
         # 创建执行线程
         self.trans_all_button.setEnabled(False)
         reload_sign = True
-        thread = utils.thread.createMangaTransQThread(self, image_paths, reload_sign)
+        use_sqlite = False
+        thread = utils.thread.createMangaTransQThread(self, image_paths, reload_sign, use_sqlite)
         thread.signal.connect(self.finishTransProcessRefresh)
         thread.bar_signal.connect(self.trans_process_bar.paintProgressBar)
         thread.add_message_signal.connect(self.trans_process_bar.setMessageText)
@@ -1305,7 +1306,7 @@ class Manga(QMainWindow) :
 
 
     # 漫画翻译配置过滤
-    def mangaTransFilter(self, json_data, delay_time) :
+    def mangaTransFilter(self, json_data, delay_time, use_sqlite) :
 
         # 解析ocr结果获取原文
         original = []
@@ -1333,7 +1334,7 @@ class Manga(QMainWindow) :
         manga_trans = utils.sqlite.TRANS_MAP[manga_trans]
 
         # 如果本地有翻译缓存则直接使用
-        if manga_trans in trans_map :
+        if manga_trans in trans_map and use_sqlite :
             result = trans_map[manga_trans]
         else :
             # 调用翻译
@@ -1438,7 +1439,7 @@ class Manga(QMainWindow) :
 
 
     # 图片翻译
-    def mangaTrans(self, image_path) :
+    def mangaTrans(self, image_path, use_sqlite) :
 
         # 从缓存文件中获取json结果
         with open(self.getJsonFilePath(image_path), "r", encoding="utf-8") as file:
@@ -1449,7 +1450,7 @@ class Manga(QMainWindow) :
         if self.object.config["mangaChatgptDelayUse"] == True :
             delay_time = self.object.config["mangaChatgptDelayTime"]
         # 漫画翻译配置过滤
-        sign, result = self.mangaTransFilter(json_data, delay_time)
+        sign, result = self.mangaTransFilter(json_data, delay_time, use_sqlite)
         if not sign :
             return sign, result
 
@@ -1622,7 +1623,7 @@ class Manga(QMainWindow) :
         self.trans_process_bar.modifyTitle("翻译中...请勿关闭此窗口")
         self.trans_process_bar.show()
         # 创建执行线程
-        thread = utils.thread.createMangaTransQThread(self, self.image_path_list, reload_sign)
+        thread = utils.thread.createMangaTransQThread(self, self.image_path_list, reload_sign, True)
         thread.signal.connect(self.finishTransProcessRefresh)
         thread.bar_signal.connect(self.trans_process_bar.paintProgressBar)
         thread.add_message_signal.connect(self.trans_process_bar.setMessageText)
@@ -2231,7 +2232,7 @@ class RenderTextBlock(QWidget) :
                 return
 
             # 请求翻译
-            sign, trans_result = self.object.manga_ui.mangaTransFilter(ocr_result, 0)
+            sign, trans_result = self.object.manga_ui.mangaTransFilter(ocr_result, 0, True)
             if not sign :
                 utils.message.MessageBox("翻译失败", trans_result, self.rate)
                 self.paint_button.deleteLater()
