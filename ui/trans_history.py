@@ -113,6 +113,10 @@ class TransHistory(QWidget) :
                 item = QTableWidgetItem(v)
                 item.setTextAlignment(Qt.AlignVCenter)
                 self.table_widget.setItem(i, j, item)
+                # 翻译源和原文不可编辑
+                if j == 0 or j == 1 :
+                    item.setFlags(item.flags() & ~Qt.ItemIsEditable)
+                    item.setFlags(item.flags() | Qt.ItemIsEnabled)
 
         # 设置行高自适应内容
         for row in range(self.table_widget.rowCount()):
@@ -123,7 +127,7 @@ class TransHistory(QWidget) :
     def showEvent(self, e) :
 
         self.refreshTableData()
-        self.table_widget.verticalScrollBar().setValue(self.table_widget.verticalScrollBar().maximum())
+        self.table_widget.scrollToBottom()
 
 
     # 窗口关闭处理

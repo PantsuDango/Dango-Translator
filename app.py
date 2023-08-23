@@ -144,9 +144,9 @@ class DangoTranslator :
     # 点击翻译历史键
     def clickTransHistory(self) :
 
+        self.trans_history_ui.show()
         self.range_ui.hide()
         self.translation_ui.hide()
-        self.trans_history_ui.show()
 
 
     # 自动登录后检查
