@@ -284,7 +284,7 @@ def configConvert(object) :
     # chatgpt prompt
     object.config["chatgptPrompt"] = object.config.get("chatgptPrompt", translator.api.CHATGPT_PROMPT)
     # chatgpt联系上下文开关
-    object.config["chatgptContextUse"] = object.config.get("chatgptContextUse", True)
+    object.config["chatgptContextUse"] = object.config.get("chatgptContextUse", False)
     # chatgpt联系上下文句子数
     object.config["chatgptContextCount"] = object.config.get("chatgptContextCount", 5)
 
