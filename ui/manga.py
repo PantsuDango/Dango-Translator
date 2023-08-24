@@ -855,6 +855,9 @@ class Manga(QMainWindow) :
         item = self.original_image_widget.itemAt(pos)
         if item is not None:
             menu = QMenu(self)
+            menu.setStyleSheet("QMenu {color: #5B8FF9; background-color: #FFFFFF;}"
+                               "QMenu::item:selected:enabled {background: #E5F5FF;}"
+                               "QMenu::item:checked {background: #E5F5FF;}")
             # 添加菜单项
             translater_action = menu.addAction("翻译当前图片")
             translater_action.triggered.connect(lambda: self.translaterItemWidget(item, "original"))
@@ -871,6 +874,9 @@ class Manga(QMainWindow) :
         item = self.edit_image_widget.itemAt(pos)
         if item is not None:
             menu = QMenu(self)
+            menu.setStyleSheet("QMenu {color: #5B8FF9; background-color: #FFFFFF;}"
+                               "QMenu::item:selected:enabled {background: #E5F5FF;}"
+                               "QMenu::item:checked {background: #E5F5FF;}")
             # 添加菜单项
             translater_action = menu.addAction("翻译当前图片")
             translater_action.triggered.connect(lambda: self.translaterItemWidget(item, "edit"))
@@ -887,6 +893,9 @@ class Manga(QMainWindow) :
         item = self.trans_image_widget.itemAt(pos)
         if item is not None:
             menu = QMenu(self)
+            menu.setStyleSheet("QMenu {color: #5B8FF9; background-color: #FFFFFF;}"
+                               "QMenu::item:selected:enabled {background: #E5F5FF;}"
+                               "QMenu::item:checked {background: #E5F5FF;}")
             # 添加菜单项
             output_action = menu.addAction("另存为")
             output_action.triggered.connect(lambda: self.saveImageItemWidget(item))
@@ -2057,8 +2066,11 @@ class RenderTextBlock(QWidget) :
         self.resize(1000*self.rate[0], 635*self.rate[1])
         # 窗口无标题栏、窗口置顶、窗口透明
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint | Qt.Tool)
-        # 鼠标样式
+        # 样式
         self.setCursor(ui.static.icon.PIXMAP_CURSOR)
+        self.setStyleSheet("QMenu {color: #5B8FF9; background-color: #FFFFFF;}"
+                           "QMenu::item:selected:enabled {background: #E5F5FF;}"
+                           "QMenu::item:checked {background: #E5F5FF;}")
 
         # 图片大图展示
         self.scroll_area = CustomScrollArea(self)
@@ -2152,7 +2164,7 @@ class RenderTextBlock(QWidget) :
             button.move_signal.connect(self.refreshTextBlockPosition)
             button.setGeometry(x, y, w, h)
             button.setStyleSheet("QPushButton {background: transparent; border: 2px solid red;}"
-                                 "QPushButton:hover {background-color:rgba(62, 62, 62, 0.1)}")
+                                 "QPushButton:hover {background-color:rgba(62, 62, 62, 0.1);")
             # 文本框右键菜单
             button.setContextMenuPolicy(Qt.CustomContextMenu)
             button.customContextMenuRequested.connect(lambda _, b=button: self.showTextBlockButtonMenu(b))
