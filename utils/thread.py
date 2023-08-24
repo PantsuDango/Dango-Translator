@@ -188,6 +188,8 @@ class createInputImagesQThread(QThread) :
         time.sleep(0.1)
         # 遍历文件列表, 将每个文件路径添加到列表框中
         for index, image_path in enumerate(self.images) :
+            # 判断文件是否已经添加
+            image_path = os.path.normpath(image_path)
             if image_path in self.window.image_path_list :
                 continue
             # 判断图片是否损坏

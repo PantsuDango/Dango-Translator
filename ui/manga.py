@@ -556,7 +556,8 @@ class Manga(QMainWindow) :
 
         if images :
             # 清除所有图片
-            self.clearAllImages()
+            if self.object.config.get("mangaInputClearUse") :
+                self.clearAllImages()
             # 根据文件名排序
             images = self.dirFilesPathSort(images)
             # 进度条窗口
@@ -941,7 +942,7 @@ class Manga(QMainWindow) :
 
 
     # 原图列表框添加图片
-    def originalImageWidgetAddImage(self, index, image_path):
+    def originalImageWidgetAddImage(self, index, image_path) :
 
         item = QListWidgetItem(self.original_image_widget)
         pixmap = QPixmap(image_path)
@@ -950,6 +951,7 @@ class Manga(QMainWindow) :
         item.setIcon(QIcon(pixmap))
         item.listWidget()
         self.original_image_widget.addItem(item)
+        image_path = os.path.normpath(image_path)
         self.image_path_list.append(image_path)
 
 
@@ -1286,7 +1288,7 @@ class Manga(QMainWindow) :
         filtrate = self.object.config.get("mangaFiltrateUse", True)
         sign, result = translator.ocr.dango.mangaOCR(
             object=self.object,
-            image_path=image_path,
+            filepath=image_path,
             image_base64=None,
             filtrate=filtrate,
             low_accuracy_mode=False,
@@ -1889,7 +1891,7 @@ class Manga(QMainWindow) :
             if image_list :
                 event.accept()
                 # 清除所有图片
-                self.clearAllImages()
+                #self.clearAllImages()
                 # 根据文件名排序
                 image_list = self.dirFilesPathSort(image_list)
                 # 进度条窗口
@@ -2431,18 +2433,15 @@ class RenderTextBlock(QWidget) :
         with open(self.image_path, "rb") as file :
             image = QImage.fromData(file.read())
 
-        # 如果图片太大就裁剪一半
-        if image.width() == 0 or image.height() == 0 :
-            image = Image.open(self.image_path)
-            # 等比例缩放为原来的一半
-            # width, height = image.size
-            # new_width = width // 2
-            # new_height = height // 2
-            # resized_image = image.resize((new_width, new_height))
-            # resized_image.save(self.image_path)
-            # # 重新读取图片
-            # with open(self.image_path, "rb") as file :
-            #     image = QImage.fromData(file.read())
+        for i in range(3) :
+            # 如果图片打不开就尝试修复
+            if image.width() == 0 or image.height() == 0 :
+                Image.open(self.image_path).save(self.image_path, quality=95)
+                # 重新读取图片
+                with open(self.image_path, "rb") as file :
+                    image = QImage.fromData(file.read())
+            else :
+                break
 
         self.image_pixmap = QPixmap.fromImage(image)
         self.matchImageSize()
@@ -3683,6 +3682,7 @@ class Setting(QWidget) :
         self.chatgpt_delay_time = self.object.config.get("mangaChatgptDelayTime", 1)
         self.filter_char_use = self.object.config.get("mangaFilterCharUse", False)
         self.filter_char_count = self.object.config.get("mangaFilterCharCount", False)
+        self.input_clear_use = self.object.config.get("mangaInputClearUse", True)
         self.font_list = [
             "鸿蒙/HarmonyOS_Sans/HarmonyOS_Sans_Regular",
             "阿里/东方大楷/Alimama_DongFangDaKai_Regular",
@@ -4143,14 +4143,33 @@ class Setting(QWidget) :
                              "QPushButton:hover { background-color: #83AAF9; }"
                              "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
 
+        # 导入原图时是否清除已导入的图片开关
+        self.input_clear_switch = ui.switch.SwitchOCR(other_tab, self.input_clear_use, startX=(65-20) * self.rate)
+        self.customSetGeometry(self.input_clear_switch, 20, 70, 65, 20)
+        self.input_clear_switch.checkedChanged.connect(self.changeInputClearUseSwitch)
+        self.input_clear_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 导入原图时是否清除已导入的图片标签
+        label = QLabel(other_tab)
+        label.setText("导入原图时是否清除已导入的图片")
+        self.customSetGeometry(label, 100, 70, 500, 20)
+        # 导入原图时是否清除已导入的图片?号图标
+        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", other_tab)
+        self.customSetIconSize(button, 20, 20)
+        self.customSetGeometry(button, 310, 70, 20, 20)
+        button.clicked.connect(lambda: self.showDesc("input_clear"))
+        button.setCursor(ui.static.icon.QUESTION_CURSOR)
+        button.setStyleSheet("QPushButton { background: transparent;}"
+                             "QPushButton:hover { background-color: #83AAF9; }"
+                             "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
+
         # 自动打开图片翻译
         self.auto_open_manga_switch = ui.switch.SwitchOCR(other_tab, sign=self.auto_open_manga_use, startX=(65-20) * self.rate)
-        self.customSetGeometry(self.auto_open_manga_switch, 20, 70, 65, 20)
+        self.customSetGeometry(self.auto_open_manga_switch, 20, 120, 65, 20)
         self.auto_open_manga_switch.checkedChanged.connect(self.changeAutoOpenMangaSwitch)
         self.auto_open_manga_switch.setCursor(ui.static.icon.SELECT_CURSOR)
         # 自动打开图片翻译标签
         label = QLabel(other_tab)
-        self.customSetGeometry(label, 100, 70, 400, 20)
+        self.customSetGeometry(label, 100, 120, 400, 20)
         label.setText("登录后自动打开图片翻译界面")
 
         # 加载背景图
@@ -4284,6 +4303,10 @@ class Setting(QWidget) :
                                           "\n\n开关开启时, 若某个文本块的文字数小于所设置的数值, 则不会被翻译"
                                           "\n\n范围为1-5, 单位个")
 
+        elif message_type == "input_clear" :
+            self.desc_ui.setWindowTitle("导入原图时是否清除已导入的图片说明")
+            self.desc_ui.desc_text.append("\n开关开启时, 每次执行导入原图操作时, 会清除全部已导入的图片")
+
         else :
             return
 
@@ -4354,6 +4377,12 @@ class Setting(QWidget) :
     def changeOutputRenameUseSwitch(self, checked) :
 
         self.object.config["mangaOutputRenameUse"] = checked
+
+
+    # 改变导入原图时是否清除已导入的图片开关状态
+    def changeInputClearUseSwitch(self, checked) :
+
+        self.object.config["mangaInputClearUse"] = checked
 
 
     # 改变快速渲染开关状态
