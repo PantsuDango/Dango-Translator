@@ -2464,10 +2464,9 @@ class RenderTextBlock(QWidget) :
                 pixmap.width() / self.image_pixmap.width(),
                 pixmap.height() / self.image_pixmap.height()
             ]
+            self.rate_label.setText("{}%".format(round(self.image_rate[0] * 100)))
         except Exception :
             self.logger.error(traceback.format_exc())
-
-        self.rate_label.setText("{}%".format(round(self.image_rate[0] * 100)))
 
 
     # 文本框按钮自适配比例
