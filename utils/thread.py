@@ -190,11 +190,13 @@ class createInputImagesQThread(QThread) :
         for index, image_path in enumerate(self.images) :
             if image_path in self.window.image_path_list :
                 continue
+            # 判断图片是否损坏
+            self.window.repairBadImage(image_path)
             # 判断文件大小, 如果超过2MB就缩小
             file_size = self.window.getFileSize(image_path)
             if file_size > 2 :
                 self.window.adjustImageSize(image_path, 2*1024*1024)
-
+            # 发送添加到列表框信号
             self.image_widget_signal.emit(str(index+1), image_path, False)
             # 进度条
             self.bar_signal.emit(

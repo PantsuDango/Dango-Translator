@@ -16,7 +16,7 @@ import json
 from math import sqrt
 import webbrowser
 import qtawesome
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFile
 import traceback
 import pyperclip
 import pathlib
@@ -35,7 +35,6 @@ import utils.http
 import utils.thread
 import utils.message
 import utils.sqlite
-
 
 FONT_PATH_1 = "./config/other/NotoSansSC-Regular.otf"
 FONT_PATH_2 = "./config/other/华康方圆体W7.TTC"
@@ -1976,28 +1975,42 @@ class Manga(QMainWindow) :
     # 调整图片大小
     def adjustImageSize(self, image_path, target_size):
 
-        ext = pathlib.Path(image_path).suffix.replace(".", "")
-        format = self.image_ext_map[ext]
+        try :
+            ext = pathlib.Path(image_path).suffix.replace(".", "")
+            format = self.image_ext_map[ext]
 
-        # 打开原始图片
-        image = Image.open(image_path)
-        # 创建一个缓冲区，用于保存调整后的图片
-        image_data = io.BytesIO()
-        # 调整图片尺寸
-        factor = 0.9  # 调整因子，可以适当调整以满足目标大小
-        image.save(image_data, format=format, quality=85)
-        while image_data.tell() > target_size :
+            # 打开原始图片
+            image = Image.open(image_path)
+            image_data = io.BytesIO()
+            image.save(image_data, format=format, quality=95)
+            factor = 0.9
+            # 调整图片尺寸
+            while image_data.tell() > target_size :
+                image_data.seek(0)
+                image_data.truncate()
+                image = image.resize((int(image.width * factor), int(image.height * factor)))
+                image.save(image_data, format=format, quality=95)
+                factor -= 0.1
+                if factor < 0.1 :
+                    break
+            # 保存调整后的图片
             image_data.seek(0)
-            image_data.truncate()
-            image.save(image_data, format=format, quality=85)
-            if factor < 0.1 :
-                break
-            image = image.resize((int(image.width*factor), int(image.height*factor)))
-            factor -= 0.1
-        # 保存调整后的图片
-        image_data.seek(0)
-        adjusted_image = Image.open(image_data)
-        adjusted_image.save(image_path, format)
+            adjusted_image = Image.open(image_data)
+            adjusted_image.save(image_path, format, quality=95)
+        except Exception :
+            self.logger.error(traceback.format_exc())
+
+
+    # 修复坏图
+    def repairBadImage(self, image_path) :
+
+        try :
+            image = Image.open(image_path)
+            image.load()
+        except Exception :
+            ImageFile.LOAD_TRUNCATED_IMAGES = True
+            image.save(image_path, quality=95)
+            ImageFile.LOAD_TRUNCATED_IMAGES = False
 
 
     # 窗口关闭处理
@@ -2389,19 +2402,19 @@ class RenderTextBlock(QWidget) :
             image = QImage.fromData(file.read())
 
         # 如果图片太大就裁剪一半
-        if image.width() == 0 or image.height() == 0:
+        if image.width() == 0 or image.height() == 0 :
             image = Image.open(self.image_path)
             # 等比例缩放为原来的一半
-            width, height = image.size
-            new_width = width // 2
-            new_height = height // 2
-            resized_image = image.resize((new_width, new_height))
-            resized_image.save(self.image_path)
-            # 重新读取图片
-            with open(self.image_path, "rb") as file :
-                image = QImage.fromData(file.read())
-        self.image_pixmap = QPixmap.fromImage(image)
+            # width, height = image.size
+            # new_width = width // 2
+            # new_height = height // 2
+            # resized_image = image.resize((new_width, new_height))
+            # resized_image.save(self.image_path)
+            # # 重新读取图片
+            # with open(self.image_path, "rb") as file :
+            #     image = QImage.fromData(file.read())
 
+        self.image_pixmap = QPixmap.fromImage(image)
         self.matchImageSize()
 
 
@@ -2437,19 +2450,23 @@ class RenderTextBlock(QWidget) :
     # 图片自适配比例
     def matchImageSize(self) :
 
-        pixmap = self.image_pixmap
-        if pixmap.height() > self.height() :
-            rate = self.height() / pixmap.height()
-            pixmap = pixmap.scaled(pixmap.width()*rate, pixmap.height()*rate)
-        if pixmap.width() > self.width() :
-            rate = self.width() / pixmap.width()
-            pixmap = pixmap.scaled(pixmap.width()*rate, pixmap.height()*rate)
-        self.image_label.setPixmap(pixmap)
+        try :
+            pixmap = self.image_pixmap
+            if pixmap.height() > self.height() :
+                rate = self.height() / pixmap.height()
+                pixmap = pixmap.scaled(pixmap.width()*rate, pixmap.height()*rate)
+            if pixmap.width() > self.width() :
+                rate = self.width() / pixmap.width()
+                pixmap = pixmap.scaled(pixmap.width()*rate, pixmap.height()*rate)
+            self.image_label.setPixmap(pixmap)
 
-        self.image_rate = [
-            pixmap.width() / self.image_pixmap.width(),
-            pixmap.height() / self.image_pixmap.height()
-        ]
+            self.image_rate = [
+                pixmap.width() / self.image_pixmap.width(),
+                pixmap.height() / self.image_pixmap.height()
+            ]
+        except Exception :
+            self.logger.error(traceback.format_exc())
+
         self.rate_label.setText("{}%".format(round(self.image_rate[0] * 100)))
 
 
