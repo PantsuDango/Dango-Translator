@@ -55,9 +55,6 @@ class Manga(QMainWindow) :
         self.setting_ui = Setting(object)
         self.ui()
         self.trans_edit_ui = TransEdit(object)
-        self.show_image_widget = None
-        self.show_error_sign = False
-        self.click_button_type = "original"
         utils.thread.createThread(self.checkPermission)
         self.flushed_render_image_and_text_block_signal.connect(self.transProcessFlushedRenderImageAndTextBlock)
 
@@ -388,6 +385,11 @@ class Manga(QMainWindow) :
         }
         # 隐藏图片列表框状态, True-隐藏, False-不隐藏
         self.hide_image_widget_status = False
+        self.show_image_widget = None
+        self.show_error_sign = False
+        self.click_button_type = "original"
+        # 使用有效期
+        self.valid_time = "-"
 
 
     # 根据分辨率定义控件位置尺寸
@@ -832,7 +834,7 @@ class Manga(QMainWindow) :
                     "打开",
                     self.manga_read_count,
                     index,
-                    len(self.image_path_list)
+                    len(self.image_path_list),
                 ))
         else :
             self.status_label.setText(
@@ -840,12 +842,14 @@ class Manga(QMainWindow) :
                 '<font color="#5B8FF9">&nbsp;&nbsp;&nbsp;翻译源:&nbsp;</font> <font color="#708090">{}</font>'
                 '<font color="#5B8FF9">&nbsp;&nbsp;&nbsp;试用开关:&nbsp;</font> <font color="#708090">{}</font>'
                 '<font color="#5B8FF9">&nbsp;&nbsp;&nbsp;当前页数:&nbsp;</font> <font color="#708090">{}/{}</font>'
+                '<font color="#5B8FF9">&nbsp;&nbsp;&nbsp;有效期截止:&nbsp;</font> <font color="#708090">{}</font>'
                 .format(
                     self.language_map[self.object.config["mangaLanguage"]],
                     self.object.config["mangaTrans"],
                     "关闭",
                     index,
-                    len(self.image_path_list)
+                    len(self.image_path_list),
+                    self.valid_time
                 ))
 
 
@@ -1943,6 +1947,12 @@ class Manga(QMainWindow) :
             # 延时
             time.sleep(5)
 
+        # 查询有效时间
+        sign, valid_time = utils.http.mangaOCRQueryQuota(self.object)
+        print(sign)
+        print(valid_time)
+        if sign :
+            self.valid_time = valid_time
         self.mangaReadCount()
         self.refreshStatusLabel()
         self.show_error_label.hide()

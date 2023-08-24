@@ -192,3 +192,30 @@ def ocrProbationReadCount(object) :
         return
     count = resp.get("Data", 0)
     object.settin_ui.online_ocr_probation_label.setText("试用在线OCR, 剩余%d次"%count)
+
+
+# 查询漫画OCR额度
+def mangaOCRQueryQuota(object) :
+
+    url = "%s?Token=%s"%(object.yaml["dict_info"]["ocr_query_quota"], object.config["DangoToken"])
+    try :
+        res = post(url, {}, object.logger)
+        # 未购买
+        if len(res["Result"]) == 0 :
+            return False, ""
+        max_end_time = ""
+        for val in res["Result"] :
+            if "漫画" not in val["PackName"] :
+                continue
+            if val["EndTime"] > max_end_time :
+                max_end_time = val["EndTime"]
+        now_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        # 已过期
+        if now_time > max_end_time :
+            return False, max_end_time
+        else :
+            # 未过期
+            return True, max_end_time
+    except Exception :
+        object.logger.error(format_exc())
+        return False, "查询出错"
