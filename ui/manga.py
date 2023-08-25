@@ -117,6 +117,8 @@ class Manga(QMainWindow) :
         self.trans_all_action_group.setExclusive(True)
         self.createTransAllAction("跳过已翻译的")
         self.createTransAllAction("全部重新翻译")
+        self.createTransAllAction("只重新翻译并渲染文字")
+        self.createTransAllAction("只重新渲染文字")
         # 将下拉菜单设置为按钮的菜单
         self.trans_all_button.setMenu(self.trans_all_menu)
         self.trans_all_action_group.triggered.connect(self.TransAllImages)
@@ -599,9 +601,13 @@ class Manga(QMainWindow) :
     def TransAllImages(self, action) :
 
         if action.data() == "跳过已翻译的" :
-            self.clickTransAllButton(False)
+            self.clickTransAllButton("pass")
         elif action.data() == "全部重新翻译" :
-            self.clickTransAllButton(True)
+            self.clickTransAllButton("all")
+        elif action.data() == "只重新翻译并渲染文字" :
+            self.clickTransAllButton("rdr")
+        elif action.data() == "只重新渲染文字" :
+            self.clickTransAllButton("rdr")
         else :
             return
 
@@ -1090,11 +1096,17 @@ class Manga(QMainWindow) :
 
 
     # 翻译进程
-    def transProcess(self, image_path, reload_sign=False, use_sqlite=True) :
-
+    def transProcess(self, image_path, execute_type="pass", use_sqlite=True) :
+        """
+        @execute_type
+        all   : 所有步骤都执行
+        pass  : 跳过已执行过的
+        trans : 只执行翻译和文字渲染
+        rdr   : 只执行文字渲染
+        """
         # 漫画OCR
         start = time.time()
-        if not os.path.exists(self.getJsonFilePath(image_path)) or reload_sign :
+        if not os.path.exists(self.getJsonFilePath(image_path)) or execute_type == "all" :
             sign, ocr_result = self.mangaOCR(image_path)
             self.trans_process_bar.paintStatus("ocr", round(time.time()-start, 1), sign)
             # OCR失败
@@ -1126,7 +1138,7 @@ class Manga(QMainWindow) :
         start = time.time()
         trans_sign = False
         # 判断是否需要翻译
-        if not os.path.exists(self.getJsonFilePath(image_path)) or reload_sign :
+        if not os.path.exists(self.getJsonFilePath(image_path)) or execute_type == "all" or execute_type == "trans" :
             trans_sign = True
         else :
             with open(self.getJsonFilePath(image_path), "r", encoding="utf-8") as file :
@@ -1148,7 +1160,7 @@ class Manga(QMainWindow) :
 
         # 文字消除
         start = time.time()
-        if not os.path.exists(self.getIptFilePath(image_path)) or reload_sign :
+        if not os.path.exists(self.getIptFilePath(image_path)) or execute_type == "all" :
             sign, ipt_result = self.mangaTextInpaint(image_path)
             self.trans_process_bar.paintStatus("ipt", round(time.time()-start, 1), sign)
             # 文字消除失败
@@ -1163,8 +1175,8 @@ class Manga(QMainWindow) :
 
         # 漫画文字渲染
         start = time.time()
-        if not os.path.exists(self.getRdrFilePath(image_path)) or reload_sign :
-            sign, rdr_result = self.mangaTextRdr(image_path)
+        if not os.path.exists(self.getRdrFilePath(image_path)) or execute_type == "all" or execute_type == "trans" or execute_type == "rdr" :
+            sign, rdr_result = self.mangaTextRdr(image_path, execute_type)
             self.trans_process_bar.paintStatus("rdr", round(time.time()-start, 1), sign)
             if not sign :
                 message = "文字渲染过程失败: %s"%rdr_result
@@ -1211,9 +1223,12 @@ class Manga(QMainWindow) :
         self.trans_process_bar.show()
         # 创建执行线程
         self.trans_all_button.setEnabled(False)
-        reload_sign = True
-        use_sqlite = False
-        thread = utils.thread.createMangaTransQThread(self, image_paths, reload_sign, use_sqlite)
+        thread = utils.thread.createMangaTransQThread(
+            window=self,
+            image_paths=image_paths,
+            execute_type="all",
+            use_sqlite=False
+        )
         thread.signal.connect(self.finishTransProcessRefresh)
         thread.bar_signal.connect(self.trans_process_bar.paintProgressBar)
         thread.add_message_signal.connect(self.trans_process_bar.setMessageText)
@@ -1513,11 +1528,37 @@ class Manga(QMainWindow) :
 
 
     # 漫画文字渲染
-    def mangaTextRdr(self, image_path) :
+    def mangaTextRdr(self, image_path, execute_type) :
 
         # 从缓存文件中获取json结果
         with open(self.getJsonFilePath(image_path), "r", encoding="utf-8") as file :
             json_data = json.load(file)
+
+        new_text_blocks = []
+        if execute_type == "trans" or execute_type == "rdr" :
+            for text_block in json_data["text_block"] :
+                # 修改字体颜色
+                if self.object.config["mangaFontColorUse"] :
+                    color = QColor(self.object.config["mangaFontColor"])
+                    f_r, f_g, f_b, f_a = color.getRgb()
+                    text_block["foreground_color"] = [f_r, f_g, f_b]
+                # 修改轮廓颜色
+                if self.object.config["mangaBgColorUse"] :
+                    color = QColor(self.object.config["mangaBgColor"])
+                    b_r, b_g, b_b, b_a = color.getRgb()
+                    text_block["background_color"] = [b_r, b_g, b_b]
+                # 字体大小
+                if self.object.config["mangaFontSizeUse"] :
+                    text_block["text_size"] = self.object.config["mangaFontSize"]
+                # 轮廓宽度
+                text_block["shadow_size"] = self.object.config["mangaShadowSize"]
+                # 使用全局字体
+                text_block["font_selector"] = self.object.config["mangaFontType"]
+
+                new_text_blocks.append(text_block)
+        else :
+            new_text_blocks = json_data["text_block"]
+
         # 从缓存文件里获取ipt图片
         with open(self.getIptFilePath(image_path), "rb") as file :
             ipt = base64.b64encode(file.read()).decode("utf-8")
@@ -1526,7 +1567,7 @@ class Manga(QMainWindow) :
             object=self.object,
             trans_list=json_data["translated_text"],
             inpainted_image=ipt,
-            text_block=json_data["text_block"],
+            text_block=new_text_blocks,
             font=self.object.config["mangaFontType"],
             check_permission=self.check_permission
         )
@@ -1534,6 +1575,11 @@ class Manga(QMainWindow) :
             # 缓存ipt图片
             with open(self.getRdrFilePath(image_path), "wb") as file :
                 file.write(base64.b64decode(result["rendered_image"]))
+            # 缓存ocr结果
+            if execute_type == "trans" or execute_type == "rdr" :
+                json_data["text_block"] = new_text_blocks
+                with open(self.getJsonFilePath(image_path), "w", encoding="utf-8") as file :
+                    json.dump(json_data, file, indent=4)
 
         return sign, result
 
@@ -1664,7 +1710,7 @@ class Manga(QMainWindow) :
 
 
     # 一键翻译
-    def clickTransAllButton(self, reload_sign) :
+    def clickTransAllButton(self, execute_type) :
 
         if len(self.image_path_list) == 0 :
             return utils.message.MessageBox("翻译失败", "请先导入要翻译的图片      ")
@@ -1674,7 +1720,12 @@ class Manga(QMainWindow) :
         self.trans_process_bar.modifyTitle("翻译中...请勿关闭此窗口")
         self.trans_process_bar.show()
         # 创建执行线程
-        thread = utils.thread.createMangaTransQThread(self, self.image_path_list, reload_sign, True)
+        thread = utils.thread.createMangaTransQThread(
+            window=self,
+            image_paths=self.image_path_list,
+            execute_type=execute_type,
+            use_sqlite=True
+        )
         thread.signal.connect(self.finishTransProcessRefresh)
         thread.bar_signal.connect(self.trans_process_bar.paintProgressBar)
         thread.add_message_signal.connect(self.trans_process_bar.setMessageText)
@@ -2784,7 +2835,7 @@ class RenderTextBlock(QWidget) :
             self.image_label.paint_status = True
             self.scroll_area.setCursor(Qt.CrossCursor)
             self.image_label.setCursor(Qt.CrossCursor)
-            self.manual_ocr_button.setStyleSheet("background-color: #83AAF9;")
+            self.manual_ocr_button.setStyleSheet("background-color: #83AAF9; color: #FFFFFF;")
             if not self.object.manga_ui.hide_image_widget_status :
                 self.object.manga_ui.last_page_button.hide()
                 self.object.manga_ui.next_page_button.hide()
@@ -2795,7 +2846,9 @@ class RenderTextBlock(QWidget) :
             self.image_label.paint_status = False
             self.scroll_area.setCursor(Qt.OpenHandCursor)
             self.image_label.setCursor(Qt.OpenHandCursor)
-            self.manual_ocr_button.setStyleSheet("QPushButton:hover {background-color: #83AAF9;}")
+            self.manual_ocr_button.setStyleSheet("QPushButton {color: #5B8FF9;}"
+                                                 "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}"
+                                                 "QPushButton:pressed {background-color: #83AAF9; color: #FFFFFF;}")
             if not self.object.manga_ui.hide_image_widget_status :
                 self.object.manga_ui.last_page_button.show()
                 self.object.manga_ui.next_page_button.show()
@@ -2815,7 +2868,7 @@ class RenderTextBlock(QWidget) :
             self.image_label.paint_status = True
             self.scroll_area.setCursor(Qt.CrossCursor)
             self.image_label.setCursor(Qt.CrossCursor)
-            self.area_recover_button.setStyleSheet("background-color: #83AAF9;")
+            self.area_recover_button.setStyleSheet("background-color: #83AAF9; color: #FFFFFF;")
             if not self.object.manga_ui.hide_image_widget_status :
                 self.object.manga_ui.last_page_button.hide()
                 self.object.manga_ui.next_page_button.hide()
@@ -2826,7 +2879,9 @@ class RenderTextBlock(QWidget) :
             self.image_label.paint_status = False
             self.scroll_area.setCursor(Qt.OpenHandCursor)
             self.image_label.setCursor(Qt.OpenHandCursor)
-            self.area_recover_button.setStyleSheet("QPushButton:hover {background-color: #83AAF9;}")
+            self.area_recover_button.setStyleSheet("QPushButton {color: #5B8FF9;}"
+                                                   "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}"
+                                                   "QPushButton:pressed {background-color: #83AAF9; color: #FFFFFF;}")
             if not self.object.manga_ui.hide_image_widget_status :
                 self.object.manga_ui.last_page_button.show()
                 self.object.manga_ui.next_page_button.show()
