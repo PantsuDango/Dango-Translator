@@ -329,11 +329,10 @@ class Range(QMainWindow) :
         screen_w, screen_h = self.getScreenSize()
         w = self.width()
         h = self.height()
-
-        if w >= screen_w - 100:
-            w = screen_w - 100
-        if h >= screen_h - 100:
-            h = screen_h - 100
+        if w >= screen_w :
+            w = screen_w
+        if h >= screen_h :
+            h = screen_h
 
         self.resize(w, h)
         self.label.resize(w, h)

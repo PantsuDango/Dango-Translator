@@ -1026,13 +1026,12 @@ class Translation(QMainWindow) :
         screen_w, screen_h = self.getScreenSize()
         w = self.width()
         h = self.height()
+        if w >= screen_w :
+            w = screen_w
+        if h >= screen_h :
+            h = screen_h
 
-        if w >= screen_w - 100 :
-            w = screen_w - 100
-        if h >= screen_h - 100 :
-            h = screen_h - 100
         self.resize(w, h)
-
         width = round((self.width() - 534 * self.rate) / 2)
         height = self.height() - 30 * self.rate
 
