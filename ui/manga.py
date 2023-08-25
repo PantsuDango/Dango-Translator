@@ -258,7 +258,7 @@ class Manga(QMainWindow) :
         self.createCutLine(self.cut_line_label4)
 
         # 原图列表框
-        self.original_image_widget = QListWidget(self)
+        self.original_image_widget = CustomListWidget(self)
         self.original_image_widget.setIconSize(QSize(180*self.rate, 180*self.rate))
         self.original_image_widget.itemSelectionChanged.connect(self.loadOriginalImage)
         self.original_image_widget.show()
@@ -268,7 +268,7 @@ class Manga(QMainWindow) :
         self.setAcceptDrops(True)
 
         # 编辑图列表框
-        self.edit_image_widget = QListWidget(self)
+        self.edit_image_widget = CustomListWidget(self)
         self.edit_image_widget.setIconSize(QSize(180*self.rate, 180*self.rate))
         self.edit_image_widget.itemSelectionChanged.connect(self.loadEditImage)
         self.edit_image_widget.hide()
@@ -277,13 +277,33 @@ class Manga(QMainWindow) :
         self.edit_image_widget.setSpacing(5)
 
         # 译图列表框
-        self.trans_image_widget = QListWidget(self)
+        self.trans_image_widget = CustomListWidget(self)
         self.trans_image_widget.setIconSize(QSize(180*self.rate, 180*self.rate))
         self.trans_image_widget.itemSelectionChanged.connect(self.loadTransImage)
         self.trans_image_widget.hide()
         self.trans_image_widget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.trans_image_widget.customContextMenuRequested.connect(self.showTransListWidgetMenu)
         self.trans_image_widget.setSpacing(5)
+
+        # 批量删除按钮上方横向分割线
+        self.cut_line_label5 = QLabel(self)
+        self.createCutLine(self.cut_line_label5)
+
+        # 批量删除按钮
+        self.delete_button = QPushButton(self)
+        self.delete_button.setText("批量删除")
+        self.delete_button.setStyleSheet("QPushButton {background: #FFFFFF; color: #5B8FF9;}"
+                                         "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}")
+        self.delete_button.clicked.connect(lambda: self.removeItemWidget(self.click_button_type))
+        self.delete_button.setToolTip("<b>按住Ctrl键可以多选列表框的图片, 然后批量删除</b>")
+
+        # 全部删除按钮
+        self.all_delete_button = QPushButton(self)
+        self.all_delete_button.setText("全部删除")
+        self.all_delete_button.setStyleSheet("QPushButton {background: #FFFFFF; color: #5B8FF9;}"
+                                             "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}")
+        self.all_delete_button.clicked.connect(self.clearAllImages)
+        self.all_delete_button.setToolTip("<b>删除列表框所有图片</b>")
 
         # 图片大图展示
         self.show_image_scroll_area = CustomScrollArea(self)
@@ -867,7 +887,7 @@ class Manga(QMainWindow) :
             translater_action = menu.addAction("翻译当前图片")
             translater_action.triggered.connect(lambda: self.translaterItemWidget(item, "original"))
             delete_action = menu.addAction("移除当前图片")
-            delete_action.triggered.connect(lambda: self.removeItemWidget(item, "original"))
+            delete_action.triggered.connect(lambda: self.removeItemWidget("original"))
             # 显示菜单
             cursorPos = QCursor.pos()
             menu.exec_(cursorPos)
@@ -886,7 +906,7 @@ class Manga(QMainWindow) :
             translater_action = menu.addAction("翻译当前图片")
             translater_action.triggered.connect(lambda: self.translaterItemWidget(item, "edit"))
             delete_action = menu.addAction("移除当前图片")
-            delete_action.triggered.connect(lambda: self.removeItemWidget(item, "edit"))
+            delete_action.triggered.connect(lambda: self.removeItemWidget("edit"))
             # 显示菜单
             cursorPos = QCursor.pos()
             menu.exec_(cursorPos)
@@ -926,27 +946,37 @@ class Manga(QMainWindow) :
 
 
     # 列表框右键菜单删除子项
-    def removeItemWidget(self, item, item_type) :
+    def removeItemWidget(self, item_type) :
 
         if item_type == "edit" :
-            row = self.edit_image_widget.indexFromItem(item).row()
+            items = self.edit_image_widget.selectedItems()
+        elif item_type == "trans" :
+            items = self.trans_image_widget.selectedItems()
         else :
-            row = self.original_image_widget.indexFromItem(item).row()
-        if row > (len(self.image_path_list) - 1) :
-            return
-        # 列表框删除图片
-        self.original_image_widget.takeItem(row)
-        self.edit_image_widget.takeItem(row)
-        self.trans_image_widget.takeItem(row)
-        self.image_path_list.pop(row)
+            items = self.original_image_widget.selectedItems()
+
+        for item in items :
+            if item_type == "edit" :
+                row = self.edit_image_widget.indexFromItem(item).row()
+            elif item_type == "trans" :
+                row = self.trans_image_widget.indexFromItem(item).row()
+            else :
+                row = self.original_image_widget.indexFromItem(item).row()
+            if row > (len(self.image_path_list) - 1) :
+                continue
+            # 列表框删除图片
+            self.original_image_widget.takeItem(row)
+            self.edit_image_widget.takeItem(row)
+            self.trans_image_widget.takeItem(row)
+            self.image_path_list.pop(row)
 
 
     # 原图列表框添加图片
     def originalImageWidgetAddImage(self, index, image_path) :
 
-        item = QListWidgetItem(self.original_image_widget)
-        pixmap = QPixmap(image_path)
+        pixmap = self.fromImageToPixmap(image_path)
         pixmap = pixmap.scaled(180*self.rate, 180*self.rate, aspectRatioMode=Qt.KeepAspectRatio)
+        item = QListWidgetItem(self.original_image_widget)
         item.setText(index)
         item.setIcon(QIcon(pixmap))
         item.listWidget()
@@ -1000,7 +1030,7 @@ class Manga(QMainWindow) :
         row = self.image_path_list.index(image_path)
         item = self.edit_image_widget.item(row)
         rdr_image_path = self.getRdrFilePath(image_path)
-        pixmap = QPixmap(rdr_image_path)
+        pixmap = self.fromImageToPixmap(rdr_image_path)
         pixmap = pixmap.scaled(180*self.rate, 180*self.rate, aspectRatioMode=Qt.KeepAspectRatio)
         item.setIcon(QIcon(pixmap))
 
@@ -1013,7 +1043,7 @@ class Manga(QMainWindow) :
         row = self.image_path_list.index(image_path)
         item = self.trans_image_widget.item(row)
         rdr_image_path = self.getRdrFilePath(image_path)
-        pixmap = QPixmap(rdr_image_path)
+        pixmap = self.fromImageToPixmap(rdr_image_path)
         pixmap = pixmap.scaled(180*self.rate, 180*self.rate, aspectRatioMode=Qt.KeepAspectRatio)
         item.setIcon(QIcon(pixmap))
 
@@ -1760,7 +1790,7 @@ class Manga(QMainWindow) :
         # 原图列表框
         self.original_image_widget.setGeometry(
             0, self.input_image_button.height() + self.original_image_button.height(),
-            self.cut_line_label4.x(), self.status_label.y() - (self.input_image_button.height()+self.original_image_button.height())
+            self.cut_line_label4.x(), self.status_label.y() - (self.input_image_button.height()+self.original_image_button.height()*2)
         )
         # 编辑列表框
         self.edit_image_widget.setGeometry(
@@ -1771,6 +1801,21 @@ class Manga(QMainWindow) :
         self.trans_image_widget.setGeometry(
             0, self.input_image_button.height() + self.original_image_button.height(),
             self.cut_line_label4.x(), self.original_image_widget.height()
+        )
+        # 批量删除按钮
+        self.delete_button.setGeometry(
+            0, self.status_label.y() - self.original_image_button.height(),
+            self.cut_line_label4.x()//2, self.original_image_button.height()
+        )
+        # 全部删除按钮
+        self.all_delete_button.setGeometry(
+            self.delete_button.width(), self.delete_button.y(),
+            self.cut_line_label4.x()//2, self.original_image_button.height()
+        )
+        # 批量删除按钮上方横向分割线
+        self.cut_line_label5.setGeometry(
+            0, self.delete_button.y()-1,
+            self.cut_line_label4.x(), 1
         )
         # 图片大图展示
         if self.hide_image_widget_status :
@@ -1793,13 +1838,13 @@ class Manga(QMainWindow) :
         # 隐藏图片列表框按钮
         if self.hide_image_widget_status :
             self.hide_image_widget_button.setGeometry(
-                0, (self.show_image_scroll_area.height()-100*h_rate) // 2,
-                15 * w_rate, 100 * h_rate
+                0, self.show_image_scroll_area.y(),
+                15 * w_rate, self.show_image_scroll_area.height()
             )
         else :
             self.hide_image_widget_button.setGeometry(
-                self.cut_line_label4.x(), (self.show_image_scroll_area.height()-100*h_rate) // 2,
-                15*w_rate, 100*h_rate
+                self.cut_line_label4.x(), self.show_image_scroll_area.y(),
+                15*w_rate, self.show_image_scroll_area.height()
             )
         # 上一页按钮
         if self.hide_image_widget_status :
@@ -1951,8 +1996,6 @@ class Manga(QMainWindow) :
 
         # 查询有效时间
         sign, valid_time = utils.http.mangaOCRQueryQuota(self.object)
-        print(sign)
-        print(valid_time)
         if sign :
             self.valid_time = valid_time
         self.mangaReadCount()
@@ -2041,12 +2084,31 @@ class Manga(QMainWindow) :
             ImageFile.LOAD_TRUNCATED_IMAGES = False
 
 
+    # 读取图片加载到QPixmap
+    def fromImageToPixmap(self, image_path) :
+
+        for _ in range(3) :
+            image = QImage(image_path)
+            if image.width() != 0 and image.height() != 0 :
+                break
+        if image.width() == 0 and image.height() == 0 :
+            try :
+                image_data = Image.open(image_path).convert("RGBA").tobytes()
+                image = QImage(image_data, image.size[0], image.size[1], QImage.Format_RGBA8888)
+            except Exception :
+                self.logger.error(traceback.format_exc())
+
+        pixmap = QPixmap.fromImage(image)
+
+        return pixmap
+
+
     # 窗口关闭处理
     def closeEvent(self, event) :
 
         self.hide()
         self.object.translation_ui.show()
-        if self.object.range_ui.show_sign == True:
+        if self.object.range_ui.show_sign == True :
             self.object.range_ui.show()
 
 
@@ -2065,7 +2127,7 @@ class RenderTextBlock(QWidget) :
         self.trans_edit_ui = edit_window
         self.object = edit_window.object
         self.logger = self.object.logger
-        self.image_rate = []
+        self.image_rate = [1, 1]
         self.button_list = []
         self.paint_status = False
         self.paint_button = None
@@ -2176,7 +2238,7 @@ class RenderTextBlock(QWidget) :
             button.move_signal.connect(self.refreshTextBlockPosition)
             button.setGeometry(x, y, w, h)
             button.setStyleSheet("QPushButton {background: transparent; border: 2px solid red;}"
-                                 "QPushButton:hover {background-color:rgba(62, 62, 62, 0.1);")
+                                 "QPushButton:hover {background-color: rgba(62, 62, 62, 0.1);}")
             # 文本框右键菜单
             button.setContextMenuPolicy(Qt.CustomContextMenu)
             button.customContextMenuRequested.connect(lambda _, b=button: self.showTextBlockButtonMenu(b))
@@ -2192,7 +2254,7 @@ class RenderTextBlock(QWidget) :
             self.paint_button = CustomTextBlockButton(self.image_label)
             self.paint_button.setCursor(ui.static.icon.EDIT_CURSOR)
             self.paint_button.setStyleSheet("QPushButton {background: transparent; border: 2px solid red;}"
-                                            "QPushButton:hover {background-color:rgba(62, 62, 62, 0.1)}")
+                                            "QPushButton:hover {background-color: rgba(62, 62, 62, 0.1)}")
             self.paint_button.setGeometry(x, y, w, h)
             self.paint_button.show()
 
@@ -2430,20 +2492,7 @@ class RenderTextBlock(QWidget) :
 
         if not os.path.exists(self.image_path) :
             return
-        with open(self.image_path, "rb") as file :
-            image = QImage.fromData(file.read())
-
-        for i in range(3) :
-            # 如果图片打不开就尝试修复
-            if image.width() == 0 or image.height() == 0 :
-                Image.open(self.image_path).save(self.image_path, quality=95)
-                # 重新读取图片
-                with open(self.image_path, "rb") as file :
-                    image = QImage.fromData(file.read())
-            else :
-                break
-
-        self.image_pixmap = QPixmap.fromImage(image)
+        self.image_pixmap = self.object.manga_ui.fromImageToPixmap(self.image_path)
         self.matchImageSize()
 
 
@@ -4541,3 +4590,25 @@ class TransparentImageLabel(QLabel) :
         opacity_effect = QGraphicsOpacityEffect()
         opacity_effect.setOpacity(opacity)
         self.setGraphicsEffect(opacity_effect)
+
+
+# 支持多选的列表框
+class CustomListWidget(QListWidget) :
+
+    def __init__(self, parent=None) :
+        super().__init__(parent)
+        self.setSelectionMode(QListWidget.MultiSelection)
+
+    def keyPressEvent(self, event):
+        if event.modifiers() & Qt.ControlModifier:
+            self.setSelectionMode(QListWidget.ExtendedSelection)
+        else:
+            self.setSelectionMode(QListWidget.SingleSelection)
+        super().keyPressEvent(event)
+
+    def mousePressEvent(self, event):
+        if event.modifiers() & (Qt.ControlModifier | Qt.ShiftModifier):
+            self.setSelectionMode(QListWidget.ExtendedSelection)
+        else:
+            self.setSelectionMode(QListWidget.SingleSelection)
+        super().mousePressEvent(event)

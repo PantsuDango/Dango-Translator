@@ -286,7 +286,7 @@ def configConvert(object) :
     # chatgpt联系上下文开关
     object.config["chatgptContextUse"] = object.config.get("chatgptContextUse", False)
     # chatgpt联系上下文句子数
-    object.config["chatgptContextCount"] = object.config.get("chatgptContextCount", 5)
+    object.config["chatgptContextCount"] = object.config.get("chatgptContextCount", 3)
 
     ################### 其他设定 ###################
     # 翻译界面透明度
