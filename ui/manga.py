@@ -94,9 +94,7 @@ class Manga(QMainWindow) :
                                       "QMenu::item:checked {background: #E5F5FF;}")
         self.input_action_group = QActionGroup(self.input_menu)
         self.input_action_group.setExclusive(True)
-        self.createInputAction("从文件导入")
-        self.createInputAction("从文件夹导入")
-        self.createInputAction("从多个文件夹导入")
+        self.refreshInputImageMenu()
         # 将下拉菜单设置为按钮的菜单
         self.input_image_button.setMenu(self.input_menu)
         self.input_action_group.triggered.connect(self.openImageFiles)
@@ -412,6 +410,22 @@ class Manga(QMainWindow) :
         self.click_button_type = "original"
         # 使用有效期
         self.valid_time = "-"
+        # 保存的历史路径最大长度
+        self.manga_dir_paths_max_length = 10
+        # 保存的历史打开路径
+        self.manga_dir_paths = []
+        manga_dir_path = self.object.yaml.get("manga_dir_path", [])
+        # 兼容旧版本以字符串保存的单组路径
+        if type(manga_dir_path) == str :
+            self.manga_dir_paths.insert(0, manga_dir_path)
+        elif type(manga_dir_path) == list :
+            self.manga_dir_paths = manga_dir_path
+        # 去重
+        self.manga_dir_paths = list(set(self.manga_dir_paths))
+        # 最大保存
+        if len(self.manga_dir_paths) > self.manga_dir_paths_max_length :
+            self.manga_dir_paths = self.manga_dir_paths[:self.manga_dir_paths_max_length]
+        self.object.yaml["manga_dir_path"] = self.manga_dir_paths
 
 
     # 根据分辨率定义控件位置尺寸
@@ -500,77 +514,141 @@ class Manga(QMainWindow) :
                 image_widget.setCurrentRow(row -1)
 
 
+    # 从文件导入
+    def inputImageFromFile(self, init_path) :
+
+        images, _ = QFileDialog.getOpenFileNames(
+            self,
+            "选择要翻译的生肉漫画原图（可多选）",
+            init_path,
+            "图片类型(*.png *.jpg *.jpeg *.webp);;所有类型 (*)",
+            options=QFileDialog.Options()
+        )
+        return images
+
+
+    # 从文件夹导入
+    def inputImageFromDir(self, init_path) :
+
+        images = []
+        folder_path = QFileDialog.getExistingDirectory(
+            self,
+            "选择要翻译的生肉漫画目录",
+            init_path,
+            options=QFileDialog.Options()
+        )
+        # 检查目录
+        if not os.path.exists(folder_path) :
+            utils.message.MessageBox("导入图片失败", "不存在的目录     ")
+            return images
+        if os.path.basename(folder_path) == "dango_manga" :
+            utils.message.MessageBox("导入图片失败", "不能选择dango_manga目录     ")
+            return images
+        if "dango_manga" in folder_path and os.path.basename(folder_path) == "tmp" :
+            utils.message.MessageBox("导入图片失败", "不能选择tmp目录     ")
+            return images
+        # 获取目录下所有图片加入列表
+        for file in os.listdir(folder_path) :
+            # 过滤非图片文件
+            file_ext = os.path.splitext(file)[1].lower()
+            if file_ext != ".png" and file_ext != ".jpg" and file_ext != ".jpeg" and file_ext != ".webp" :
+                continue
+            images.append(os.path.join(folder_path, file))
+
+        return images
+
+
+    # 从多文件夹导入
+    def inputImageFromBatchDir(self) :
+
+        images = []
+        file_dialog = QFileDialog()
+        file_dialog.setFileMode(QFileDialog.Directory)
+        file_dialog.setOption(QFileDialog.DontUseNativeDialog, True)
+        l = file_dialog.findChild(QListView, "listView")
+        if l :
+            l.setSelectionMode(QAbstractItemView.MultiSelection)
+        t = file_dialog.findChild(QTreeView)
+        if t :
+            t.setSelectionMode(QAbstractItemView.MultiSelection)
+        file_dialog.setFilter(QDir.Dirs)
+        if file_dialog.exec_() == QDialog.Accepted:
+            folder_paths = file_dialog.selectedFiles()
+            # 遍历多个文件夹
+            for folder_path in folder_paths[1:] :
+                if not os.path.exists(folder_path) :
+                    utils.message.MessageBox("导入图片失败", "不存在的目录     ")
+                    return []
+                if os.path.basename(folder_path) == "dango_manga" :
+                    utils.message.MessageBox("导入图片失败", "不能选择dango_manga目录     ")
+                    return []
+                if "dango_manga" in folder_path and os.path.basename(folder_path) == "tmp" :
+                    utils.message.MessageBox("导入图片失败", "不能选择tmp目录     ")
+                    return []
+                for file in os.listdir(folder_path) :
+                    # 过滤非图片文件
+                    file_ext = os.path.splitext(file)[1].lower()
+                    if file_ext != ".png" and file_ext != ".jpg" and file_ext != ".jpeg" and file_ext != ".webp" :
+                        continue
+                    images.append(os.path.join(folder_path, file))
+
+        return images
+
+
+    # 从历史目录里直接导入
+    def inputImageFromHistoryPath(self, folder_path) :
+
+        images = []
+        # 路径校验
+        if not os.path.exists(folder_path):
+            utils.message.MessageBox("导入图片失败", "不存在的目录     ")
+            return images
+        if os.path.basename(folder_path) == "dango_manga" :
+            utils.message.MessageBox("导入图片失败", "不能选择dango_manga目录     ")
+            return images
+        if "dango_manga" in folder_path and os.path.basename(folder_path) == "tmp" :
+            utils.message.MessageBox("导入图片失败", "不能选择tmp目录     ")
+            return images
+        for file in os.listdir(folder_path) :
+            # 过滤非图片文件
+            file_ext = os.path.splitext(file)[1].lower()
+            if file_ext != ".png" and file_ext != ".jpg" and file_ext != ".jpeg" and file_ext != ".webp":
+                continue
+            images.append(os.path.join(folder_path, file))
+
+        return images
+
+
     # 打开图片文件列表
     def openImageFiles(self, action) :
 
-        dir_path = self.object.yaml.get("manga_dir_path", os.getcwd())
-        options = QFileDialog.Options()
+        # 最近一次打开的目录
+        init_path = os.getcwd()
+        if len(self.manga_dir_paths) > 0 :
+            init_path = self.manga_dir_paths[0]
+
         images = []
         if action.data() == "从文件导入" :
-            images, _ = QFileDialog.getOpenFileNames(self,
-                                                     "选择要翻译的生肉漫画原图（可多选）",
-                                                     dir_path,
-                                                     "图片类型(*.png *.jpg *.jpeg *.webp);;所有类型 (*)",
-                                                     options=options)
-            if not images :
-                return
-
+            images = self.inputImageFromFile(init_path)
         elif action.data() == "从文件夹导入" :
-            folder_path = QFileDialog.getExistingDirectory(self,
-                                                           "选择要翻译的生肉漫画目录",
-                                                           dir_path,
-                                                           options=options)
-            # 检查目录
-            if not os.path.exists(folder_path) :
-                return
-            if os.path.basename(folder_path) == "dango_manga" :
-                utils.message.MessageBox("导入图片失败", "不能选择dango_manga目录     ")
-                return
-            if "dango_manga" in folder_path and os.path.basename(folder_path) == "tmp"  :
-                utils.message.MessageBox("导入图片失败", "不能选择tmp目录     ")
-                return
-            # 获取目录下所有图片加入列表
-            for file in os.listdir(folder_path) :
-                file_ext = os.path.splitext(file)[1].lower()
-                if file_ext != ".png" and file_ext != ".jpg" and file_ext != ".jpeg" and file_ext != ".webp" :
-                    continue
-                images.append(os.path.join(folder_path, file))
-
+            images = self.inputImageFromDir(init_path)
         elif action.data() == "从多个文件夹导入" :
-            file_dialog = QFileDialog()
-            file_dialog.setFileMode(QFileDialog.Directory)
-            file_dialog.setOption(QFileDialog.DontUseNativeDialog, True)
-            l = file_dialog.findChild(QListView, "listView")
-            if l :
-                l.setSelectionMode(QAbstractItemView.MultiSelection)
-            t = file_dialog.findChild(QTreeView)
-            if t :
-                t.setSelectionMode(QAbstractItemView.MultiSelection)
-            file_dialog.setFilter(QDir.Dirs)
-            if file_dialog.exec_() == QDialog.Accepted :
-                folder_paths = file_dialog.selectedFiles()
-                # 遍历多个文件夹
-                for folder_path in folder_paths[1:] :
-                    if not os.path.exists(folder_path) :
-                        continue
-                    if os.path.basename(folder_path) == "dango_manga":
-                        utils.message.MessageBox("导入图片失败", "不能选择dango_manga目录     ")
-                        return
-                    if "dango_manga" in folder_path and os.path.basename(folder_path) == "tmp":
-                        utils.message.MessageBox("导入图片失败", "不能选择tmp目录     ")
-                        return
-                    for file in os.listdir(folder_path) :
-                        file_ext = os.path.splitext(file)[1].lower()
-                        if file_ext != ".png" and file_ext != ".jpg" and file_ext != ".jpeg" and file_ext != ".webp" :
-                            continue
-                        images.append(os.path.join(folder_path, file))
-
+            images = self.inputImageFromBatchDir()
+        elif action.data() in self.manga_dir_paths :
+            images = self.inputImageFromHistoryPath(action.data())
         else :
             return
 
+        if not images :
+            return
+
+        dir_paths = []
+        # 校验是否有过长的路径
         for file_path in images :
             file_name = os.path.basename(file_path)
             base_path = os.path.dirname(file_path)
+            if base_path not in dir_paths :
+                dir_paths.append(base_path)
             check_file_path = os.path.join(base_path, "dango_manga", "tmp", file_name)
             if len(check_file_path) >= 250 :
                 utils.message.MessageBox("导入图片失败", "文件地址过长:\n%s"%file_path)
@@ -592,9 +670,15 @@ class Manga(QMainWindow) :
             utils.thread.runQThread(thread)
 
         # 记忆上次操作的目录
-        for image_path in images :
-            self.object.yaml["manga_dir_path"] = os.path.dirname(image_path)
-            break
+        for dir_path in dir_paths :
+            if dir_path in self.manga_dir_paths :
+                self.manga_dir_paths.remove(dir_path)
+            self.manga_dir_paths.insert(0, dir_path)
+        if len(self.manga_dir_paths) > self.manga_dir_paths_max_length :
+            self.manga_dir_paths = self.manga_dir_paths[:self.manga_dir_paths_max_length]
+        self.object.yaml["manga_dir_path"] = self.manga_dir_paths
+        # 刷新原图导入按钮的菜单栏
+        self.refreshInputImageMenu()
 
 
     # 一键翻译
@@ -617,10 +701,15 @@ class Manga(QMainWindow) :
 
         try :
             output_image_list = []
+            folder_name = "dango-%s"%(time.time())
+            base_path = ""
+
             for image_path in self.image_path_list :
                 rdr_image_path = self.getRdrFilePath(image_path)
                 if os.path.exists(rdr_image_path) :
                     output_image_list.append(rdr_image_path)
+                    folder_name = os.path.basename(os.path.dirname(image_path))
+                    base_path = os.path.dirname(image_path)
             if len(output_image_list) == 0 :
                 return utils.message.MessageBox("导出失败", "没有可以导出的译图文件      ")
 
@@ -631,7 +720,7 @@ class Manga(QMainWindow) :
                 # 默认桌面
                 dialog.setDirectory(QStandardPaths.standardLocations(QStandardPaths.DesktopLocation)[0])
             except Exception :
-                # 默认用户目录
+                # 默认用户根目录
                 dialog.setDirectory(QDir.homePath())
             folder_path = dialog.getExistingDirectory(self, "选择要导出的位置", "", options=options)
             if not os.path.exists(folder_path):
@@ -639,7 +728,7 @@ class Manga(QMainWindow) :
 
             if action.data() == "导出到指定目录" :
                 # 新建导出文件夹
-                folder_path = os.path.join(folder_path, os.path.basename(self.object.yaml["manga_dir_path"]))
+                folder_path = os.path.join(folder_path, folder_name)
                 if not os.path.exists(folder_path) :
                     os.mkdir(folder_path)
                 # 复制完成的rdr图片
@@ -652,12 +741,12 @@ class Manga(QMainWindow) :
 
             elif action.data() == "导出为压缩包" :
                 # 压缩包名称
-                zip_name = "{}.zip".format(os.path.basename(self.object.yaml["manga_dir_path"]))
+                zip_name = "{}.zip".format(folder_name)
                 zip_path = os.path.join(folder_path, zip_name)
                 # 是否重命名文件
                 if self.object.config.get("mangaOutputRenameUse", False) :
                     # 新建导出文件夹
-                    folder_path = os.path.join(folder_path, os.path.basename(self.object.yaml["manga_dir_path"]))
+                    folder_path = os.path.join(folder_path, folder_name)
                     if not os.path.exists(folder_path):
                         os.mkdir(folder_path)
                     # 复制完成的rdr图片
@@ -672,9 +761,9 @@ class Manga(QMainWindow) :
                     utils.zip.zipFiles(output_image_list, zip_path)
 
             elif action.data() == "导出工程文件压缩包" :
-                zip_name = "{}.zip".format(os.path.basename(self.object.yaml["manga_dir_path"]))
+                zip_name = "{}.zip".format(folder_name)
                 zip_path = os.path.join(folder_path, zip_name)
-                utils.zip.zipDirectory(self.object.yaml["manga_dir_path"], zip_path)
+                utils.zip.zipDirectory(base_path, zip_path)
 
             else :
                 return
@@ -777,6 +866,19 @@ class Manga(QMainWindow) :
         action.setData(label)
         self.input_action_group.addAction(action)
         self.input_menu.addAction(action)
+
+
+    # 刷新导入原图按钮的下拉菜单选项
+    def refreshInputImageMenu(self) :
+
+        self.input_menu.clear()
+        self.createInputAction("从文件导入")
+        self.createInputAction("从文件夹导入")
+        self.createInputAction("从多个文件夹导入")
+        if len(self.manga_dir_paths) > 0 :
+            self.input_menu.addSeparator()
+        for path in self.manga_dir_paths :
+            self.createInputAction(path)
 
 
     # 创建一键翻译按钮的下拉菜单
