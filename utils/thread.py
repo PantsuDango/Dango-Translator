@@ -8,6 +8,7 @@ import utils.email
 import utils.message
 import utils.http
 import traceback
+import translator.sound
 
 
 # 创建线程
@@ -165,6 +166,9 @@ class createMangaTransQThread(QThread) :
         self.add_message_signal.emit("成功{}张, 失败{}张, 翻译结束".format(self.success_count, len(self.image_paths) - self.success_count), "green")
         self.window.trans_process_bar.finish_sign = True
         self.signal.emit("", False)
+        # 播放系统提示音
+        if len(self.image_paths) > 1 :
+            translator.sound.playSystemSound()
 
 
 # 图片翻译导入图片进程

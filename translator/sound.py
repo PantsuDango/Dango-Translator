@@ -4,6 +4,7 @@ import utils.thread
 import time
 import base64
 import os
+import winsound
 
 
 # 音乐朗读模块
@@ -163,3 +164,12 @@ class Sound() :
             self.browser.quit()
         except Exception :
             self.logger.error(format_exc())
+
+
+# 播放系统提示音
+def playSystemSound() :
+
+    try :
+        winsound.PlaySound("*", winsound.SND_ALIAS)
+    except Exception :
+        pass
