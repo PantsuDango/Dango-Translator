@@ -6,6 +6,8 @@ import base64
 import os
 import winsound
 
+FINISH_SOUND_FILE_PATH = "./config/other/finish.wav"
+
 
 # 音乐朗读模块
 class Sound() :
@@ -170,6 +172,9 @@ class Sound() :
 def playSystemSound() :
 
     try :
-        winsound.PlaySound("*", winsound.SND_ALIAS)
+        if os.path.exists(FINISH_SOUND_FILE_PATH) :
+            winsound.PlaySound(FINISH_SOUND_FILE_PATH, winsound.SND_FILENAME)
+        else :
+            winsound.PlaySound("*", winsound.SND_ALIAS)
     except Exception :
         pass
