@@ -55,7 +55,6 @@ class Manga(QMainWindow) :
         self.setting_ui = Setting(object)
         self.ui()
         self.trans_edit_ui = TransEdit(object)
-        utils.thread.createThread(self.checkPermission)
         self.flushed_render_image_and_text_block_signal.connect(self.transProcessFlushedRenderImageAndTextBlock)
 
 
@@ -396,6 +395,8 @@ class Manga(QMainWindow) :
         }
         # 试用开关
         self.check_permission = False
+        # 是否进行试用检测
+        self.is_check_permission_sign = False
         # 接口试用次数
         self.manga_read_count = -1
         # 对于Image库format格式类型映射
@@ -2163,18 +2164,27 @@ class Manga(QMainWindow) :
     # 校验图片翻译接口权限
     def checkPermission(self) :
 
+        # 校验团子token是否存在
         token = self.object.config.get("DangoToken", "")
-        if not token:
+        if not token :
             # 登录OCR服务获取token
             utils.http.loginDangoOCR(self.object)
+            token = self.object.config.get("DangoToken", "")
+        if not token :
+            return
 
         url = self.object.yaml.get("dango_check_permission", "https://capiv1.ap-sh.starivercs.cn/OCR/Admin/CheckPermission")
         url += "?Token={}".format(token)
         body = {"Type": 1}
 
         while True :
+            # 是否处于漫画翻译界面, 只有打开该界面才进行试用检测
+            if not self.is_check_permission_sign :
+                break
+            # 请求查询使用权限接口
             resp = utils.http.post(url=url, body=body, logger=self.logger, headers=None, timeout=5)
             if not resp :
+                time.sleep(5)
                 continue
             code = resp.get("Code", -1)
             # 有使用权限
@@ -2201,6 +2211,7 @@ class Manga(QMainWindow) :
             self.refreshStatusLabel()
             # 延时
             time.sleep(5)
+
 
         # 查询有效时间
         sign, valid_time = utils.http.mangaOCRQueryQuota(self.object)
@@ -2311,9 +2322,17 @@ class Manga(QMainWindow) :
         return pixmap
 
 
+    # 窗口显示信号
+    def showEvent(self, e) :
+
+        self.is_check_permission_sign = True
+        utils.thread.createThread(self.checkPermission)
+
+
     # 窗口关闭处理
     def closeEvent(self, event) :
 
+        self.is_check_permission_sign = False
         self.hide()
         self.object.translation_ui.show()
         if self.object.range_ui.show_sign == True :
