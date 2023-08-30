@@ -138,6 +138,12 @@ class Manga(QMainWindow) :
         self.createOutputAction("导出到指定目录")
         self.createOutputAction("导出为压缩包")
         self.createOutputAction("导出工程文件压缩包")
+        self.output_menu.addSeparator()
+        action = self.createOutputAction("导出后是否删除过程文件")
+        if self.output_is_delete_cache :
+            action.setIcon(ui.static.icon.CHECKMARK_ICON)
+        else :
+            action.setIcon(ui.static.icon.CLOSE_ICON)
         # 将下拉菜单设置为按钮的菜单
         self.output_image_button.setMenu(self.output_menu)
         self.output_action_group.triggered.connect(self.outputImages)
@@ -426,6 +432,8 @@ class Manga(QMainWindow) :
         if len(self.manga_dir_paths) > self.manga_dir_paths_max_length :
             self.manga_dir_paths = self.manga_dir_paths[:self.manga_dir_paths_max_length]
         self.object.yaml["manga_dir_path"] = self.manga_dir_paths
+        # 导出后是否删除过程文件
+        self.output_is_delete_cache = False
 
 
     # 根据分辨率定义控件位置尺寸
@@ -699,6 +707,14 @@ class Manga(QMainWindow) :
     # 导出译图文件
     def outputImages(self, action) :
 
+        if action.data() == "导出后是否删除过程文件" :
+            self.output_is_delete_cache = not self.output_is_delete_cache
+            if self.output_is_delete_cache :
+                action.setIcon(ui.static.icon.CHECKMARK_ICON)
+            else:
+                action.setIcon(ui.static.icon.CLOSE_ICON)
+            return
+
         try :
             output_image_list = []
             folder_name = "dango-%s"%(time.time())
@@ -767,6 +783,17 @@ class Manga(QMainWindow) :
 
             else :
                 return
+
+            # 删除过程文件
+            if self.output_is_delete_cache :
+                delete_dir_list = []
+                for image_path in self.image_path_list :
+                    dango_manga_path, _ = self.getDangoMangaPath(image_path)
+                    delete_dir_list.append(dango_manga_path)
+                delete_dir_list = list(set(delete_dir_list))
+                for delete_dir in delete_dir_list :
+                    shutil.rmtree(delete_dir)
+
 
         except Exception :
             self.logger.error(traceback.format_exc())
@@ -899,6 +926,8 @@ class Manga(QMainWindow) :
         action.setData(label)
         self.output_action_group.addAction(action)
         self.output_menu.addAction(action)
+
+        return action
 
 
     # 创建语种按钮的下拉菜单
