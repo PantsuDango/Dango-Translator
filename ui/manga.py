@@ -139,7 +139,7 @@ class Manga(QMainWindow) :
         self.createOutputAction("导出为压缩包")
         self.createOutputAction("导出工程文件压缩包")
         self.output_menu.addSeparator()
-        action = self.createOutputAction("导出后是否删除过程文件")
+        action = self.createOutputAction("导出后删除过程文件")
         if self.output_is_delete_cache :
             action.setIcon(ui.static.icon.CHECKMARK_ICON)
         else :
@@ -434,6 +434,8 @@ class Manga(QMainWindow) :
         self.object.yaml["manga_dir_path"] = self.manga_dir_paths
         # 导出后是否删除过程文件
         self.output_is_delete_cache = False
+        # 导入时是否清空列表框
+        self.manga_input_clear_use = True
 
 
     # 根据分辨率定义控件位置尺寸
@@ -630,6 +632,14 @@ class Manga(QMainWindow) :
     # 打开图片文件列表
     def openImageFiles(self, action) :
 
+        if action.data() == "每次导入清除已导入的图片" :
+            self.manga_input_clear_use = not self.manga_input_clear_use
+            if self.manga_input_clear_use :
+                action.setIcon(ui.static.icon.CHECKMARK_ICON)
+            else :
+                action.setIcon(ui.static.icon.CLOSE_ICON)
+            return
+
         # 最近一次打开的目录
         init_path = os.getcwd()
         if len(self.manga_dir_paths) > 0 :
@@ -664,7 +674,7 @@ class Manga(QMainWindow) :
 
         if images :
             # 清除所有图片
-            if self.object.config.get("mangaInputClearUse") :
+            if self.manga_input_clear_use :
                 self.clearAllImages()
             # 根据文件名排序
             images = self.dirFilesPathSort(images)
@@ -707,7 +717,7 @@ class Manga(QMainWindow) :
     # 导出译图文件
     def outputImages(self, action) :
 
-        if action.data() == "导出后是否删除过程文件" :
+        if action.data() == "导出后删除过程文件" :
             self.output_is_delete_cache = not self.output_is_delete_cache
             if self.output_is_delete_cache :
                 action.setIcon(ui.static.icon.CHECKMARK_ICON)
@@ -894,6 +904,8 @@ class Manga(QMainWindow) :
         self.input_action_group.addAction(action)
         self.input_menu.addAction(action)
 
+        return action
+
 
     # 刷新导入原图按钮的下拉菜单选项
     def refreshInputImageMenu(self) :
@@ -902,10 +914,18 @@ class Manga(QMainWindow) :
         self.createInputAction("从文件导入")
         self.createInputAction("从文件夹导入")
         self.createInputAction("从多个文件夹导入")
+        # 历史路径
         if len(self.manga_dir_paths) > 0 :
             self.input_menu.addSeparator()
         for path in self.manga_dir_paths :
             self.createInputAction(path)
+        # 是否清空列表框
+        self.input_menu.addSeparator()
+        action = self.createInputAction("每次导入清除已导入的图片")
+        if self.manga_input_clear_use :
+            action.setIcon(ui.static.icon.CHECKMARK_ICON)
+        else :
+            action.setIcon(ui.static.icon.CLOSE_ICON)
 
 
     # 创建一键翻译按钮的下拉菜单
@@ -916,6 +936,8 @@ class Manga(QMainWindow) :
         action.setData(label)
         self.trans_all_action_group.addAction(action)
         self.trans_all_menu.addAction(action)
+
+        return action
 
 
     # 创建译图导出按钮的下拉菜单
@@ -941,6 +963,8 @@ class Manga(QMainWindow) :
         if self.language_map[self.object.config["mangaLanguage"]] == label :
             action.setChecked(True)
 
+        return action
+
 
     # 创建翻译源按钮的下拉菜单
     def createTransAction(self, label) :
@@ -952,6 +976,8 @@ class Manga(QMainWindow) :
         self.trans_menu.addAction(action)
         if self.object.config["mangaTrans"] == label :
             action.setChecked(True)
+
+        return action
 
 
     # 改变所使用的语种
@@ -3917,7 +3943,6 @@ class Setting(QWidget) :
         self.chatgpt_delay_time = self.object.config.get("mangaChatgptDelayTime", 1)
         self.filter_char_use = self.object.config.get("mangaFilterCharUse", False)
         self.filter_char_count = self.object.config.get("mangaFilterCharCount", False)
-        self.input_clear_use = self.object.config.get("mangaInputClearUse", True)
         self.font_list = [
             "鸿蒙/HarmonyOS_Sans/HarmonyOS_Sans_Regular",
             "阿里/东方大楷/Alimama_DongFangDaKai_Regular",
@@ -4378,33 +4403,14 @@ class Setting(QWidget) :
                              "QPushButton:hover { background-color: #83AAF9; }"
                              "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
 
-        # 导入原图时是否清除已导入的图片开关
-        self.input_clear_switch = ui.switch.SwitchOCR(other_tab, self.input_clear_use, startX=(65-20) * self.rate)
-        self.customSetGeometry(self.input_clear_switch, 20, 70, 65, 20)
-        self.input_clear_switch.checkedChanged.connect(self.changeInputClearUseSwitch)
-        self.input_clear_switch.setCursor(ui.static.icon.SELECT_CURSOR)
-        # 导入原图时是否清除已导入的图片标签
-        label = QLabel(other_tab)
-        label.setText("导入原图时是否清除已导入的图片")
-        self.customSetGeometry(label, 100, 70, 500, 20)
-        # 导入原图时是否清除已导入的图片?号图标
-        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", other_tab)
-        self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 310, 70, 20, 20)
-        button.clicked.connect(lambda: self.showDesc("input_clear"))
-        button.setCursor(ui.static.icon.QUESTION_CURSOR)
-        button.setStyleSheet("QPushButton { background: transparent;}"
-                             "QPushButton:hover { background-color: #83AAF9; }"
-                             "QPushButton:pressed { background-color: #4480F9; padding-left: 3px;padding-top: 3px; }")
-
         # 自动打开图片翻译
         self.auto_open_manga_switch = ui.switch.SwitchOCR(other_tab, sign=self.auto_open_manga_use, startX=(65-20) * self.rate)
-        self.customSetGeometry(self.auto_open_manga_switch, 20, 120, 65, 20)
+        self.customSetGeometry(self.auto_open_manga_switch, 20, 70, 65, 20)
         self.auto_open_manga_switch.checkedChanged.connect(self.changeAutoOpenMangaSwitch)
         self.auto_open_manga_switch.setCursor(ui.static.icon.SELECT_CURSOR)
         # 自动打开图片翻译标签
         label = QLabel(other_tab)
-        self.customSetGeometry(label, 100, 120, 400, 20)
+        self.customSetGeometry(label, 100, 70, 400, 20)
         label.setText("登录后自动打开图片翻译界面")
 
         # 加载背景图
@@ -4538,10 +4544,6 @@ class Setting(QWidget) :
                                           "\n\n开关开启时, 若某个文本块的文字数小于所设置的数值, 则不会被翻译"
                                           "\n\n范围为1-5, 单位个")
 
-        elif message_type == "input_clear" :
-            self.desc_ui.setWindowTitle("导入原图时是否清除已导入的图片说明")
-            self.desc_ui.desc_text.append("\n开关开启时, 每次执行导入原图操作时, 会清除全部已导入的图片")
-
         else :
             return
 
@@ -4612,12 +4614,6 @@ class Setting(QWidget) :
     def changeOutputRenameUseSwitch(self, checked) :
 
         self.object.config["mangaOutputRenameUse"] = checked
-
-
-    # 改变导入原图时是否清除已导入的图片开关状态
-    def changeInputClearUseSwitch(self, checked) :
-
-        self.object.config["mangaInputClearUse"] = checked
 
 
     # 改变快速渲染开关状态
