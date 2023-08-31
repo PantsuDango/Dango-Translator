@@ -1059,27 +1059,6 @@ class Settin(QMainWindow) :
         label.setFrameShape(QFrame.Box)
         label.setStyleSheet("border-width: 1px; border-style: solid; border-color: rgba(62, 62, 62, 0.1);")
 
-        # 翻译框页签
-        translation_frame_tab = QWidget()
-        tab_widget.addTab(translation_frame_tab, "")
-        tab_widget.setTabText(tab_widget.indexOf(translation_frame_tab), "翻译框")
-        # 翻译框页签图标
-        tab_widget.setTabIcon(tab_widget.indexOf(translation_frame_tab), ui.static.icon.TRANSLATION_FRAME_ICON)
-
-        # 横向分割线
-        label = QLabel(translation_frame_tab)
-        self.customSetGeometry(label, 0, 0, self.window_width, 1)
-        label.setFrameShadow(QFrame.Raised)
-        label.setFrameShape(QFrame.Box)
-        label.setStyleSheet("border-width: 1px; "
-                            "border-style: solid; "
-                            "border-color: rgba(62, 62, 62, 0.2);")
-
-        # 此Label用于雾化翻译框页签的背景图
-        label = QLabel(translation_frame_tab)
-        label.setGeometry(QRect(0, 0, self.window_width+5, self.window_height+5))
-        label.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
-
         # 字体样式页签
         font_tab = QWidget()
         tab_widget.addTab(font_tab, "")
@@ -1099,6 +1078,63 @@ class Settin(QMainWindow) :
 
         # 此Label用于雾化字体样式页签的背景图
         label = QLabel(font_tab)
+        label.setGeometry(QRect(0, 0, self.window_width + 5, self.window_height + 5))
+        label.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
+
+        # 翻译字体大小设定
+        self.fontSize_spinBox = QSpinBox(font_tab)
+        self.customSetGeometry(self.fontSize_spinBox, 30, 25, 40, 25)
+        self.fontSize_spinBox.setMinimum(10)
+        self.fontSize_spinBox.setMaximum(30)
+        self.fontSize_spinBox.setValue(self.fontSize)
+        self.fontSize_spinBox.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 翻译字体大小设定标签
+        label = QLabel(font_tab)
+        self.customSetGeometry(label, 90, 30, 300, 16)
+        label.setText("翻译框上显示的字体大小")
+
+        # 翻译字体类型设定
+        self.font_comboBox = QFontComboBox(font_tab)
+        self.customSetGeometry(self.font_comboBox, 20, 75, 185, 25)
+        self.font_comboBox.activated[str].connect(self.getFontType)
+        self.comboBox_font = QFont(self.font_type)
+        self.font_comboBox.setCurrentFont(self.comboBox_font)
+        self.font_comboBox.setCursor(ui.static.icon.SELECT_CURSOR)
+        self.font_comboBox.setStyleSheet("font: %spt '%s'; color: %s"
+                                         % (self.font_size, self.comboBox_font, self.color_1))
+        # 翻译字体类型设定标签
+        label = QLabel(font_tab)
+        self.customSetGeometry(label, 225, 80, 300, 20)
+        label.setText("翻译框上显示的字体类型")
+
+        # 字体样式设定开关
+        self.font_type_switch = ui.switch.SwitchFontType(font_tab, sign=self.font_color_type, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.font_type_switch, 20, 130, 65, 20)
+        self.font_type_switch.checkedChanged.connect(self.changeFontColorTypeSwitch)
+        self.font_type_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 字体样式设定标签
+        label = QLabel(font_tab)
+        self.customSetGeometry(label, 105, 130, 300, 20)
+        label.setText("翻译框上显示字体样式, 建议使用描边样式")
+
+        # 翻译框页签
+        translation_frame_tab = QWidget()
+        tab_widget.addTab(translation_frame_tab, "")
+        tab_widget.setTabText(tab_widget.indexOf(translation_frame_tab), "翻译框")
+        # 翻译框页签图标
+        tab_widget.setTabIcon(tab_widget.indexOf(translation_frame_tab), ui.static.icon.TRANSLATION_FRAME_ICON)
+
+        # 横向分割线
+        label = QLabel(translation_frame_tab)
+        self.customSetGeometry(label, 0, 0, self.window_width, 1)
+        label.setFrameShadow(QFrame.Raised)
+        label.setFrameShape(QFrame.Box)
+        label.setStyleSheet("border-width: 1px; "
+                            "border-style: solid; "
+                            "border-color: rgba(62, 62, 62, 0.2);")
+
+        # 此Label用于雾化翻译框页签的背景图
+        label = QLabel(translation_frame_tab)
         label.setGeometry(QRect(0, 0, self.window_width+5, self.window_height+5))
         label.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
 
@@ -1130,42 +1166,6 @@ class Settin(QMainWindow) :
         label = QLabel(translation_frame_tab)
         self.customSetGeometry(label, 105, 80, 300, 20)
         label.setText("是否在翻译框上显示翻译耗时")
-
-        # 翻译字体大小设定
-        self.fontSize_spinBox = QSpinBox(font_tab)
-        self.customSetGeometry(self.fontSize_spinBox, 30, 25, 40, 25)
-        self.fontSize_spinBox.setMinimum(10)
-        self.fontSize_spinBox.setMaximum(30)
-        self.fontSize_spinBox.setValue(self.fontSize)
-        self.fontSize_spinBox.setCursor(ui.static.icon.SELECT_CURSOR)
-        # 翻译字体大小设定标签
-        label = QLabel(font_tab)
-        self.customSetGeometry(label, 90, 30, 300, 16)
-        label.setText("翻译框上显示的字体大小")
-
-        # 翻译字体类型设定
-        self.font_comboBox = QFontComboBox(font_tab)
-        self.customSetGeometry(self.font_comboBox, 20, 75, 185, 25)
-        self.font_comboBox.activated[str].connect(self.getFontType)
-        self.comboBox_font = QFont(self.font_type)
-        self.font_comboBox.setCurrentFont(self.comboBox_font)
-        self.font_comboBox.setCursor(ui.static.icon.SELECT_CURSOR)
-        self.font_comboBox.setStyleSheet("font: %spt '%s'; color: %s"
-                                         %(self.font_size, self.comboBox_font, self.color_1))
-        # 翻译字体类型设定标签
-        label = QLabel(font_tab)
-        self.customSetGeometry(label, 225, 80, 300, 20)
-        label.setText("翻译框上显示的字体类型")
-
-        # 字体样式设定开关
-        self.font_type_switch = ui.switch.SwitchFontType(font_tab, sign=self.font_color_type, startX=(65-20)*self.rate)
-        self.customSetGeometry(self.font_type_switch, 20, 130, 65, 20)
-        self.font_type_switch.checkedChanged.connect(self.changeFontColorTypeSwitch)
-        self.font_type_switch.setCursor(ui.static.icon.SELECT_CURSOR)
-        # 字体样式设定标签
-        label = QLabel(font_tab)
-        self.customSetGeometry(label, 105, 130, 300, 20)
-        label.setText("翻译框上显示字体样式, 建议使用描边样式")
 
 
     # 功能设定标签页
@@ -2704,10 +2704,14 @@ class Settin(QMainWindow) :
 
         if object == self.horizontal_slider :
             if event.type() == QEvent.Enter :
+                x = (self.x() + self.width() // 2) - (self.object.translation_ui.width() // 2)
+                y = self.y() - self.object.translation_ui.height()
+                self.object.translation_ui.move(x, y)
                 self.object.translation_ui.show()
 
-            if event.type() == QEvent.Leave :
+            elif event.type() == QEvent.Leave :
                 self.object.translation_ui.hide()
+                self.object.translation_ui.move(self.translation_ui_x, self.translation_ui_y)
 
             return QWidget.eventFilter(self, object, event)
 
@@ -3057,6 +3061,9 @@ class Settin(QMainWindow) :
             self.object.translation_ui.stop_sign = True
         # 刷新在线ocr试用次数
         utils.thread.createThread(utils.http.ocrProbationReadCount, self.object)
+        # 记录翻译框位置
+        self.translation_ui_x = self.object.translation_ui.x()
+        self.translation_ui_y = self.object.translation_ui.y()
 
 
     # 窗口关闭处理
