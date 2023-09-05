@@ -1293,28 +1293,31 @@ class Manga(QMainWindow) :
             self.trans_process_bar.paintStatus("ocr", 0, True)
 
         # 翻译
-        start = time.time()
-        trans_sign = False
-        # 判断是否需要翻译
-        if not os.path.exists(self.getJsonFilePath(image_path)) or execute_type == "all" or execute_type == "trans" :
-            trans_sign = True
-        else :
-            with open(self.getJsonFilePath(image_path), "r", encoding="utf-8") as file :
-                json_data = json.load(file)
-            if "translated_text" not in json_data:
+        self.trans_result = ""
+        def transThread() :
+            start = time.time()
+            trans_sign = False
+            # 判断是否需要翻译
+            if not os.path.exists(self.getJsonFilePath(image_path)) or execute_type == "all" or execute_type == "trans" :
                 trans_sign = True
-        # 需要翻译
-        if trans_sign :
-            sign, trans_result = self.mangaTrans(image_path, use_sqlite)
-            self.trans_process_bar.paintStatus("trans", round(time.time()-start, 1), sign)
-            # 翻译失败
-            if not sign :
-                self.trans_process_bar.paintStatus("ipt", 0, False)
-                self.trans_process_bar.paintStatus("rdr", 0, False)
-                message = "翻译过程失败: %s"%trans_result
-                return message
-        else :
-            self.trans_process_bar.paintStatus("trans", 0, True)
+            else :
+                with open(self.getJsonFilePath(image_path), "r", encoding="utf-8") as file :
+                    json_data = json.load(file)
+                if "translated_text" not in json_data:
+                    trans_sign = True
+            # 需要翻译
+            if trans_sign :
+                sign, trans_result = self.mangaTrans(image_path, use_sqlite)
+                self.trans_process_bar.paintStatus("trans", round(time.time()-start, 1), sign)
+                # 翻译失败
+                if not sign :
+                    #self.trans_process_bar.paintStatus("ipt", 0, False)
+                    self.trans_process_bar.paintStatus("rdr", 0, False)
+                    self.trans_result = "翻译过程失败: %s"%trans_result
+            else :
+                self.trans_process_bar.paintStatus("trans", 0, True)
+        # 并发执行翻译
+        trans_thread = utils.thread.createThread(transThread)
 
         # 文字消除
         start = time.time()
@@ -1330,6 +1333,10 @@ class Manga(QMainWindow) :
         else:
             self.trans_process_bar.paintStatus("ipt", 0, True)
 
+        # 阻塞, 等待翻译完成再执行文字渲染
+        trans_thread.join()
+        if self.trans_result :
+            return self.trans_result
 
         # 漫画文字渲染
         start = time.time()
