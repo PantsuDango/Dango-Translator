@@ -2558,19 +2558,18 @@ class RenderTextBlock(QWidget) :
             ocr_result = self.object.manga_ui.mangaOcrFilter(ocr_result)
 
             # 请求ipt
-            sign, ipt_result = translator.ocr.dango.mangaIPT(
-                object=self.object,
-                filepath=None,
-                mask=ocr_result["mask"],
-                image_base64=original_cut_image_base64,
-                check_permission=self.object.manga_ui.check_permission
-            )
-            if not sign :
-                utils.message.MessageBox("文字消除失败", ipt_result, self.rate)
-                self.paint_button.deleteLater()
-                if self.paint_status :
-                    self.manualOCR()
-                return
+            self.ipt_sign = True
+            self.ipt_result = ""
+            def iptThread() :
+                self.ipt_sign, self.ipt_result = translator.ocr.dango.mangaIPT(
+                    object=self.object,
+                    filepath=None,
+                    mask=ocr_result["mask"],
+                    image_base64=original_cut_image_base64,
+                    check_permission=self.object.manga_ui.check_permission
+                )
+            # 并发执行文字消除
+            ipt_thread = utils.thread.createThread(iptThread)
 
             # 请求翻译
             sign, trans_result = self.object.manga_ui.mangaTransFilter(ocr_result, 0, True)
@@ -2581,6 +2580,16 @@ class RenderTextBlock(QWidget) :
                     self.manualOCR()
                 return
             ocr_result = trans_result
+
+            # 阻塞, 等待ipt执行完毕
+            ipt_thread.join()
+            ipt_result = self.ipt_result
+            if not self.ipt_sign :
+                utils.message.MessageBox("文字消除失败", ipt_result, self.rate)
+                self.paint_button.deleteLater()
+                if self.paint_status :
+                    self.manualOCR()
+                return
 
             # 请求rdr
             sign, rdr_result = translator.ocr.dango.mangaRDR(
