@@ -20,6 +20,7 @@ from PIL import Image, ImageDraw, ImageFile
 import traceback
 import pyperclip
 import pathlib
+import natsort
 
 import translator.ocr.dango
 import translator.api
@@ -838,16 +839,19 @@ class Manga(QMainWindow) :
     # 文件列表排序
     def dirFilesPathSort(self, files) :
 
-        tmp_dict = {}
-        for file_path in files :
-            if len(file_path) not in tmp_dict :
-                tmp_dict[len(file_path)] = []
-            tmp_dict[len(file_path)].append(file_path)
+        try :
+            new_files = natsort.natsorted(files, key=lambda x: os.path.splitext(x)[1])
+        except Exception :
+            tmp_dict = {}
+            for file_path in files :
+                if len(file_path) not in tmp_dict:
+                    tmp_dict[len(file_path)] = []
+                tmp_dict[len(file_path)].append(file_path)
 
-        new_files = []
-        for k in sorted(tmp_dict.keys()) :
-            for val in sorted(tmp_dict[k]) :
-                new_files.append(val)
+            new_files = []
+            for k in sorted(tmp_dict.keys()):
+                for val in sorted(tmp_dict[k]):
+                    new_files.append(val)
 
         return new_files
 
