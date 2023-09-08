@@ -227,6 +227,8 @@ class ChatGPTSetting(QWidget) :
             "gpt-4-0314",
             "gpt-4-32k",
             "gpt-4-32k-0314",
+            "gpt-4-0413",
+            "gpt-4-0613",
         ]
 
 
