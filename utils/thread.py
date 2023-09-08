@@ -197,7 +197,10 @@ class createInputImagesQThread(QThread) :
             if image_path in self.window.image_path_list :
                 continue
             # 判断图片是否损坏
-            self.window.repairBadImage(image_path)
+            try :
+                self.window.repairBadImage(image_path)
+            except Exception :
+                continue
             # 判断文件大小, 如果超过2MB就缩小
             file_size = self.window.getFileSize(image_path)
             if file_size > 2 :

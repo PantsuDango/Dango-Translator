@@ -1117,6 +1117,50 @@ class Settin(QMainWindow) :
         self.customSetGeometry(label, 105, 130, 300, 20)
         label.setText("翻译框上显示字体样式, 建议使用描边样式")
 
+        # 翻译框固定字体轮廓颜色开关
+        self.fixed_outline_button = QRadioButton(font_tab)
+        self.fixed_outline_button.setText("使用描边字体时, 字体轮廓颜色固定为")
+        self.customSetGeometry(self.fixed_outline_button, 20, 180, 300, 20)
+        self.fixed_outline_button.setCursor(ui.static.icon.SELECT_CURSOR)
+        if self.fixed_outline_color_use :
+            self.fixed_outline_button.setChecked(True)
+        # 修改翻译框固定字体轮廓颜色
+        self.fixed_outline_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.fixed_outline_color), "", font_tab)
+        self.customSetIconSize(self.fixed_outline_color_button, 20, 20)
+        self.customSetGeometry(self.fixed_outline_color_button, 280, 180, 80, 20)
+        self.fixed_outline_color_button.setCursor(ui.static.icon.EDIT_CURSOR)
+        self.fixed_outline_color_button.setText(" 轮廓色")
+        self.fixed_outline_color_button.clicked.connect(lambda: self.changeTranslateColor("fixed_outline", self.fixed_outline_color))
+
+        # 翻译框固定字体内嵌颜色开关
+        self.fixed_inline_button = QRadioButton(font_tab)
+        self.fixed_inline_button.setText("使用描边字体时, 字体内嵌颜色固定为")
+        self.customSetGeometry(self.fixed_inline_button, 20, 230, 300, 20)
+        self.fixed_inline_button.setCursor(ui.static.icon.SELECT_CURSOR)
+        if not self.fixed_outline_color_use :
+            self.fixed_inline_button.setChecked(True)
+        # 修改翻译框固定字体内嵌颜色
+        self.fixed_inline_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.fixed_inline_color), "", font_tab)
+        self.customSetIconSize(self.fixed_inline_color_button, 20, 20)
+        self.customSetGeometry(self.fixed_inline_color_button, 280, 230, 80, 20)
+        self.fixed_inline_color_button.setCursor(ui.static.icon.EDIT_CURSOR)
+        self.fixed_inline_color_button.setText(" 内嵌色")
+        self.fixed_inline_color_button.clicked.connect(lambda: self.changeTranslateColor("fixed_inline", self.fixed_inline_color))
+
+        # 翻译框字体轮廓宽度设定
+        self.fixed_outline_width_spinbox = QDoubleSpinBox(font_tab)
+        self.customSetGeometry(self.fixed_outline_width_spinbox, 20, 280, 45, 25)
+        self.fixed_outline_width_spinbox.setDecimals(1)
+        self.fixed_outline_width_spinbox.setMinimum(0.1)
+        self.fixed_outline_width_spinbox.setMaximum(3.0)
+        self.fixed_outline_width_spinbox.setSingleStep(0.1)
+        self.fixed_outline_width_spinbox.setValue(self.fixed_outline_width)
+        self.fixed_outline_width_spinbox.setCursor(ui.static.icon.EDIT_CURSOR)
+        # 翻译框字体轮廓宽度标签
+        label = QLabel(font_tab)
+        self.customSetGeometry(label, 85, 285, 600, 20)
+        label.setText("使用描边字体时描边轮廓的宽度, 建议为0.7")
+
         # 翻译框页签
         translation_frame_tab = QWidget()
         tab_widget.addTab(translation_frame_tab, "")
@@ -1818,6 +1862,11 @@ class Settin(QMainWindow) :
         self.set_top_use = self.object.config["setTop"]
         # 自动朗读开关
         self.auto_playsound_use = self.object.config["autoPlaysoundUse"]
+        # 描边字体参数
+        self.fixed_outline_color_use = self.object.config["fixedOutlineColorUse"]
+        self.fixed_outline_color = self.object.config["fixedOutlineColor"]
+        self.fixed_inline_color = self.object.config["fixedInlineColor"]
+        self.fixed_outline_width = self.object.config["fixedOutlineWidth"]
 
 
     # 获取节点信息
@@ -2616,6 +2665,12 @@ class Settin(QMainWindow) :
         elif translate_type == "original" :
             self.original_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=color.name()))
             self.original_color = color.name()
+        elif translate_type == "fixed_outline" :
+            self.fixed_outline_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=color.name()))
+            self.fixed_outline_color = color.name()
+        elif translate_type == "fixed_inline" :
+            self.fixed_inline_color_button.setIcon(qtawesome.icon("fa5s.paint-brush", color=color.name()))
+            self.fixed_inline_color = color.name()
 
 
     # 说明窗口
@@ -3051,6 +3106,11 @@ class Settin(QMainWindow) :
         self.object.config["agreeCollectUse"] = self.agree_collect_use
         # 自动朗读开关
         self.object.config["autoPlaysoundUse"] = self.auto_playsound_use
+        # 翻译框描边字体参数
+        self.object.config["fixedOutlineColorUse"] = self.fixed_outline_button.isChecked()
+        self.object.config["fixedOutlineColor"] = self.fixed_outline_color
+        self.object.config["fixedInlineColor"] = self.fixed_inline_color
+        self.object.config["fixedOutlineWidth"] = self.fixed_outline_width_spinbox.value()
 
 
     # 窗口显示信号

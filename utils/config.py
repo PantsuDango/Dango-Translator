@@ -386,6 +386,12 @@ def configConvert(object) :
     object.config["mangaFilterCharUse"] = object.config.get("mangaFilterCharUse", True)
     object.config["mangaFilterCharCount"] = object.config.get("mangaFilterCharCount", 1)
 
+    # 描边字体参数
+    object.config["fixedOutlineColorUse"] = object.config.get("fixedOutlineColorUse", False)
+    object.config["fixedOutlineColor"] = object.config.get("fixedOutlineColor", "#FFFFFF")
+    object.config["fixedInlineColor"] = object.config.get("fixedInlineColor", "#FFFFFF")
+    object.config["fixedOutlineWidth"] = object.config.get("fixedOutlineWidth", 0.7)
+
     # 允许写入的key
     allow_keys = [
         "dictInfo", "offlineOCR", "onlineOCR", "DangoToken", "onlineOCRProbation", "nodeURL", "baiduOCR", "OCR", "AccessToken",
@@ -402,7 +408,8 @@ def configConvert(object) :
         "mangaFontType", "mangaOutputRenameUse", "mangaFastRenderUse", "mangaShadowSize", "mangaFiltrateUse",
         "mangaFontSizeUse", "mangaFontSize", "youdaoPrivateUse", "youdaoAPI", "chatgptPrompt", "xiaoniuPrivateUse",
         "xiaoniuAPI", "huoshanPrivateUse", "huoshanAPI", "mangaChatgptDelayUse", "mangaChatgptDelayTime",
-        "chatgptContextUse", "chatgptContextCount", "mangaFilterCharUse", "mangaFilterCharCount",
+        "chatgptContextUse", "chatgptContextCount", "mangaFilterCharUse", "mangaFilterCharCount", "fixedOutlineColorUse",
+        "fixedOutlineColor", "fixedInlineColor", "fixedOutlineWidth"
     ]
     # 删除多余的key
     delete_keys = []

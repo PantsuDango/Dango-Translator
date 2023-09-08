@@ -866,7 +866,18 @@ class Translation(QMainWindow) :
 
         # 显示在文本框上
         if self.object.config["showColorType"] == False :
-            self.setOutlineFont(result, "#FFFFFF", color, 0.7)
+            if self.object.config["fixedOutlineColorUse"] :
+                font_color = color
+                outline_color = self.object.config["fixedOutlineColor"]
+            else :
+                font_color = self.object.config["fixedInlineColor"]
+                outline_color = color
+            self.setOutlineFont(
+                text=result,
+                font_color=font_color,
+                outline_color=outline_color,
+                outline_width=self.object.config["fixedOutlineWidth"]
+            )
         else :
             result = result.replace("\n", "<br>")
             self.translate_text.append("<font color=%s>%s</font>"%(color, result))
