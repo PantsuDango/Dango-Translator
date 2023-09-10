@@ -304,3 +304,19 @@ def modifyTranslationDBTgt(id, tgt, logger) :
     except Exception :
         logger.error(traceback.format_exc())
         return traceback.format_exc()
+
+
+# 删除翻译数据
+def deleteTranslationDBByID(id, logger) :
+
+    global TRANSLATION_DB
+    if not TRANSLATION_DB :
+        return
+
+    sql = '''DELETE FROM translations WHERE id = ?;'''
+    try :
+        TRANSLATION_DB.execute(sql, (id,))
+        TRANSLATION_DB.commit()
+    except Exception :
+        logger.error(traceback.format_exc())
+        return traceback.format_exc()

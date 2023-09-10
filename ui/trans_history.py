@@ -8,6 +8,7 @@ import fileinput
 import re
 import os
 import traceback
+import pyperclip
 
 import ui.static.icon
 import utils.message
@@ -120,6 +121,9 @@ class TransHistory(QWidget) :
         self.table_widget.setSelectionMode(QTableWidget.ContiguousSelection)
         # 文本修改信号
         self.table_widget.cellChanged.connect(self.modifyTransData)
+        # 右键菜单
+        self.table_widget.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.table_widget.customContextMenuRequested.connect(self.showMenu)
 
         # 上一页按钮
         button = QPushButton(self)
@@ -270,7 +274,7 @@ class TransHistory(QWidget) :
         src = self.src_search_text.text()
         tgt = self.tgt_search_text.text()
         self.trans_data_total = utils.sqlite.selectTranslationDBTotal(src, tgt, self.logger)
-        self.setWindowTitle("翻译历史(每页最多显示{}行, 数据总量{}行, 排序方式-按时间倒序, 原文和译文可编辑修改)".format(self.max_rows, self.trans_data_total))
+        self.setWindowTitle("翻译历史(每页最多显示{}行, 数据总量{}行, 排序方式-按时间倒序, 双击原文和译文可编辑修改, 右键可复制和删除)".format(self.max_rows, self.trans_data_total))
 
         # 刷新页码
         self.refreshPageLabel()
@@ -301,6 +305,44 @@ class TransHistory(QWidget) :
             err = traceback.format_exc()
             self.logger.error(err)
             utils.message.MessageBox("修改翻译历史", "修改失败:\n{}".format(err))
+
+
+    # 表格右键菜单
+    def showMenu(self, pos) :
+
+        item = self.table_widget.itemAt(pos)
+        if item is not None :
+            menu = QMenu(self)
+            menu.setStyleSheet("QMenu {color: #5B8FF9; background-color: #FFFFFF; font: 12pt '华康方圆体W7';}"
+                               "QMenu::item:selected:enabled {background: #E5F5FF;}"
+                               "QMenu::item:checked {background: #E5F5FF;}")
+            # 添加菜单项
+            copy_action = menu.addAction("复制")
+            copy_action.triggered.connect(lambda: pyperclip.copy(item.text()))
+            delete_action = menu.addAction("删除")
+            delete_action.triggered.connect(lambda: self.deleteTransData(item))
+            # 显示菜单
+            cursorPos = QCursor.pos()
+            menu.exec_(cursorPos)
+
+
+    # 删除翻译数据
+    def deleteTransData(self, item) :
+
+        try :
+            row = self.table_widget.row(item)
+            id = int(self.table_widget.item(row, 0).text())
+            err = utils.sqlite.deleteTranslationDBByID(id, self.logger)
+            if err :
+                utils.message.MessageBox("删除翻译历史", "删除失败:\n{}".format(err))
+            else :
+                utils.message.MessageBox("删除翻译历史", "删除成功")
+        except Exception :
+            err = traceback.format_exc()
+            self.logger.error(err)
+            utils.message.MessageBox("删除翻译历史", "删除失败:\n{}".format(err))
+
+        self.refreshTable()
 
 
     # 窗口关闭处理
