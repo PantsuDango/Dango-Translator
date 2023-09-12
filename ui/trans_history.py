@@ -44,8 +44,8 @@ class TransHistory(QWidget) :
         self.blue_color = "#5B8FF9"
         self.gray_color = "#DCDCDC"
         # 界面尺寸
-        self.window_width = int(1000 * self.rate)
-        self.window_height = int(790 * self.rate)
+        self.window_width = 1000
+        self.window_height = 790
         # 最多显示的记录行数
         self.max_rows = 300
         # 总表数据
@@ -58,12 +58,8 @@ class TransHistory(QWidget) :
 
     def ui(self) :
 
-        # 窗口尺寸及不可拉伸
-        self.resize(self.window_width, self.window_height)
-        self.setMinimumSize(QSize(self.window_width, self.window_height))
-        self.setMaximumSize(QSize(self.window_width, self.window_height))
-        self.setWindowFlags(Qt.WindowCloseButtonHint)
-
+        # 窗口尺寸
+        self.resize(self.window_width*self.rate, self.window_height*self.rate)
         # 窗口图标
         self.setWindowIcon(ui.static.icon.APP_LOGO_ICON)
         # 鼠标样式
@@ -77,28 +73,23 @@ class TransHistory(QWidget) :
                            %(self.font_size, self.font_type, self.font_size, self.blue_color, 6.66*self.rate, self.font_type))
 
         # 原文搜索框标签
-        label = QLabel(self)
-        self.customSetGeometry(label, 10, 0, 150, 30)
-        label.setText("按原文模糊查询:")
+        self.src_search_label = QLabel(self)
+        self.src_search_label.setText("按原文模糊查询:")
         # 原文搜索框
         self.src_search_text = QLineEdit(self)
-        self.customSetGeometry(self.src_search_text, 140, 0, 840, 30)
         self.src_search_text.setPlaceholderText("请输入要查询的原文")
         self.src_search_text.textChanged.connect(self.searchTransData)
 
         # 译文搜索框标签
-        label = QLabel(self)
-        self.customSetGeometry(label, 10, 30, 150, 30)
-        label.setText("按译文模糊查询:")
+        self.tgt_search_label = QLabel(self)
+        self.tgt_search_label.setText("按译文模糊查询:")
         # 译文搜索框
         self.tgt_search_text = QLineEdit(self)
-        self.customSetGeometry(self.tgt_search_text, 140, 30, 840, 30)
         self.tgt_search_text.setPlaceholderText("请输入要查询的译文")
         self.tgt_search_text.textChanged.connect(self.searchTransData)
 
         # 表格
         self.table_widget = QTableWidget(self)
-        self.customSetGeometry(self.table_widget, 0, 60, 1000, 700)
         self.table_widget.setCursor(ui.static.icon.EDIT_CURSOR)
         # 表格列数
         self.table_widget.setColumnCount(4)
@@ -126,40 +117,38 @@ class TransHistory(QWidget) :
         self.table_widget.customContextMenuRequested.connect(self.showMenu)
 
         # 上一页按钮
-        button = QPushButton(self)
-        self.customSetGeometry(button, 325, 760, 100, 30)
-        button.setText("<上一页")
-        button.clicked.connect(lambda: self.paging("last"))
+        self.last_page_button = QPushButton(self)
+        self.last_page_button.setText("<上一页")
+        self.last_page_button.clicked.connect(lambda: self.paging("last"))
 
         # 页码输入框
         self.page_spinbox = QSpinBox(self)
-        self.customSetGeometry(self.page_spinbox, 450, 760, 50, 30)
         self.page_spinbox.setMinimum(1)
         self.page_spinbox.valueChanged.connect(lambda: self.paging(None))
 
         # 页码标签
         self.page_label = QLabel(self)
-        self.customSetGeometry(self.page_label, 500, 760, 100, 30)
 
         # 下一页按钮
-        button = QPushButton(self)
-        self.customSetGeometry(button, 575, 760, 100, 30)
-        button.setText("下一页>")
-        button.clicked.connect(lambda: self.paging("next"))
+        self.next_page_button = QPushButton(self)
+        self.next_page_button.setText("下一页>")
+        self.next_page_button.clicked.connect(lambda: self.paging("next"))
 
         # 导出按钮
-        button = QPushButton(self)
-        self.customSetGeometry(button, 900, 760, 100, 30)
-        button.setText("导出全部")
-        button.clicked.connect(self.outputAllTansData)
+        self.output_button = QPushButton(self)
+        self.output_button.setText("导出全部")
+        self.output_button.clicked.connect(self.outputAllTansData)
 
 
     # 根据分辨率定义控件位置尺寸
-    def customSetGeometry(self, object, x, y, w, h):
+    def customSetGeometry(self, object, x, y, w, h, w_rate=1, h_rate=1) :
 
-        object.setGeometry(QRect(int(x * self.rate),
-                                 int(y * self.rate), int(w * self.rate),
-                                 int(h * self.rate)))
+        object.setGeometry(QRect(
+            int(x * w_rate),
+            int(y * w_rate),
+            int(w * h_rate),
+            int(h * h_rate))
+        )
 
 
     # 刷新表格数据
@@ -343,6 +332,36 @@ class TransHistory(QWidget) :
             utils.message.MessageBox("删除翻译历史", "删除失败:\n{}".format(err))
 
         self.refreshTable()
+
+
+    # 窗口尺寸变化信号
+    def resizeEvent(self, event) :
+
+        w = event.size().width()
+        h = event.size().height()
+        w_rate = w / self.window_width
+        h_rate = h / self.window_height
+
+        # 原文搜索框标签
+        self.customSetGeometry(self.src_search_label, 10, 0, 150, 30, w_rate, h_rate)
+        # 原文搜索框
+        self.customSetGeometry(self.src_search_text, 140, 0, 840, 30, w_rate, h_rate)
+        # 译文搜索框标签
+        self.customSetGeometry(self.tgt_search_label, 10, 30, 150, 30, w_rate, h_rate)
+        # 译文搜索框
+        self.customSetGeometry(self.tgt_search_text, 140, 30, 840, 30, w_rate, h_rate)
+        # 表格
+        self.customSetGeometry(self.table_widget, 0, 60, 1000, 700, w_rate, h_rate)
+        # 上一页按钮
+        self.customSetGeometry(self.last_page_button, 325, 760, 100, 30, w_rate, h_rate)
+        # 页码输入框
+        self.customSetGeometry(self.page_spinbox, 450, 760, 50, 30, w_rate, h_rate)
+        # 页码标签
+        self.customSetGeometry(self.page_label, 500, 760, 100, 30, w_rate, h_rate)
+        # 下一页按钮
+        self.customSetGeometry(self.next_page_button, 575, 760, 100, 30, w_rate, h_rate)
+        # 导出按钮
+        self.customSetGeometry(self.output_button, 900, 760, 100, 30, w_rate, h_rate)
 
 
     # 窗口关闭处理
