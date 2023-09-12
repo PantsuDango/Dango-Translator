@@ -343,25 +343,52 @@ class TransHistory(QWidget) :
         h_rate = h / self.window_height
 
         # 原文搜索框标签
-        self.customSetGeometry(self.src_search_label, 10, 0, 150, 30, w_rate, h_rate)
+        self.customSetGeometry(self.src_search_label, 10, 0, 140, 30, w_rate, h_rate)
         # 原文搜索框
-        self.customSetGeometry(self.src_search_text, 140, 0, 840, 30, w_rate, h_rate)
+        self.src_search_text.setGeometry(
+            self.src_search_label.x() + self.src_search_label.width(), 0,
+            w-20*w_rate-self.src_search_label.width(), self.src_search_label.height()
+        )
         # 译文搜索框标签
-        self.customSetGeometry(self.tgt_search_label, 10, 30, 150, 30, w_rate, h_rate)
+        self.tgt_search_label.setGeometry(
+            self.src_search_label.x(), self.src_search_label.height(),
+            self.src_search_label.width(), self.src_search_label.height()
+        )
         # 译文搜索框
-        self.customSetGeometry(self.tgt_search_text, 140, 30, 840, 30, w_rate, h_rate)
+        self.tgt_search_text.setGeometry(
+            self.src_search_text.x(), self.src_search_text.height(),
+            self.src_search_text.width(), self.src_search_text.height()
+        )
         # 表格
-        self.customSetGeometry(self.table_widget, 0, 60, 1000, 700, w_rate, h_rate)
-        # 上一页按钮
-        self.customSetGeometry(self.last_page_button, 325, 760, 100, 30, w_rate, h_rate)
-        # 页码输入框
-        self.customSetGeometry(self.page_spinbox, 450, 760, 50, 30, w_rate, h_rate)
-        # 页码标签
-        self.customSetGeometry(self.page_label, 500, 760, 100, 30, w_rate, h_rate)
-        # 下一页按钮
-        self.customSetGeometry(self.next_page_button, 575, 760, 100, 30, w_rate, h_rate)
+        self.table_widget.setGeometry(
+            0, self.tgt_search_text.y() + self.tgt_search_text.height(),
+            w, h-self.src_search_label.height()*3
+        )
         # 导出按钮
-        self.customSetGeometry(self.output_button, 900, 760, 100, 30, w_rate, h_rate)
+        self.output_button.setGeometry(
+            w-100*w_rate, self.table_widget.y()+self.table_widget.height(),
+            100*w_rate, self.src_search_text.height()
+        )
+        # 上一页按钮
+        self.last_page_button.setGeometry(
+            325*w_rate,  self.output_button.y(),
+            self.output_button.width(),  self.output_button.height()
+        )
+        # 页码输入框
+        self.page_spinbox.setGeometry(
+            self.last_page_button.x()+self.last_page_button.width()+25*w_rate, self.last_page_button.y(),
+            self.last_page_button.width()//2, self.last_page_button.height()
+        )
+        # 页码标签
+        self.page_label.setGeometry(
+            self.page_spinbox.x()+self.page_spinbox.width(), self.page_spinbox.y(),
+            self.last_page_button.width(), self.last_page_button.height()
+        )
+        # 下一页按钮
+        self.next_page_button.setGeometry(
+            self.output_button.x()-self.last_page_button.x(), self.last_page_button.y(),
+            self.last_page_button.width(), self.last_page_button.height()
+        )
 
 
     # 窗口关闭处理
