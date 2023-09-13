@@ -94,6 +94,8 @@ def insertTranslationDB(logger, src, trans_type, tgt, create_time=None) :
         trans_type = TRANS_MAP_INVERSION[trans_type]
     if re.match("^{}[:：]".format(trans_type), tgt) :
         return
+    # 过滤句子首尾的标点符号
+    src = replacePunctuation(src)
     # 统一翻译类型基于TRANS_MAP
     if trans_type in TRANS_MAP :
         trans_type = TRANS_MAP[trans_type]
@@ -151,9 +153,11 @@ def selectTranslationDBBySrcAndTransType(src, logger) :
     rows = []
     trans_map = {}
     global TRANSLATION_DB
-    if not TRANSLATION_DB:
+    if not TRANSLATION_DB :
         return trans_map
 
+    # 过滤句子首尾的标点符号
+    src = replacePunctuation(src)
     try :
         sql = '''SELECT * FROM translations WHERE src = ?;'''
         cursor = TRANSLATION_DB.execute(sql, (src,))
@@ -320,3 +324,12 @@ def deleteTranslationDBByID(id, logger) :
     except Exception :
         logger.error(traceback.format_exc())
         return traceback.format_exc()
+
+
+# 过滤句子首尾的标点符号
+def replacePunctuation(sentence) :
+
+    pattern = r"^[，。！？,.!?\uff0c\uff01\uff1f]+|[，。！？,.!?\uff0c\uff01\uff1f]+$"
+    sentence = re.sub(pattern, "", sentence)
+
+    return sentence
