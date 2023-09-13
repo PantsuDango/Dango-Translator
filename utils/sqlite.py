@@ -5,6 +5,8 @@ import datetime
 import time
 import traceback
 import csv
+from difflib import SequenceMatcher
+
 
 DB_PATH = "../db/"
 HISTORY_FILE_PATH = "../翻译历史.txt"
@@ -320,3 +322,46 @@ def deleteTranslationDBByID(id, logger) :
     except Exception :
         logger.error(traceback.format_exc())
         return traceback.format_exc()
+
+
+# 判断字符串相似度
+def getEqualRate(str1, str2) :
+
+    score = SequenceMatcher(None, str1, str2).quick_ratio()
+    score = score * 100
+    return score
+
+
+# 根据相似度查询数据
+def selectTransDataBySimilarity(src, similar_score, logger) :
+
+    new_src = ""
+    err = ""
+    max_score = 0
+
+    global TRANSLATION_DB
+    if not TRANSLATION_DB :
+        return new_src, err
+
+    sql = '''SELECT src FROM translations GROUP BY src;'''
+    try :
+        cursor = TRANSLATION_DB.execute(sql)
+        while True:
+            rows = cursor.fetchmany(10000)
+            if not rows :
+                break
+            for row in rows :
+                # 判断相似度
+                score = getEqualRate(src, row[0])
+                if score < similar_score :
+                    continue
+                # 取最高相似度
+                if score > max_score :
+                    max_score = score
+                    new_src = row[0]
+        cursor.close()
+    except Exception :
+        err = traceback.format_exc()
+        logger.error(err)
+
+    return new_src, err

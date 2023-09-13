@@ -57,6 +57,9 @@ def openConfig(logger) :
     # 2023.07.30 翻译历史数据同步
     if "sync_db" not in config.keys() :
         config["sync_db"] = False
+    # 本地翻译历史查询相似度
+    if "similar_score" not in config.keys() :
+        config["similar_score"] = 95
 
     return config
 
