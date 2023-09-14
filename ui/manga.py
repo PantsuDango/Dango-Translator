@@ -1562,8 +1562,16 @@ class Manga(QMainWindow) :
             json_data["translated_text"] = translated_text
             return sign, json_data
 
-        # 从本地数据库获取翻译
-        trans_map = utils.sqlite.selectTranslationDBBySrcAndTransType(original, self.logger)
+        # 从数据库中获取翻译结果
+        trans_map = {}
+        if self.object.config["transHistoryUse"] :
+            trans_map = utils.sqlite.selectTranslationDBBySrcAndTransType(original, self.logger)
+            # 是否使用模糊匹配
+            if not self.object.config["transHistoryPerfectUse"] and self.object.yaml["similar_score"] < 100 and not trans_map :
+                similar_original = utils.sqlite.selectTransDataBySimilarity(original, self.object.yaml["similar_score"], self.logger)
+                if similar_original :
+                    trans_map = utils.sqlite.selectTranslationDBBySrcAndTransType(similar_original, self.logger)
+
         # 翻译源
         manga_trans = self.object.config["mangaTrans"]
         manga_trans = utils.sqlite.TRANS_MAP[manga_trans]
@@ -3536,8 +3544,17 @@ class TransEdit(QWidget) :
             return
         # 翻译源
         trans_type = self.trans_type_map[trans_type]
-        # 从本地数据库获取翻译
-        trans_map = utils.sqlite.selectTranslationDBBySrcAndTransType(original, self.logger)
+
+        # 从数据库中获取翻译结果
+        trans_map = {}
+        if self.object.config["transHistoryUse"] :
+            trans_map = utils.sqlite.selectTranslationDBBySrcAndTransType(original, self.logger)
+            # 是否使用模糊匹配
+            if not self.object.config["transHistoryPerfectUse"] and self.object.yaml["similar_score"] < 100 and not trans_map :
+                similar_original = utils.sqlite.selectTransDataBySimilarity(original, self.object.yaml["similar_score"], self.logger)
+                if similar_original:
+                    trans_map = utils.sqlite.selectTranslationDBBySrcAndTransType(similar_original, self.logger)
+
         if trans_type in trans_map :
             result = trans_map[trans_type]
         else :

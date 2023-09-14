@@ -1127,7 +1127,7 @@ class Settin(QMainWindow) :
         # 修改翻译框固定字体轮廓颜色
         self.fixed_outline_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.fixed_outline_color), "", font_tab)
         self.customSetIconSize(self.fixed_outline_color_button, 20, 20)
-        self.customSetGeometry(self.fixed_outline_color_button, 280, 180, 80, 20)
+        self.customSetGeometry(self.fixed_outline_color_button, 300, 180, 80, 20)
         self.fixed_outline_color_button.setCursor(ui.static.icon.EDIT_CURSOR)
         self.fixed_outline_color_button.setText(" 轮廓色")
         self.fixed_outline_color_button.clicked.connect(lambda: self.changeTranslateColor("fixed_outline", self.fixed_outline_color))
@@ -1142,7 +1142,7 @@ class Settin(QMainWindow) :
         # 修改翻译框固定字体内嵌颜色
         self.fixed_inline_color_button = QPushButton(qtawesome.icon("fa5s.paint-brush", color=self.fixed_inline_color), "", font_tab)
         self.customSetIconSize(self.fixed_inline_color_button, 20, 20)
-        self.customSetGeometry(self.fixed_inline_color_button, 280, 230, 80, 20)
+        self.customSetGeometry(self.fixed_inline_color_button, 300, 230, 80, 20)
         self.fixed_inline_color_button.setCursor(ui.static.icon.EDIT_CURSOR)
         self.fixed_inline_color_button.setText(" 内嵌色")
         self.fixed_inline_color_button.clicked.connect(lambda: self.changeTranslateColor("fixed_inline", self.fixed_inline_color))
@@ -1329,7 +1329,7 @@ class Settin(QMainWindow) :
         # 调用翻译历史?号图标
         button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", trans_history_tab)
         self.customSetIconSize(button, 20, 20)
-        self.customSetGeometry(button, 360, 30, 20, 20)
+        self.customSetGeometry(button, 375, 30, 20, 20)
         button.setStyleSheet("background: transparent;")
         button.clicked.connect(lambda: self.showDesc("transHistory"))
         button.setCursor(ui.static.icon.QUESTION_CURSOR)
