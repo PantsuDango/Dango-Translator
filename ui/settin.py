@@ -1119,7 +1119,7 @@ class Settin(QMainWindow) :
 
         # 翻译框固定字体轮廓颜色开关
         self.fixed_outline_button = QRadioButton(font_tab)
-        self.fixed_outline_button.setText("使用描边字体时, 字体轮廓颜色固定为")
+        self.fixed_outline_button.setText(" 使用描边字体时, 字体轮廓颜色固定为")
         self.customSetGeometry(self.fixed_outline_button, 20, 180, 300, 20)
         self.fixed_outline_button.setCursor(ui.static.icon.SELECT_CURSOR)
         if self.fixed_outline_color_use :
@@ -1134,7 +1134,7 @@ class Settin(QMainWindow) :
 
         # 翻译框固定字体内嵌颜色开关
         self.fixed_inline_button = QRadioButton(font_tab)
-        self.fixed_inline_button.setText("使用描边字体时, 字体内嵌颜色固定为")
+        self.fixed_inline_button.setText(" 使用描边字体时, 字体内嵌颜色固定为")
         self.customSetGeometry(self.fixed_inline_button, 20, 230, 300, 20)
         self.fixed_inline_button.setCursor(ui.static.icon.SELECT_CURSOR)
         if not self.fixed_outline_color_use :
@@ -1245,32 +1245,11 @@ class Settin(QMainWindow) :
         label.setFrameShape(QFrame.Box)
         label.setStyleSheet("border-width: 1px; border-style: solid; border-color: rgba(62, 62, 62, 0.1);")
 
-        # 自动模式页签
-        auto_mode_tab = QWidget(self.tab_4)
-        tab_widget.addTab(auto_mode_tab, "")
-        tab_widget.setTabText(tab_widget.indexOf(auto_mode_tab), "自动模式")
-        tab_widget.setTabIcon(tab_widget.indexOf(auto_mode_tab), ui.static.icon.AUTO_MODE_ICON)
-
-        # 横向分割线
-        label = QLabel(auto_mode_tab)
-        self.customSetGeometry(label, 0, 0, self.window_width, 1)
-        label.setFrameShadow(QFrame.Raised)
-        label.setFrameShape(QFrame.Box)
-        label.setStyleSheet("border-width: 1px; "
-                            "border-style: solid; "
-                            "border-color: rgba(62, 62, 62, 0.2);")
-
-        # 雾化页签的背景图
-        label = QLabel(auto_mode_tab)
-        label.setGeometry(QRect(0, 0, self.window_width+5, self.window_height+5))
-        label.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
-
         # 快捷键页签
         shortcut_key_tab = QWidget()
         tab_widget.addTab(shortcut_key_tab, "")
         tab_widget.setTabText(tab_widget.indexOf(shortcut_key_tab), "快捷键")
         tab_widget.setTabIcon(tab_widget.indexOf(shortcut_key_tab), ui.static.icon.SHORTCUT_KEY_ICON)
-
         # 横向分割线
         label = QLabel(shortcut_key_tab)
         self.customSetGeometry(label, 0, 0, self.window_width, 1)
@@ -1279,10 +1258,45 @@ class Settin(QMainWindow) :
         label.setStyleSheet("border-width: 1px; "
                             "border-style: solid; "
                             "border-color: rgba(62, 62, 62, 0.2);")
-
         # 雾化页签的背景图
         label = QLabel(shortcut_key_tab)
+        label.setGeometry(QRect(0, 0, self.window_width + 5, self.window_height + 5))
+        label.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
+
+        # 自动模式页签
+        auto_mode_tab = QWidget(self.tab_4)
+        tab_widget.addTab(auto_mode_tab, "")
+        tab_widget.setTabText(tab_widget.indexOf(auto_mode_tab), "自动模式")
+        tab_widget.setTabIcon(tab_widget.indexOf(auto_mode_tab), ui.static.icon.AUTO_MODE_ICON)
+        # 横向分割线
+        label = QLabel(auto_mode_tab)
+        self.customSetGeometry(label, 0, 0, self.window_width, 1)
+        label.setFrameShadow(QFrame.Raised)
+        label.setFrameShape(QFrame.Box)
+        label.setStyleSheet("border-width: 1px; "
+                            "border-style: solid; "
+                            "border-color: rgba(62, 62, 62, 0.2);")
+        # 雾化页签的背景图
+        label = QLabel(auto_mode_tab)
         label.setGeometry(QRect(0, 0, self.window_width+5, self.window_height+5))
+        label.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
+
+        # 翻译历史页签
+        trans_history_tab = QWidget()
+        tab_widget.addTab(trans_history_tab, "")
+        tab_widget.setTabText(tab_widget.indexOf(trans_history_tab), "翻译历史")
+        tab_widget.setTabIcon(tab_widget.indexOf(trans_history_tab), ui.static.icon.HISTORY_RECORD_ICON)
+        # 横向分割线
+        label = QLabel(trans_history_tab)
+        self.customSetGeometry(label, 0, 0, self.window_width, 1)
+        label.setFrameShadow(QFrame.Raised)
+        label.setFrameShape(QFrame.Box)
+        label.setStyleSheet("border-width: 1px; "
+                            "border-style: solid; "
+                            "border-color: rgba(62, 62, 62, 0.2);")
+        # 雾化页签的背景图
+        label = QLabel(trans_history_tab)
+        label.setGeometry(QRect(0, 0, self.window_width + 5, self.window_height + 5))
         label.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
 
         # 其他页签
@@ -1290,7 +1304,6 @@ class Settin(QMainWindow) :
         tab_widget.addTab(other_tab, "")
         tab_widget.setTabText(tab_widget.indexOf(other_tab), "其他")
         tab_widget.setTabIcon(tab_widget.indexOf(other_tab), ui.static.icon.OTHER_ICON)
-
         # 横向分割线
         label = QLabel(other_tab)
         self.customSetGeometry(label, 0, 0, self.window_width, 1)
@@ -1299,11 +1312,63 @@ class Settin(QMainWindow) :
         label.setStyleSheet("border-width: 1px; "
                             "border-style: solid; "
                             "border-color: rgba(62, 62, 62, 0.2);")
-
         # 雾化页签的背景图
         label = QLabel(other_tab)
         label.setGeometry(QRect(0, 0, self.window_width+5, self.window_height+5))
         label.setStyleSheet("background: rgba(255, 255, 255, 0.5);")
+
+        # 调用翻译历史开关
+        self.trans_history_switch = ui.switch.SwitchOCR(trans_history_tab, sign=self.trans_history_use, startX=(65-20)*self.rate)
+        self.customSetGeometry(self.trans_history_switch, 20, 30, 65, 20)
+        self.trans_history_switch.checkedChanged.connect(self.changeTransHistorySwitch)
+        self.trans_history_switch.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 调用翻译历史标签
+        label = QLabel(trans_history_tab)
+        self.customSetGeometry(label, 105, 30, 400, 20)
+        label.setText("调用翻译API前是否查询翻译历史获取译文")
+        # 调用翻译历史?号图标
+        button = QPushButton(qtawesome.icon("fa.question-circle", color=self.color_2), "", trans_history_tab)
+        self.customSetIconSize(button, 20, 20)
+        self.customSetGeometry(button, 360, 30, 20, 20)
+        button.setStyleSheet("background: transparent;")
+        button.clicked.connect(lambda: self.showDesc("transHistory"))
+        button.setCursor(ui.static.icon.QUESTION_CURSOR)
+
+        # 调用翻译历史完全匹配开关
+        self.trans_history_perfect_button = QRadioButton(trans_history_tab)
+        self.customSetGeometry(self.trans_history_perfect_button, 20, 80, 300, 20)
+        self.trans_history_perfect_button.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 调用翻译历史完全匹配标签
+        label = QLabel(trans_history_tab)
+        self.customSetGeometry(label, 50, 80, 600, 20)
+        label.setText("查询翻译历史时查询方式为 <span style='color: {};'>完全匹配</span>".format(self.color_2))
+
+        # 调用翻译历史模糊匹配开关
+        self.trans_history_fuzzy_button = QRadioButton(trans_history_tab)
+        self.customSetGeometry(self.trans_history_fuzzy_button, 20, 130, 600, 20)
+        self.trans_history_fuzzy_button.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 调用翻译历史模糊匹配标签
+        label = QLabel(trans_history_tab)
+        self.customSetGeometry(label, 50, 130, 600, 20)
+        label.setText("查询翻译历史时查询方式为 <span style='color: {};'>模糊匹配</span><span style='color: red;'>（此方式查询较慢, 非必要不建议开启）</span>".format(self.color_2))
+
+        if self.trans_history_perfect_use :
+            self.trans_history_perfect_button.setChecked(True)
+        else :
+            self.trans_history_fuzzy_button.setChecked(True)
+
+        # 调用翻译历史模糊匹配相似度设定
+        self.trans_history_similar_spinbox = QSpinBox(trans_history_tab)
+        self.customSetGeometry(self.trans_history_similar_spinbox, 20, 175, 45, 25)
+        self.trans_history_similar_spinbox.setMinimum(90)
+        self.trans_history_similar_spinbox.setMaximum(100)
+        self.trans_history_similar_spinbox.setSingleStep(1)
+        self.trans_history_similar_spinbox.setValue(self.trans_history_similar_score)
+        self.trans_history_similar_spinbox.setCursor(ui.static.icon.SELECT_CURSOR)
+        # 调用翻译历史模糊匹配相似度标签
+        label = QLabel(trans_history_tab)
+        self.customSetGeometry(label, 85, 180, 600, 20)
+        label.setText("模糊匹配时, 查询翻译历史的原文匹配相似度阈值, 建议98")
 
         # 自动模式速率设定
         self.auto_speed_spinBox = QDoubleSpinBox(auto_mode_tab)
@@ -1867,6 +1932,10 @@ class Settin(QMainWindow) :
         self.fixed_outline_color = self.object.config["fixedOutlineColor"]
         self.fixed_inline_color = self.object.config["fixedInlineColor"]
         self.fixed_outline_width = self.object.config["fixedOutlineWidth"]
+        # 翻译历史参数
+        self.trans_history_use = self.object.config["transHistoryUse"]
+        self.trans_history_perfect_use = self.object.config["transHistoryPerfectUse"]
+        self.trans_history_similar_score = self.object.yaml["similar_score"]
 
 
     # 获取节点信息
@@ -2694,11 +2763,18 @@ class Settin(QMainWindow) :
             self.desc_ui.setWindowTitle("在线OCR额度查询")
             self.desc_ui.desc_text.append(utils.http.onlineOCRQueryQuota(self.object))
 
+        # 用户体验改善
         elif message_type == "agreeCollect" :
             self.desc_ui.setWindowTitle("用户体验改善说明")
             self.desc_ui.desc_text.append("\n开启后将会上传个人翻译历史, 帮助团子用于开发公共词库功能, 以优化翻译器未来的使用体验\n\n"
                                           "数据将会进行脱敏处理\n\n不会将数据用于任何非法用途")
 
+        # 调用翻译历史
+        elif message_type == "transHistory" :
+            self.desc_ui.setWindowTitle("调用翻译历史说明")
+            self.desc_ui.desc_text.append("\n开启后, 每次调用翻译API前, 都会先查询本地翻译历史库, 如果存在相同的句子则会直接使用, 不会再重复调用翻译API"
+                                          "\n\n关闭后则每次翻译都调用翻译API"
+                                          "\n\n建议开启, 以节省翻译API调用次数, 避免已经翻译过的句子再次调用翻译源浪费额度")
 
         self.desc_ui.show()
 
@@ -3111,6 +3187,10 @@ class Settin(QMainWindow) :
         self.object.config["fixedOutlineColor"] = self.fixed_outline_color
         self.object.config["fixedInlineColor"] = self.fixed_inline_color
         self.object.config["fixedOutlineWidth"] = self.fixed_outline_width_spinbox.value()
+        # 翻译历史参数
+        self.object.config["transHistoryUse"] = self.trans_history_use
+        self.object.config["transHistoryPerfectUse"] = self.trans_history_perfect_button.isChecked()
+        self.object.yaml["similar_score"] = self.trans_history_similar_spinbox.value()
 
 
     # 窗口显示信号
@@ -3195,3 +3275,12 @@ class Settin(QMainWindow) :
     def openHuoshanSetting(self) :
 
         self.huoshan_setting_ui.show()
+
+
+    # 改变翻译历史开关状态
+    def changeTransHistorySwitch(self, checked) :
+
+        if checked :
+            self.trans_history_use = True
+        else:
+            self.trans_history_use = False

@@ -59,7 +59,7 @@ def openConfig(logger) :
         config["sync_db"] = False
     # 本地翻译历史查询相似度
     if "similar_score" not in config.keys() :
-        config["similar_score"] = 95
+        config["similar_score"] = 100
 
     return config
 
@@ -394,6 +394,9 @@ def configConvert(object) :
     object.config["fixedOutlineColor"] = object.config.get("fixedOutlineColor", "#FFFFFF")
     object.config["fixedInlineColor"] = object.config.get("fixedInlineColor", "#FFFFFF")
     object.config["fixedOutlineWidth"] = object.config.get("fixedOutlineWidth", 0.7)
+    # 翻译历史参数
+    object.config["transHistoryUse"] = object.config.get("transHistoryUse", True)
+    object.config["transHistoryPerfectUse"] = object.config.get("transHistoryPerfectUse", True)
 
     # 允许写入的key
     allow_keys = [
@@ -412,7 +415,7 @@ def configConvert(object) :
         "mangaFontSizeUse", "mangaFontSize", "youdaoPrivateUse", "youdaoAPI", "chatgptPrompt", "xiaoniuPrivateUse",
         "xiaoniuAPI", "huoshanPrivateUse", "huoshanAPI", "mangaChatgptDelayUse", "mangaChatgptDelayTime",
         "chatgptContextUse", "chatgptContextCount", "mangaFilterCharUse", "mangaFilterCharCount", "fixedOutlineColorUse",
-        "fixedOutlineColor", "fixedInlineColor", "fixedOutlineWidth"
+        "fixedOutlineColor", "fixedInlineColor", "fixedOutlineWidth", "transHistoryUse", "transHistoryPerfectUse"
     ]
     # 删除多余的key
     delete_keys = []

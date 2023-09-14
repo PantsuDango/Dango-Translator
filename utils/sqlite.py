@@ -336,12 +336,11 @@ def getEqualRate(str1, str2) :
 def selectTransDataBySimilarity(src, similar_score, logger) :
 
     new_src = ""
-    err = ""
     max_score = 0
 
     global TRANSLATION_DB
     if not TRANSLATION_DB :
-        return new_src, err
+        return new_src
 
     sql = '''SELECT src FROM translations GROUP BY src;'''
     try :
@@ -361,7 +360,6 @@ def selectTransDataBySimilarity(src, similar_score, logger) :
                     new_src = row[0]
         cursor.close()
     except Exception :
-        err = traceback.format_exc()
-        logger.error(err)
+        logger.error(traceback.format_exc())
 
-    return new_src, err
+    return new_src
