@@ -44,7 +44,7 @@ class DangoTranslator :
         # 本地配置
         self.yaml = utils.config.openConfig(self.logger)
         # 版本号
-        self.yaml["version"] = "4.5.7"
+        self.yaml["version"] = "4.5.8"
         # 配置中心
         dict_info = utils.config.getDictInfo(self.yaml["dict_info_url"], self.logger)
         if dict_info :
@@ -144,9 +144,9 @@ class DangoTranslator :
     # 点击翻译历史键
     def clickTransHistory(self) :
 
+        self.trans_history_ui.show()
         self.range_ui.hide()
         self.translation_ui.hide()
-        self.trans_history_ui.show()
 
 
     # 自动登录后检查

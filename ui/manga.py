@@ -16,10 +16,11 @@ import json
 from math import sqrt
 import webbrowser
 import qtawesome
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFile
 import traceback
 import pyperclip
 import pathlib
+import natsort
 
 import translator.ocr.dango
 import translator.api
@@ -35,7 +36,6 @@ import utils.http
 import utils.thread
 import utils.message
 import utils.sqlite
-
 
 FONT_PATH_1 = "./config/other/NotoSansSC-Regular.otf"
 FONT_PATH_2 = "./config/other/华康方圆体W7.TTC"
@@ -56,10 +56,6 @@ class Manga(QMainWindow) :
         self.setting_ui = Setting(object)
         self.ui()
         self.trans_edit_ui = TransEdit(object)
-        self.show_image_widget = None
-        self.show_error_sign = False
-        self.click_button_type = "original"
-        utils.thread.createThread(self.checkPermission)
         self.flushed_render_image_and_text_block_signal.connect(self.transProcessFlushedRenderImageAndTextBlock)
 
 
@@ -98,9 +94,7 @@ class Manga(QMainWindow) :
                                       "QMenu::item:checked {background: #E5F5FF;}")
         self.input_action_group = QActionGroup(self.input_menu)
         self.input_action_group.setExclusive(True)
-        self.createInputAction("从文件导入")
-        self.createInputAction("从文件夹导入")
-        self.createInputAction("从多个文件夹导入")
+        self.refreshInputImageMenu()
         # 将下拉菜单设置为按钮的菜单
         self.input_image_button.setMenu(self.input_menu)
         self.input_action_group.triggered.connect(self.openImageFiles)
@@ -121,6 +115,8 @@ class Manga(QMainWindow) :
         self.trans_all_action_group.setExclusive(True)
         self.createTransAllAction("跳过已翻译的")
         self.createTransAllAction("全部重新翻译")
+        self.createTransAllAction("只重新翻译并渲染文字")
+        self.createTransAllAction("只重新渲染文字")
         # 将下拉菜单设置为按钮的菜单
         self.trans_all_button.setMenu(self.trans_all_menu)
         self.trans_all_action_group.triggered.connect(self.TransAllImages)
@@ -142,6 +138,12 @@ class Manga(QMainWindow) :
         self.createOutputAction("导出到指定目录")
         self.createOutputAction("导出为压缩包")
         self.createOutputAction("导出工程文件压缩包")
+        self.output_menu.addSeparator()
+        action = self.createOutputAction("导出后删除过程文件")
+        if self.output_is_delete_cache :
+            action.setIcon(ui.static.icon.CHECKMARK_ICON)
+        else :
+            action.setIcon(ui.static.icon.CLOSE_ICON)
         # 将下拉菜单设置为按钮的菜单
         self.output_image_button.setMenu(self.output_menu)
         self.output_action_group.triggered.connect(self.outputImages)
@@ -262,7 +264,7 @@ class Manga(QMainWindow) :
         self.createCutLine(self.cut_line_label4)
 
         # 原图列表框
-        self.original_image_widget = QListWidget(self)
+        self.original_image_widget = CustomListWidget(self)
         self.original_image_widget.setIconSize(QSize(180*self.rate, 180*self.rate))
         self.original_image_widget.itemSelectionChanged.connect(self.loadOriginalImage)
         self.original_image_widget.show()
@@ -272,7 +274,7 @@ class Manga(QMainWindow) :
         self.setAcceptDrops(True)
 
         # 编辑图列表框
-        self.edit_image_widget = QListWidget(self)
+        self.edit_image_widget = CustomListWidget(self)
         self.edit_image_widget.setIconSize(QSize(180*self.rate, 180*self.rate))
         self.edit_image_widget.itemSelectionChanged.connect(self.loadEditImage)
         self.edit_image_widget.hide()
@@ -281,13 +283,33 @@ class Manga(QMainWindow) :
         self.edit_image_widget.setSpacing(5)
 
         # 译图列表框
-        self.trans_image_widget = QListWidget(self)
+        self.trans_image_widget = CustomListWidget(self)
         self.trans_image_widget.setIconSize(QSize(180*self.rate, 180*self.rate))
         self.trans_image_widget.itemSelectionChanged.connect(self.loadTransImage)
         self.trans_image_widget.hide()
         self.trans_image_widget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.trans_image_widget.customContextMenuRequested.connect(self.showTransListWidgetMenu)
         self.trans_image_widget.setSpacing(5)
+
+        # 批量删除按钮上方横向分割线
+        self.cut_line_label5 = QLabel(self)
+        self.createCutLine(self.cut_line_label5)
+
+        # 批量删除按钮
+        self.delete_button = QPushButton(self)
+        self.delete_button.setText("批量删除")
+        self.delete_button.setStyleSheet("QPushButton {background: #FFFFFF; color: #5B8FF9;}"
+                                         "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}")
+        self.delete_button.clicked.connect(lambda: self.removeItemWidget(self.click_button_type))
+        self.delete_button.setToolTip("<b>按住Ctrl键可以多选列表框的图片, 然后批量删除</b>")
+
+        # 全部删除按钮
+        self.all_delete_button = QPushButton(self)
+        self.all_delete_button.setText("全部删除")
+        self.all_delete_button.setStyleSheet("QPushButton {background: #FFFFFF; color: #5B8FF9;}"
+                                             "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}")
+        self.all_delete_button.clicked.connect(self.clearAllImages)
+        self.all_delete_button.setToolTip("<b>删除列表框所有图片</b>")
 
         # 图片大图展示
         self.show_image_scroll_area = CustomScrollArea(self)
@@ -374,6 +396,8 @@ class Manga(QMainWindow) :
         }
         # 试用开关
         self.check_permission = False
+        # 是否进行试用检测
+        self.is_check_permission_sign = False
         # 接口试用次数
         self.manga_read_count = -1
         # 对于Image库format格式类型映射
@@ -389,6 +413,31 @@ class Manga(QMainWindow) :
         }
         # 隐藏图片列表框状态, True-隐藏, False-不隐藏
         self.hide_image_widget_status = False
+        self.show_image_widget = None
+        self.show_error_sign = False
+        self.click_button_type = "original"
+        # 使用有效期
+        self.valid_time = "-"
+        # 保存的历史路径最大长度
+        self.manga_dir_paths_max_length = 10
+        # 保存的历史打开路径
+        self.manga_dir_paths = []
+        manga_dir_path = self.object.yaml.get("manga_dir_path", [])
+        # 兼容旧版本以字符串保存的单组路径
+        if type(manga_dir_path) == str :
+            self.manga_dir_paths.insert(0, manga_dir_path)
+        elif type(manga_dir_path) == list :
+            self.manga_dir_paths = manga_dir_path
+        # 去重
+        self.manga_dir_paths = list(set(self.manga_dir_paths))
+        # 最大保存
+        if len(self.manga_dir_paths) > self.manga_dir_paths_max_length :
+            self.manga_dir_paths = self.manga_dir_paths[:self.manga_dir_paths_max_length]
+        self.object.yaml["manga_dir_path"] = self.manga_dir_paths
+        # 导出后是否删除过程文件
+        self.output_is_delete_cache = False
+        # 导入时是否清空列表框
+        self.manga_input_clear_use = True
 
 
     # 根据分辨率定义控件位置尺寸
@@ -477,77 +526,149 @@ class Manga(QMainWindow) :
                 image_widget.setCurrentRow(row -1)
 
 
+    # 从文件导入
+    def inputImageFromFile(self, init_path) :
+
+        images, _ = QFileDialog.getOpenFileNames(
+            self,
+            "选择要翻译的生肉漫画原图（可多选）",
+            init_path,
+            "图片类型(*.png *.jpg *.jpeg *.webp);;所有类型 (*)",
+            options=QFileDialog.Options()
+        )
+        return images
+
+
+    # 从文件夹导入
+    def inputImageFromDir(self, init_path) :
+
+        images = []
+        folder_path = QFileDialog.getExistingDirectory(
+            self,
+            "选择要翻译的生肉漫画目录",
+            init_path,
+            options=QFileDialog.Options()
+        )
+        # 检查目录
+        if not os.path.exists(folder_path) :
+            utils.message.MessageBox("导入图片失败", "不存在的目录     ")
+            return images
+        if os.path.basename(folder_path) == "dango_manga" :
+            utils.message.MessageBox("导入图片失败", "不能选择dango_manga目录     ")
+            return images
+        if "dango_manga" in folder_path and os.path.basename(folder_path) == "tmp" :
+            utils.message.MessageBox("导入图片失败", "不能选择tmp目录     ")
+            return images
+        # 获取目录下所有图片加入列表
+        for file in os.listdir(folder_path) :
+            # 过滤非图片文件
+            file_ext = os.path.splitext(file)[1].lower()
+            if file_ext != ".png" and file_ext != ".jpg" and file_ext != ".jpeg" and file_ext != ".webp" :
+                continue
+            images.append(os.path.join(folder_path, file))
+
+        return images
+
+
+    # 从多文件夹导入
+    def inputImageFromBatchDir(self) :
+
+        images = []
+        file_dialog = QFileDialog()
+        file_dialog.setFileMode(QFileDialog.Directory)
+        file_dialog.setOption(QFileDialog.DontUseNativeDialog, True)
+        l = file_dialog.findChild(QListView, "listView")
+        if l :
+            l.setSelectionMode(QAbstractItemView.MultiSelection)
+        t = file_dialog.findChild(QTreeView)
+        if t :
+            t.setSelectionMode(QAbstractItemView.MultiSelection)
+        file_dialog.setFilter(QDir.Dirs)
+        if file_dialog.exec_() == QDialog.Accepted:
+            folder_paths = file_dialog.selectedFiles()
+            # 遍历多个文件夹
+            for folder_path in folder_paths[1:] :
+                if not os.path.exists(folder_path) :
+                    utils.message.MessageBox("导入图片失败", "不存在的目录     ")
+                    return []
+                if os.path.basename(folder_path) == "dango_manga" :
+                    utils.message.MessageBox("导入图片失败", "不能选择dango_manga目录     ")
+                    return []
+                if "dango_manga" in folder_path and os.path.basename(folder_path) == "tmp" :
+                    utils.message.MessageBox("导入图片失败", "不能选择tmp目录     ")
+                    return []
+                for file in os.listdir(folder_path) :
+                    # 过滤非图片文件
+                    file_ext = os.path.splitext(file)[1].lower()
+                    if file_ext != ".png" and file_ext != ".jpg" and file_ext != ".jpeg" and file_ext != ".webp" :
+                        continue
+                    images.append(os.path.join(folder_path, file))
+
+        return images
+
+
+    # 从历史目录里直接导入
+    def inputImageFromHistoryPath(self, folder_path) :
+
+        images = []
+        # 路径校验
+        if not os.path.exists(folder_path):
+            utils.message.MessageBox("导入图片失败", "不存在的目录     ")
+            return images
+        if os.path.basename(folder_path) == "dango_manga" :
+            utils.message.MessageBox("导入图片失败", "不能选择dango_manga目录     ")
+            return images
+        if "dango_manga" in folder_path and os.path.basename(folder_path) == "tmp" :
+            utils.message.MessageBox("导入图片失败", "不能选择tmp目录     ")
+            return images
+        for file in os.listdir(folder_path) :
+            # 过滤非图片文件
+            file_ext = os.path.splitext(file)[1].lower()
+            if file_ext != ".png" and file_ext != ".jpg" and file_ext != ".jpeg" and file_ext != ".webp":
+                continue
+            images.append(os.path.join(folder_path, file))
+
+        return images
+
+
     # 打开图片文件列表
     def openImageFiles(self, action) :
 
-        dir_path = self.object.yaml.get("manga_dir_path", os.getcwd())
-        options = QFileDialog.Options()
+        if action.data() == "每次导入清除已导入的图片" :
+            self.manga_input_clear_use = not self.manga_input_clear_use
+            if self.manga_input_clear_use :
+                action.setIcon(ui.static.icon.CHECKMARK_ICON)
+            else :
+                action.setIcon(ui.static.icon.CLOSE_ICON)
+            return
+
+        # 最近一次打开的目录
+        init_path = os.getcwd()
+        if len(self.manga_dir_paths) > 0 :
+            init_path = self.manga_dir_paths[0]
+
         images = []
         if action.data() == "从文件导入" :
-            images, _ = QFileDialog.getOpenFileNames(self,
-                                                     "选择要翻译的生肉漫画原图（可多选）",
-                                                     dir_path,
-                                                     "图片类型(*.png *.jpg *.jpeg *.webp);;所有类型 (*)",
-                                                     options=options)
-            if not images :
-                return
-
+            images = self.inputImageFromFile(init_path)
         elif action.data() == "从文件夹导入" :
-            folder_path = QFileDialog.getExistingDirectory(self,
-                                                           "选择要翻译的生肉漫画目录",
-                                                           dir_path,
-                                                           options=options)
-            # 检查目录
-            if not os.path.exists(folder_path) :
-                return
-            if os.path.basename(folder_path) == "dango_manga" :
-                utils.message.MessageBox("导入图片失败", "不能选择dango_manga目录     ")
-                return
-            if "dango_manga" in folder_path and os.path.basename(folder_path) == "tmp"  :
-                utils.message.MessageBox("导入图片失败", "不能选择tmp目录     ")
-                return
-            # 获取目录下所有图片加入列表
-            for file in os.listdir(folder_path) :
-                file_ext = os.path.splitext(file)[1].lower()
-                if file_ext != ".png" and file_ext != ".jpg" and file_ext != ".jpeg" and file_ext != ".webp" :
-                    continue
-                images.append(os.path.join(folder_path, file))
-
+            images = self.inputImageFromDir(init_path)
         elif action.data() == "从多个文件夹导入" :
-            file_dialog = QFileDialog()
-            file_dialog.setFileMode(QFileDialog.Directory)
-            file_dialog.setOption(QFileDialog.DontUseNativeDialog, True)
-            l = file_dialog.findChild(QListView, "listView")
-            if l :
-                l.setSelectionMode(QAbstractItemView.MultiSelection)
-            t = file_dialog.findChild(QTreeView)
-            if t :
-                t.setSelectionMode(QAbstractItemView.MultiSelection)
-            file_dialog.setFilter(QDir.Dirs)
-            if file_dialog.exec_() == QDialog.Accepted :
-                folder_paths = file_dialog.selectedFiles()
-                # 遍历多个文件夹
-                for folder_path in folder_paths[1:] :
-                    if not os.path.exists(folder_path) :
-                        continue
-                    if os.path.basename(folder_path) == "dango_manga":
-                        utils.message.MessageBox("导入图片失败", "不能选择dango_manga目录     ")
-                        return
-                    if "dango_manga" in folder_path and os.path.basename(folder_path) == "tmp":
-                        utils.message.MessageBox("导入图片失败", "不能选择tmp目录     ")
-                        return
-                    for file in os.listdir(folder_path) :
-                        file_ext = os.path.splitext(file)[1].lower()
-                        if file_ext != ".png" and file_ext != ".jpg" and file_ext != ".jpeg" and file_ext != ".webp" :
-                            continue
-                        images.append(os.path.join(folder_path, file))
-
+            images = self.inputImageFromBatchDir()
+        elif action.data() in self.manga_dir_paths :
+            images = self.inputImageFromHistoryPath(action.data())
         else :
             return
 
+        if not images :
+            return
+
+        dir_paths = []
+        # 校验是否有过长的路径
         for file_path in images :
             file_name = os.path.basename(file_path)
             base_path = os.path.dirname(file_path)
+            if base_path not in dir_paths :
+                dir_paths.append(base_path)
             check_file_path = os.path.join(base_path, "dango_manga", "tmp", file_name)
             if len(check_file_path) >= 250 :
                 utils.message.MessageBox("导入图片失败", "文件地址过长:\n%s"%file_path)
@@ -555,7 +676,8 @@ class Manga(QMainWindow) :
 
         if images :
             # 清除所有图片
-            self.clearAllImages()
+            if self.manga_input_clear_use :
+                self.clearAllImages()
             # 根据文件名排序
             images = self.dirFilesPathSort(images)
             # 进度条窗口
@@ -568,18 +690,28 @@ class Manga(QMainWindow) :
             utils.thread.runQThread(thread)
 
         # 记忆上次操作的目录
-        for image_path in images :
-            self.object.yaml["manga_dir_path"] = os.path.dirname(image_path)
-            break
+        for dir_path in dir_paths :
+            if dir_path in self.manga_dir_paths :
+                self.manga_dir_paths.remove(dir_path)
+            self.manga_dir_paths.insert(0, dir_path)
+        if len(self.manga_dir_paths) > self.manga_dir_paths_max_length :
+            self.manga_dir_paths = self.manga_dir_paths[:self.manga_dir_paths_max_length]
+        self.object.yaml["manga_dir_path"] = self.manga_dir_paths
+        # 刷新原图导入按钮的菜单栏
+        self.refreshInputImageMenu()
 
 
     # 一键翻译
     def TransAllImages(self, action) :
 
         if action.data() == "跳过已翻译的" :
-            self.clickTransAllButton(False)
+            self.clickTransAllButton("pass")
         elif action.data() == "全部重新翻译" :
-            self.clickTransAllButton(True)
+            self.clickTransAllButton("all")
+        elif action.data() == "只重新翻译并渲染文字" :
+            self.clickTransAllButton("rdr")
+        elif action.data() == "只重新渲染文字" :
+            self.clickTransAllButton("rdr")
         else :
             return
 
@@ -587,12 +719,25 @@ class Manga(QMainWindow) :
     # 导出译图文件
     def outputImages(self, action) :
 
+        if action.data() == "导出后删除过程文件" :
+            self.output_is_delete_cache = not self.output_is_delete_cache
+            if self.output_is_delete_cache :
+                action.setIcon(ui.static.icon.CHECKMARK_ICON)
+            else:
+                action.setIcon(ui.static.icon.CLOSE_ICON)
+            return
+
         try :
             output_image_list = []
+            folder_name = "dango-%s"%(time.time())
+            base_path = ""
+
             for image_path in self.image_path_list :
                 rdr_image_path = self.getRdrFilePath(image_path)
                 if os.path.exists(rdr_image_path) :
                     output_image_list.append(rdr_image_path)
+                    folder_name = os.path.basename(os.path.dirname(image_path))
+                    base_path = os.path.dirname(image_path)
             if len(output_image_list) == 0 :
                 return utils.message.MessageBox("导出失败", "没有可以导出的译图文件      ")
 
@@ -603,7 +748,7 @@ class Manga(QMainWindow) :
                 # 默认桌面
                 dialog.setDirectory(QStandardPaths.standardLocations(QStandardPaths.DesktopLocation)[0])
             except Exception :
-                # 默认用户目录
+                # 默认用户根目录
                 dialog.setDirectory(QDir.homePath())
             folder_path = dialog.getExistingDirectory(self, "选择要导出的位置", "", options=options)
             if not os.path.exists(folder_path):
@@ -611,7 +756,7 @@ class Manga(QMainWindow) :
 
             if action.data() == "导出到指定目录" :
                 # 新建导出文件夹
-                folder_path = os.path.join(folder_path, os.path.basename(self.object.yaml["manga_dir_path"]))
+                folder_path = os.path.join(folder_path, folder_name)
                 if not os.path.exists(folder_path) :
                     os.mkdir(folder_path)
                 # 复制完成的rdr图片
@@ -624,12 +769,12 @@ class Manga(QMainWindow) :
 
             elif action.data() == "导出为压缩包" :
                 # 压缩包名称
-                zip_name = "{}.zip".format(os.path.basename(self.object.yaml["manga_dir_path"]))
+                zip_name = "{}.zip".format(folder_name)
                 zip_path = os.path.join(folder_path, zip_name)
                 # 是否重命名文件
                 if self.object.config.get("mangaOutputRenameUse", False) :
                     # 新建导出文件夹
-                    folder_path = os.path.join(folder_path, os.path.basename(self.object.yaml["manga_dir_path"]))
+                    folder_path = os.path.join(folder_path, folder_name)
                     if not os.path.exists(folder_path):
                         os.mkdir(folder_path)
                     # 复制完成的rdr图片
@@ -644,12 +789,23 @@ class Manga(QMainWindow) :
                     utils.zip.zipFiles(output_image_list, zip_path)
 
             elif action.data() == "导出工程文件压缩包" :
-                zip_name = "{}.zip".format(os.path.basename(self.object.yaml["manga_dir_path"]))
+                zip_name = "{}.zip".format(folder_name)
                 zip_path = os.path.join(folder_path, zip_name)
-                utils.zip.zipDirectory(self.object.yaml["manga_dir_path"], zip_path)
+                utils.zip.zipDirectory(base_path, zip_path)
 
             else :
                 return
+
+            # 删除过程文件
+            if self.output_is_delete_cache :
+                delete_dir_list = []
+                for image_path in self.image_path_list :
+                    dango_manga_path, _ = self.getDangoMangaPath(image_path)
+                    delete_dir_list.append(dango_manga_path)
+                delete_dir_list = list(set(delete_dir_list))
+                for delete_dir in delete_dir_list :
+                    shutil.rmtree(delete_dir)
+
 
         except Exception :
             self.logger.error(traceback.format_exc())
@@ -683,16 +839,19 @@ class Manga(QMainWindow) :
     # 文件列表排序
     def dirFilesPathSort(self, files) :
 
-        tmp_dict = {}
-        for file_path in files :
-            if len(file_path) not in tmp_dict :
-                tmp_dict[len(file_path)] = []
-            tmp_dict[len(file_path)].append(file_path)
+        try :
+            new_files = natsort.natsorted(files, key=lambda x: os.path.splitext(x)[1])
+        except Exception :
+            tmp_dict = {}
+            for file_path in files :
+                if len(file_path) not in tmp_dict:
+                    tmp_dict[len(file_path)] = []
+                tmp_dict[len(file_path)].append(file_path)
 
-        new_files = []
-        for k in sorted(tmp_dict.keys()) :
-            for val in sorted(tmp_dict[k]) :
-                new_files.append(val)
+            new_files = []
+            for k in sorted(tmp_dict.keys()):
+                for val in sorted(tmp_dict[k]):
+                    new_files.append(val)
 
         return new_files
 
@@ -750,6 +909,29 @@ class Manga(QMainWindow) :
         self.input_action_group.addAction(action)
         self.input_menu.addAction(action)
 
+        return action
+
+
+    # 刷新导入原图按钮的下拉菜单选项
+    def refreshInputImageMenu(self) :
+
+        self.input_menu.clear()
+        self.createInputAction("从文件导入")
+        self.createInputAction("从文件夹导入")
+        self.createInputAction("从多个文件夹导入")
+        # 历史路径
+        if len(self.manga_dir_paths) > 0 :
+            self.input_menu.addSeparator()
+        for path in self.manga_dir_paths :
+            self.createInputAction(path)
+        # 是否清空列表框
+        self.input_menu.addSeparator()
+        action = self.createInputAction("每次导入清除已导入的图片")
+        if self.manga_input_clear_use :
+            action.setIcon(ui.static.icon.CHECKMARK_ICON)
+        else :
+            action.setIcon(ui.static.icon.CLOSE_ICON)
+
 
     # 创建一键翻译按钮的下拉菜单
     def createTransAllAction(self, label) :
@@ -760,6 +942,8 @@ class Manga(QMainWindow) :
         self.trans_all_action_group.addAction(action)
         self.trans_all_menu.addAction(action)
 
+        return action
+
 
     # 创建译图导出按钮的下拉菜单
     def createOutputAction(self, label) :
@@ -769,6 +953,8 @@ class Manga(QMainWindow) :
         action.setData(label)
         self.output_action_group.addAction(action)
         self.output_menu.addAction(action)
+
+        return action
 
 
     # 创建语种按钮的下拉菜单
@@ -782,6 +968,8 @@ class Manga(QMainWindow) :
         if self.language_map[self.object.config["mangaLanguage"]] == label :
             action.setChecked(True)
 
+        return action
+
 
     # 创建翻译源按钮的下拉菜单
     def createTransAction(self, label) :
@@ -793,6 +981,8 @@ class Manga(QMainWindow) :
         self.trans_menu.addAction(action)
         if self.object.config["mangaTrans"] == label :
             action.setChecked(True)
+
+        return action
 
 
     # 改变所使用的语种
@@ -833,7 +1023,7 @@ class Manga(QMainWindow) :
                     "打开",
                     self.manga_read_count,
                     index,
-                    len(self.image_path_list)
+                    len(self.image_path_list),
                 ))
         else :
             self.status_label.setText(
@@ -841,12 +1031,14 @@ class Manga(QMainWindow) :
                 '<font color="#5B8FF9">&nbsp;&nbsp;&nbsp;翻译源:&nbsp;</font> <font color="#708090">{}</font>'
                 '<font color="#5B8FF9">&nbsp;&nbsp;&nbsp;试用开关:&nbsp;</font> <font color="#708090">{}</font>'
                 '<font color="#5B8FF9">&nbsp;&nbsp;&nbsp;当前页数:&nbsp;</font> <font color="#708090">{}/{}</font>'
+                '<font color="#5B8FF9">&nbsp;&nbsp;&nbsp;有效期截止:&nbsp;</font> <font color="#708090">{}</font>'
                 .format(
                     self.language_map[self.object.config["mangaLanguage"]],
                     self.object.config["mangaTrans"],
                     "关闭",
                     index,
-                    len(self.image_path_list)
+                    len(self.image_path_list),
+                    self.valid_time
                 ))
 
 
@@ -856,11 +1048,14 @@ class Manga(QMainWindow) :
         item = self.original_image_widget.itemAt(pos)
         if item is not None:
             menu = QMenu(self)
+            menu.setStyleSheet("QMenu {color: #5B8FF9; background-color: #FFFFFF;}"
+                               "QMenu::item:selected:enabled {background: #E5F5FF;}"
+                               "QMenu::item:checked {background: #E5F5FF;}")
             # 添加菜单项
             translater_action = menu.addAction("翻译当前图片")
             translater_action.triggered.connect(lambda: self.translaterItemWidget(item, "original"))
             delete_action = menu.addAction("移除当前图片")
-            delete_action.triggered.connect(lambda: self.removeItemWidget(item, "original"))
+            delete_action.triggered.connect(lambda: self.removeItemWidget("original"))
             # 显示菜单
             cursorPos = QCursor.pos()
             menu.exec_(cursorPos)
@@ -872,11 +1067,14 @@ class Manga(QMainWindow) :
         item = self.edit_image_widget.itemAt(pos)
         if item is not None:
             menu = QMenu(self)
+            menu.setStyleSheet("QMenu {color: #5B8FF9; background-color: #FFFFFF;}"
+                               "QMenu::item:selected:enabled {background: #E5F5FF;}"
+                               "QMenu::item:checked {background: #E5F5FF;}")
             # 添加菜单项
             translater_action = menu.addAction("翻译当前图片")
             translater_action.triggered.connect(lambda: self.translaterItemWidget(item, "edit"))
             delete_action = menu.addAction("移除当前图片")
-            delete_action.triggered.connect(lambda: self.removeItemWidget(item, "edit"))
+            delete_action.triggered.connect(lambda: self.removeItemWidget("edit"))
             # 显示菜单
             cursorPos = QCursor.pos()
             menu.exec_(cursorPos)
@@ -888,6 +1086,9 @@ class Manga(QMainWindow) :
         item = self.trans_image_widget.itemAt(pos)
         if item is not None:
             menu = QMenu(self)
+            menu.setStyleSheet("QMenu {color: #5B8FF9; background-color: #FFFFFF;}"
+                               "QMenu::item:selected:enabled {background: #E5F5FF;}"
+                               "QMenu::item:checked {background: #E5F5FF;}")
             # 添加菜单项
             output_action = menu.addAction("另存为")
             output_action.triggered.connect(lambda: self.saveImageItemWidget(item))
@@ -913,31 +1114,42 @@ class Manga(QMainWindow) :
 
 
     # 列表框右键菜单删除子项
-    def removeItemWidget(self, item, item_type) :
+    def removeItemWidget(self, item_type) :
 
         if item_type == "edit" :
-            row = self.edit_image_widget.indexFromItem(item).row()
+            items = self.edit_image_widget.selectedItems()
+        elif item_type == "trans" :
+            items = self.trans_image_widget.selectedItems()
         else :
-            row = self.original_image_widget.indexFromItem(item).row()
-        if row > (len(self.image_path_list) - 1) :
-            return
-        # 列表框删除图片
-        self.original_image_widget.takeItem(row)
-        self.edit_image_widget.takeItem(row)
-        self.trans_image_widget.takeItem(row)
-        self.image_path_list.pop(row)
+            items = self.original_image_widget.selectedItems()
+
+        for item in items :
+            if item_type == "edit" :
+                row = self.edit_image_widget.indexFromItem(item).row()
+            elif item_type == "trans" :
+                row = self.trans_image_widget.indexFromItem(item).row()
+            else :
+                row = self.original_image_widget.indexFromItem(item).row()
+            if row > (len(self.image_path_list) - 1) :
+                continue
+            # 列表框删除图片
+            self.original_image_widget.takeItem(row)
+            self.edit_image_widget.takeItem(row)
+            self.trans_image_widget.takeItem(row)
+            self.image_path_list.pop(row)
 
 
     # 原图列表框添加图片
-    def originalImageWidgetAddImage(self, index, image_path):
+    def originalImageWidgetAddImage(self, index, image_path) :
 
-        item = QListWidgetItem(self.original_image_widget)
-        pixmap = QPixmap(image_path)
+        pixmap = self.fromImageToPixmap(image_path)
         pixmap = pixmap.scaled(180*self.rate, 180*self.rate, aspectRatioMode=Qt.KeepAspectRatio)
+        item = QListWidgetItem(self.original_image_widget)
         item.setText(index)
         item.setIcon(QIcon(pixmap))
         item.listWidget()
         self.original_image_widget.addItem(item)
+        image_path = os.path.normpath(image_path)
         self.image_path_list.append(image_path)
 
 
@@ -986,7 +1198,7 @@ class Manga(QMainWindow) :
         row = self.image_path_list.index(image_path)
         item = self.edit_image_widget.item(row)
         rdr_image_path = self.getRdrFilePath(image_path)
-        pixmap = QPixmap(rdr_image_path)
+        pixmap = self.fromImageToPixmap(rdr_image_path)
         pixmap = pixmap.scaled(180*self.rate, 180*self.rate, aspectRatioMode=Qt.KeepAspectRatio)
         item.setIcon(QIcon(pixmap))
 
@@ -999,7 +1211,7 @@ class Manga(QMainWindow) :
         row = self.image_path_list.index(image_path)
         item = self.trans_image_widget.item(row)
         rdr_image_path = self.getRdrFilePath(image_path)
-        pixmap = QPixmap(rdr_image_path)
+        pixmap = self.fromImageToPixmap(rdr_image_path)
         pixmap = pixmap.scaled(180*self.rate, 180*self.rate, aspectRatioMode=Qt.KeepAspectRatio)
         item.setIcon(QIcon(pixmap))
 
@@ -1046,11 +1258,17 @@ class Manga(QMainWindow) :
 
 
     # 翻译进程
-    def transProcess(self, image_path, reload_sign=False) :
-
+    def transProcess(self, image_path, execute_type="pass", use_sqlite=True) :
+        """
+        @execute_type
+        all   : 所有步骤都执行
+        pass  : 跳过已执行过的
+        trans : 只执行翻译和文字渲染
+        rdr   : 只执行文字渲染
+        """
         # 漫画OCR
         start = time.time()
-        if not os.path.exists(self.getJsonFilePath(image_path)) or reload_sign :
+        if not os.path.exists(self.getJsonFilePath(image_path)) or execute_type == "all" :
             sign, ocr_result = self.mangaOCR(image_path)
             self.trans_process_bar.paintStatus("ocr", round(time.time()-start, 1), sign)
             # OCR失败
@@ -1079,32 +1297,35 @@ class Manga(QMainWindow) :
             self.trans_process_bar.paintStatus("ocr", 0, True)
 
         # 翻译
-        start = time.time()
-        trans_sign = False
-        # 判断是否需要翻译
-        if not os.path.exists(self.getJsonFilePath(image_path)) or reload_sign :
-            trans_sign = True
-        else :
-            with open(self.getJsonFilePath(image_path), "r", encoding="utf-8") as file :
-                json_data = json.load(file)
-            if "translated_text" not in json_data:
+        self.trans_result = ""
+        def transThread() :
+            start = time.time()
+            trans_sign = False
+            # 判断是否需要翻译
+            if not os.path.exists(self.getJsonFilePath(image_path)) or execute_type == "all" or execute_type == "trans" :
                 trans_sign = True
-        # 需要翻译
-        if trans_sign :
-            sign, trans_result = self.mangaTrans(image_path)
-            self.trans_process_bar.paintStatus("trans", round(time.time()-start, 1), sign)
-            # 翻译失败
-            if not sign :
-                self.trans_process_bar.paintStatus("ipt", 0, False)
-                self.trans_process_bar.paintStatus("rdr", 0, False)
-                message = "翻译过程失败: %s"%trans_result
-                return message
-        else :
-            self.trans_process_bar.paintStatus("trans", 0, True)
+            else :
+                with open(self.getJsonFilePath(image_path), "r", encoding="utf-8") as file :
+                    json_data = json.load(file)
+                if "translated_text" not in json_data:
+                    trans_sign = True
+            # 需要翻译
+            if trans_sign :
+                sign, trans_result = self.mangaTrans(image_path, use_sqlite)
+                self.trans_process_bar.paintStatus("trans", round(time.time()-start, 1), sign)
+                # 翻译失败
+                if not sign :
+                    #self.trans_process_bar.paintStatus("ipt", 0, False)
+                    self.trans_process_bar.paintStatus("rdr", 0, False)
+                    self.trans_result = "翻译过程失败: %s"%trans_result
+            else :
+                self.trans_process_bar.paintStatus("trans", 0, True)
+        # 并发执行翻译
+        trans_thread = utils.thread.createThread(transThread)
 
         # 文字消除
         start = time.time()
-        if not os.path.exists(self.getIptFilePath(image_path)) or reload_sign :
+        if not os.path.exists(self.getIptFilePath(image_path)) or execute_type == "all" :
             sign, ipt_result = self.mangaTextInpaint(image_path)
             self.trans_process_bar.paintStatus("ipt", round(time.time()-start, 1), sign)
             # 文字消除失败
@@ -1116,11 +1337,15 @@ class Manga(QMainWindow) :
         else:
             self.trans_process_bar.paintStatus("ipt", 0, True)
 
+        # 阻塞, 等待翻译完成再执行文字渲染
+        trans_thread.join()
+        if self.trans_result :
+            return self.trans_result
 
         # 漫画文字渲染
         start = time.time()
-        if not os.path.exists(self.getRdrFilePath(image_path)) or reload_sign :
-            sign, rdr_result = self.mangaTextRdr(image_path)
+        if not os.path.exists(self.getRdrFilePath(image_path)) or execute_type == "all" or execute_type == "trans" or execute_type == "rdr" :
+            sign, rdr_result = self.mangaTextRdr(image_path, execute_type)
             self.trans_process_bar.paintStatus("rdr", round(time.time()-start, 1), sign)
             if not sign :
                 message = "文字渲染过程失败: %s"%rdr_result
@@ -1167,8 +1392,12 @@ class Manga(QMainWindow) :
         self.trans_process_bar.show()
         # 创建执行线程
         self.trans_all_button.setEnabled(False)
-        reload_sign = True
-        thread = utils.thread.createMangaTransQThread(self, image_paths, reload_sign)
+        thread = utils.thread.createMangaTransQThread(
+            window=self,
+            image_paths=image_paths,
+            execute_type="all",
+            use_sqlite=False
+        )
         thread.signal.connect(self.finishTransProcessRefresh)
         thread.bar_signal.connect(self.trans_process_bar.paintProgressBar)
         thread.add_message_signal.connect(self.trans_process_bar.setMessageText)
@@ -1271,7 +1500,14 @@ class Manga(QMainWindow) :
     def mangaOCR(self, image_path) :
 
         filtrate = self.object.config.get("mangaFiltrateUse", True)
-        sign, result = translator.ocr.dango.mangaOCR(self.object, image_path, None, filtrate, self.check_permission)
+        sign, result = translator.ocr.dango.mangaOCR(
+            object=self.object,
+            filepath=image_path,
+            image_base64=None,
+            filtrate=filtrate,
+            low_accuracy_mode=False,
+            check_permission=self.check_permission
+        )
         if sign :
             # 缓存mask图片
             with open(self.getMaskFilePath(image_path), "wb") as file :
@@ -1305,7 +1541,7 @@ class Manga(QMainWindow) :
 
 
     # 漫画翻译配置过滤
-    def mangaTransFilter(self, json_data, delay_time) :
+    def mangaTransFilter(self, json_data, delay_time, use_sqlite) :
 
         # 解析ocr结果获取原文
         original = []
@@ -1326,14 +1562,22 @@ class Manga(QMainWindow) :
             json_data["translated_text"] = translated_text
             return sign, json_data
 
-        # 从本地数据库获取翻译
-        trans_map = utils.sqlite.selectTranslationDBBySrcAndTransType(original, self.logger)
+        # 从数据库中获取翻译结果
+        trans_map = {}
+        if self.object.config["transHistoryUse"] :
+            trans_map = utils.sqlite.selectTranslationDBBySrcAndTransType(original, self.logger)
+            # 是否使用模糊匹配
+            if not self.object.config["transHistoryPerfectUse"] and self.object.yaml["similar_score"] < 100 and not trans_map :
+                similar_original = utils.sqlite.selectTransDataBySimilarity(original, self.object.yaml["similar_score"], self.logger)
+                if similar_original :
+                    trans_map = utils.sqlite.selectTranslationDBBySrcAndTransType(similar_original, self.logger)
+
         # 翻译源
         manga_trans = self.object.config["mangaTrans"]
         manga_trans = utils.sqlite.TRANS_MAP[manga_trans]
 
         # 如果本地有翻译缓存则直接使用
-        if manga_trans in trans_map :
+        if manga_trans in trans_map and use_sqlite :
             result = trans_map[manga_trans]
         else :
             # 调用翻译
@@ -1438,7 +1682,7 @@ class Manga(QMainWindow) :
 
 
     # 图片翻译
-    def mangaTrans(self, image_path) :
+    def mangaTrans(self, image_path, use_sqlite) :
 
         # 从缓存文件中获取json结果
         with open(self.getJsonFilePath(image_path), "r", encoding="utf-8") as file:
@@ -1449,7 +1693,7 @@ class Manga(QMainWindow) :
         if self.object.config["mangaChatgptDelayUse"] == True :
             delay_time = self.object.config["mangaChatgptDelayTime"]
         # 漫画翻译配置过滤
-        sign, result = self.mangaTransFilter(json_data, delay_time)
+        sign, result = self.mangaTransFilter(json_data, delay_time, use_sqlite)
         if not sign :
             return sign, result
 
@@ -1461,11 +1705,37 @@ class Manga(QMainWindow) :
 
 
     # 漫画文字渲染
-    def mangaTextRdr(self, image_path) :
+    def mangaTextRdr(self, image_path, execute_type) :
 
         # 从缓存文件中获取json结果
         with open(self.getJsonFilePath(image_path), "r", encoding="utf-8") as file :
             json_data = json.load(file)
+
+        new_text_blocks = []
+        if execute_type == "trans" or execute_type == "rdr" :
+            for text_block in json_data["text_block"] :
+                # 修改字体颜色
+                if self.object.config["mangaFontColorUse"] :
+                    color = QColor(self.object.config["mangaFontColor"])
+                    f_r, f_g, f_b, f_a = color.getRgb()
+                    text_block["foreground_color"] = [f_r, f_g, f_b]
+                # 修改轮廓颜色
+                if self.object.config["mangaBgColorUse"] :
+                    color = QColor(self.object.config["mangaBgColor"])
+                    b_r, b_g, b_b, b_a = color.getRgb()
+                    text_block["background_color"] = [b_r, b_g, b_b]
+                # 字体大小
+                if self.object.config["mangaFontSizeUse"] :
+                    text_block["text_size"] = self.object.config["mangaFontSize"]
+                # 轮廓宽度
+                text_block["shadow_size"] = self.object.config["mangaShadowSize"]
+                # 使用全局字体
+                text_block["font_selector"] = self.object.config["mangaFontType"]
+
+                new_text_blocks.append(text_block)
+        else :
+            new_text_blocks = json_data["text_block"]
+
         # 从缓存文件里获取ipt图片
         with open(self.getIptFilePath(image_path), "rb") as file :
             ipt = base64.b64encode(file.read()).decode("utf-8")
@@ -1474,7 +1744,7 @@ class Manga(QMainWindow) :
             object=self.object,
             trans_list=json_data["translated_text"],
             inpainted_image=ipt,
-            text_block=json_data["text_block"],
+            text_block=new_text_blocks,
             font=self.object.config["mangaFontType"],
             check_permission=self.check_permission
         )
@@ -1482,6 +1752,11 @@ class Manga(QMainWindow) :
             # 缓存ipt图片
             with open(self.getRdrFilePath(image_path), "wb") as file :
                 file.write(base64.b64decode(result["rendered_image"]))
+            # 缓存ocr结果
+            if execute_type == "trans" or execute_type == "rdr" :
+                json_data["text_block"] = new_text_blocks
+                with open(self.getJsonFilePath(image_path), "w", encoding="utf-8") as file :
+                    json.dump(json_data, file, indent=4)
 
         return sign, result
 
@@ -1612,7 +1887,7 @@ class Manga(QMainWindow) :
 
 
     # 一键翻译
-    def clickTransAllButton(self, reload_sign) :
+    def clickTransAllButton(self, execute_type) :
 
         if len(self.image_path_list) == 0 :
             return utils.message.MessageBox("翻译失败", "请先导入要翻译的图片      ")
@@ -1622,7 +1897,12 @@ class Manga(QMainWindow) :
         self.trans_process_bar.modifyTitle("翻译中...请勿关闭此窗口")
         self.trans_process_bar.show()
         # 创建执行线程
-        thread = utils.thread.createMangaTransQThread(self, self.image_path_list, reload_sign)
+        thread = utils.thread.createMangaTransQThread(
+            window=self,
+            image_paths=self.image_path_list,
+            execute_type=execute_type,
+            use_sqlite=True
+        )
         thread.signal.connect(self.finishTransProcessRefresh)
         thread.bar_signal.connect(self.trans_process_bar.paintProgressBar)
         thread.add_message_signal.connect(self.trans_process_bar.setMessageText)
@@ -1738,7 +2018,7 @@ class Manga(QMainWindow) :
         # 原图列表框
         self.original_image_widget.setGeometry(
             0, self.input_image_button.height() + self.original_image_button.height(),
-            self.cut_line_label4.x(), self.status_label.y() - (self.input_image_button.height()+self.original_image_button.height())
+            self.cut_line_label4.x(), self.status_label.y() - (self.input_image_button.height()+self.original_image_button.height()*2)
         )
         # 编辑列表框
         self.edit_image_widget.setGeometry(
@@ -1749,6 +2029,21 @@ class Manga(QMainWindow) :
         self.trans_image_widget.setGeometry(
             0, self.input_image_button.height() + self.original_image_button.height(),
             self.cut_line_label4.x(), self.original_image_widget.height()
+        )
+        # 批量删除按钮
+        self.delete_button.setGeometry(
+            0, self.status_label.y() - self.original_image_button.height(),
+            self.cut_line_label4.x()//2, self.original_image_button.height()
+        )
+        # 全部删除按钮
+        self.all_delete_button.setGeometry(
+            self.delete_button.width(), self.delete_button.y(),
+            self.cut_line_label4.x()//2, self.original_image_button.height()
+        )
+        # 批量删除按钮上方横向分割线
+        self.cut_line_label5.setGeometry(
+            0, self.delete_button.y()-1,
+            self.cut_line_label4.x(), 1
         )
         # 图片大图展示
         if self.hide_image_widget_status :
@@ -1771,13 +2066,13 @@ class Manga(QMainWindow) :
         # 隐藏图片列表框按钮
         if self.hide_image_widget_status :
             self.hide_image_widget_button.setGeometry(
-                0, (self.show_image_scroll_area.height()-100*h_rate) // 2,
-                15 * w_rate, 100 * h_rate
+                0, self.show_image_scroll_area.y(),
+                15 * w_rate, self.show_image_scroll_area.height()
             )
         else :
             self.hide_image_widget_button.setGeometry(
-                self.cut_line_label4.x(), (self.show_image_scroll_area.height()-100*h_rate) // 2,
-                15*w_rate, 100*h_rate
+                self.cut_line_label4.x(), self.show_image_scroll_area.y(),
+                15*w_rate, self.show_image_scroll_area.height()
             )
         # 上一页按钮
         if self.hide_image_widget_status :
@@ -1869,7 +2164,7 @@ class Manga(QMainWindow) :
             if image_list :
                 event.accept()
                 # 清除所有图片
-                self.clearAllImages()
+                #self.clearAllImages()
                 # 根据文件名排序
                 image_list = self.dirFilesPathSort(image_list)
                 # 进度条窗口
@@ -1888,18 +2183,27 @@ class Manga(QMainWindow) :
     # 校验图片翻译接口权限
     def checkPermission(self) :
 
+        # 校验团子token是否存在
         token = self.object.config.get("DangoToken", "")
-        if not token:
+        if not token :
             # 登录OCR服务获取token
             utils.http.loginDangoOCR(self.object)
+            token = self.object.config.get("DangoToken", "")
+        if not token :
+            return
 
         url = self.object.yaml.get("dango_check_permission", "https://capiv1.ap-sh.starivercs.cn/OCR/Admin/CheckPermission")
         url += "?Token={}".format(token)
         body = {"Type": 1}
 
         while True :
+            # 是否处于漫画翻译界面, 只有打开该界面才进行试用检测
+            if not self.is_check_permission_sign :
+                break
+            # 请求查询使用权限接口
             resp = utils.http.post(url=url, body=body, logger=self.logger, headers=None, timeout=5)
             if not resp :
+                time.sleep(5)
                 continue
             code = resp.get("Code", -1)
             # 有使用权限
@@ -1927,6 +2231,11 @@ class Manga(QMainWindow) :
             # 延时
             time.sleep(5)
 
+
+        # 查询有效时间
+        sign, valid_time = utils.http.mangaOCRQueryQuota(self.object)
+        if sign :
+            self.valid_time = valid_time
         self.mangaReadCount()
         self.refreshStatusLabel()
         self.show_error_label.hide()
@@ -1975,36 +2284,77 @@ class Manga(QMainWindow) :
     # 调整图片大小
     def adjustImageSize(self, image_path, target_size):
 
-        ext = pathlib.Path(image_path).suffix.replace(".", "")
-        format = self.image_ext_map[ext]
+        try :
+            ext = pathlib.Path(image_path).suffix.replace(".", "")
+            format = self.image_ext_map[ext]
 
-        # 打开原始图片
-        image = Image.open(image_path)
-        # 创建一个缓冲区，用于保存调整后的图片
-        image_data = io.BytesIO()
-        # 调整图片尺寸
-        factor = 0.9  # 调整因子，可以适当调整以满足目标大小
-        image.save(image_data, format=format, quality=85)
-        while image_data.tell() > target_size :
+            # 打开原始图片
+            image = Image.open(image_path)
+            image_data = io.BytesIO()
+            image.save(image_data, format=format, quality=95)
+            factor = 0.9
+            # 调整图片尺寸
+            while image_data.tell() > target_size :
+                image_data.seek(0)
+                image_data.truncate()
+                image = image.resize((int(image.width * factor), int(image.height * factor)))
+                image.save(image_data, format=format, quality=95)
+                factor -= 0.1
+                if factor < 0.1 :
+                    break
+            # 保存调整后的图片
             image_data.seek(0)
-            image_data.truncate()
-            image.save(image_data, format=format, quality=85)
-            if factor < 0.1 :
+            adjusted_image = Image.open(image_data)
+            adjusted_image.save(image_path, format, quality=95)
+        except Exception :
+            self.logger.error(traceback.format_exc())
+
+
+    # 修复坏图
+    def repairBadImage(self, image_path) :
+
+        try :
+            image = Image.open(image_path)
+            image.load()
+        except Exception :
+            ImageFile.LOAD_TRUNCATED_IMAGES = True
+            image.save(image_path, quality=95)
+            ImageFile.LOAD_TRUNCATED_IMAGES = False
+
+
+    # 读取图片加载到QPixmap
+    def fromImageToPixmap(self, image_path) :
+
+        for _ in range(3) :
+            image = QImage(image_path)
+            if image.width() != 0 and image.height() != 0 :
                 break
-            image = image.resize((int(image.width*factor), int(image.height*factor)))
-            factor -= 0.1
-        # 保存调整后的图片
-        image_data.seek(0)
-        adjusted_image = Image.open(image_data)
-        adjusted_image.save(image_path, format)
+        if image.width() == 0 and image.height() == 0 :
+            try :
+                image_data = Image.open(image_path).convert("RGBA").tobytes()
+                image = QImage(image_data, image.size[0], image.size[1], QImage.Format_RGBA8888)
+            except Exception :
+                self.logger.error(traceback.format_exc())
+
+        pixmap = QPixmap.fromImage(image)
+
+        return pixmap
+
+
+    # 窗口显示信号
+    def showEvent(self, e) :
+
+        self.is_check_permission_sign = True
+        utils.thread.createThread(self.checkPermission)
 
 
     # 窗口关闭处理
     def closeEvent(self, event) :
 
+        self.is_check_permission_sign = False
         self.hide()
         self.object.translation_ui.show()
-        if self.object.range_ui.show_sign == True:
+        if self.object.range_ui.show_sign == True :
             self.object.range_ui.show()
 
 
@@ -2023,7 +2373,7 @@ class RenderTextBlock(QWidget) :
         self.trans_edit_ui = edit_window
         self.object = edit_window.object
         self.logger = self.object.logger
-        self.image_rate = []
+        self.image_rate = [1, 1]
         self.button_list = []
         self.paint_status = False
         self.paint_button = None
@@ -2036,8 +2386,11 @@ class RenderTextBlock(QWidget) :
         self.resize(1000*self.rate[0], 635*self.rate[1])
         # 窗口无标题栏、窗口置顶、窗口透明
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint | Qt.Tool)
-        # 鼠标样式
+        # 样式
         self.setCursor(ui.static.icon.PIXMAP_CURSOR)
+        self.setStyleSheet("QMenu {color: #5B8FF9; background-color: #FFFFFF;}"
+                           "QMenu::item:selected:enabled {background: #E5F5FF;}"
+                           "QMenu::item:checked {background: #E5F5FF;}")
 
         # 图片大图展示
         self.scroll_area = CustomScrollArea(self)
@@ -2131,7 +2484,7 @@ class RenderTextBlock(QWidget) :
             button.move_signal.connect(self.refreshTextBlockPosition)
             button.setGeometry(x, y, w, h)
             button.setStyleSheet("QPushButton {background: transparent; border: 2px solid red;}"
-                                 "QPushButton:hover {background-color:rgba(62, 62, 62, 0.1)}")
+                                 "QPushButton:hover {background-color: rgba(62, 62, 62, 0.1);}")
             # 文本框右键菜单
             button.setContextMenuPolicy(Qt.CustomContextMenu)
             button.customContextMenuRequested.connect(lambda _, b=button: self.showTextBlockButtonMenu(b))
@@ -2147,7 +2500,7 @@ class RenderTextBlock(QWidget) :
             self.paint_button = CustomTextBlockButton(self.image_label)
             self.paint_button.setCursor(ui.static.icon.EDIT_CURSOR)
             self.paint_button.setStyleSheet("QPushButton {background: transparent; border: 2px solid red;}"
-                                            "QPushButton:hover {background-color:rgba(62, 62, 62, 0.1)}")
+                                            "QPushButton:hover {background-color: rgba(62, 62, 62, 0.1)}")
             self.paint_button.setGeometry(x, y, w, h)
             self.paint_button.show()
 
@@ -2198,6 +2551,7 @@ class RenderTextBlock(QWidget) :
                 filepath=None,
                 image_base64=original_cut_image_base64,
                 filtrate=False,
+                low_accuracy_mode=True,
                 check_permission=self.object.manga_ui.check_permission
             )
             if not sign :
@@ -2216,22 +2570,21 @@ class RenderTextBlock(QWidget) :
             ocr_result = self.object.manga_ui.mangaOcrFilter(ocr_result)
 
             # 请求ipt
-            sign, ipt_result = translator.ocr.dango.mangaIPT(
-                object=self.object,
-                filepath=None,
-                mask=ocr_result["mask"],
-                image_base64=original_cut_image_base64,
-                check_permission=self.object.manga_ui.check_permission
-            )
-            if not sign :
-                utils.message.MessageBox("文字消除失败", ipt_result, self.rate)
-                self.paint_button.deleteLater()
-                if self.paint_status :
-                    self.manualOCR()
-                return
+            self.ipt_sign = True
+            self.ipt_result = ""
+            def iptThread() :
+                self.ipt_sign, self.ipt_result = translator.ocr.dango.mangaIPT(
+                    object=self.object,
+                    filepath=None,
+                    mask=ocr_result["mask"],
+                    image_base64=original_cut_image_base64,
+                    check_permission=self.object.manga_ui.check_permission
+                )
+            # 并发执行文字消除
+            ipt_thread = utils.thread.createThread(iptThread)
 
             # 请求翻译
-            sign, trans_result = self.object.manga_ui.mangaTransFilter(ocr_result, 0)
+            sign, trans_result = self.object.manga_ui.mangaTransFilter(ocr_result, 0, True)
             if not sign :
                 utils.message.MessageBox("翻译失败", trans_result, self.rate)
                 self.paint_button.deleteLater()
@@ -2239,6 +2592,16 @@ class RenderTextBlock(QWidget) :
                     self.manualOCR()
                 return
             ocr_result = trans_result
+
+            # 阻塞, 等待ipt执行完毕
+            ipt_thread.join()
+            ipt_result = self.ipt_result
+            if not self.ipt_sign :
+                utils.message.MessageBox("文字消除失败", ipt_result, self.rate)
+                self.paint_button.deleteLater()
+                if self.paint_status :
+                    self.manualOCR()
+                return
 
             # 请求rdr
             sign, rdr_result = translator.ocr.dango.mangaRDR(
@@ -2384,23 +2747,7 @@ class RenderTextBlock(QWidget) :
 
         if not os.path.exists(self.image_path) :
             return
-        with open(self.image_path, "rb") as file :
-            image = QImage.fromData(file.read())
-
-        # 如果图片太大就裁剪一半
-        if image.width() == 0 or image.height() == 0:
-            image = Image.open(self.image_path)
-            # 等比例缩放为原来的一半
-            width, height = image.size
-            new_width = width // 2
-            new_height = height // 2
-            resized_image = image.resize((new_width, new_height))
-            resized_image.save(self.image_path)
-            # 重新读取图片
-            with open(self.image_path, "rb") as file :
-                image = QImage.fromData(file.read())
-        self.image_pixmap = QPixmap.fromImage(image)
-
+        self.image_pixmap = self.object.manga_ui.fromImageToPixmap(self.image_path)
         self.matchImageSize()
 
 
@@ -2436,20 +2783,23 @@ class RenderTextBlock(QWidget) :
     # 图片自适配比例
     def matchImageSize(self) :
 
-        pixmap = self.image_pixmap
-        if pixmap.height() > self.height() :
-            rate = self.height() / pixmap.height()
-            pixmap = pixmap.scaled(pixmap.width()*rate, pixmap.height()*rate)
-        if pixmap.width() > self.width() :
-            rate = self.width() / pixmap.width()
-            pixmap = pixmap.scaled(pixmap.width()*rate, pixmap.height()*rate)
-        self.image_label.setPixmap(pixmap)
+        try :
+            pixmap = self.image_pixmap
+            if pixmap.height() > self.height() :
+                rate = self.height() / pixmap.height()
+                pixmap = pixmap.scaled(pixmap.width()*rate, pixmap.height()*rate)
+            if pixmap.width() > self.width() :
+                rate = self.width() / pixmap.width()
+                pixmap = pixmap.scaled(pixmap.width()*rate, pixmap.height()*rate)
+            self.image_label.setPixmap(pixmap)
 
-        self.image_rate = [
-            pixmap.width() / self.image_pixmap.width(),
-            pixmap.height() / self.image_pixmap.height()
-        ]
-        self.rate_label.setText("{}%".format(round(self.image_rate[0] * 100)))
+            self.image_rate = [
+                pixmap.width() / self.image_pixmap.width(),
+                pixmap.height() / self.image_pixmap.height()
+            ]
+            self.rate_label.setText("{}%".format(round(self.image_rate[0] * 100)))
+        except Exception :
+            self.logger.error(traceback.format_exc())
 
 
     # 文本框按钮自适配比例
@@ -2689,7 +3039,7 @@ class RenderTextBlock(QWidget) :
             self.image_label.paint_status = True
             self.scroll_area.setCursor(Qt.CrossCursor)
             self.image_label.setCursor(Qt.CrossCursor)
-            self.manual_ocr_button.setStyleSheet("background-color: #83AAF9;")
+            self.manual_ocr_button.setStyleSheet("background-color: #83AAF9; color: #FFFFFF;")
             if not self.object.manga_ui.hide_image_widget_status :
                 self.object.manga_ui.last_page_button.hide()
                 self.object.manga_ui.next_page_button.hide()
@@ -2700,7 +3050,9 @@ class RenderTextBlock(QWidget) :
             self.image_label.paint_status = False
             self.scroll_area.setCursor(Qt.OpenHandCursor)
             self.image_label.setCursor(Qt.OpenHandCursor)
-            self.manual_ocr_button.setStyleSheet("QPushButton:hover {background-color: #83AAF9;}")
+            self.manual_ocr_button.setStyleSheet("QPushButton {color: #5B8FF9;}"
+                                                 "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}"
+                                                 "QPushButton:pressed {background-color: #83AAF9; color: #FFFFFF;}")
             if not self.object.manga_ui.hide_image_widget_status :
                 self.object.manga_ui.last_page_button.show()
                 self.object.manga_ui.next_page_button.show()
@@ -2720,7 +3072,7 @@ class RenderTextBlock(QWidget) :
             self.image_label.paint_status = True
             self.scroll_area.setCursor(Qt.CrossCursor)
             self.image_label.setCursor(Qt.CrossCursor)
-            self.area_recover_button.setStyleSheet("background-color: #83AAF9;")
+            self.area_recover_button.setStyleSheet("background-color: #83AAF9; color: #FFFFFF;")
             if not self.object.manga_ui.hide_image_widget_status :
                 self.object.manga_ui.last_page_button.hide()
                 self.object.manga_ui.next_page_button.hide()
@@ -2731,7 +3083,9 @@ class RenderTextBlock(QWidget) :
             self.image_label.paint_status = False
             self.scroll_area.setCursor(Qt.OpenHandCursor)
             self.image_label.setCursor(Qt.OpenHandCursor)
-            self.area_recover_button.setStyleSheet("QPushButton:hover {background-color: #83AAF9;}")
+            self.area_recover_button.setStyleSheet("QPushButton {color: #5B8FF9;}"
+                                                   "QPushButton:hover {background-color: #83AAF9; color: #FFFFFF;}"
+                                                   "QPushButton:pressed {background-color: #83AAF9; color: #FFFFFF;}")
             if not self.object.manga_ui.hide_image_widget_status :
                 self.object.manga_ui.last_page_button.show()
                 self.object.manga_ui.next_page_button.show()
@@ -3190,8 +3544,17 @@ class TransEdit(QWidget) :
             return
         # 翻译源
         trans_type = self.trans_type_map[trans_type]
-        # 从本地数据库获取翻译
-        trans_map = utils.sqlite.selectTranslationDBBySrcAndTransType(original, self.logger)
+
+        # 从数据库中获取翻译结果
+        trans_map = {}
+        if self.object.config["transHistoryUse"] :
+            trans_map = utils.sqlite.selectTranslationDBBySrcAndTransType(original, self.logger)
+            # 是否使用模糊匹配
+            if not self.object.config["transHistoryPerfectUse"] and self.object.yaml["similar_score"] < 100 and not trans_map :
+                similar_original = utils.sqlite.selectTransDataBySimilarity(original, self.object.yaml["similar_score"], self.logger)
+                if similar_original:
+                    trans_map = utils.sqlite.selectTranslationDBBySrcAndTransType(similar_original, self.logger)
+
         if trans_type in trans_map :
             result = trans_map[trans_type]
         else :
@@ -4465,3 +4828,25 @@ class TransparentImageLabel(QLabel) :
         opacity_effect = QGraphicsOpacityEffect()
         opacity_effect.setOpacity(opacity)
         self.setGraphicsEffect(opacity_effect)
+
+
+# 支持多选的列表框
+class CustomListWidget(QListWidget) :
+
+    def __init__(self, parent=None) :
+        super().__init__(parent)
+        self.setSelectionMode(QListWidget.MultiSelection)
+
+    def keyPressEvent(self, event):
+        if event.modifiers() & Qt.ControlModifier:
+            self.setSelectionMode(QListWidget.ExtendedSelection)
+        else:
+            self.setSelectionMode(QListWidget.SingleSelection)
+        super().keyPressEvent(event)
+
+    def mousePressEvent(self, event):
+        if event.modifiers() & (Qt.ControlModifier | Qt.ShiftModifier):
+            self.setSelectionMode(QListWidget.ExtendedSelection)
+        else:
+            self.setSelectionMode(QListWidget.SingleSelection)
+        super().mousePressEvent(event)

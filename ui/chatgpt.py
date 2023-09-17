@@ -227,6 +227,8 @@ class ChatGPTSetting(QWidget) :
             "gpt-4-0314",
             "gpt-4-32k",
             "gpt-4-32k-0314",
+            "gpt-4-0413",
+            "gpt-4-0613",
         ]
 
 
@@ -324,10 +326,10 @@ class ChatGPTSetting(QWidget) :
         if not self.object.config["chatgptContextUse"] :
             self.context_switch.mousePressEvent(1)
             self.context_switch.updateValue()
-            self.object.config["chatgptContextUse"] = True
+            self.object.config["chatgptContextUse"] = False
         # 重置联系上下文句子数
-        self.context_spinbox.setValue(5)
-        self.object.config["chatgptContextCount"] = 5
+        self.context_spinbox.setValue(3)
+        self.object.config["chatgptContextCount"] = 3
 
 
     # 改变联系上下文开关状态
@@ -351,7 +353,7 @@ class ChatGPTSetting(QWidget) :
         desc_ui.show()
 
         desc_ui.setWindowTitle("chatgpt联系上下文说明")
-        signal.emit("\n开关开启后, chatgpt会联系之前翻译过的句子场景进行翻译, 可能会提高翻译准确率, 但是会消耗更多的翻译额度\n\n最大可联系句子为10, 默认值为5")
+        signal.emit("\n开关开启后, chatgpt会联系之前翻译过的句子场景进行翻译, 可能会提高翻译准确率, 但是会消耗更多的翻译额度\n\n最大可联系句子为10, 默认值为3")
         QApplication.processEvents()
 
 

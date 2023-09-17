@@ -2,7 +2,11 @@ import os.path
 import sqlite3
 import re
 import datetime
+import time
 import traceback
+import csv
+from difflib import SequenceMatcher
+
 
 DB_PATH = "../db/"
 HISTORY_FILE_PATH = "../翻译历史.txt"
@@ -72,6 +76,7 @@ def connectTranslationDB(logger) :
             CREATE INDEX IF NOT EXISTS src ON translations (src);
         '''
         TRANSLATION_DB.execute(sql)
+        TRANSLATION_DB.commit()
     except Exception :
         logger.error(traceback.format_exc())
 
@@ -105,13 +110,17 @@ def insertTranslationDB(logger, src, trans_type, tgt, create_time=None) :
         TRANSLATION_DB.execute(sql, (src, trans_type, tgt, create_time))
         TRANSLATION_DB.commit()
     except sqlite3.IntegrityError :
-        pass
+        sql = '''
+            UPDATE translations SET tgt = ? WHERE src =? AND trans_type = ?;
+        '''
+        TRANSLATION_DB.execute(sql, (tgt, src, trans_type))
+        TRANSLATION_DB.commit()
     except Exception :
         logger.error(traceback.format_exc())
 
 
 # 查询翻译历史数据库
-def selectTranslationDBList(count, logger) :
+def selectTranslationDBList(src, tgt, limit, offset, logger) :
 
     rows = []
     global TRANSLATION_DB
@@ -119,8 +128,17 @@ def selectTranslationDBList(count, logger) :
         return rows
 
     try :
-        sql = '''SELECT * FROM translations ORDER BY id DESC LIMIT ?;'''
-        cursor = TRANSLATION_DB.execute(sql, (count,))
+        if src :
+            if tgt :
+                sql = '''SELECT id, trans_type, src, tgt FROM translations WHERE src LIKE '%{}%' AND tgt LIKE '%{}%' ORDER BY id DESC LIMIT ? OFFSET ?;'''.format(src, tgt)
+            else :
+                sql = '''SELECT id, trans_type, src, tgt FROM translations WHERE src LIKE '%{}%' ORDER BY id DESC LIMIT ? OFFSET ?;'''.format(src)
+        else:
+            if tgt :
+                sql = '''SELECT id, trans_type, src, tgt FROM translations WHERE tgt LIKE '%{}%' ORDER BY id DESC LIMIT ? OFFSET ?;'''.format(tgt)
+            else :
+                sql = '''SELECT id, trans_type, src, tgt FROM translations ORDER BY id DESC LIMIT ? OFFSET ?;'''
+        cursor = TRANSLATION_DB.execute(sql, (limit, offset))
         rows = cursor.fetchall()
         cursor.close()
     except Exception :
@@ -202,3 +220,146 @@ def initTranslationDB(object) :
     if not object.yaml["sync_db"] :
         SyncTranslationHistory(object.logger)
         object.yaml["sync_db"] = True
+
+
+# 查询翻译历史总数
+def selectTranslationDBTotal(src, tgt, logger) :
+
+    result = 0
+    global TRANSLATION_DB
+    if not TRANSLATION_DB :
+        return result
+
+    try :
+        if src :
+            if tgt :
+                sql = '''SELECT count(*) FROM translations WHERE src LIKE '%{}%' AND tgt LIKE '%{}%';'''.format(src, tgt)
+            else :
+                sql = '''SELECT count(*) FROM translations WHERE src LIKE '%{}%';'''.format(src)
+        else :
+            if tgt :
+                sql = '''SELECT count(*) FROM translations WHERE tgt LIKE '%{}%';'''.format(tgt)
+            else :
+                sql = '''SELECT count(*) FROM translations;'''
+        cursor = TRANSLATION_DB.execute(sql)
+        result = cursor.fetchone()[0]
+        cursor.close()
+    except Exception :
+        logger.error(traceback.format_exc())
+
+    return result
+
+
+# 导出所有数据
+def outputTranslationDB(file_path, logger) :
+
+    global TRANSLATION_DB
+    if not TRANSLATION_DB :
+        return
+
+    sql = '''SELECT src, trans_type, tgt, create_time FROM translations;'''
+    try :
+        cursor = TRANSLATION_DB.execute(sql)
+        titles = [description[0] for description in cursor.description]
+
+        with open(file_path, "w", encoding="utf-8", newline="") as file :
+            writer = csv.writer(file)
+            writer.writerow(titles)
+            while True:
+                rows = cursor.fetchmany(10000)
+                if not rows :
+                    break
+                writer.writerows(rows)
+        cursor.close()
+    except Exception :
+        logger.error(traceback.format_exc())
+        return traceback.format_exc()
+
+
+# 修改原文翻译数据
+def modifyTranslationDBSrc(id, src, logger) :
+
+    global TRANSLATION_DB
+    if not TRANSLATION_DB :
+        return
+
+    sql = '''UPDATE translations SET src = ? WHERE id = ?;'''
+    try :
+        TRANSLATION_DB.execute(sql, (src, id,))
+        TRANSLATION_DB.commit()
+    except Exception :
+        logger.error(traceback.format_exc())
+        return traceback.format_exc()
+
+
+# 修改原文翻译数据
+def modifyTranslationDBTgt(id, tgt, logger) :
+
+    global TRANSLATION_DB
+    if not TRANSLATION_DB :
+        return
+
+    sql = '''UPDATE translations SET tgt = ? WHERE id = ?;'''
+    try :
+        TRANSLATION_DB.execute(sql, (tgt, id,))
+        TRANSLATION_DB.commit()
+    except Exception :
+        logger.error(traceback.format_exc())
+        return traceback.format_exc()
+
+
+# 删除翻译数据
+def deleteTranslationDBByID(id, logger) :
+
+    global TRANSLATION_DB
+    if not TRANSLATION_DB :
+        return
+
+    sql = '''DELETE FROM translations WHERE id = ?;'''
+    try :
+        TRANSLATION_DB.execute(sql, (id,))
+        TRANSLATION_DB.commit()
+    except Exception :
+        logger.error(traceback.format_exc())
+        return traceback.format_exc()
+
+
+# 判断字符串相似度
+def getEqualRate(str1, str2) :
+
+    score = SequenceMatcher(None, str1, str2).quick_ratio()
+    score = score * 100
+    return score
+
+
+# 根据相似度查询数据
+def selectTransDataBySimilarity(src, similar_score, logger) :
+
+    new_src = ""
+    max_score = 0
+
+    global TRANSLATION_DB
+    if not TRANSLATION_DB :
+        return new_src
+
+    sql = '''SELECT src FROM translations GROUP BY src;'''
+    try :
+        cursor = TRANSLATION_DB.execute(sql)
+        while True:
+            rows = cursor.fetchmany(10000)
+            if not rows :
+                break
+            for row in rows :
+                # 判断相似度
+                score = getEqualRate(src, row[0])
+                if score < similar_score :
+                    continue
+                # 取最高相似度
+                if score > max_score :
+                    max_score = score
+                    new_src = row[0]
+        cursor.close()
+    except Exception :
+        logger.error(traceback.format_exc())
+
+    return new_src

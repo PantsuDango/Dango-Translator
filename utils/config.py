@@ -57,6 +57,9 @@ def openConfig(logger) :
     # 2023.07.30 翻译历史数据同步
     if "sync_db" not in config.keys() :
         config["sync_db"] = False
+    # 本地翻译历史查询相似度
+    if "similar_score" not in config.keys() :
+        config["similar_score"] = 100
 
     return config
 
@@ -284,9 +287,9 @@ def configConvert(object) :
     # chatgpt prompt
     object.config["chatgptPrompt"] = object.config.get("chatgptPrompt", translator.api.CHATGPT_PROMPT)
     # chatgpt联系上下文开关
-    object.config["chatgptContextUse"] = object.config.get("chatgptContextUse", True)
+    object.config["chatgptContextUse"] = object.config.get("chatgptContextUse", False)
     # chatgpt联系上下文句子数
-    object.config["chatgptContextCount"] = object.config.get("chatgptContextCount", 5)
+    object.config["chatgptContextCount"] = object.config.get("chatgptContextCount", 3)
 
     ################### 其他设定 ###################
     # 翻译界面透明度
@@ -386,6 +389,15 @@ def configConvert(object) :
     object.config["mangaFilterCharUse"] = object.config.get("mangaFilterCharUse", True)
     object.config["mangaFilterCharCount"] = object.config.get("mangaFilterCharCount", 1)
 
+    # 描边字体参数
+    object.config["fixedOutlineColorUse"] = object.config.get("fixedOutlineColorUse", False)
+    object.config["fixedOutlineColor"] = object.config.get("fixedOutlineColor", "#FFFFFF")
+    object.config["fixedInlineColor"] = object.config.get("fixedInlineColor", "#FFFFFF")
+    object.config["fixedOutlineWidth"] = object.config.get("fixedOutlineWidth", 0.7)
+    # 翻译历史参数
+    object.config["transHistoryUse"] = object.config.get("transHistoryUse", True)
+    object.config["transHistoryPerfectUse"] = object.config.get("transHistoryPerfectUse", True)
+
     # 允许写入的key
     allow_keys = [
         "dictInfo", "offlineOCR", "onlineOCR", "DangoToken", "onlineOCRProbation", "nodeURL", "baiduOCR", "OCR", "AccessToken",
@@ -402,7 +414,8 @@ def configConvert(object) :
         "mangaFontType", "mangaOutputRenameUse", "mangaFastRenderUse", "mangaShadowSize", "mangaFiltrateUse",
         "mangaFontSizeUse", "mangaFontSize", "youdaoPrivateUse", "youdaoAPI", "chatgptPrompt", "xiaoniuPrivateUse",
         "xiaoniuAPI", "huoshanPrivateUse", "huoshanAPI", "mangaChatgptDelayUse", "mangaChatgptDelayTime",
-        "chatgptContextUse", "chatgptContextCount", "mangaFilterCharUse", "mangaFilterCharCount"
+        "chatgptContextUse", "chatgptContextCount", "mangaFilterCharUse", "mangaFilterCharCount", "fixedOutlineColorUse",
+        "fixedOutlineColor", "fixedInlineColor", "fixedOutlineWidth", "transHistoryUse", "transHistoryPerfectUse"
     ]
     # 删除多余的key
     delete_keys = []

@@ -333,7 +333,7 @@ def offlineOCR(object, test=False) :
 
 
 # 漫画OCR
-def mangaOCR(object, filepath, image_base64=None, filtrate=True, check_permission=False) :
+def mangaOCR(object, filepath, image_base64=None, filtrate=True, low_accuracy_mode=False, check_permission=False) :
 
     token = object.config.get("DangoToken", "")
     if token == "" :
@@ -357,6 +357,7 @@ def mangaOCR(object, filepath, image_base64=None, filtrate=True, check_permissio
         "disable_skip_area": filtrate,
         "detect_scale": object.config.get("mangaDetectScale", 1),
         "merge_threshold": object.config.get("mangaMergeThreshold", 5.0),
+        "low_accuracy_mode": low_accuracy_mode,
         "image": image_base64
     }
     url = object.yaml["dict_info"].get("manga_ocr", "https://dl.ap-sh.starivercs.cn/v2/manga_trans/advanced/manga_ocr")

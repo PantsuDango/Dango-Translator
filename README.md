@@ -1,8 +1,8 @@
 # 团子翻译器 - 基于OCR的生肉翻译软件
 
 
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.5.7-ff69b4)](https://github.com/PantsuDango/Dango-Translator)
-[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2023--08--14-ff69b4)]()
+[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.5.8-ff69b4)](https://github.com/PantsuDango/Dango-Translator)
+[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2023--09--14-ff69b4)]()
 [![操作系统](https://img.shields.io/badge/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-win7--11-ff69b4)]()
 [![GitHubStars](https://img.shields.io/github/stars/PantsuDango/Dango-Translator)]()
 [![GitHubForks](https://img.shields.io/github/forks/PantsuDango/Dango-Translator)]()
@@ -29,28 +29,29 @@
 ## 安装版下载
 - 群文件下载: [![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-19%E7%BE%A4916323291-ff69b4)](https://dango-static.eos-shanghai-2.cmecloud.cn/resources/translator/20%E7%BE%A4.jpg)  
 - 官网下载: [下载地址](https://translator.dango.cloud)
-- Github Releases: [Ver4.5.7](https://github.com/PantsuDango/Dango-Translator/releases/tag/Ver4.5.7)
+- Github Releases: [Ver4.5.8](https://github.com/PantsuDango/Dango-Translator/releases/tag/Ver4.5.8)
 
   
 ## 更新日志
 ### 翻译器相关
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.5.7-ff69b4)]()
-[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2023--08--14-ff69b4)]()
+[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.5.8-ff69b4)]()
+[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2023--09--14-ff69b4)]()
 
-#### 版本号：4.5.7
-#### 更新时间 2023/08/14
+#### 版本号：4.5.8
+#### 更新时间 2023/09/14
 #### 新增
-+ 翻译源新增私人有道、私人小牛、私人火山;
-+ 优化翻译历史的界面, 新增sqllite管理翻译数据, 翻译加入本地查询, 重复的译文不会反复调用翻译源, 而是直接用本地保存的已翻译的结果;
-+ chatgpt新增自定义催眠话术、联系上下文、翻译间隔延时功能;
-+ 图片翻译编辑图新增, 区域还原功能, 可手动还原消除错误的区域;
-+ 图片翻译高级设置新增过滤短字数句子功能;     
++ 全面优化翻译历史界面, 支持对翻译历史增、删、改、查润色和导出;      
++ 设置页面功能设定新增本地翻译历史调用配置;      
++ 翻译框文字的描边参数和颜色, 可以在设置的样式设定里修改了;      
++ 图片翻译新增, 自动记录前几次的导入目录, 方便快速导入;      
++ 图片翻译新增, 导出时可选清除缓存文件;      
++ 图片翻译新增, 支持批量删除和全部删除图片框的图片;      
++ 图片翻译新增, 一键翻译时可选只重新渲染和只翻译并重新渲染;          
 #### 优化
-+ 优化设置-翻译设定-私人翻译界面;
-+ 优化图片翻译界面;
-+ 修复特定情况下出现的翻译框过大, 位置超屏幕等各种问题;
-+ 修复一些已知的bug;
-
++ 图片翻译时, 翻译和文字消除改为同时进行, 减少总体耗时;      
++ 优化图片翻译手动绘制时偶尔会识别失败的问题;      
++ 修复图片翻译可能出现闪退的问题;      
++ 修复一些已知的bug和糟糕的体验;      
 更多更新日志: [查看](https://github.com/PantsuDango/Dango-Translator/releases)  
 
 ## 原理说明

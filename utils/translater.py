@@ -272,7 +272,14 @@ class TranslaterProcess(QThread) :
 
             # 保存译文
             if self.trans_type != "original" :
-                utils.sqlite.insertTranslationDB(self.logger, self.object.translation_ui.original, self.trans_type, result)
+                trans_type = self.trans_type
+                if self.trans_type == "webdriver_1" :
+                    trans_type = self.object.translation_ui.webdriver1.web_type
+                elif self.trans_type == "webdriver_2" :
+                    trans_type = self.object.translation_ui.webdriver2.web_type
+                elif self.trans_type == "webdriver_3" :
+                    trans_type = self.object.translation_ui.webdriver3.web_type
+                utils.sqlite.insertTranslationDB(self.logger, self.object.translation_ui.original, trans_type, result)
 
         # 根据屏蔽词过滤
         for val in self.object.config["Filter"]:
@@ -495,7 +502,14 @@ class Translater(QThread) :
         nothing_sign = False
 
         # 从数据库中获取翻译结果
-        self.trans_map = utils.sqlite.selectTranslationDBBySrcAndTransType(original, self.logger)
+        self.trans_map = {}
+        if self.object.config["transHistoryUse"] :
+            self.trans_map = utils.sqlite.selectTranslationDBBySrcAndTransType(original, self.logger)
+            # 是否使用模糊匹配
+            if not self.object.config["transHistoryPerfectUse"] and self.object.yaml["similar_score"] < 100 and not self.trans_map :
+                similar_original = utils.sqlite.selectTransDataBySimilarity(original, self.object.yaml["similar_score"], self.logger)
+                if similar_original :
+                    self.trans_map = utils.sqlite.selectTranslationDBBySrcAndTransType(similar_original, self.logger)
 
         # 公共翻译一
         if self.object.translation_ui.webdriver1.web_type :
@@ -568,7 +582,15 @@ class Translater(QThread) :
     def flushTranslate(self, original) :
 
         # 从数据库中获取翻译结果
-        self.trans_map = utils.sqlite.selectTranslationDBBySrcAndTransType(original, self.logger)
+        self.trans_map = {}
+        if self.object.config["transHistoryUse"] :
+            self.trans_map = utils.sqlite.selectTranslationDBBySrcAndTransType(original, self.logger)
+            # 是否使用模糊匹配
+            if not self.object.config["transHistoryPerfectUse"] and self.object.yaml["similar_score"] < 100 and not self.trans_map :
+                similar_original = utils.sqlite.selectTransDataBySimilarity(original, self.object.yaml["similar_score"], self.logger)
+                if similar_original :
+                    self.trans_map = utils.sqlite.selectTranslationDBBySrcAndTransType(similar_original, self.logger)
+
         # 更新原文
         self.object.translation_ui.original = original
 

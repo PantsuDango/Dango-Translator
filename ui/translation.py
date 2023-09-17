@@ -113,18 +113,30 @@ class Translation(QMainWindow) :
         # 翻译框加入描边文字
         self.format = QTextCharFormat()
         # 初始化
-        self.format.setTextOutline(QPen(QColor(self.font_color_1), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
-        self.translate_text.mergeCurrentCharFormat(self.format)
-        self.translate_text.append("欢迎使用团子翻译器: Ver%s"%self.object.yaml["version"])
-        self.format.setTextOutline(QPen(QColor(self.font_color_2), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
-        self.translate_text.mergeCurrentCharFormat(self.format)
-        self.translate_text.append("B站关注UP主[团子翻译器], 查看动态可了解翻译器最新情况")
-        self.format.setTextOutline(QPen(QColor(self.font_color_1), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
-        self.translate_text.mergeCurrentCharFormat(self.format)
-        self.translate_text.append("——最新QQ交流群: %s"%self.object.yaml["dict_info"]["qq_group_number"])
-        self.format.setTextOutline(QPen(QColor(self.font_color_2), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
-        self.translate_text.mergeCurrentCharFormat(self.format)
-        self.translate_text.append("软件在使用上有任何问题, 欢迎直接来交流群找客服娘协助")
+        self.setOutlineFont(
+            text="欢迎使用团子翻译器: Ver%s"%self.object.yaml["version"],
+            font_color="#FFFFFF",
+            outline_color=self.font_color_1,
+            outline_width=0.7
+        )
+        self.setOutlineFont(
+            text="B站关注UP主[团子翻译器], 查看动态可了解翻译器最新情况",
+            font_color="#FFFFFF",
+            outline_color=self.font_color_2,
+            outline_width=0.7
+        )
+        self.setOutlineFont(
+            text="——最新QQ交流群: %s"%self.object.yaml["dict_info"]["qq_group_number"],
+            font_color="#FFFFFF",
+            outline_color=self.font_color_1,
+            outline_width=0.7
+        )
+        self.setOutlineFont(
+            text="软件在使用上有任何问题, 欢迎直接来交流群找客服娘协助",
+            font_color="#FFFFFF",
+            outline_color=self.font_color_2,
+            outline_width=0.7
+        )
 
         # 翻译界面显示通知信息
         thread = utils.thread.createShowTranslateTextQThread(self.object)
@@ -730,9 +742,7 @@ class Translation(QMainWindow) :
         if result :
             self.translate_text.clear()
             for content in result.split(r"\n") :
-                self.format.setTextOutline(QPen(QColor(self.font_color_1), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
-                self.translate_text.mergeCurrentCharFormat(self.format)
-                self.translate_text.append(content)
+                self.setOutlineFont(content, "#FFFFFF", self.font_color_1, 0.7)
 
 
     # 当翻译内容改变时界面自适应窗口大小
@@ -856,9 +866,18 @@ class Translation(QMainWindow) :
 
         # 显示在文本框上
         if self.object.config["showColorType"] == False :
-            self.format.setTextOutline(QPen(QColor(color), 0.7, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
-            self.translate_text.mergeCurrentCharFormat(self.format)
-            self.translate_text.append(result)
+            if self.object.config["fixedOutlineColorUse"] :
+                font_color = color
+                outline_color = self.object.config["fixedOutlineColor"]
+            else :
+                font_color = self.object.config["fixedInlineColor"]
+                outline_color = color
+            self.setOutlineFont(
+                text=result,
+                font_color=font_color,
+                outline_color=outline_color,
+                outline_width=self.object.config["fixedOutlineWidth"]
+            )
         else :
             result = result.replace("\n", "<br>")
             self.translate_text.append("<font color=%s>%s</font>"%(color, result))
@@ -1026,13 +1045,12 @@ class Translation(QMainWindow) :
         screen_w, screen_h = self.getScreenSize()
         w = self.width()
         h = self.height()
+        if w >= screen_w :
+            w = screen_w
+        if h >= screen_h :
+            h = screen_h
 
-        if w >= screen_w - 100 :
-            w = screen_w - 100
-        if h >= screen_h - 100 :
-            h = screen_h - 100
         self.resize(w, h)
-
         width = round((self.width() - 534 * self.rate) / 2)
         height = self.height() - 30 * self.rate
 
@@ -1121,6 +1139,15 @@ class Translation(QMainWindow) :
             self.width(),
             height * self.rate
         )
+
+
+    # 设置描边字体
+    def setOutlineFont(self, text: str, font_color: str, outline_color: str, outline_width: float) :
+
+        self.format.setForeground(QColor(font_color))
+        self.format.setTextOutline(QPen(QColor(outline_color), outline_width, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+        self.translate_text.mergeCurrentCharFormat(self.format)
+        self.translate_text.append(text)
 
 
     # 退出程序

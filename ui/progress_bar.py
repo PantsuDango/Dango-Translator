@@ -34,14 +34,13 @@ class ProgressBar(QWidget) :
         # 窗口图标
         self.setWindowIcon(ui.static.icon.APP_LOGO_ICON)
         # 设置字体
-        self.setStyleSheet("font: %spt '%s'; background-color: rgb(255, 255, 255);}"%(self.font_size, self.font_type))
+        self.setStyleSheet("font: %spt '%s'; background-color: rgb(255, 255, 255);"%(self.font_size, self.font_type))
 
         self.progress_bar = QProgressBar(self)
         self.customSetGeometry(self.progress_bar, 20, 10, 260, 10)
         self.progress_bar.setTextVisible(False)
-        self.progress_bar.setStyleSheet("QProgressBar { background-color: rgba(62, 62, 62, 0.2); "
-                                        "border-radius: 6px;}"
-                                        "QProgressBar::chunk { background-color: %s; border-radius: 5px;}"
+        self.progress_bar.setStyleSheet("QProgressBar {background-color: rgba(62, 62, 62, 0.2); border-radius: 6px;}"
+                                        "QProgressBar::chunk {background-color: %s; border-radius: 5px;}"
                                         %(self.color_2))
         self.progress_bar.setValue(0)
 
@@ -145,13 +144,12 @@ class MangaProgressBar(QWidget) :
         # 窗口图标
         self.setWindowIcon(ui.static.icon.APP_LOGO_ICON)
         # 设置字体
-        self.setStyleSheet("font: %spt '%s'; background-color: rgb(255, 255, 255);}"%(self.font_size, self.font_type))
+        self.setStyleSheet("font: %spt '%s'; background-color: rgb(255, 255, 255);"%(self.font_size, self.font_type))
 
         self.progress_bar = QProgressBar(self)
         self.customSetGeometry(self.progress_bar, 20, 10, 260, 10)
         self.progress_bar.setTextVisible(False)
-        self.progress_bar.setStyleSheet("QProgressBar { background-color: rgba(62, 62, 62, 0.2); "
-                                        "border-radius: 6px;}"
+        self.progress_bar.setStyleSheet("QProgressBar { background-color: rgba(62, 62, 62, 0.2); border-radius: 6px;}"
                                         "QProgressBar::chunk { background-color: %s; border-radius: 5px;}"
                                         %(self.color_2))
         self.progress_bar.setValue(0)

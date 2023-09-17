@@ -8,6 +8,7 @@ import utils.email
 import utils.message
 import utils.http
 import traceback
+import translator.sound
 
 
 # 创建线程
@@ -113,13 +114,14 @@ class createMangaTransQThread(QThread) :
     bar_signal = pyqtSignal(int, str)
     add_message_signal = pyqtSignal(str, str)
 
-    def __init__(self, window, image_paths, reload_sign=False):
+    def __init__(self, window, image_paths, execute_type="pass", use_sqlite=True):
 
         super(createMangaTransQThread, self).__init__()
         self.window = window
         self.logger = self.window.logger
         self.image_paths = image_paths
-        self.reload_sign = reload_sign
+        self.execute_type = execute_type
+        self.use_sqlite = use_sqlite
         self.window.trans_process_bar.stop_sign = False
         self.window.trans_process_bar.finish_sign = False
         self.success_count = 0
@@ -133,7 +135,7 @@ class createMangaTransQThread(QThread) :
         try :
             for index, image_path in enumerate(self.image_paths) :
                 # 翻译进程
-                result = self.window.transProcess(image_path, self.reload_sign)
+                result = self.window.transProcess(image_path, self.execute_type, self.use_sqlite)
                 # 如果失败记录日志
                 image_name = os.path.basename(image_path)
                 if result :
@@ -164,6 +166,9 @@ class createMangaTransQThread(QThread) :
         self.add_message_signal.emit("成功{}张, 失败{}张, 翻译结束".format(self.success_count, len(self.image_paths) - self.success_count), "green")
         self.window.trans_process_bar.finish_sign = True
         self.signal.emit("", False)
+        # 播放系统提示音
+        if len(self.image_paths) > 1 :
+            translator.sound.playSystemSound()
 
 
 # 图片翻译导入图片进程
@@ -187,13 +192,20 @@ class createInputImagesQThread(QThread) :
         time.sleep(0.1)
         # 遍历文件列表, 将每个文件路径添加到列表框中
         for index, image_path in enumerate(self.images) :
+            # 判断文件是否已经添加
+            image_path = os.path.normpath(image_path)
             if image_path in self.window.image_path_list :
+                continue
+            # 判断图片是否损坏
+            try :
+                self.window.repairBadImage(image_path)
+            except Exception :
                 continue
             # 判断文件大小, 如果超过2MB就缩小
             file_size = self.window.getFileSize(image_path)
             if file_size > 2 :
                 self.window.adjustImageSize(image_path, 2*1024*1024)
-
+            # 发送添加到列表框信号
             self.image_widget_signal.emit(str(index+1), image_path, False)
             # 进度条
             self.bar_signal.emit(
