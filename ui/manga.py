@@ -840,7 +840,8 @@ class Manga(QMainWindow) :
     def dirFilesPathSort(self, files) :
 
         try :
-            new_files = natsort.natsorted(files, key=lambda x: os.path.splitext(x)[1])
+            new_files = natsort.natsorted(files, alg=ns.PATH)
+            # new_files = natsort.natsorted(files, key=lambda x: os.path.splitext(x)[1])
         except Exception :
             tmp_dict = {}
             for file_path in files :
