@@ -1004,12 +1004,17 @@ class Manga(QMainWindow) :
 
 
     # 刷新底部状态栏信息
-    def refreshStatusLabel(self, image_path="") :
+    def refreshStatusLabel(self) :
 
         # 计算当前页码
         index = 0
-        if image_path in self.image_path_list :
-            index = self.image_path_list.index(image_path) + 1
+        if not self.original_image_widget.isHidden() :
+            index = self.original_image_widget.currentRow()
+        elif not self.edit_image_widget.isHidden() :
+            index = self.edit_image_widget.currentRow()
+        elif not self.trans_image_widget.isHidden() :
+            index = self.trans_image_widget.currentRow()
+        index += 1
 
         if self.check_permission :
             self.status_label.setText(
@@ -1860,7 +1865,7 @@ class Manga(QMainWindow) :
         if init_image_rate :
             self.setImageInitRate(init_image_rate)
         # 刷新状态栏
-        self.refreshStatusLabel(image_path)
+        self.refreshStatusLabel()
 
 
     # 设置图片初始缩放比例
