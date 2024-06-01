@@ -1,13 +1,13 @@
 # 团子翻译器 - 基于OCR的生肉翻译软件
 
 
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.5.8-ff69b4)](https://github.com/PantsuDango/Dango-Translator)
-[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2023--09--14-ff69b4)]()
+[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver5.2.2-ff69b4)](https://github.com/PantsuDango/Dango-Translator)
+[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2024--06--01-ff69b4)]()
 [![操作系统](https://img.shields.io/badge/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-win7--11-ff69b4)]()
 [![GitHubStars](https://img.shields.io/github/stars/PantsuDango/Dango-Translator)]()
 [![GitHubForks](https://img.shields.io/github/forks/PantsuDango/Dango-Translator)]()
 [![作者](https://img.shields.io/badge/QQ-%E8%83%96%E6%AC%A1%E5%9B%A2%E5%AD%90-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E4%BD%9C%E8%80%85.png)
-[![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-20%E7%BE%A4691201730-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/19%E7%BE%A4.png)
+[![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-11%E7%BE%A4835628840-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/19%E7%BE%A4.png)
 
   
 ## 简介
@@ -23,36 +23,32 @@
 
 
 ## 使用教程
-[翻译器使用文档教程](https://dango-docs.ap-sh.starivercs.cn/#/4.0/basic/dangotranslator)
+[翻译器使用文档教程](https://dango-docs.ap-sh.starivercs.cn/#/5.0/basic/dangotranslator)
 
   
 ## 安装版下载
-- 群文件下载: [![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-20%E7%BE%A4691201730-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/19%E7%BE%A4.png)  
+- 群文件下载: [![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-11%E7%BE%A4835628840-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/19%E7%BE%A4.png)  
 - 官网下载: [下载地址](https://translator.dango.cloud)
-- Github Releases: [Ver4.5.8](https://github.com/PantsuDango/Dango-Translator/releases/tag/Ver4.5.8)
+- Github Releases: [Ver5.2.2](https://eos-shanghai-2.cmecloud.cn/dango-static/patches/dango_translator/exe/%E5%9B%A2%E5%AD%90%E7%BF%BB%E8%AF%91%E5%99%A8v5.2.2%E5%AE%89%E8%A3%85%E5%8C%85-%E5%AE%8C%E6%95%B4%E7%89%88.exe)
 
   
 ## 更新日志
 ### 翻译器相关
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver4.5.8-ff69b4)]()
-[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2023--09--14-ff69b4)]()
+[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver5.2.2-ff69b4)]()
+[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2024--06--01-ff69b4)]()
 
-#### 版本号：4.5.8
-#### 更新时间 2023/09/14
+#### 版本号：5.2.2
+#### 更新时间 2024/06/01
 #### 新增
-+ 全面优化翻译历史界面, 支持对翻译历史增、删、改、查润色和导出;      
-+ 设置页面功能设定新增本地翻译历史调用配置;      
-+ 翻译框文字的描边参数和颜色, 可以在设置的样式设定里修改了;      
-+ 图片翻译新增, 自动记录前几次的导入目录, 方便快速导入;      
-+ 图片翻译新增, 导出时可选清除缓存文件;      
-+ 图片翻译新增, 支持批量删除和全部删除图片框的图片;      
-+ 图片翻译新增, 一键翻译时可选只重新渲染和只翻译并重新渲染;          
++ 开启贴图翻译时, 新增配置可让贴图层变为鼠标穿透效果, 不会妨碍操作下层的应用, 配置位于[设置-功能设定-其他]一栏里;      
++ 新增全屏置顶开关, 配置位于[设置-功能设定-其他]一栏里;       
 #### 优化
-+ 图片翻译时, 翻译和文字消除改为同时进行, 减少总体耗时;      
-+ 优化图片翻译手动绘制时偶尔会识别失败的问题;      
-+ 修复图片翻译可能出现闪退的问题;      
-+ 修复一些已知的bug和糟糕的体验;      
-更多更新日志: [查看](https://github.com/PantsuDango/Dango-Translator/releases)  
++ 彻底优化各种闪退、崩溃、卡死等问题!!!!!     
++ 优化自动翻译时, 底下白色字的状态栏, 会过分闪烁问题;      
++ 修复漫画翻译在特定情况下, 会出现只翻译第一张的问题;      
++ 修复部分开关文字不准确问题;      
++ 修复设置页部分数字选择器偶发乱码问题;  
+更多更新日志: [查看](https://dango-docs.ap-sh.starivercs.cn/#/5.0/develop/changelog)  
 
 ## 原理说明
 ### 实时翻译
@@ -71,6 +67,8 @@
 
 [Cypas_Nya](https://blog.ayano.top) 在线教程文档, 星河云开发
 
+[艾梦](https://github.com/HighCWu) 漫画翻译/在线OCR, 星河云模型开发
+
   
 ## 软件预览
 
@@ -78,31 +76,24 @@
 ![](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.3.6/%E4%BD%BF%E7%94%A8%E6%95%88%E6%9E%9C.png)
 
 #### 漫画翻译
-![初始界面](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.5.7/manga.png)
-![原图](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.5.6/manga1.png)
-![编辑](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.5.6/manga2.png)
-![译图](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.5.6/manga3.png)
+![初始界面](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver5.2.2/manga.png)
+![原图](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver5.2.2/manga1.png)
+![编辑](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver5.2.2/manga2.png)
+![译图](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver5.2.2/manga3.png)
 
 #### 登录界面
-<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.5.6/login1.png" width="50%" height="50%">
-
-#### 注册界面
-<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.3.6/%E6%B3%A8%E5%86%8C.png" width="50%" height="50%">
+<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver5.2.2/login.png" width="50%" height="50%">
 
 #### 主界面
-![](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.5.6/translation.png)
+![](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver5.2.2/translation.png)
 
 #### 设置界面
-<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.5.6/setting1.png" width="100%" height="100%">
-<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.5.7/settin.png" width="100%" height="100%">
-<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.5.6/setting3.png" width="100%" height="100%">
-<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.5.6/setting4.png" width="100%" height="100%">
-<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.5.6/setting5.png" width="100%" height="100%">
+<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver5.2.2/setting1.png" width="100%" height="100%">
+<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver5.2.2/setting2.png" width="100%" height="100%">
+<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver5.2.2/setting3.png" width="100%" height="100%">
+<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver5.2.2/setting4.png" width="100%" height="100%">
 <img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.3.6/%E5%A4%9A%E8%8C%83%E5%9B%B4%E5%88%87%E6%8D%A2.png" width="30%" height="30%">
-<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.5.6/filter.png" width="30%" height="30%">
-
-#### 支持作者
-<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.5.6/setting6.png" width="100%" height="100%">
+<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver5.2.2/text_lib.png" width="30%" height="30%">
 
 ## 开源协议
 本项目使用GNU LESSER GENERAL PUBLIC LICENSE(LGPL)开源协议
