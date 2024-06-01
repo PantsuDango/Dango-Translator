@@ -7,7 +7,7 @@
 [![GitHubStars](https://img.shields.io/github/stars/PantsuDango/Dango-Translator)]()
 [![GitHubForks](https://img.shields.io/github/forks/PantsuDango/Dango-Translator)]()
 [![作者](https://img.shields.io/badge/QQ-%E8%83%96%E6%AC%A1%E5%9B%A2%E5%AD%90-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E4%BD%9C%E8%80%85.png)
-[![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-11%E7%BE%A4835628840-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/19%E7%BE%A4.png)
+[![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-11%E7%BE%A4835628840-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/qrcode_1717254152512.jpg)
 
   
 ## 简介
@@ -47,7 +47,8 @@
 + 优化自动翻译时, 底下白色字的状态栏, 会过分闪烁问题;      
 + 修复漫画翻译在特定情况下, 会出现只翻译第一张的问题;      
 + 修复部分开关文字不准确问题;      
-+ 修复设置页部分数字选择器偶发乱码问题;  
++ 修复设置页部分数字选择器偶发乱码问题;   
++ 
 更多更新日志: [查看](https://dango-docs.ap-sh.starivercs.cn/#/5.0/develop/changelog)  
 
 ## 原理说明
