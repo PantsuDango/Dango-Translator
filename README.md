@@ -27,9 +27,9 @@
 
   
 ## 安装版下载
-- 群文件下载: [![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-11%E7%BE%A4835628840-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/19%E7%BE%A4.png)  
+- 群文件下载: [![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-11%E7%BE%A4835628840-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/qrcode_1717254152512.jpg)  
 - 官网下载: [下载地址](https://translator.dango.cloud)
-- Github Releases: [Ver5.2.2](https://eos-shanghai-2.cmecloud.cn/dango-static/patches/dango_translator/exe/%E5%9B%A2%E5%AD%90%E7%BF%BB%E8%AF%91%E5%99%A8v5.2.2%E5%AE%89%E8%A3%85%E5%8C%85-%E5%AE%8C%E6%95%B4%E7%89%88.exe)
+- Github Releases: [Ver5.2.2](https://eos-shanghai-2.cmecloud.cn/dango-static/patches/dango_translator/exe/DangoTranslator-v5.2.2-%E5%AE%8C%E6%95%B4%E7%89%88.exe)
 
   
 ## 更新日志
