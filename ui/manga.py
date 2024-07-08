@@ -2192,7 +2192,7 @@ class Manga(QMainWindow) :
         if not token :
             return
 
-        url = self.object.yaml.get("dango_check_permission", "https://capiv1.ap-sh.starivercs.cn/OCR/Admin/CheckPermission")
+        url = self.object.yaml["dict_info"].get("dango_check_permission", "https://capiv1.ap-sh.starivercs.cn/OCR/Admin/CheckPermission")
         url += "?Token={}".format(token)
         body = {"Type": 1}
 
