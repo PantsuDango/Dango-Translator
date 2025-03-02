@@ -29,7 +29,7 @@
 
 ## 安装版下载
 
-- 群文件下载: [![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-4%E7%BE%A4939840254-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/qrcode_1740921893259.jpg)  
+- 群文件下载: [![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-4%E7%BE%A41036831717-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/qrcode_1740921893259.jpg)  
 - 官网下载: [下载地址](https://translator.dango.cloud)
 - Github Releases: [Ver5.5.1](https://nfd.ap-sh.starivercs.cn/ec/3de2b6b69b4ae5c164cd1f6c612edfa9XvPco)
 
