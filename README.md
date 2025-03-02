@@ -7,7 +7,7 @@
 [![GitHubStars](https://img.shields.io/github/stars/PantsuDango/Dango-Translator)]()
 [![GitHubForks](https://img.shields.io/github/forks/PantsuDango/Dango-Translator)]()
 [![作者](https://img.shields.io/badge/QQ-%E8%83%96%E6%AC%A1%E5%9B%A2%E5%AD%90-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E4%BD%9C%E8%80%85.png)
-[![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-4%E7%BE%A4939840254-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/qrcode_1740921893259.jpg)
+[![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-4%E7%BE%A41036831717-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/qrcode_1740921893259.jpg)
 
 
 ## 简介
@@ -27,15 +27,12 @@
 
 [翻译器使用文档教程](https://dango-docs.ap-sh.starivercs.cn/#/5.0/basic/dangotranslator)
 
-
-
 ## 安装版下载
 
 - 群文件下载: [![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-4%E7%BE%A4939840254-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/qrcode_1740921893259.jpg)  
 - 官网下载: [下载地址](https://translator.dango.cloud)
 - Github Releases: [Ver5.5.1](https://nfd.ap-sh.starivercs.cn/ec/3de2b6b69b4ae5c164cd1f6c612edfa9XvPco)
 
-  
 ## 更新日志
 [![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver5.5.1-ff69b4)]()
 [![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2024--12--06-ff69b4)]()
@@ -64,14 +61,12 @@
 + 更多更新日志: [查看](https://dango-docs.ap-sh.starivercs.cn/#/5.0/develop/changelog)  
 
 
-
 ## 原理说明
 
 ### 实时翻译
 ![原理说明](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E6%B5%81%E7%A8%8B%E5%9B%BE.png)
 ### 图片翻译
 ![原理说明](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.5.4/%E6%BC%AB%E7%94%BB%E7%BF%BB%E8%AF%91%E8%AF%B4%E6%98%8E.png)
-
 
 
 ## 特别鸣谢
@@ -87,7 +82,6 @@
 [Cypas_Nya](https://blog.ayano.top) 在线教程文档, 星河云开发
 
 [艾梦](https://github.com/HighCWu) 漫画翻译/在线OCR, 星河云模型开发
-
 
 
 ## 软件预览
