@@ -1,8 +1,8 @@
 # 团子翻译器 - 基于OCR的生肉翻译软件
 
 
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver5.5.1-ff69b4)](https://github.com/PantsuDango/Dango-Translator)
-[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2024--12--06-ff69b4)]()
+[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver6.0.0-ff69b4)](https://github.com/PantsuDango/Dango-Translator)
+[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2025--03--31-ff69b4)]()
 [![操作系统](https://img.shields.io/badge/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-win7--11-ff69b4)]()
 [![GitHubStars](https://img.shields.io/github/stars/PantsuDango/Dango-Translator)]()
 [![GitHubForks](https://img.shields.io/github/forks/PantsuDango/Dango-Translator)]()
@@ -31,33 +31,27 @@
 
 - 群文件下载: [![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-4%E7%BE%A41036831717-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/qrcode_1740921893259.jpg)  
 - 官网下载: [下载地址](https://translator.dango.cloud)
-- Github Releases: [Ver5.5.1](https://nfd.ap-sh.starivercs.cn/ec/3de2b6b69b4ae5c164cd1f6c612edfa9XvPco)
+- 网盘系在: [夸克网盘](https://pan.quark.cn/s/eb5663a0edf2)
+- Github Releases: [Ver6.0.0](https://nfd.ap-sh.starivercs.cn/ec/3de2b6b69b4ae5c164cd1f6c612edfa9XvPco)
 
 ## 更新日志
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver5.5.1-ff69b4)]()
-[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2024--12--06-ff69b4)]()
+[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver6.0.0-ff69b4)]()
+[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2025--03--31-ff69b4)]()
 
-#### 版本号：5.5.1
-#### 更新时间 2024/12/06     
+#### 版本号：6.0.0
+#### 更新时间 2025/03/31     
 
 #### 全局:
-+ 支持手机号注册、登录、修改密码;      
-+ 优化修改翻译源颜色的图标;      
-+ 修复各种已知问题...
++ 6.0大版本迭代, 漫画翻译界面彻底重构;      
++ 支持翻译为中文以外的其他语言;
 
 #### 实时翻译:
-+ 截取范围框时所选区域会高亮;      
-+ 本地OCR采用动态端口, 避免端口冲突而运行失败;      
++ 各种问题优化;
 
 #### 漫画翻译:
-+ 优化漫画UI尺寸比例异常问题;      
-+ 新增超分辨率功能, 可以对模糊的图修复清晰再翻译;      
-+ 新增支持批量拖拽导入图片文件和多文件夹;      
-+ 新增支持从含图片目录的.txt文档导入图片;      
-+ 新增翻译完成自动导出译图功能;      
-+ 新增支持自定义导出译图的图片格式和压缩比例;      
-+ 图片列表框右键菜单栏支持快速导出单张译图;      
-+ 原文语种新增繁体中文, 可将繁体转简体;      
++ 漫画翻译完全重构, 发布全新交互界面;
++ 支持手动擦除、涂抹、添加空文本框;
++ 新增样式模版, 支持一键保存、快速切换模版样式;
 + 更多更新日志: [查看](https://dango-docs.ap-sh.starivercs.cn/#/5.0/develop/changelog)  
 
 
@@ -66,7 +60,7 @@
 ### 实时翻译
 ![原理说明](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E6%B5%81%E7%A8%8B%E5%9B%BE.png)
 ### 图片翻译
-![原理说明](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.5.4/%E6%BC%AB%E7%94%BB%E7%BF%BB%E8%AF%91%E8%AF%B4%E6%98%8E.png)
+![原理说明](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver6.0.0/manga.png)
 
 
 ## 特别鸣谢
@@ -90,22 +84,22 @@
 ![](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.3.6/%E4%BD%BF%E7%94%A8%E6%95%88%E6%9E%9C.png)
 
 #### 漫画翻译
-![初始界面](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver5.2.2/manga.png)
-![原图](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver5.2.2/manga1.png)
-![编辑](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver5.2.2/manga2.png)
-![译图](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver5.2.2/manga3.png)
+![初始界面](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver6.0.0/manga1.png)
+![原图](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver6.0.0/manga1.png)
+![编辑](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver6.0.0/manga2.png)
+![译图](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver6.0.0/manga3.png)
 
 #### 登录界面
-<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver5.2.2/login.png" width="50%" height="50%">
+<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver6.0.0/login.jpg" width="50%" height="50%">
 
 #### 主界面
-![](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver5.2.2/translation.png)
+![](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver6.0.0/mode.jpg)
 
 #### 设置界面
-<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver5.2.2/setting1.png" width="100%" height="100%">
-<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver5.2.2/setting2.png" width="100%" height="100%">
-<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver5.2.2/setting3.png" width="100%" height="100%">
-<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver5.2.2/setting4.png" width="100%" height="100%">
+<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver6.0.0/setting1.jpg" width="100%" height="100%">
+<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver6.0.0/setting2.jpg" width="100%" height="100%">
+<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver6.0.0/setting3.png" width="100%" height="100%">
+<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver6.0.0/setting4.png" width="100%" height="100%">
 <img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.3.6/%E5%A4%9A%E8%8C%83%E5%9B%B4%E5%88%87%E6%8D%A2.png" width="30%" height="30%">
 <img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver5.2.2/text_lib.png" width="30%" height="30%">
 
