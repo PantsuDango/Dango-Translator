@@ -1,8 +1,8 @@
 # 团子翻译器 - 基于OCR的生肉翻译软件
 
 
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver6.0.0-ff69b4)](https://github.com/PantsuDango/Dango-Translator)
-[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2025--03--31-ff69b4)]()
+[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver6.0.1-ff69b4)](https://github.com/PantsuDango/Dango-Translator)
+[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2025--04--07-ff69b4)]()
 [![操作系统](https://img.shields.io/badge/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-win7--11-ff69b4)]()
 [![GitHubStars](https://img.shields.io/github/stars/PantsuDango/Dango-Translator)]()
 [![GitHubForks](https://img.shields.io/github/forks/PantsuDango/Dango-Translator)]()
@@ -32,26 +32,34 @@
 - 群文件下载: [![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-4%E7%BE%A41036831717-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/qrcode_1740921893259.jpg)  
 - 官网下载: [下载地址](https://translator.dango.cloud)
 - 网盘系在: [夸克网盘](https://pan.quark.cn/s/eb5663a0edf2)
-- Github Releases: [Ver6.0.0](https://nfd.ap-sh.starivercs.cn/ec/1f7f8f3ade3bcc6a675e9e06e6711d81S2k5Xhmtkx)
+- Github Releases: [Ver6.0.1](https://nfd.ap-sh.starivercs.cn/ec/bc73f09f0474c59e5045125e3751fa071go)
 
 ## 更新日志
 [![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver6.0.0-ff69b4)]()
 [![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2025--03--31-ff69b4)]()
 
-#### 版本号：6.0.0
-#### 更新时间 2025/03/31     
+#### 版本号：6.0.1
+#### 更新时间 2025/04/07     
 
 #### 全局:
-+ 6.0大版本迭代, 漫画翻译界面彻底重构;      
-+ 支持翻译为中文以外的其他语言;
++ 修复了各种可能导致软件闪退的问题
++ 修复词库界面编辑文本的时候, 如果最小化了界面, 会导致编辑的文本消失的问题
++ 修复翻译历史界面, 如果最小化了界面, 再放大需要重新加载数据导致卡顿的问题
 
 #### 实时翻译:
-+ 各种问题优化;
++ 用户未配置就误打开chatgpt的开关, 导致整体翻译耗时过长, 现在加上了开启限制, 需要经过测试通过才可开启
 
 #### 漫画翻译:
-+ 漫画翻译完全重构, 发布全新交互界面;
-+ 支持手动擦除、涂抹、添加空文本框;
-+ 新增样式模版, 支持一键保存、快速切换模版样式;
++ 界面原本默认全屏, 现在支持自定义缩放尺寸
++ 轮廓颜色样式新增可设置为, 和当前字体色相反
++ 调整了界面上滚动条的颜色, 并加粗
++ 点击译图上的文本块时, 现在滚轮会自动滑到译文编辑的区域, 避免小屏幕用户需要频繁滑动滚轮
++ 手动擦除和笔刷填涂现在笔头改为了圆形
++ 进一步优化了手动擦除和笔刷填涂后的图片质量
++ 修复样式模版操作的时候, 消息提示窗上的模版名称错误的问题
++ 原图和译图下方的缩放比例处, 新增了一组比例的下拉框, 可以快速切换比例的
++ 高级设置-其他一栏里, 新增了翻译环节出错后可设置最大重试次数的功能
++ 优化了原图和译图, 拖拽移动图片的速度, 使其移动更平滑
 + 更多更新日志: [查看](https://dango-docs.ap-sh.starivercs.cn/#/5.0/develop/changelog)  
 
 
