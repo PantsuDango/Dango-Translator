@@ -1,5 +1,5 @@
 selenium==3.141.0
-opencv_python==4.2.0.34
+opencv_python==4.8.1.78
 pywin32==304
 QtAwesome==0.7.1
 scikit_image==0.15.0
