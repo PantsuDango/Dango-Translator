@@ -1,13 +1,13 @@
 # 团子翻译器 - 基于OCR的生肉翻译软件
 
 
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver6.0.1-ff69b4)](https://github.com/PantsuDango/Dango-Translator)
-[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2025--04--07-ff69b4)]()
+[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver6.0.3-ff69b4)](https://github.com/PantsuDango/Dango-Translator)
+[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2025--08--19-ff69b4)]()
 [![操作系统](https://img.shields.io/badge/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-win7--11-ff69b4)]()
 [![GitHubStars](https://img.shields.io/github/stars/PantsuDango/Dango-Translator)]()
 [![GitHubForks](https://img.shields.io/github/forks/PantsuDango/Dango-Translator)]()
 [![作者](https://img.shields.io/badge/QQ-%E8%83%96%E6%AC%A1%E5%9B%A2%E5%AD%90-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E4%BD%9C%E8%80%85.png)
-[![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-4%E7%BE%A41036831717-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/qrcode_1740921893259.jpg)
+[![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-4%E7%BE%A41036831717-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver6.0.3/qrcode_1755654091663.jpg)
 
 
 ## 简介
@@ -17,7 +17,7 @@
 + 搭载了离线OCR, 项目地址: [DangoOCR](https://github.com/PantsuDango/DangoOCR) 
 + 搭载了在线OCR和漫画OCR, 官网地址: [星河云OCR](https://cloud.stariver.org.cn/auth/login.html)
 + 实现自动模式，实时识别区域内的文本并翻译
-+ 配置了15种翻译源
++ 配置有常规翻译、在线AI翻译、本地AI翻译
 + 账号系统, 能够自动云端保存配置
 + 另有图片翻译功能, 实现对生肉漫画图片自动识别、翻译、消字、嵌字
 
@@ -29,37 +29,24 @@
 
 ## 安装版下载
 
-- 群文件下载: [![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-4%E7%BE%A41036831717-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/qrcode_1740921893259.jpg)  
+- 群文件下载: [![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-4%E7%BE%A41036831717-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver6.0.3/qrcode_1755654091663.jpg)  
 - 官网下载: [下载地址](https://translator.dango.cloud)
 - 网盘系在: [夸克网盘](https://pan.quark.cn/s/eb5663a0edf2)
-- Github Releases: [Ver6.0.1](https://nfd.ap-sh.starivercs.cn/ec/bc73f09f0474c59e5045125e3751fa071go)
+- Github Releases: [Ver6.0.3](https://dango-static-cm.starivercs.cn/resources/translator/DangoTranslator-v6.0.3-%E7%AE%80%E6%98%93%E7%89%88.exe)
 
 ## 更新日志
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver6.0.0-ff69b4)]()
-[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2025--03--31-ff69b4)]()
+[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver6.0.3-ff69b4)]()
+[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2025--08--19-ff69b4)]()
 
-#### 版本号：6.0.1
-#### 更新时间 2025/04/07     
+#### 版本号：6.0.3
+#### 更新时间 2025/08/19     
 
-#### 全局:
-+ 修复了各种可能导致软件闪退的问题
-+ 修复词库界面编辑文本的时候, 如果最小化了界面, 会导致编辑的文本消失的问题
-+ 修复翻译历史界面, 如果最小化了界面, 再放大需要重新加载数据导致卡顿的问题
-
-#### 实时翻译:
-+ 用户未配置就误打开chatgpt的开关, 导致整体翻译耗时过长, 现在加上了开启限制, 需要经过测试通过才可开启
-
-#### 漫画翻译:
-+ 界面原本默认全屏, 现在支持自定义缩放尺寸
-+ 轮廓颜色样式新增可设置为, 和当前字体色相反
-+ 调整了界面上滚动条的颜色, 并加粗
-+ 点击译图上的文本块时, 现在滚轮会自动滑到译文编辑的区域, 避免小屏幕用户需要频繁滑动滚轮
-+ 手动擦除和笔刷填涂现在笔头改为了圆形
-+ 进一步优化了手动擦除和笔刷填涂后的图片质量
-+ 修复样式模版操作的时候, 消息提示窗上的模版名称错误的问题
-+ 原图和译图下方的缩放比例处, 新增了一组比例的下拉框, 可以快速切换比例的
-+ 高级设置-其他一栏里, 新增了翻译环节出错后可设置最大重试次数的功能
-+ 优化了原图和译图, 拖拽移动图片的速度, 使其移动更平滑
++ 在线AI翻译新增2个通用翻译源;      
++ 优化了在线AI翻译的设置, 新增各种自定义方式;      
++ 设置页新增我的标签页, 支持各种账号相关操作;      
++ 首次运行新增操作引导;      
++ 优化设置页布局使其更加人性化;      
++ 修复了各种已知问题;      
 + 更多更新日志: [查看](https://dango-docs.ap-sh.starivercs.cn/#/5.0/develop/changelog)  
 
 
@@ -91,6 +78,10 @@
 #### 使用效果
 ![游戏实时翻译](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.3.6/%E4%BD%BF%E7%94%A8%E6%95%88%E6%9E%9C.png)
 ![漫画翻译](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver6.0.0/manga3.jpg)
+
+#### 快速上手
+![实时翻译](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver6.0.3/%E5%AE%9E%E6%97%B6%E7%BF%BB%E8%AF%91.png)
+![漫画翻译](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver6.0.3/%E6%BC%AB%E7%94%BB%E7%BF%BB%E8%AF%91.png)
 
 #### 登录界面
 <img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver6.0.0/login.jpg" width="50%" height="50%">
