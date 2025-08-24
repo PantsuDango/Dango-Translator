@@ -1,8 +1,8 @@
 # 团子翻译器 - 基于OCR的生肉翻译软件
 
 
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver6.0.3-ff69b4)](https://github.com/PantsuDango/Dango-Translator)
-[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2025--08--19-ff69b4)]()
+[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-v6.0.4-ff69b4)](https://github.com/PantsuDango/Dango-Translator)
+[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2025--08--24-ff69b4)]()
 [![操作系统](https://img.shields.io/badge/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-win7--11-ff69b4)]()
 [![GitHubStars](https://img.shields.io/github/stars/PantsuDango/Dango-Translator)]()
 [![GitHubForks](https://img.shields.io/github/forks/PantsuDango/Dango-Translator)]()
@@ -25,29 +25,34 @@
 
 ## 使用教程
 
-[翻译器使用文档教程](https://dango-docs.ap-sh.starivercs.cn/#/5.0/basic/dangotranslator)
+[翻译器使用文档教程](https://dango-docs-v6.ap-sh.starivercs.cn/)
 
 ## 安装版下载
 
 - 群文件下载: [![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-4%E7%BE%A41036831717-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver6.0.3/qrcode_1755654091663.jpg)  
 - 官网下载: [下载地址](https://translator.dango.cloud)
-- 网盘系在: [夸克网盘](https://pan.quark.cn/s/eb5663a0edf2)
-- Github Releases: [Ver6.0.3](https://dango-static-cm.starivercs.cn/resources/translator/DangoTranslator-v6.0.3-%E7%AE%80%E6%98%93%E7%89%88.exe)
+- 网盘下载: [夸克网盘](https://pan.quark.cn/s/eb5663a0edf2)
+- Github Releases: [v6.0.4](https://dango-static-cm.starivercs.cn/resources/translator/DangoTranslator-v6.0.4-%E7%AE%80%E6%98%93%E7%89%88.exe)
 
 ## 更新日志
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-Ver6.0.3-ff69b4)]()
-[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2025--08--19-ff69b4)]()
+[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-v6.0.4-ff69b4)]()
+[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2025--08--24-ff69b4)]()
+
+#### 版本号：6.0.4
+#### 更新时间 2025/08/24
+
++ 修复颜色选择无法使用问题;
++ 调整了在线AI翻译的设置页UI;
 
 #### 版本号：6.0.3
-#### 更新时间 2025/08/19     
+#### 更新时间 2025/08/19
 
 + 在线AI翻译新增2个通用翻译源;      
 + 优化了在线AI翻译的设置, 新增各种自定义方式;      
 + 设置页新增我的标签页, 支持各种账号相关操作;      
 + 首次运行新增操作引导;      
 + 优化设置页布局使其更加人性化;      
-+ 修复了各种已知问题;      
-+ 更多更新日志: [查看](https://dango-docs.ap-sh.starivercs.cn/#/5.0/develop/changelog)  
++ 修复了各种已知问题;
 
 
 ## 原理说明
