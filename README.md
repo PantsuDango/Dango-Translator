@@ -1,8 +1,8 @@
 # 团子翻译器 - 基于OCR的生肉翻译软件
 
 
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-v6.1.1-ff69b4)](https://github.com/PantsuDango/Dango-Translator)
-[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2025--10--17-ff69b4)]()
+[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-v6.1.2-ff69b4)](https://github.com/PantsuDango/Dango-Translator)
+[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2025--10--18-ff69b4)]()
 [![操作系统](https://img.shields.io/badge/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-win7--11-ff69b4)]()
 [![GitHubStars](https://img.shields.io/github/stars/PantsuDango/Dango-Translator)]()
 [![GitHubForks](https://img.shields.io/github/forks/PantsuDango/Dango-Translator)]()
@@ -32,11 +32,15 @@
 - 群文件下载: [![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-6%E7%BE%A4434137389-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/qrcode_1759602480385.jpg)  
 - 官网下载: [下载地址](https://translator.dango.cloud)
 - 网盘下载: [夸克网盘](https://pan.quark.cn/s/eb5663a0edf2)
-- Github Releases: [v6.1.1](https://dango-static-cm.starivercs.cn/resources/translator/DangoTranslator-v6.1.1-%E7%AE%80%E6%98%93%E7%89%88.exe)
+- Github Releases: [v6.1.2](https://dango-static-cm.starivercs.cn/resources/translator/DangoTranslator-v6.1.2-%E7%AE%80%E6%98%93%E7%89%88.exe)
 
 ## 更新日志
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-v6.1.1-ff69b4)]()
-[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2025--10--17-ff69b4)]()
+[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-v6.1.2-ff69b4)]()
+[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2025--10--18-ff69b4)]()
+
+版本号：6.1.2
+#### 更新时间 2025/10/18
+1. 修复点击翻译框工具栏的分开/覆盖按钮会导致软件崩溃的问题;      
 
 #### 版本号：6.1.1
 #### 更新时间 2025/10/17
