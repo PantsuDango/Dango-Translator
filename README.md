@@ -1,8 +1,8 @@
 # 团子翻译器 - 基于OCR的生肉翻译软件
 
 
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-v6.2.1-ff69b4)](https://github.com/PantsuDango/Dango-Translator)
-[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2026--04--07-ff69b4)]()
+[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-v6.2.2-ff69b4)](https://github.com/PantsuDango/Dango-Translator)
+[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2026--05--02-ff69b4)]()
 [![操作系统](https://img.shields.io/badge/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-win7--11-ff69b4)]()
 [![GitHubStars](https://img.shields.io/github/stars/PantsuDango/Dango-Translator)]()
 [![GitHubForks](https://img.shields.io/github/forks/PantsuDango/Dango-Translator)]()
@@ -38,21 +38,30 @@
 - 群文件下载: [![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-6%E7%BE%A4434137389-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/qrcode_1759602480385.jpg)  
 - 官网下载: [下载地址](https://translator.dango.cloud)
 - 网盘下载: [夸克网盘](https://pan.quark.cn/s/eb5663a0edf2)
-- Github Releases: [v6.2.1](https://github.com/PantsuDango/Dango-Translator/releases/tag/Ver6.2.1)
+- Github Releases: [v6.2.2](https://github.com/PantsuDango/Dango-Translator/releases/tag/Ver6.2.2)
 
 ## 更新日志
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-v6.2.1-ff69b4)]()
-[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2026--04--07-ff69b4)]()
+[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-v6.2.2-ff69b4)]()
+[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2026--05--02-ff69b4)]()
 
-版本号：6.2.1
-#### 更新时间 2026/04/07
-全局:
-1. 修复6.2.0引入的一个在线AI翻译的错误解析问题, 该问题会导致在使用AI翻译时, 若翻译错误, 应该被正确打印的错误信息统一都输出为了"ChatGPT翻译失败: 原文和译文行数不匹配. 可将高级设置里的逐行翻译后处理开关开启, 使其自动进行逐行翻译";
-漫画翻译:
-1. 修复某些带有特殊字符的目录, 拖拽导入会失败;
-2. 修复某些带有特殊字符的图片, 右键打开图片所在位置会失败;
-3. 修复切换查看模式后图片缩放比例不一致问题;
-4. 手动擦除支持调节笔刷颜色和大小;
+版本号：6.2.2
+#### 更新时间 2026/05/02
+##### 实时翻译
+- 优化截图逻辑, 实现截图时对窗口忽略, 即使翻译框和识别范围重叠, 也不会影响识别效果. 且开启贴图模式时, 不再会出现"闪烁"现象;
+
+##### 漫画翻译
+- 文本框样式编辑栏的重新贴字按钮, 加入了快捷键，ctrl+/ 触发;
+- 移除了原图和译图上的 "原图"、"译图" 页眉, 避免遮挡;
+- 漫画翻译现在打开时, 会自动恢复上次导入和处理图片记录;
+- 优化漫画翻译模块内存占用过大问题, 现在会定时自动释放;
+- 新增复制粘贴文本框功能, 选中文本块右键复制, 可在任意图上粘贴;
+- 修复拖拽导入时某些路径会失败的问题;
+- 漫画翻译的, 原图译图查看模式会保存配置;
+- 展开/折叠更多工具容器时, 原图译图展示控件会自动调整尺寸, 避免上边被遮住;
+- 样式编辑栏和设置里的各种控件均支持鼠标滚轮调整数值;
+##### 全局
+- 设置-我的页签, 新增查看更新日志的按钮;
+- 修复了各种已知问题, 优化使用体验;
 
 
 ## 原理说明
