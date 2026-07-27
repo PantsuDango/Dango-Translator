@@ -5,6 +5,7 @@ import os
 import time
 import requests
 import zipfile
+import subprocess
 
 import utils.message
 import utils.thread
@@ -47,10 +48,11 @@ def install_offline_ocr(object) :
 def killOfflineOCR(port) :
 
     try :
-        popen_content = os.popen("netstat -ano |findstr %s"%port).read()
-        if popen_content :
-            pid = popen_content.split(" ")[-1]
-            os.popen("taskkill /f /t /im %s"%pid)
+        popen_content = subprocess.run(["netstat", "-ano"], capture_output=True, text=True).stdout
+        lines = [line for line in popen_content.splitlines() if str(port) in line]
+        if lines:
+            pid = lines[0].split()[-1]
+            subprocess.run(["taskkill", "/f", "/t", "/pid", pid], capture_output=True)
     except Exception :
         return format_exc()
 
