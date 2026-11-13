@@ -81,10 +81,22 @@ HOOK 翻译从 7.0.0 版本开始上线，适用于 PC 端的 Galgame 和 RPG �
 </table>
 
 <details>
-<summary><b>已适配 40+ 游戏引擎（点击展开）</b></summary>
+<summary><b>已适配 44 个游戏引擎（点击展开）</b></summary>
 <br>
 
-KiriKiri、Ren'Py、RPG Maker MV / MZ / VX Ace / Unite、TyranoScript、Unity（Mono / Utage / EventScript / Scenario / Nemk Novel / TeamNimbus Dialogue）、Adventure Creator、Yarn Spinner、SiglusEngine、YU-RIS、CatSystem2、BGI、WillPlus、LiveMaker、WOLF RPG Editor、NScripter、PJADV、CMVS、Visual Novel Maker、RPG Developer Bakin、Taskforce2、AZSystem、Bolero ADV System、MIDAREAGEHA、VALKYRIA、C,system、DDWorks、LC-ScriptEngine、DxLib Compiled Dialogue、Abel / AST、constructor SSF、Escu:de / ACP、MADOKA GSX、Aigis ggDP、MED、BXSQ raylib、Nitroplus Diesel、Acquire Totomono
+<table>
+  <tr><td>KiriKiri</td><td>Ren'Py</td><td>RPG Maker MV / MZ</td><td>RPG Maker VX Ace</td></tr>
+  <tr><td>RPG Maker Unite</td><td>TyranoScript</td><td>Unity Mono</td><td>Unity Utage</td></tr>
+  <tr><td>Unity EventScript</td><td>Unity Scenario</td><td>Unity Nemk Novel</td><td>Unity TeamNimbus Dialogue</td></tr>
+  <tr><td>Adventure Creator</td><td>Yarn Spinner</td><td>SiglusEngine</td><td>YU-RIS</td></tr>
+  <tr><td>CatSystem2</td><td>BGI</td><td>WillPlus</td><td>LiveMaker</td></tr>
+  <tr><td>WOLF RPG Editor</td><td>NScripter</td><td>PJADV</td><td>CMVS</td></tr>
+  <tr><td>Visual Novel Maker</td><td>RPG Developer Bakin</td><td>Taskforce2</td><td>AZSystem</td></tr>
+  <tr><td>Bolero ADV System</td><td>MIDAREAGEHA</td><td>VALKYRIA</td><td>C,system</td></tr>
+  <tr><td>DDWorks</td><td>LC-ScriptEngine</td><td>DxLib Compiled Dialogue</td><td>Abel / AST</td></tr>
+  <tr><td>constructor SSF</td><td>Escu:de / ACP</td><td>MADOKA GSX</td><td>Aigis ggDP</td></tr>
+  <tr><td>MED</td><td>BXSQ raylib</td><td>Nitroplus Diesel</td><td>Acquire Totomono</td></tr>
+</table>
 
 </details>
 
@@ -113,24 +125,47 @@ HOOK 组件及其使用到的相关第三方组件源码已开源：[DangoTransl
 
 ## 免费与会员
 
-翻译器可以免费使用：本地 OCR、微软等翻译源、HOOK 实时翻译都无需付费。开通会员可以获得更好的识别和翻译效果，以及更多便捷功能：
+<table>
+  <tr>
+    <td valign="top" width="33%">
+      <p align="center"><img src="https://img.shields.io/badge/%E5%85%8D%E8%B4%B9%E4%BD%BF%E7%94%A8-39A76E?style=for-the-badge" height="44" alt="免费使用"><br><sub>下载即可使用</sub></p>
+      ✅ 本地 OCR<br>
+      ✅ 微软等翻译源<br>
+      ✅ HOOK 实时翻译
+    </td>
+    <td valign="top" width="33%">
+      <p align="center"><img src="https://img.shields.io/badge/%E5%AE%9E%E6%97%B6%E7%BF%BB%E8%AF%91%E4%BC%9A%E5%91%98-FF4D88?style=for-the-badge" height="44" alt="实时翻译会员"><br><sub>全部功能，有效期内不限次数</sub></p>
+      ✅ 在线 OCR<br>
+      ✅ 团子 LLM 翻译源<br>
+      ✅ HOOK 全文本翻译缓存<br>
+      ✅ HOOK 云共享译文一键加载<br>
+      ✅ HOOK 译文注入游戏
+    </td>
+    <td valign="top" width="33%">
+      <p align="center"><img src="https://img.shields.io/badge/%E6%BC%AB%E7%94%BB%E7%BF%BB%E8%AF%91%E4%BC%9A%E5%91%98-FF4D88?style=for-the-badge" height="44" alt="漫画翻译会员"><br><sub>全部功能，有效期内不限次数</sub></p>
+      ✅ 漫画原文气泡识别<br>
+      ✅ 自动抠字消除原文<br>
+      ✅ 自定义渲染译文<br>
+      ✅ 团子 LLM 翻译源
+    </td>
+  </tr>
+</table>
 
-| 会员 | 权益 |
-| --- | --- |
-| 实时翻译会员 | 在线 OCR、团子 LLM 翻译源、HOOK 全文本翻译缓存、HOOK 云共享译文一键加载、HOOK 译文注入游戏 |
-| 漫画翻译会员 | 漫画气泡识别、自动消除原文、自定义渲染译文、团子 LLM 翻译源 |
-
-会员可在软件内「会员权益」页面开通。
+会员可在软件内「会员权益」页面开通，开通后可获得更好的识别和翻译效果。
 
 
 ## 帮助
 
-<p>
-  <a href="https://dango-docs-v6.ap-sh.starivercs.cn/"><img src="https://img.shields.io/badge/%F0%9F%93%96-%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B-4a90e2?style=for-the-badge" alt="使用教程"></a>
-  <a href="https://docs.qq.com/sheet/DUnRaVWRCbW9xZFVK?tab=BB08J2&no_promotion=1"><img src="https://img.shields.io/badge/%F0%9F%93%9D-%E9%97%AE%E9%A2%98%E5%8F%8D%E9%A6%88-4a90e2?style=for-the-badge" alt="问题反馈"></a>
-</p>
-
-使用中遇到问题或有功能建议，可以在问题反馈文档中提交，也可以加入交流群交流。
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <h3>📖 <a href="https://dango-docs-v6.ap-sh.starivercs.cn/">使用教程</a></h3>
+    </td>
+    <td align="center" width="50%">
+      <h3>💬 <a href="https://docs.qq.com/sheet/DUnRaVWRCbW9xZFVK?tab=BB08J2&no_promotion=1">问题反馈</a></h3>
+    </td>
+  </tr>
+</table>
 
 
 ## 更新日志
