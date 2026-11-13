@@ -1,121 +1,188 @@
-# 团子翻译器 - 基于OCR的生肉翻译软件
+<p align="center">
+  <img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver7.0.4/logo.png" width="128" height="128" alt="团子翻译器">
+</p>
 
+<h1 align="center">团子翻译器</h1>
 
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-v6.3.3-ff69b4)](https://github.com/PantsuDango/Dango-Translator)
-[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2026--07--26-ff69b4)]()
-[![操作系统](https://img.shields.io/badge/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-win7--11-ff69b4)]()
-[![GitHubStars](https://img.shields.io/github/stars/PantsuDango/Dango-Translator)]()
-[![GitHubForks](https://img.shields.io/github/forks/PantsuDango/Dango-Translator)]()
-[![作者](https://img.shields.io/badge/QQ-%E8%83%96%E6%AC%A1%E5%9B%A2%E5%AD%90-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E4%BD%9C%E8%80%85.png)
-[![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-6%E7%BE%A4434137389-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/qrcode_1759602480385.jpg)
+<p align="center">游戏与漫画的生肉翻译软件 · OCR 实时翻译 · HOOK 游戏翻译 · 漫画一键嵌字</p>
+
+<p align="center">
+  <a href="https://translator.dango.cloud"><img src="https://img.shields.io/badge/%E7%AB%8B%E5%8D%B3%E4%B8%8B%E8%BD%BD-v7.0.4-ff69b4?style=for-the-badge" alt="立即下载"></a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/%E7%B3%BB%E7%BB%9F-Windows%207~11-ff69b4" alt="系统">
+  <a href="https://github.com/PantsuDango/Dango-Translator/stargazers"><img src="https://img.shields.io/github/stars/PantsuDango/Dango-Translator" alt="Stars"></a>
+  <a href="https://github.com/PantsuDango/Dango-Translator/network/members"><img src="https://img.shields.io/github/forks/PantsuDango/Dango-Translator" alt="Forks"></a>
+  <a href="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/qrcode_1759602480385.jpg"><img src="https://img.shields.io/badge/%E4%BA%A4%E6%B5%81%E7%BE%A4-434137389-ff69b4" alt="交流群"></a>
+  <a href="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E4%BD%9C%E8%80%85.png"><img src="https://img.shields.io/badge/QQ-%E8%83%96%E6%AC%A1%E5%9B%A2%E5%AD%90-ff69b4" alt="作者"></a>
+</p>
 
 
 ## 简介
 
-团子翻译器是一款生肉翻译软件，通过OCR识别屏幕特定范围内的文字，然后将识别到的文字调取各种翻译源，并实时输出翻译结果。
+团子翻译器是一款生肉翻译软件，提供三种翻译方式：
 
-+ 搭载了离线OCR, 项目地址: [DangoOCR](https://github.com/PantsuDango/DangoOCR) 
-+ 搭载了在线OCR和漫画OCR, 官网地址: [星河云OCR](https://dashboard.stariver.org.cn/)
-+ 实现自动模式，实时识别区域内的文本并翻译
-+ 配置有常规翻译、在线AI翻译、本地AI翻译
-+ 账号系统, 能够自动云端保存配置
-+ 另有图片翻译功能, 实现对生肉漫画图片自动识别、翻译、消字、嵌字
+- **OCR 实时翻译**：框选屏幕上的任意区域，自动识别文字并翻译，游戏、视频、网页都能用
+- **HOOK 翻译**：直接读取游戏里的对话，比 OCR 更准更快；还能提前翻译整个游戏，并让游戏直接显示中文
+- **漫画翻译**：导入生肉漫画，一键完成识别、翻译、消字、嵌字
+
+支持本地 / 在线 OCR，以及常规翻译、在线 AI、本地 AI 多种翻译源，账号登录后配置自动云端保存。
+
+
+## 下载
+
+当前最新版本：**v7.0.4**（2026/11/13）
+
+| 渠道 | 地址 |
+| --- | --- |
+| 官网 | [translator.dango.cloud](https://translator.dango.cloud) |
+| 夸克网盘 | [点击下载](https://pan.quark.cn/s/eb5663a0edf2) |
+| GitHub Releases | [v7.0.4](https://github.com/PantsuDango/Dango-Translator/releases/tag/Ver7.0.4) |
+| 交流群文件 | [6 群 434137389](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/qrcode_1759602480385.jpg) |
+
+已安装旧版本的用户，打开软件后会自动提示更新。
+
+
+## 功能介绍
+
+### OCR 实时翻译
+
+- 框选屏幕上的文字区域，文字一变化就自动翻译
+- 可同时框选多个区域
+- 覆盖模式下，译文直接贴在原文位置上，看起来就像原本就是中文
+- 译文框的字体、颜色、背景都可以自由调整
+- 支持屏蔽词、自定义词库、朗读原文
+
+<table>
+  <tr>
+    <td align="center" width="33%"><a href="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver7.0.4/start_use_ocr_settings.jpg"><img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver7.0.4/start_use_ocr_settings.jpg" alt="选择OCR"></a><br>① 选择 OCR<br><sub>本地 OCR 免费，在线 OCR 识别更强</sub></td>
+    <td align="center" width="33%"><a href="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver7.0.4/start_use_source_settings.jpg"><img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver7.0.4/start_use_source_settings.jpg" alt="选择翻译源"></a><br>② 选择翻译源<br><sub>免费可选微软，会员可使用团子 LLM</sub></td>
+    <td align="center" width="33%"><a href="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver7.0.4/start_use_ocr_range.jpg"><img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver7.0.4/start_use_ocr_range.jpg" alt="框选文字区域"></a><br>③ 框选区域，开启自动翻译<br><sub>文字变化时自动识别翻译</sub></td>
+  </tr>
+</table>
+
+### HOOK 翻译
+
+HOOK 翻译从 7.0.0 版本开始上线，适用于 PC 端的 Galgame 和 RPG 等游戏。导入游戏后就能直接读取游戏里的对话并翻译，不用框选范围，比 OCR 更准更快。
+
+- **实时翻译**：游戏里显示一句，译文框就翻译一句，对话、角色名、选项都能翻译
+- **全量翻译**：提前把整个游戏的文本翻译好，游玩时直接出译文，没有等待
+- **译文注入**：游戏里的对话直接显示成中文，就像在玩汉化版
+- **译文云共享**：别人翻译过的游戏，可以直接加载云端共享的译文，省去翻译时间
+- **转区启动**：可通过 Locale Emulator 转区启动游戏，解决部分日文游戏的乱码问题
+
+<table>
+  <tr>
+    <td align="center" width="33%"><a href="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver7.0.4/start_use_hook_import.jpg"><img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver7.0.4/start_use_hook_import.jpg" alt="导入游戏"></a><br>① 导入游戏<br><sub>切换到 HOOK 模式，导入游戏即可翻译</sub></td>
+    <td align="center" width="33%"><a href="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver7.0.4/start_use_hook_full_text.jpg"><img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver7.0.4/start_use_hook_full_text.jpg" alt="全量翻译"></a><br>② 全量翻译（可选）<br><sub>提前翻译全部文本，游玩零延迟</sub></td>
+    <td align="center" width="33%"><a href="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver7.0.4/start_use_hook_embed.jpg"><img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver7.0.4/start_use_hook_embed.jpg" alt="译文注入"></a><br>③ 译文注入（可选）<br><sub>开启「注入」，游戏直接显示译文</sub></td>
+  </tr>
+</table>
+
+<details>
+<summary><b>已适配 40+ 游戏引擎（点击展开）</b></summary>
+<br>
+
+KiriKiri、Ren'Py、RPG Maker MV / MZ / VX Ace / Unite、TyranoScript、Unity（Mono / Utage / EventScript / Scenario / Nemk Novel / TeamNimbus Dialogue）、Adventure Creator、Yarn Spinner、SiglusEngine、YU-RIS、CatSystem2、BGI、WillPlus、LiveMaker、WOLF RPG Editor、NScripter、PJADV、CMVS、Visual Novel Maker、RPG Developer Bakin、Taskforce2、AZSystem、Bolero ADV System、MIDAREAGEHA、VALKYRIA、C,system、DDWorks、LC-ScriptEngine、DxLib Compiled Dialogue、Abel / AST、constructor SSF、Escu:de / ACP、MADOKA GSX、Aigis ggDP、MED、BXSQ raylib、Nitroplus Diesel、Acquire Totomono
+
+</details>
+
+遇到无法使用的游戏，可以到 [问题反馈文档](https://docs.qq.com/sheet/DUnRaVWRCbW9xZFVK?tab=BB08J2&no_promotion=1) 提交，我们会持续适配。
+
+HOOK 组件及其使用到的相关第三方组件源码已开源：[DangoTranslator-Hook-Extension](https://github.com/PantsuDango/DangoTranslator-Hook-Extension)
+
+### 漫画翻译
+
+- 导入图片或文件夹，一键完成识别、翻译、消除原文、嵌入译文，支持批量处理
+- 原文消除干净，译文自动断句排版
+- 译文的字体、颜色、描边、阴影等样式都能自由调整，常用样式可保存为模板
+- 提供擦除、填涂、还原等修图工具，方便手动精修
+- 支持导出译图和 PDF
+
+<table>
+  <tr>
+    <td align="center" width="33%"><a href="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver7.0.4/start_use_manga_source_settings.jpg"><img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver7.0.4/start_use_manga_source_settings.jpg" alt="选择语种和翻译源"></a><br>① 选择语种和翻译源<br><sub>原文语种、目标语种、翻译源</sub></td>
+    <td align="center" width="33%"><a href="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver7.0.4/start_use_manga_import.jpg"><img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver7.0.4/start_use_manga_import.jpg" alt="导入图片"></a><br>② 导入图片<br><sub>支持单张、多张或整个文件夹</sub></td>
+    <td align="center" width="33%"><a href="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver7.0.4/start_use_manga_run.jpg"><img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver7.0.4/start_use_manga_run.jpg" alt="一键翻译"></a><br>③ 一键翻译<br><sub>自动识别、消字、翻译、嵌字</sub></td>
+  </tr>
+</table>
+
+<sub>点击图片可查看大图。</sub>
+
+
+## 免费与会员
+
+翻译器可以免费使用：本地 OCR、微软等翻译源、HOOK 实时翻译都无需付费。开通会员可以获得更好的识别和翻译效果，以及更多便捷功能：
+
+| 会员 | 权益 |
+| --- | --- |
+| 实时翻译会员 | 在线 OCR、团子 LLM 翻译源、HOOK 全文本翻译缓存、HOOK 云共享译文一键加载、HOOK 译文注入游戏 |
+| 漫画翻译会员 | 漫画气泡识别、自动消除原文、自定义渲染译文、团子 LLM 翻译源 |
+
+会员可在软件内「会员权益」页面开通。
+
+
+## 帮助
+
+<p>
+  <a href="https://dango-docs-v6.ap-sh.starivercs.cn/"><img src="https://img.shields.io/badge/%F0%9F%93%96-%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B-4a90e2?style=for-the-badge" alt="使用教程"></a>
+  <a href="https://docs.qq.com/sheet/DUnRaVWRCbW9xZFVK?tab=BB08J2&no_promotion=1"><img src="https://img.shields.io/badge/%F0%9F%93%9D-%E9%97%AE%E9%A2%98%E5%8F%8D%E9%A6%88-4a90e2?style=for-the-badge" alt="问题反馈"></a>
+</p>
+
+使用中遇到问题或有功能建议，可以在问题反馈文档中提交，也可以加入交流群交流。
+
+
+## 更新日志
+
+### v7.0.4（2026/11/13）
+
+**实时翻译**
+- 新增 HOOK 译文云共享，可一键加载云端已有的游戏译文
+- 适配 ggDP、MED、BXSQ raylib、CMVS、Diesel、Totomono 引擎
+- 优化 Ren'Py、KiriKiri、CatSystem2、Unity Mono、RPG Maker MV、TyranoScript 引擎适配
+- OCR 模式和 HOOK 模式的译文语种互相独立，全量翻译与 HOOK 语种同步
+- 全量翻译界面支持调整窗口尺寸
+- 全屏置顶改为常驻开启，优化置顶判定
+- 修复贴图覆盖首次翻译时文字偏移的问题
+
+**漫画翻译**
+- 新增无字图替换消除图功能
+- 查看模式新增对照消除图和仅看消除图
+- 笔刷填涂和手动擦除新增圆形、椭圆、画圈绘制方式
+- 新增合并全部文本框功能，优化合并文本框的交互
+- 编辑框支持自定义高度
+- 新增 Ctrl+2~7 快捷键开关更多工具
+- 渲染新增采样率设置，优化渲染速度和导入速度
+- 日语识别升级为新版模型
+- 修复框选拖出图片边界时选区偏移等问题
+
+**全局**
+- 在线 AI 翻译源支持配置更多数量
+- 修复一些已知问题，优化体验
+
+历史版本的更新内容请查看 [完整更新日志](https://dango-docs.ap-sh.starivercs.cn/guide/change_log.html)。
 
 
 ## 仓库代码维护说明
 
-自 4.5.8 版本后, 团子翻译器换成了 Golang 完全重构了，因为完全换语言重写了，因此 Python 版本的代码不再更新。
-为了方便大家下载最新版本，此仓库还是会正常在首页说明里更新版本信息。
-如您有 Golang 版本的开发需求，可通过交流群直接与我沟通联系。
+本仓库的开源代码止步于 **4.5.8** 版本（Python 版本）。
 
-
-## 使用教程
-
-[翻译器使用文档教程](https://dango-docs.ap-sh.starivercs.cn/)
-
-## 安装版下载
-
-- 群文件下载: [![群号](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E4%BA%A4%E6%B5%81%E7%BE%A4-6%E7%BE%A4434137389-ff69b4)](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/qrcode_1759602480385.jpg)  
-- 官网下载: [下载地址](https://translator.dango.cloud)
-- 网盘下载: [夸克网盘](https://pan.quark.cn/s/eb5663a0edf2)
-- Github Releases: [v6.3.3](https://github.com/PantsuDango/Dango-Translator/releases/tag/Ver6.3.3)
-
-## 更新日志
-[![最新版本](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC-v6.3.3-ff69b4)]()
-[![更新时间](https://img.shields.io/badge/%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4-2026--07--26-ff69b4)]()
-
-版本号：6.3.2-6.3.3
-#### 更新时间 2026/07/26
-##### 实时翻译
-- 修复隐藏范围框时, 会导致穿透截图功能失效的问题;
-- 新增阴影字体效果, 在设置-实时翻译-显示设定里开启;
-
-##### 漫画翻译
-- 修复PDF导出可能会重复图片且变红的问题;
-- 字体大小新增"总是填满文本框"选项;
-- 样式支持给文字添加阴影效果;
-- 样式编辑栏支持按分类折叠各个选项;
-- 优化样式模板显示的列表项数量;
-- 样式模板新增支持, 按模版名称搜索;
-- 搜索替换窗新增, 只替换原文和只替换译文选项;
-- 加入状态灯显示渲染器、ppc、网络的状态;
-- 手动擦除和笔刷填涂新增右键快捷取色;
-- 新增支持给文本设置下划线和斜体;
-##### 全局
-- 移除在线AI翻译的模型列表, 模型名称直接输入;
-- 另修复了各种已知问题, 优化使用体验;
-
-
-## 原理说明
-
-### 实时翻译
-![原理说明](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/%E6%B5%81%E7%A8%8B%E5%9B%BE.png)
-### 图片翻译
-![原理说明](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver6.0.0/manga.png)
+自 4.5.8 版本之后，团子翻译器使用 Golang 完全重构，新版本主程序不再开源，本仓库的 Python 代码也不再更新。为了方便大家了解和下载最新版本，此仓库的首页说明会继续跟随版本更新。如您有 Golang 版本的开发需求，可通过交流群直接与我沟通联系。
 
 
 ## 特别鸣谢
 
-[PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)  在线&本地OCR均基于此框架搭建
+| 项目 / 成员 | 贡献 |
+| --- | --- |
+| [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR) | 在线 & 本地 OCR 均基于此框架搭建 |
+| [QPT 打包工具](https://github.com/GT-ZhangAcer/QPT) | 本地 OCR 基于此工具打包 |
+| [GT-Zhang](https://github.com/GT-ZhangAcer) | 在线 & 本地 OCR 开发过程给予了诸多帮助 |
+| [C4a15Wh](https://c4a15wh.cn) | 在线 OCR，星河云架构开发 |
+| [Cypas_Nya](https://blog.ayano.top) | 在线教程文档，星河云开发 |
+| [艾梦](https://github.com/HighCWu) | 漫画翻译 / 在线 OCR，星河云模型开发 |
 
-[QPT打包工具](https://github.com/GT-ZhangAcer/QPT)  本地OCR基于此工具打包
-
-[GT-Zhang](https://github.com/GT-ZhangAcer) 在线&本地OCR开发过程给予了诸多帮助
-
-[C4a15Wh](https://c4a15wh.cn) 在线OCR, 星河云架构开发
-
-[Cypas_Nya](https://blog.ayano.top) 在线教程文档, 星河云开发
-
-[艾梦](https://github.com/HighCWu) 漫画翻译/在线OCR, 星河云模型开发
-
-
-## 软件预览
-
-#### 使用效果
-![游戏实时翻译](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.3.6/%E4%BD%BF%E7%94%A8%E6%95%88%E6%9E%9C.png)
-![漫画翻译](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver6.0.0/manga3.jpg)
-
-#### 快速上手
-![实时翻译](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver6.0.3/%E5%AE%9E%E6%97%B6%E7%BF%BB%E8%AF%91.png)
-![漫画翻译](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver6.0.3/%E6%BC%AB%E7%94%BB%E7%BF%BB%E8%AF%91.png)
-
-#### 登录界面
-<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver6.0.0/login.jpg" width="50%" height="50%">
-#### 主界面
-<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver6.0.0/mode.jpg" width="50%" height="50%">
-
-#### 漫画翻译
-![原图](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver6.0.0/manga1.jpg)
-![编辑](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver6.0.0/manga2.jpg)
-![译图](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver6.0.0/manga3.jpg)
-
-#### 设置界面
-<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver6.0.0/setting1.jpg" width="100%" height="100%">
-<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver6.0.0/setting2.jpg" width="100%" height="100%">
-<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver6.0.0/setting3.png" width="100%" height="100%">
-<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver6.0.0/setting4.png" width="100%" height="100%">
-<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver4.3.6/%E5%A4%9A%E8%8C%83%E5%9B%B4%E5%88%87%E6%8D%A2.png" width="30%" height="30%">
-<img src="https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/Ver5.2.2/text_lib.png" width="30%" height="30%">
 
 ## 开源协议
-本项目使用GNU LESSER GENERAL PUBLIC LICENSE(LGPL)开源协议
+
+本仓库中 4.5.8 及以前版本的代码使用 [GNU LESSER GENERAL PUBLIC LICENSE (LGPL)](LICENSE) 开源协议。
