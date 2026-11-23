@@ -4,10 +4,10 @@
 
 <h1 align="center">团子翻译器</h1>
 
-<p align="center">游戏与漫画的生肉翻译软件 · OCR 实时翻译 · HOOK 游戏翻译 · 漫画一键嵌字</p>
+<p align="center">游戏与漫画的生肉翻译软件 · OCR 实时翻译 · HOOK 游戏翻译 · 实时语音翻译 · 漫画一键嵌字</p>
 
 <p align="center">
-  <a href="https://translator.dango.cloud"><img src="https://img.shields.io/badge/%E7%AB%8B%E5%8D%B3%E4%B8%8B%E8%BD%BD-v7.0.4-ff69b4?style=for-the-badge" alt="立即下载"></a>
+  <a href="https://translator.dango.cloud"><img src="https://img.shields.io/badge/%E7%AB%8B%E5%8D%B3%E4%B8%8B%E8%BD%BD-v7.1.0-ff69b4?style=for-the-badge" alt="立即下载"></a>
 </p>
 
 <p align="center">
@@ -21,10 +21,11 @@
 
 ## 简介
 
-团子翻译器是一款生肉翻译软件，提供三种翻译方式：
+团子翻译器是一款生肉翻译软件，桌面端提供四种翻译方式
 
 - **OCR 实时翻译**：框选屏幕上的任意区域，自动识别文字并翻译，游戏、视频、网页都能用
 - **HOOK 翻译**：直接读取游戏里的对话，比 OCR 更准更快；还能提前翻译整个游戏，并让游戏直接显示中文
+- **实时语音翻译**支持监听系统音频，在译文框实时显示译文
 - **漫画翻译**：导入生肉漫画，一键完成识别、翻译、消字、嵌字
 
 支持本地 / 在线 OCR，以及常规翻译、在线 AI、本地 AI 多种翻译源，账号登录后配置自动云端保存。
@@ -32,19 +33,24 @@
 
 ## 下载
 
-当前最新版本：**v7.0.4**（2026/11/13）
+当前版本：**v7.1.0**（2026/11/24）
 
-| 渠道 | 地址 |
-| --- | --- |
-| 官网 | [translator.dango.cloud](https://translator.dango.cloud) |
-| 夸克网盘 | [点击下载](https://pan.quark.cn/s/eb5663a0edf2) |
-| GitHub Releases | [v7.0.4](https://github.com/PantsuDango/Dango-Translator/releases/tag/Ver7.0.4) |
+| 渠道 | 地址                                                                                                                  |
+| --- |---------------------------------------------------------------------------------------------------------------------|
+| 官网 | [translator.dango.cloud](https://translator.dango.cloud)                                                            |
+| 夸克网盘 | [点击下载](https://pan.quark.cn/s/eb5663a0edf2)                                                                         |
+| GitHub Releases | [v7.1.0](https://github.com/PantsuDango/Dango-Translator/releases)                                                  |
 | 交流群文件 | [6 群 434137389](https://github.com/PantsuDango/ImageHub/blob/master/DangoTranslate/public/qrcode_1759602480385.jpg) |
 
 已安装旧版本的用户，打开软件后会自动提示更新。
 
 
 ## 功能介绍
+
+### 实时语音翻译
+
+- 在译文框切换到语音识别模式，开启「监听」即可实时翻译游戏、视频等播放的声音
+- 通过「监听来源」选择系统音频，也支持按应用监听
 
 ### OCR 实时翻译
 
@@ -81,7 +87,7 @@ HOOK 翻译从 7.0.0 版本开始上线，适用于 PC 端的 Galgame 和 RPG �
 </table>
 
 <details>
-<summary><b>已适配 44 个游戏引擎（点击展开）</b></summary>
+<summary><b>HOOK 引擎适配列表（50 项，点击展开）</b></summary>
 <br>
 
 <table>
@@ -96,6 +102,8 @@ HOOK 翻译从 7.0.0 版本开始上线，适用于 PC 端的 Galgame 和 RPG �
   <tr><td>DDWorks</td><td>LC-ScriptEngine</td><td>DxLib Compiled Dialogue</td><td>Abel / AST</td></tr>
   <tr><td>constructor SSF</td><td>Escu:de / ACP</td><td>MADOKA GSX</td><td>Aigis ggDP</td></tr>
   <tr><td>MED</td><td>BXSQ raylib</td><td>Nitroplus Diesel</td><td>Acquire Totomono</td></tr>
+  <tr><td>Godot</td><td>GameMaker</td><td>Unity ScenarioScript</td><td>NekoSDK 4th</td></tr>
+  <tr><td colspan="2">Unity DialogueManager</td><td colspan="2">Flutter Windows</td></tr>
 </table>
 
 </details>
@@ -111,6 +119,8 @@ HOOK 组件及其使用到的相关第三方组件源码已开源：[DangoTransl
 - 译文的字体、颜色、描边、阴影等样式都能自由调整，常用样式可保存为模板
 - 提供擦除、填涂、还原等修图工具，方便手动精修
 - 支持导出译图和 PDF
+
+**团子漫画翻译浏览器插件**支持直接在网页上批量翻译漫画，可从桌面版漫画翻译界面的「在浏览器插件使用漫画翻译」打开插件页面
 
 <table>
   <tr>
@@ -170,31 +180,32 @@ HOOK 组件及其使用到的相关第三方组件源码已开源：[DangoTransl
 
 ## 更新日志
 
-### v7.0.4（2026/11/13）
+### v7.1.0（2026/11/24）
 
 **实时翻译**
-- 新增 HOOK 译文云共享，可一键加载云端已有的游戏译文
-- 适配 ggDP、MED、BXSQ raylib、CMVS、Diesel、Totomono 引擎
-- 优化 Ren'Py、KiriKiri、CatSystem2、Unity Mono、RPG Maker MV、TyranoScript 引擎适配
-- OCR 模式和 HOOK 模式的译文语种互相独立，全量翻译与 HOOK 语种同步
-- 全量翻译界面支持调整窗口尺寸
-- 全屏置顶改为常驻开启，优化置顶判定
-- 修复贴图覆盖首次翻译时文字偏移的问题
+
+- 新增实时语音翻译模式, 支持实时翻译系统播放的声音, 可单独监听指定游戏或应用
+- 新增 Godot、GameMaker、Unity ScenarioScript、NekoSDK 4th、Unity DialogueManager、Flutter Windows 引擎适配
+- 优化 Ren’Py、KiriKiri、BGI、RPG Maker MV、TyranoScript、PJADV、Utage 引擎适配
+- 全量翻译进度改为在同一行更新, 修复下载云译文后列表和完成数量不刷新的问题
+- OCR 文本合并默认改为智能合并
+- 贴图覆盖默认开启字号自适应和鼠标穿透, 修复旧译文残留和画面不刷新的问题
 
 **漫画翻译**
-- 新增无字图替换消除图功能
-- 查看模式新增对照消除图和仅看消除图
-- 笔刷填涂和手动擦除新增圆形、椭圆、画圈绘制方式
-- 新增合并全部文本框功能，优化合并文本框的交互
-- 编辑框支持自定义高度
-- 新增 Ctrl+2~7 快捷键开关更多工具
-- 渲染新增采样率设置，优化渲染速度和导入速度
-- 日语识别升级为新版模型
-- 修复框选拖出图片边界时选区偏移等问题
+
+- 发布了团子漫画翻译浏览器插件，支持直接在浏览器上对漫画批量翻译
+- 新增"在浏览器插件使用漫画翻译"入口
+- 优化自动字号, 译文放不下时可选择缩小文字, 或保留字号并自动扩大文本框
+- 优化文本框尺寸调整, 修复拖动一侧时其他边偏移的问题
+- 原文编辑框新增分行开关, 支持保留原文换行或合并显示
+- 样式模板支持重命名, 局部样式支持 Ctrl+/ 快速应用
+- 统一右键菜单样式并汉化
+- 优化大图识别和擦除, 减少处理失败和选区错位
+- 修复异常超长译文可能导致渲染卡住的问题
 
 **全局**
-- 在线 AI 翻译源支持配置更多数量
-- 修复一些已知问题，优化体验
+
+- 优化登录、注册和找回密码界面
 
 历史版本的更新内容请查看 [完整更新日志](https://dango-docs.ap-sh.starivercs.cn/guide/change_log.html)。
 
