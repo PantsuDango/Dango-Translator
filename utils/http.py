@@ -14,18 +14,12 @@ def post(url, body, logger, headers=None, timeout=5) :
     }
     result = {}
 
-    try :
-        # 消除https警告
-        requests.packages.urllib3.disable_warnings()
-    except Exception :
-        pass
-
     response = None
     try :
         if headers :
-            response = requests.post(url, headers=headers, data=json.dumps(body), proxies=proxies, verify=False, timeout=timeout)
+            response = requests.post(url, headers=headers, data=json.dumps(body), proxies=proxies, verify=True, timeout=timeout)
         else :
-            response = requests.post(url, data=json.dumps(body), proxies=proxies, verify=False, timeout=timeout)
+            response = requests.post(url, data=json.dumps(body), proxies=proxies, verify=True, timeout=timeout)
         try :
             response.encoding = "utf-8"
             result = json.loads(response.text)
@@ -100,7 +94,7 @@ def getOCR(url) :
     proxies = {"http": None, "https": None}
     start = time.time()
     try :
-        res = requests.get(url, proxies=proxies, verify=False, timeout=3)
+        res = requests.get(url, proxies=proxies, verify=True, timeout=3)
         time_diff = time.time() - start
         status_code = res.status_code
     except Exception :

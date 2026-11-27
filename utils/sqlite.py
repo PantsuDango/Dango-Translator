@@ -130,15 +130,18 @@ def selectTranslationDBList(src, tgt, limit, offset, logger) :
     try :
         if src :
             if tgt :
-                sql = '''SELECT id, trans_type, src, tgt FROM translations WHERE src LIKE '%{}%' AND tgt LIKE '%{}%' ORDER BY id DESC LIMIT ? OFFSET ?;'''.format(src, tgt)
+                sql = '''SELECT id, trans_type, src, tgt FROM translations WHERE src LIKE ? AND tgt LIKE ? ORDER BY id DESC LIMIT ? OFFSET ?;'''
+                cursor = TRANSLATION_DB.execute(sql, (f'%{src}%', f'%{tgt}%', limit, offset))
             else :
-                sql = '''SELECT id, trans_type, src, tgt FROM translations WHERE src LIKE '%{}%' ORDER BY id DESC LIMIT ? OFFSET ?;'''.format(src)
+                sql = '''SELECT id, trans_type, src, tgt FROM translations WHERE src LIKE ? ORDER BY id DESC LIMIT ? OFFSET ?;'''
+                cursor = TRANSLATION_DB.execute(sql, (f'%{src}%', limit, offset))
         else:
             if tgt :
-                sql = '''SELECT id, trans_type, src, tgt FROM translations WHERE tgt LIKE '%{}%' ORDER BY id DESC LIMIT ? OFFSET ?;'''.format(tgt)
+                sql = '''SELECT id, trans_type, src, tgt FROM translations WHERE tgt LIKE ? ORDER BY id DESC LIMIT ? OFFSET ?;'''
+                cursor = TRANSLATION_DB.execute(sql, (f'%{tgt}%', limit, offset))
             else :
                 sql = '''SELECT id, trans_type, src, tgt FROM translations ORDER BY id DESC LIMIT ? OFFSET ?;'''
-        cursor = TRANSLATION_DB.execute(sql, (limit, offset))
+                cursor = TRANSLATION_DB.execute(sql, (limit, offset))
         rows = cursor.fetchall()
         cursor.close()
     except Exception :
@@ -233,15 +236,18 @@ def selectTranslationDBTotal(src, tgt, logger) :
     try :
         if src :
             if tgt :
-                sql = '''SELECT count(*) FROM translations WHERE src LIKE '%{}%' AND tgt LIKE '%{}%';'''.format(src, tgt)
+                sql = '''SELECT count(*) FROM translations WHERE src LIKE ? AND tgt LIKE ?;'''
+                cursor = TRANSLATION_DB.execute(sql, (f'%{src}%', f'%{tgt}%'))
             else :
-                sql = '''SELECT count(*) FROM translations WHERE src LIKE '%{}%';'''.format(src)
+                sql = '''SELECT count(*) FROM translations WHERE src LIKE ?;'''
+                cursor = TRANSLATION_DB.execute(sql, (f'%{src}%',))
         else :
             if tgt :
-                sql = '''SELECT count(*) FROM translations WHERE tgt LIKE '%{}%';'''.format(tgt)
+                sql = '''SELECT count(*) FROM translations WHERE tgt LIKE ?;'''
+                cursor = TRANSLATION_DB.execute(sql, (f'%{tgt}%',))
             else :
                 sql = '''SELECT count(*) FROM translations;'''
-        cursor = TRANSLATION_DB.execute(sql)
+                cursor = TRANSLATION_DB.execute(sql)
         result = cursor.fetchone()[0]
         cursor.close()
     except Exception :
